@@ -1,0 +1,15 @@
+-- 机构表中缺少 UNITMANAGER 字段
+alter table F_UNITINFO add UNITMANAGER varchar2(32);
+
+insert into F_UNITINFO
+(UNITCODE, PARENTUNIT, UNITTYPE, ISVALID, UNITTAG,
+UNITNAME, ENGLISHNAME, DEPNO, UNITDESC, ADDRBOOKID,
+UNITSHORTNAME, UNITWORD, UNITGRADE, UNITORDER, UPDATEDATE,
+CREATEDATE, EXTJSONINFO, CREATOR, UPDATOR, UNITPATH)
+values
+('U00001', null, 'N', 'T', null,
+'根机构', 'root', null, '根机构', null,
+'root', null, null, 1, sysdate,
+sysdate, null, 'u0000000', 'u0000000', '/U00001');
+
+commit;
