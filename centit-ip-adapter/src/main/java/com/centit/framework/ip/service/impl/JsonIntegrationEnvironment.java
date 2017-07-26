@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by codefan on 17-7-3.
  */
-public class StaticIntegrationEnvironment implements IntegrationEnvironment {
+public class JsonIntegrationEnvironment implements IntegrationEnvironment {
     private List<OsInfo> osInfos;
     private List<DatabaseInfo> databaseInfos;
     private List<UserAccessToken> accessTokens;

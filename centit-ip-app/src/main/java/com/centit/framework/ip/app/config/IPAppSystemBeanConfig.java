@@ -8,7 +8,7 @@ import com.centit.framework.ip.app.service.impl.IntegrationEnvironmentProxy;
 import com.centit.framework.ip.app.service.impl.PlatformEnvironmentProxy;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.ip.service.impl.JdbcIntegrationEnvironment;
-import com.centit.framework.ip.service.impl.StaticIntegrationEnvironment;
+import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
 import com.centit.framework.listener.InitialWebRuntimeEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitPasswordEncoder;
@@ -137,7 +137,7 @@ public class IPAppSystemBeanConfig implements EnvironmentAware {
                 staticIntegrationEnvironment = jdbcIntegrationEnvironment;
             }
         } else{
-            IntegrationEnvironment jsonIntegrationEnvironment = new StaticIntegrationEnvironment();
+            IntegrationEnvironment jsonIntegrationEnvironment = new JsonIntegrationEnvironment();
             jsonIntegrationEnvironment.reloadIPEnvironmen();
             if(ipEnable==null || !ipEnable) {
                 return jsonIntegrationEnvironment;
