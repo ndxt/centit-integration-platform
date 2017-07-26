@@ -78,12 +78,12 @@
 
     <scm>
         <connection>
-            scm:git:https://github.com/ndxt/centit-framework.git
+            scm:git:https://github.com/ndxt/centit-integration-platform.git
         </connection>
         <developerConnection>
-            scm:git:https://github.com/ndxt/centit-framework.git
+            scm:git:https://github.com/ndxt/centit-integration-platform.git
         </developerConnection>
-        <url>https://github.com/ndxt/centit-framework</url>
+        <url>https://github.com/ndxt/centit-integration-platform</url>
         <tag>v1.12</tag>
     </scm>
 
