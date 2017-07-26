@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>centit-ip-app</artifactId>
+    <name>com.centit.framework:centit-ip-app</name>
+    <description>先腾集成平台应用，所有的要集成的项目都要依赖这个app开发。先腾有所有的服务工具也都是依赖这个应用开发</description>
 
     <dependencies>
 

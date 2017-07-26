@@ -10,6 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>centit-ip-adapter</artifactId>
+    <name>com.centit.framework:centit-ip-adapter</name>
+    <description>南大先腾集成平台适配器，为了将应用可以从集成平台的业务中迁移到独立的服务中做适配。
+    </description>
 
     <dependencies>
         <dependency>
@@ -17,6 +20,6 @@
             <artifactId>framework-core</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
-</dependencies>
+    </dependencies>
 
 </project>
