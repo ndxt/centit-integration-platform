@@ -89,7 +89,7 @@ public class IPAppSystemBeanConfig implements EnvironmentAware {
                 staticPlatformEnvironment = jdbcPlatformEnvironment;
             }
         } else{
-            StaticPlatformEnvironment jsonPlatformEnvironment = new StaticPlatformEnvironment();
+            JsonPlatformEnvironment jsonPlatformEnvironment = new JsonPlatformEnvironment();
             jsonPlatformEnvironment.setPasswordEncoder(passwordEncoder);
             jsonPlatformEnvironment.init();
             if(ipEnable==null || !ipEnable) {
