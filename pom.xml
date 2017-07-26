@@ -10,7 +10,9 @@
     <modules>
         <module>centit-cas</module>
         <module>centit-ip</module>
-        <module>centit-ip-client</module>
+        <module>centit-ip-app</module>
+        <module>centit-ip-adapter</module>
+        <module>centit-ip-app-demo</module>
     </modules>
     <packaging>pom</packaging>
 

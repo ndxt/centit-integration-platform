@@ -37,7 +37,7 @@
 		<property name="defaultFailureUrl" value="/system/mainframe/login/error"></property>
     </bean>
      
-    <bean id="ajaxSuccessHandler" class="com.centit.product.ip.security.IpAuthenticationSuccessHandler">
+    <bean id="ajaxSuccessHandler" class="com.centit.framework.ip.security.IpAuthenticationSuccessHandler">
     </bean>
     
 	<bean id="casFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
@@ -75,7 +75,7 @@
 	    <property name="key" value="product-ip" />
 	</bean>
 	<!-- an_id_for_this_auth_provider_only
-	<bean id="proxyGrantingTicketStorage" class="org.jasig.cas.client.proxy.ProxyGrantingTicketStorageImpl" /> 
+	<bean id="proxyGrantingTicketStorage" class="org.jasig.cas.app.proxy.ProxyGrantingTicketStorageImpl" />
 	 -->             
   	<security:authentication-manager alias="authenticationManager">
 		<security:authentication-provider ref="casAuthenticationProvider" /> 

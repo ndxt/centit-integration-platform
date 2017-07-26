@@ -162,7 +162,7 @@
     <!--<filter>-->
     <!--<filter-name>compressionFilter</filter-name>-->
     <!--<filter-class>-->
-    <!--com.centit.core.web.filter.GZIPFilter-->
+    <!--com.centit.po.web.filter.GZIPFilter-->
     <!--</filter-class>-->
     <!--</filter>-->
 
@@ -184,7 +184,7 @@
     <!--
          <filter>
          <filter-name>cacheFilter</filter-name>
-         <filter-class>com.centit.core.web.filter.CacheFilter</filter-class>
+         <filter-class>com.centit.po.web.filter.CacheFilter</filter-class>
          </filter>
 
          <filter-mapping>

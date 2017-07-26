@@ -82,7 +82,7 @@
 		<property name="writeLog" value="false" />
     </bean>
      
-    <bean id="ajaxSuccessHandler" class="com.centit.product.ip.security.IpAuthenticationSuccessHandler">
+    <bean id="ajaxSuccessHandler" class="com.centit.framework.ip.security.IpAuthenticationSuccessHandler">
     	<property name="writeLog" value="true" />
     </bean>
  

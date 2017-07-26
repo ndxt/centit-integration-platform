@@ -95,7 +95,7 @@ public class CentitAuthenticationHandler extends AbstractJdbcUsernamePasswordAut
     @Override
     protected HandlerResult authenticateUsernamePasswordInternal(
             UsernamePasswordCredential usernamePasswordCredential, String s) throws GeneralSecurityException, PreventedException {
-        if (StringUtils.isBlank(this.sql) || getJdbcTemplate() == null) {
+       /* if (StringUtils.isBlank(this.sql) || getJdbcTemplate() == null) {
             throw new GeneralSecurityException("Authentication handler is not configured correctly");
         }
 
@@ -121,7 +121,8 @@ public class CentitAuthenticationHandler extends AbstractJdbcUsernamePasswordAut
             }
         } catch (final DataAccessException e) {
             throw new PreventedException("SQL exception while executing query for " + username, e);
-        }
+        }*/
+        return null;
     }
 
     @Override

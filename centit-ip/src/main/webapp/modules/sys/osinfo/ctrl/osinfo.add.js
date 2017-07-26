@@ -1,6 +1,6 @@
 define(function(require) {
-	var Core = require('core/core');
-	var Page = require('core/page');
+	var Core = require('po/po');
+	var Page = require('po/page');
 	var Config = require('config');
 	
 	// 新增角色信息
