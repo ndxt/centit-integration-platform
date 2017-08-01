@@ -47,9 +47,22 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apereo.cas</groupId>
+            <artifactId>cas-server-support-oauth-webflow</artifactId>
+            <version>${cas.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-utils</artifactId>
             <version>${centit.commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
