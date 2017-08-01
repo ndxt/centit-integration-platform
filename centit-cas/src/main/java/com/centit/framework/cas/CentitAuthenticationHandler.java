@@ -6,12 +6,10 @@ import org.apereo.cas.services.ServicesManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.Map;
 
-@Component("centitAuthenticationHandler")
 public class CentitAuthenticationHandler extends QueryDatabaseAuthenticationHandler {
 
 
