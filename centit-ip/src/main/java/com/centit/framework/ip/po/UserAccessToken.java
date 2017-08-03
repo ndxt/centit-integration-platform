@@ -1,14 +1,9 @@
 package com.centit.framework.ip.po;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "F_USER_ACCESS_TOKEN")
@@ -22,7 +17,7 @@ public class UserAccessToken implements java.io.Serializable {
     @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String tokenId;
     
-    @Column(name = "USERCODE")
+    @Column(name = "USER_CODE")
     private String userCode;
     
     @Column(name = "SECRET_ACCESS_KEY")

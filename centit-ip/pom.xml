@@ -16,13 +16,18 @@
     <dependencies>
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-hibernate</artifactId>
+            <artifactId>framework-persistence-hibernate</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>framework-sys-view-easyui</artifactId>
-            <version>${centit.ui.version}</version>
+            <artifactId>framework-system-module</artifactId>
+            <version>${centit.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-system-view-easyui</artifactId>
+            <version>${centit.framework.version}</version>
         </dependency>
 
 

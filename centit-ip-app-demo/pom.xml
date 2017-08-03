@@ -11,6 +11,7 @@
 
     <artifactId>centit-ip-app-demo</artifactId>
     <name>com.centit.framework:centit-ip-app-demo</name>
+    <packaging>war</packaging>
     <description>先腾集成平台应用开发示例</description>
 
     <dependencies>
