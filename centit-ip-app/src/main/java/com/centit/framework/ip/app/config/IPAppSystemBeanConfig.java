@@ -2,6 +2,7 @@ package com.centit.framework.ip.app.config;
 
 import com.centit.framework.config.H2Config;
 import com.centit.framework.config.RedisConfig;
+import com.centit.framework.config.WebBeanConfig;
 import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
 import com.centit.framework.ip.app.service.impl.IntegrationEnvironmentProxy;
@@ -17,10 +18,10 @@ import com.centit.framework.security.model.CentitSessionRegistry;
 import com.centit.framework.security.model.MemorySessionRegistryImpl;
 import com.centit.framework.staticsystem.config.SpringSecurityCasConfig;
 import com.centit.framework.staticsystem.config.SpringSecurityDaoConfig;
-import com.centit.framework.staticsystem.service.impl.*;
+import com.centit.framework.staticsystem.service.impl.JdbcPlatformEnvironment;
+import com.centit.framework.staticsystem.service.impl.JsonPlatformEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
@@ -30,19 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-@PropertySource("classpath:system.properties")
-@Import({RedisConfig.class, H2Config.class, SpringSecurityDaoConfig.class, SpringSecurityCasConfig.class})
+@Import({RedisConfig.class, H2Config.class, WebBeanConfig.class,
+        SpringSecurityDaoConfig.class, SpringSecurityCasConfig.class})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @Lazy
-public class IPAppSystemBeanConfig implements EnvironmentAware {
+public class IPAppSystemBeanConfig {
 
     @Autowired
     private Environment env;
-
-    @Override
-    public void setEnvironment(final Environment environment) {
-        this.env = environment;
-    }
 
     @Bean
     public PersistenceExceptionTranslationPostProcessor persistenceExceptionTranslationPostProcessor() {

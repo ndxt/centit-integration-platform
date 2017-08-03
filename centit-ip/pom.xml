@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>centit-ip</artifactId>
+    <packaging>war</packaging>
     <name>com.centit.framework:centit-ip</name>
     <description>先腾集成平台，统一管理用户和主数据并提供http接口</description>
 
