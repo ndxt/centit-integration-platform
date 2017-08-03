@@ -8,8 +8,9 @@
         <version>0.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>centit-ip</artifactId>
+    <packaging>war</packaging>
+
     <name>com.centit.framework:centit-ip</name>
     <description>先腾集成平台，统一管理用户和主数据并提供http接口</description>
 
@@ -80,4 +81,18 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 </project>
