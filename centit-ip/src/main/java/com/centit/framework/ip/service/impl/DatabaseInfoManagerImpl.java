@@ -38,10 +38,10 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
     }
 
 	@Override
-	public Serializable saveNewObject(DatabaseInfo databaseInfo) {
+	public void saveNewObject(DatabaseInfo databaseInfo) {
 		if(null==databaseInfo.getDatabaseCode())
 			databaseInfo.setDatabaseCode(baseDao.getNextKey());
-		return baseDao.saveNewObject(databaseInfo);
+		baseDao.saveNewObject(databaseInfo);
 	}
 
 	@Override

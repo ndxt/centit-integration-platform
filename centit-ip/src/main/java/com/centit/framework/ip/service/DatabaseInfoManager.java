@@ -1,22 +1,21 @@
 package com.centit.framework.ip.service;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-
 import com.centit.framework.core.service.BaseEntityManager;
 import com.centit.framework.ip.po.DatabaseInfo;
 
+import java.util.List;
+import java.util.Map;
+
 public interface DatabaseInfoManager extends BaseEntityManager<DatabaseInfo,String> {
-    public boolean connectionTest(DatabaseInfo databaseInfo);
+    boolean connectionTest(DatabaseInfo databaseInfo);
 
-    public List<DatabaseInfo> listDatabase();
-    
-    public Serializable saveNewObject(DatabaseInfo databaseInfo);
-    
-    public void mergeObject(DatabaseInfo databaseInfo);
-    
-	public String getNextKey();
+    List<DatabaseInfo> listDatabase();
 
-	public Map<String, DatabaseInfo> listObjectToDBRepo();
+    void saveNewObject(DatabaseInfo databaseInfo);
+    
+    void mergeObject(DatabaseInfo databaseInfo);
+    
+	String getNextKey();
+
+	Map<String, DatabaseInfo> listObjectToDBRepo();
 }
