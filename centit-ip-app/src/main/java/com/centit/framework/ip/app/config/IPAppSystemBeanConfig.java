@@ -1,8 +1,5 @@
 package com.centit.framework.ip.app.config;
 
-import com.centit.framework.config.H2Config;
-import com.centit.framework.config.RedisConfig;
-import com.centit.framework.config.WebBeanConfig;
 import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
 import com.centit.framework.ip.app.service.impl.IntegrationEnvironmentProxy;
@@ -16,13 +13,14 @@ import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.security.model.CentitPasswordEncoderImpl;
 import com.centit.framework.security.model.CentitSessionRegistry;
 import com.centit.framework.security.model.MemorySessionRegistryImpl;
-import com.centit.framework.staticsystem.config.SpringSecurityCasConfig;
-import com.centit.framework.staticsystem.config.SpringSecurityDaoConfig;
 import com.centit.framework.staticsystem.service.impl.JdbcPlatformEnvironment;
 import com.centit.framework.staticsystem.service.impl.JsonPlatformEnvironment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.context.annotation.*;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
@@ -30,15 +28,18 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration
-@Import({RedisConfig.class, H2Config.class, WebBeanConfig.class,
-        SpringSecurityDaoConfig.class, SpringSecurityCasConfig.class})
+@PropertySource("classpath:system.properties")
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @Lazy
-public class IPAppSystemBeanConfig {
+public class IPAppSystemBeanConfig  implements EnvironmentAware{
 
-    @Autowired
+
     private Environment env;
+
+    @Override
+    public void setEnvironment(final Environment environment) {
+        this.env = environment;
+    }
 
     @Bean
     public PersistenceExceptionTranslationPostProcessor persistenceExceptionTranslationPostProcessor() {
