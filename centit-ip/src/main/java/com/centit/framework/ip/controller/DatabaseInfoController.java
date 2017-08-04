@@ -1,31 +1,29 @@
 package com.centit.framework.ip.controller;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.centit.framework.core.common.JsonResultUtils;
+import com.centit.framework.core.common.ResponseMapData;
+import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageDesc;
+import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.ip.po.OsInfo;
+import com.centit.framework.ip.service.DatabaseInfoManager;
+import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.support.json.JsonPropertyUtils;
+import com.centit.support.security.DESSecurityUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.centit.framework.core.common.JsonResultUtils;
-import com.centit.framework.core.common.ResponseData;
-import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.core.dao.PageDesc;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.po.OsInfo;
-import com.centit.framework.ip.service.DatabaseInfoManager;
-import com.centit.support.json.JsonPropertyUtils;
-import com.centit.support.security.DESSecurityUtils;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/sys/database")
@@ -54,20 +52,15 @@ public class DatabaseInfoController extends BaseController {
             return;
         }
 
-        ResponseData resData = new ResponseData();
+        ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
 
         JsonResultUtils.writeResponseDataAsJson(resData, response, simplePropertyPreFilter);
     }
 
-
-
-	/**
+	/*
 	 * 新增
-	 * @param databaseinfo
-	 * @param request
-	 * @param response
 	 */
     @RequestMapping(method = {RequestMethod.POST})
     public void saveDatabaseInfo(@Valid DatabaseInfo databaseinfo,HttpServletRequest request, HttpServletResponse response) {
@@ -92,11 +85,9 @@ public class DatabaseInfoController extends BaseController {
         }     
         
     }
-    /**
+
+    /*
      * 编辑保存
-     * @param databaseCode
-     * @param databaseinfo
-     * @param response
      */
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.PUT})
     public void updateDatabaseInfo(@PathVariable String databaseCode, 

@@ -1,27 +1,15 @@
 package com.centit.framework.ip.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
-
-import com.centit.framework.ip.service.OsInfoManager;
-import com.centit.framework.ip.service.UserAccessTokenManager;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.centit.framework.core.common.JsonResultUtils;
 import com.centit.framework.core.common.ResponseData;
+import com.centit.framework.core.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.ip.service.DatabaseInfoManager;
+import com.centit.framework.ip.service.OsInfoManager;
+import com.centit.framework.ip.service.UserAccessTokenManager;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptInfo;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -29,8 +17,19 @@ import com.centit.framework.system.po.OptInfo;
 import com.centit.framework.system.po.UserSetting;
 import com.centit.framework.system.service.SysRoleManager;
 import com.centit.framework.system.service.UserSettingManager;
-import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.support.algorithm.StringBaseOpt;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 /**
  * 
  * @author codefan
@@ -323,7 +322,7 @@ public class PlatformDataController extends BaseController {
 		for(GrantedAuthority auth: userDetails.getAuthorities()){
 			userRoles.add(auth.getAuthority());
 		}
-		ResponseData resData = new  ResponseData();
+		ResponseMapData resData = new ResponseMapData();
 		resData.addResponseData("userInfo", userDetails);
 		resData.addResponseData("userRoles", userRoles);
 		resData.addResponseData("userUnits", userDetails.getUserUnits());
