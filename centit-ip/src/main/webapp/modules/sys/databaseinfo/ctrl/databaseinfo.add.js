@@ -1,6 +1,6 @@
 ﻿define(function(require) {
 //	var Core = require('po/po');
-	var Page = require('po/page');
+	var Page = require('core/page');
 	var Config = require('config');
 	
 	// 新增角色信息
@@ -14,7 +14,7 @@
 				.form('addValidation', 'databaseName', {
 					required: true,
 				    validType: {
-				    	remote: Config.ContextPath+'service/sys/database/noexists/'
+				    	remote: Config.ContextPath+'system/sys/database/noexists/'
 				    }
 				})
 				.form('disableValidation')
@@ -74,7 +74,7 @@
 			
 			if (isValid) {
 				form.form('ajax', {
-					url: Config.ContextPath + 'service/sys/database',
+					url: Config.ContextPath + 'system/sys/database',
 					method: 'post'
 				}).then(closeCallback);
 			}

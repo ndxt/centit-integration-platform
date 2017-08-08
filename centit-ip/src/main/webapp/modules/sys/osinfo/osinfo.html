@@ -1,4 +1,4 @@
-<html>
+
 <div class="easyui-panel search-body" cls="search">
 	<form>
 		<div class="search-item">
@@ -14,7 +14,7 @@
 		<a class="easyui-linkbutton btn-search" iconCls="icon-search">搜索</a>
 	</form>
 </div>
-<table url="service/sys/os"
+<table url="system/sys/os"
 	id="osinfoTable"
 	idField="osId"
 	search=".search"
@@ -50,10 +50,9 @@
 	$.parser.onComplete = function(panel) {
 		$.parser.onComplete = $.noop;
 		requirejs([
-		           '../modules/sys/osinfo/ctrl/osinfo',
+		           'modules/sys/osinfo/ctrl/osinfo'
 		          ], function(OsInfo) {
 			new OsInfo('osinfo', panel).load(panel);
 		});
 	};
 </script>
-</html>

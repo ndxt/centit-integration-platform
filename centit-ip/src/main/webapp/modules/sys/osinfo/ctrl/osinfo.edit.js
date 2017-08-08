@@ -1,6 +1,6 @@
 define(function(require) {
-	var Core = require('po/po');
-	var Page = require('po/page');
+	var Core = require('core/core');
+	var Page = require('core/page');
 	var Config = require('config');
 	var OsInfoAdd = require('./osinfo.add');
 	
@@ -12,7 +12,7 @@ define(function(require) {
 		this.load = function(panel, data) {
 			var form = panel.find('form');
 			
-			Core.ajax(Config.ContextPath + 'service/sys/os/' + data.osId, {
+			Core.ajax(Config.ContextPath + 'system/sys/os/' + data.osId, {
 				method: 'get'
 			}).then(
 				function(data) {
@@ -36,7 +36,7 @@ define(function(require) {
 			
 			if (isValid) {
 				form.form('ajax', {
-					url: Config.ContextPath + 'service/sys/os/' + data.osId,
+					url: Config.ContextPath + 'system/sys/os/' + data.osId,
 					method: 'put',
 					data: data
 				}).then(function(){

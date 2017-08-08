@@ -1,6 +1,6 @@
 define(function(require) {
-	var Core = require('po/po');
-	var Page = require('po/page');
+	var Core = require('core/core');
+	var Page = require('core/page');
 	var Config = require('config');
 	
 	// 新增角色信息
@@ -15,7 +15,7 @@ define(function(require) {
 				.form('addValidation', 'osId', {
 					required: true,
 				    validType: {
-				    	remote: Config.ContextPath+'service/sys/os/noexists/'
+				    	remote: Config.ContextPath+'system/sys/os/noexists/'
 				    }
 				})
 				.form('disableValidation')
@@ -30,7 +30,7 @@ define(function(require) {
 			
 			if (isValid) {
 				form.form('ajax', {
-					url: Config.ContextPath + 'service/sys/os',
+					url: Config.ContextPath + 'system/sys/os',
 					method: 'post'
 					
 				}).then(ClosecallBack);

@@ -2,7 +2,6 @@ package com.centit.framework.ip.config;
 
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
-import com.centit.framework.system.config.SystemBeanConfig;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -27,6 +26,10 @@ public class WebInitializer implements WebApplicationInitializer {
 
         initializeSpringMvcConfig(servletContext);
 
+        WebConfig.registerSpringSecurityFilter(servletContext);
+
+        WebConfig.registerSpringSessionRepositoryFilter(servletContext);
+
         WebConfig.registerRequestContextListener(servletContext);
 
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
@@ -41,7 +44,6 @@ public class WebInitializer implements WebApplicationInitializer {
 
         WebConfig.registerRequestThreadLocalFilter(servletContext);
 
-        WebConfig.registerSpringSecurityFilter(servletContext);
     }
 
     /**
@@ -50,7 +52,7 @@ public class WebInitializer implements WebApplicationInitializer {
      */
     private void initializeSpringConfig(ServletContext servletContext){
         AnnotationConfigWebApplicationContext springContext = new AnnotationConfigWebApplicationContext();
-        springContext.register(SystemBeanConfig.class, ServiceConfig.class);
+        springContext.register(ServiceConfig.class);
         servletContext.addListener(new ContextLoaderListener(springContext));
     }
 

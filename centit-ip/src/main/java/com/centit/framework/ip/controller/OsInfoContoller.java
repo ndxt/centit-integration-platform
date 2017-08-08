@@ -26,7 +26,6 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/sys/os")
-
 public class OsInfoContoller extends  BaseController {
 
     @Resource

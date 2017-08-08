@@ -1,6 +1,6 @@
 define(function(require) {
-	var Core = require('po/po');
-	var Page = require('po/page');
+	var Core = require('core/core');
+	var Page = require('core/page');
 	var Config = require('config');
 	
 	// 删除数据字典
@@ -8,7 +8,7 @@ define(function(require) {
 		
 		// @override
 		this.submit = function(table, data) {
-			Core.ajax(Config.ContextPath+'service/sys/os/'+data.osId, {
+			Core.ajax(Config.ContextPath+'system/sys/os/'+data.osId, {
             	type: 'json',
                 method: 'post',
                 data: {

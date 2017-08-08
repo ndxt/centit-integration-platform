@@ -1,6 +1,6 @@
 ﻿define(function(require) {
-	var Core = require('po/po');
-	var Page = require('po/page');
+	var Core = require('core/core');
+	var Page = require('core/page');
 	var Config = require('config');
 	var DatabaseInfoAdd = require('../ctrl/databaseinfo.add');
 	
@@ -11,7 +11,7 @@
 		// @override
 		this.load = function(panel, data) {
 			var form = panel.find('form');
-			Core.ajax(Config.ContextPath + 'service/sys/database/' + data.databaseCode, {
+			Core.ajax(Config.ContextPath + 'system/sys/database/' + data.databaseCode, {
             	type: 'json',
                 method: 'get',
 			}).then(function(data) {
@@ -37,13 +37,13 @@
 			//value.dataDesc=value.dataDesc.replace(/\&/g,"%26");
 			$.extend(data,value,{_method:'put',contentType:'application/json'});
 			if (isValid) {
-				Core.ajax(Config.ContextPath + 'service/sys/database/' + data.databaseCode, {
+				Core.ajax(Config.ContextPath + 'system/sys/database/' + data.databaseCode, {
 	            	type: 'json',
 	            	method:'POST',
 	            	data:data
 				}).then(closeCallback);
 				/*form.form('ajax', {
-					url: Config.ContextPath + 'service/sys/database/' + data.databaseCode,
+					url: Config.ContextPath + 'system/sys/database/' + data.databaseCode,
 					method: 'put',
 					data: data,
 				})*/
