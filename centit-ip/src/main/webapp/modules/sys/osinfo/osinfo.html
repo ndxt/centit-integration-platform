@@ -1,8 +1,8 @@
 
 <div class="easyui-panel search-body" cls="search">
-	<form>
+	<form id="osinfoform">
 		<div class="search-item">
-			<label>业务系统Id</label>
+			<label>业务系统ID</label>
 			<input type="text" class="easyui-textbox" name="s_osId" />
 		</div>
 		
@@ -12,6 +12,9 @@
 		</div>
 		
 		<a class="easyui-linkbutton btn-search" iconCls="icon-search">搜索</a>
+		<a class="easyui-linkbutton" style="margin-top:8px;" iconcls="icon-reload" onclick="javascript:$('#osinfoform').form('clear');$('.defaultChecked').prop('checked','true');" group="" id="">
+			<p>重置</p>
+		</a>
 	</form>
 </div>
 <table url="system/sys/os"
@@ -25,7 +28,7 @@
 			<th data-options="field:'osId'" width="10%" sortable="true">业务系统ID</th>
 			<th data-options="field:'osName'" width="10%" sortable="true">业务系统名称</th>
 			<th data-options="field:'osUrl'" width="25%" sortable="true">业务系统URL</th>
-			<th data-options="field:'ddeSyncUrl'" width="25%" sortable="true">数据同步接口url</th>
+			<th data-options="field:'ddeSyncUrl'" width="25%" sortable="true">数据同步接口URL</th>
 			<th data-options="field:'sysDataPushOption'" width="10%" sortable="true">推送数据选项</th>
 			<th data-options="field:'lastModifyDate'" width="10%" sortable="true" align="center">更新时间</th>
 			<th data-options="field:'created'" width="10%" sortable="true" align="center" format='User'>创建人员</th>

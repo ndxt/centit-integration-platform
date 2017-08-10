@@ -1,11 +1,14 @@
 ﻿<html>
 <div class="easyui-panel search-body" cls="search">
-	<form>
+	<form id="databaseinfoform">
 		<div class="search-item">
-			<label>数据库标识</label>
+			<label>数据库名</label>
 			<input type="text" class="easyui-textbox" name="s_databaseName" />
 		</div>
 		<a class="easyui-linkbutton btn-search" iconCls="icon-search">搜索</a>
+		<a class="easyui-linkbutton" style="margin-top:8px;" iconcls="icon-reload" onclick="javascript:$('#databaseinfoform').form('clear');$('.defaultChecked').prop('checked','true');" group="" id="">
+			<p>重置</p>
+		</a>
 	</form>
 </div>
 <table url="system/sys/database"
@@ -18,7 +21,7 @@
 		<tr>
 			<th data-options="field:'databaseCode'" hidden="true">数据库标识</th>
 			<th data-options="field:'databaseName'" width="15%" >数据库名</th>
-			<th data-options="field:'databaseUrl'" width="30%"  align="center">数据库连接url</th>
+			<th data-options="field:'databaseUrl'" width="30%"  align="center">数据库连接URL</th>
 			<th data-options="field:'username'" width="10%"  align="center">用户名</th>
 			<th data-options="field:'osId'" width="20%"  align="center">业务系统名称</th>
 			<th data-options="field:'createTime'" width="15%" sortable="true" align="center">创建时间</th>

@@ -10,7 +10,7 @@
 		<div class="field">
 			<label>业务系统</label>
 			<input class="easyui-combobox" name="osId" panelHeight="auto"
-					url="/service/sys/os?pageNo=1&pageSize=100" method="get"
+					url="system/sys/os?pageNo=1&pageSize=100" method="get"
 					data-options="valueField:'osId',textField:'osName',loadFilter:function(data){return data.objList;}">
 		</div>
 	</div>
@@ -26,7 +26,7 @@
 	</div>
 		
 	<div class="field" required>
-		<label>数据库连接url</label>
+		<label>数据库连接URL</label>
 		<input type="text"  name="databaseUrl" class="easyui-textbox"  id="databaseUrl" />
 	</div>
 	

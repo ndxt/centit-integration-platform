@@ -8,7 +8,7 @@
 		
 		// @override
 		this.load = function(panel) {
-			form = panel.find('form');
+			var form = panel.find('form');
 			
 			form.form('load', this.object)
 				.form('addValidation', 'databaseName', {
