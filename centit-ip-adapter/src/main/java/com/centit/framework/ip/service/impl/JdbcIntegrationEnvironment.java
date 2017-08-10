@@ -12,6 +12,8 @@ import com.centit.support.database.DatabaseAccess;
 import com.centit.support.database.DbcpConnectPools;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,6 +24,8 @@ import java.util.List;
  * Created by codefan on 17-7-3.
  */
 public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
+
+    private Logger logger = LoggerFactory.getLogger(JdbcIntegrationEnvironment.class);
 
     private List<OsInfo> osInfos;
     private List<DatabaseInfo> databaseInfos;
@@ -41,10 +45,8 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
         if(conn!=null){
             try {
                 conn.close();
-                //conn = null;
             } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("关闭连接出错",e);
             }
         }
     }
@@ -61,6 +63,7 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
             databaseInfos = new ArrayList<>();
             accessTokens = new ArrayList<>();
             e.printStackTrace();
+            logger.error("加载集成数据出错",e);
             return false;
         }
     }

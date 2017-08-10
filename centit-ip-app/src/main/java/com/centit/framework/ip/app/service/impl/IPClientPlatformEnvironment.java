@@ -14,6 +14,8 @@ import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HttpExecutor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.ConfigAttribute;
@@ -29,8 +31,9 @@ import java.util.Map;
  * @author codefan
  *
  */
-public class IPClientPlatformEnvironment implements PlatformEnvironment
-{
+public class IPClientPlatformEnvironment implements PlatformEnvironment {
+
+	private Logger logger = LoggerFactory.getLogger(IPClientPlatformEnvironment.class);
 
 	private String topOptId;
 
@@ -140,6 +143,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment
 					JSON.toJSONString(userInfo), true);
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error("获取httpClient出错",e);
 		} finally {
 			if(httpClient!=null)
 				appSession.releaseHttpClient(httpClient);
@@ -161,6 +165,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment
 			return StringRegularOpt.isTrue(sret);
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error("获取httpClient出错",e);
 			return false;
 		} finally {
 			if(httpClient!=null)

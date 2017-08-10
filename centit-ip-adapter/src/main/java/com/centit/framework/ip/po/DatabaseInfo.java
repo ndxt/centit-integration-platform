@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class DatabaseInfo implements  Serializable {
     private static final long serialVersionUID = 1L;
-    public static String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF"; 
+    public static final String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
 
     private String databaseCode;
     private String osId;

@@ -23,10 +23,16 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Autowired(required = false)
     private MessageSender innerMessageManager;
 
+    /*@Autowired
+    @NotNull
+    private SysRoleManager sysRoleManager;*/
+
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event)
     {
+        //sysRoleManager.loadRoleSecurityMetadata();
+
         if(innerMessageManager!=null)
             notificationCenter.registerMessageSender("innerMsg", innerMessageManager);
         if(optLogManager!=null)

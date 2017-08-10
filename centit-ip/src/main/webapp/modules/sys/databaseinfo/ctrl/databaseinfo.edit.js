@@ -13,7 +13,7 @@
 			var form = panel.find('form');
 			Core.ajax(Config.ContextPath + 'system/sys/database/' + data.databaseCode, {
             	type: 'json',
-                method: 'get',
+                method: 'get'
 			}).then(function(data) {
 				
 				_self.data = $.extend(_self.object, data);

@@ -10,6 +10,8 @@ import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -21,6 +23,8 @@ import java.util.List;
  * Created by codefan on 17-7-3.
  */
 public class JsonIntegrationEnvironment implements IntegrationEnvironment {
+
+    private Logger logger = LoggerFactory.getLogger(JsonIntegrationEnvironment.class);
     private List<OsInfo> osInfos;
     private List<DatabaseInfo> databaseInfos;
     private List<UserAccessToken> accessTokens;
@@ -44,9 +48,10 @@ public class JsonIntegrationEnvironment implements IntegrationEnvironment {
             accessTokens = (List<UserAccessToken>)JSON.parseArray(json.getString("userAccessTokens"),
                     UserAccessToken.class);
         } catch (IOException e) {
-            osInfos = new ArrayList<OsInfo>();
-            databaseInfos = new ArrayList<DatabaseInfo>();
+            osInfos = new ArrayList<>();
+            databaseInfos = new ArrayList<>();
             e.printStackTrace();
+            logger.error("加载集成数据出错",e);
         }
         return true;
     }

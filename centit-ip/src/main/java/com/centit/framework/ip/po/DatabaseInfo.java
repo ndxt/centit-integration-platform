@@ -1,26 +1,20 @@
 package com.centit.framework.ip.po;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import com.centit.framework.core.po.EntityWithTimestamp;
+import com.centit.support.security.DESSecurityUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Length;
 
-import com.centit.framework.core.po.EntityWithTimestamp;
-import com.centit.support.security.DESSecurityUtils;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
 
 
 @Entity
 @Table(name = "F_DATABASE_INFO")
 public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     private static final long serialVersionUID = 1L;
-    public static String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF"; 
+    public static final String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
     // 数据库名
     @Id
     @Column(name = "DATABASE_CODE")

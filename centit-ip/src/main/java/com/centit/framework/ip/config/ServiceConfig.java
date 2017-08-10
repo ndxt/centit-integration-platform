@@ -7,7 +7,6 @@ import com.centit.framework.ip.listener.InstantiationServiceBeanPostProcessor;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.system.config.SpringSecurityCasConfig;
-import com.centit.framework.system.config.SpringSecurityDaoConfig;
 import com.centit.framework.system.config.SystemBeanConfig;
 import org.springframework.context.annotation.*;
 
@@ -19,7 +18,7 @@ import org.springframework.context.annotation.*;
         excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 @Import({SystemBeanConfig.class,
         SpringSecurityCasConfig.class,
-        SpringSecurityDaoConfig.class,
+        //SpringSecurityDaoConfig.class,
         DataSourceConfig.class})
 public class ServiceConfig {
 

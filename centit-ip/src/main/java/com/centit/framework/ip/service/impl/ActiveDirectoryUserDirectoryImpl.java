@@ -1,10 +1,19 @@
 package com.centit.framework.ip.service.impl;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import com.centit.framework.ip.service.UserDirectory;
+import com.centit.framework.system.dao.UnitInfoDao;
+import com.centit.framework.system.dao.UserInfoDao;
+import com.centit.framework.system.dao.UserRoleDao;
+import com.centit.framework.system.dao.UserUnitDao;
+import com.centit.framework.system.po.*;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.naming.Context;
@@ -17,27 +26,12 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.validation.constraints.NotNull;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.centit.framework.system.dao.UnitInfoDao;
-import com.centit.framework.system.dao.UserInfoDao;
-import com.centit.framework.system.dao.UserRoleDao;
-import com.centit.framework.system.dao.UserUnitDao;
-import com.centit.framework.system.po.UnitInfo;
-import com.centit.framework.system.po.UserInfo;
-import com.centit.framework.system.po.UserRole;
-import com.centit.framework.system.po.UserRoleId;
-import com.centit.framework.system.po.UserUnit;
-import com.centit.framework.ip.service.UserDirectory;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import java.util.*;
 
 @Service("activeDirectoryUserDirectory")
 public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
+
+	private Logger logger = LoggerFactory.getLogger(ActiveDirectoryUserDirectoryImpl.class);
 
 	@Resource
     @NotNull
@@ -264,7 +258,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 			return 0;
 		}catch (NamingException e) {
 			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 			return -1;
-		}		
+		}
 	}	
 }
