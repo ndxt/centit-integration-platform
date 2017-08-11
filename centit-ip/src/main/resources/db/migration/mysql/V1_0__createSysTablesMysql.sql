@@ -944,7 +944,7 @@ where d.opt_url<>'...';
 /* View: f_v_optdef_url_map                                     */
 /*==============================================================*/
 create or replace view f_v_optdef_url_map as
-select c.opt_url || b.opt_url as opt_def_url, b.opt_req, b.opt_code
+select concat(`c`.`opt_url`,`b`.`OPT_URL`) as opt_def_url, b.opt_req, b.opt_code
 from F_OPTDEF b join F_OptInfo c
     on (b.opt_id = c.opt_id)
  where c.Opt_Type <> 'W'
