@@ -200,39 +200,41 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 					continue;
 				boolean createUser=false;
 				UserInfo userInfo = userInfoDao.getUserByLoginName(loginName);
-				if(userInfo==null){
-					userInfo = new UserInfo();
-					userInfo.setUserCode(userInfoDao.getNextKey());
-					userInfo.setLoginName(loginName);
-					userInfo.setIsValid("T");
-					userInfo.setCreateDate(now);
-					createUser = true;
-					String regEmail = getAttributeString(attrs,"mail");
-					if(StringUtils.isNoneBlank(regEmail)){
-						if(regEmail.length() <40 && userInfoDao.getUserByRegEmail(regEmail)==null)
-							userInfo.setRegEmail(regEmail);
-					}
-                    String regCellPhone = getAttributeString(attrs,"mobilePhone");
-					if(StringUtils.isNoneBlank(regCellPhone)){
-						if(regCellPhone.length() <15 && userInfoDao.getUserByRegCellPhone(regCellPhone)==null)
-							userInfo.setRegCellPhone(regCellPhone);
-					}
-                    String idCardNo = getAttributeString(attrs,"idCard");
-					if(StringUtils.isNoneBlank(idCardNo)){
-						if(idCardNo.length() <20 && userInfoDao.getUserByIdCardNo(idCardNo)==null)
-							userInfo.setIdCardNo(idCardNo);
-					}
-                    String userWord = getAttributeString(attrs,"jobNo");
-					if(StringUtils.isNoneBlank(userWord)){
-						if(userWord.length() <20 && userInfoDao.getUserByUserWord(userWord)==null)
-							userInfo.setUserWord(userWord);
-					}
+				if(userInfo==null) {
+                    userInfo = new UserInfo();
+                    userInfo.setUserCode(userInfoDao.getNextKey());
+                    userInfo.setIsValid("T");
+                    userInfo.setLoginName(loginName);
+                    userInfo.setCreateDate(now);
+                    createUser = true;
 				}
-				
+                String regEmail = getAttributeString(attrs,"mail");
+                if(StringUtils.isNoneBlank(regEmail)){
+                    if(regEmail.length() <60 && userInfoDao.getUserByRegEmail(regEmail)==null)
+                        userInfo.setRegEmail(regEmail);
+                }
+                String regCellPhone = getAttributeString(attrs,"mobilePhone");
+                if(StringUtils.isNoneBlank(regCellPhone)){
+                    if(regCellPhone.length() <15 && userInfoDao.getUserByRegCellPhone(regCellPhone)==null)
+                        userInfo.setRegCellPhone(regCellPhone);
+                }
+                String idCardNo = getAttributeString(attrs,"idCard");
+                if(StringUtils.isNoneBlank(idCardNo)){
+                    if(idCardNo.length() <20 && userInfoDao.getUserByIdCardNo(idCardNo)==null)
+                        userInfo.setIdCardNo(idCardNo);
+                }
+                String userWord = getAttributeString(attrs,"jobNo");
+                if(StringUtils.isNoneBlank(userWord)){
+                    if(userWord.length() <20 && userInfoDao.getUserByUserWord(userWord)==null)
+                        userInfo.setUserWord(userWord);
+                }
 				userInfo.setUserTag(getAttributeString(attrs,"distinguishedName"));
 				userInfo.setUserName(userName);				
 				userInfo.setUpdateDate(now);
-				userInfoDao.mergeObject(userInfo);
+                if(createUser)
+                    userInfoDao.saveNewObject(userInfo);
+                else
+                    userInfoDao.mergeObject(userInfo);
 			
 				if(createUser && StringUtils.isNoneBlank(this.defaultUserRole)){
 					UserRole role = new UserRole(
