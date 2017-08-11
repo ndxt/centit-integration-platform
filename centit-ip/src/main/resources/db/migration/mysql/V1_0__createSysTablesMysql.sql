@@ -523,6 +523,7 @@ create table F_USERINFO
    USER_PWD             varchar(20) comment '如果需要可以有',
    pwd_Expired_Time     datetime,
    REG_CELL_PHONE       varchar(15),
+   ID_CARD_NO           varchar(20),
    primary_Unit         varchar(32),
    user_Word            varchar(100) comment '微信号',
    user_Order           numeric(4,0),
