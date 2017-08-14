@@ -22,10 +22,6 @@ CREATE TABLE F_DATABASE_INFO  (
    CREATED            VARCHAR(8),
  PRIMARY KEY (DATABASE_CODE)
 );
-ALTER TABLE F_DATABASE_INFO
-   ADD CONSTRAINT FK_D_DATABA_REFERENCE_F_OS_INF FOREIGN KEY (OS_ID)
-      REFERENCES F_OS_INFO (OS_ID);
-	  
 	  
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
 values ('OS_INFO', '集成业务系统', 'SYSCONF', 'modules/sys/osinfo/osinfo.html', '/service/sys/os', null, 'O', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-gear', null, null, null, null,'u0000000','u0000000');
