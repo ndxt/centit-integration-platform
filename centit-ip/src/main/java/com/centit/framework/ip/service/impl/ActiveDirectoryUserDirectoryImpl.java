@@ -31,7 +31,7 @@ import java.util.*;
 @Service("activeDirectoryUserDirectory")
 public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 
-	private Logger logger = LoggerFactory.getLogger(ActiveDirectoryUserDirectoryImpl.class);
+	private static Logger logger = LoggerFactory.getLogger(ActiveDirectoryUserDirectoryImpl.class);
 
 	@Resource
     @NotNull
@@ -50,16 +50,16 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     private UserInfoDao userInfoDao;
 
     @Value("${userdirectory.ldap.url}")
-    private String ldapUrl;// = "LDAP://192.168.128.5:389";
+    private String ldapUrl;
 
 	@Value("${userdirectory.ldap.username}")
-	private String ldapUser;// = "accounts@centit.com";
+	private String ldapUser;
 	
 	@Value("${userdirectory.ldap.userpassword}")
-    private String ldapUserPwd;// = "yhs@yhs1";//password
+    private String ldapUserPwd;
     
 	@Value("${userdirectory.ldap.searchbase}")
-    private String searchBase;// = "CN=Users,DC=centit,DC=com";
+    private String searchBase;
  
 	
 	@Value("${userdirectory.default.rank:'YG'}")
@@ -135,6 +135,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     	try {
 			return StringBaseOpt.objectToString(attr.get());
 		} catch (NamingException e) {
+			logger.error(e.getMessage(), e);
 			return null;
 		}
     }
@@ -157,7 +158,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 			LdapContext ctx = new InitialLdapContext(env, null);
 			SearchControls searchCtls = new SearchControls();
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			Map<String,UnitInfo> allUnits = new HashMap<String,UnitInfo>();
+			Map<String,UnitInfo> allUnits = new HashMap<>();
 			String searchFilter = "(objectCategory=group)";// 
 			String returnedAtts[] = {"name","description","distinguishedName","managedBy"};
 			searchCtls.setReturningAttributes(returnedAtts);
@@ -186,7 +187,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 				allUnits.put(distinguishedName, unitInfo);
 			}			
 	
-			searchFilter = "(&(objectCategory=person)(objectClass=user))";//"(objectCategory=group)";// 
+			searchFilter = "(&(objectCategory=person)(objectClass=user))";//"(objectCategory=group)"
 			String userReturnedAtts[] = {"memberOf","displayName","sAMAccountName",
 					"mail","distinguishedName"};
 			searchCtls.setReturningAttributes(userReturnedAtts);
@@ -274,7 +275,6 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 			ctx.close();
 			return 0;
 		}catch (NamingException e) {
-			e.printStackTrace();
 			logger.error(e.getMessage(),e);
 			return -1;
 		}
