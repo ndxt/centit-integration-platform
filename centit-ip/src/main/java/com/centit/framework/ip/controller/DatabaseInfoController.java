@@ -9,6 +9,7 @@ import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.support.database.DataSourceDescription;
 import com.centit.support.json.JsonPropertyUtils;
 import com.centit.support.security.DESSecurityUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -77,13 +78,37 @@ public class DatabaseInfoController extends BaseController {
         databaseInfoMag.mergeObject(databaseinfo);
 
 
-        databaseinfo.setPassword(DESSecurityUtils.decryptBase64String(databaseinfo.getPassword(),DatabaseInfo.DESKEY));
-        if (databaseInfoMag.connectionTest(databaseinfo)) {
+//        databaseinfo.setPassword(DESSecurityUtils.decryptBase64String(databaseinfo.getPassword(),DatabaseInfo.DESKEY));
+//        if (databaseInfoMag.connectionTest(databaseinfo)) {
         	JsonResultUtils.writeBlankJson(response);
-        } else {
-        	JsonResultUtils.writeErrorMessageJson("数据库连接测试失败", response);
-        }     
+//        } else {
+//        	JsonResultUtils.writeErrorMessageJson("数据库连接测试失败", response);
+//        }
         
+    }
+
+    /**
+     * 连接测试
+     * @param databaseInfo
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "testConnect", method = {RequestMethod.GET})
+    public void testConnect(@Valid DatabaseInfo databaseInfo,HttpServletRequest request, HttpServletResponse response) {
+
+
+        boolean result = DataSourceDescription.testConntect(new DataSourceDescription(
+                databaseInfo.getDatabaseUrl(),
+                databaseInfo.getUsername(),
+                databaseInfo.getPassword()));
+
+        if (result) {
+//        	JsonResultUtils.writeCodeAndMessageJson(200,"连接测试成功",response);
+        	JsonResultUtils.writeSingleDataJson("连接测试成功",response);
+        } else {
+        	JsonResultUtils.writeErrorMessageJson("数据库连接测试失败！", response);
+        }
+
     }
 
     /*

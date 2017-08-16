@@ -33,11 +33,28 @@
 </table>
 
 <div class="temp-toolbar">
-	<a iconCls="icon-add" href="/modules/sys/databaseinfo/databaseinfo-info.html" trigger="none"
-		target="dialog" rel="databaseinfo_add" title="新增数据库" width="550" height="430" btnValue="添加">新增</a>
+	<a iconCls="icon-add"
+	   href="/modules/sys/databaseinfo/databaseinfo-info.html"
+	   trigger="none"
+	   target="dialog"
+	   rel="databaseinfo_add"
+	   title="新增数据库"
+	   width="550"
+	   height="430"
+	   btnValue="添加"
+	   buttons="[{method:'testConnect',text:'连接测试'},{method:'submit',text:'添加'},{method:'close',text:'取消'}]"
+	>新增</a>
 		
-	<a iconCls="icon-edit" href="/modules/sys/databaseinfo/databaseinfo-info.html" trigger="single"
-		target="dialog" rel="databaseinfo_edit" title="编辑 {{databaseName}} 数据库" width="550" height="430" btnValue="更新">编辑</a>
+	<a iconCls="icon-edit"
+       href="/modules/sys/databaseinfo/databaseinfo-info.html"
+       trigger="single"
+		target="dialog"
+       rel="databaseinfo_edit"
+       title="编辑 {{databaseName}} 数据库"
+       width="550" height="430"
+       btnValue="更新"
+       buttons="[{method:'testConnect',text:'连接测试'},{method:'submit',text:'更新'},{method:'close',text:'取消'}]"
+    >编辑</a>
 		
 	<hr>
 	

@@ -86,6 +86,27 @@
 		this.onClose = function(table, data) {
 			table.datagrid('reload');
 		};
+
+		this.close = function(panel, data,closeCallback){
+            closeCallback();
+        }
+
+		this.testConnect = function(panel, data) {
+			var form = panel.find('form');
+
+			var isValid = form.form('enableValidation').form('validate');
+
+			if (isValid) {
+				form.form('ajax', {
+					url: Config.ContextPath + 'system/sys/database/testConnect',
+					method: 'get'
+				}).then(function (data) {
+                    $.messager.alert('成功','连接测试成功！','info');
+                });
+			}
+
+			return false;
+		}
        
 	});
 	return DatabaseInfoAdd;
