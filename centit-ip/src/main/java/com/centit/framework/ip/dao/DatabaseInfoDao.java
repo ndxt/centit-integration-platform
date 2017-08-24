@@ -1,25 +1,24 @@
 package com.centit.framework.ip.dao;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.centit.framework.ip.po.DatabaseInfo;
-import org.springframework.stereotype.Repository;
-
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
+import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.support.database.DataSourceDescription;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo,String> {
 
     public Map<String, String> getFilterField() {
         if (filterField == null) {
-            filterField = new HashMap<String, String>();
+            filterField = new HashMap<>();
 
-            filterField.put("databaseName", CodeBook.EQUAL_HQL_ID);
+            filterField.put("databaseName", CodeBook.LIKE_HQL_ID);
 
             filterField.put("databaseNames", CodeBook.EQUAL_HQL_ID);
 
