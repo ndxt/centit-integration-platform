@@ -4,7 +4,7 @@ import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.hibernate.dao.BaseDaoImpl;
 import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.support.database.DataSourceDescription;
+import com.centit.support.database.utils.DataSourceDescription;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;

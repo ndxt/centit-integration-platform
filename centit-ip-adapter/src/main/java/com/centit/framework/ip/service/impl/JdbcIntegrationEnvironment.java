@@ -6,16 +6,16 @@ import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.support.database.DBConnect;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DatabaseAccess;
-import com.centit.support.database.DbcpConnectPools;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.DbcpConnectPools;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
 
     private DataSourceDescription dataSource;
 
-    private DBConnect getConnection() throws SQLException {
+    private Connection getConnection() throws SQLException {
         return DbcpConnectPools.getDbcpConnect(dataSource);
     }
 
@@ -41,7 +41,7 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
         this.dataSource = new DataSourceDescription( connectURI,  username,  pswd);
     }
 
-    public void close(DBConnect conn){
+    public void close(Connection conn){
         if(conn!=null){
             try {
                 conn.close();
@@ -79,7 +79,7 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
 
         CodeRepositoryUtil.loadExtendedSqlMap("ExtendedSqlMap.xml");
 
-        try(DBConnect conn = getConnection()) {
+        try(Connection conn = getConnection()) {
             JSONArray userJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
                     CodeRepositoryUtil.getExtendedSql("LIST_ALL_OS"));
             osInfos = jsonArrayToObjectList(userJSONArray, OsInfo.class);

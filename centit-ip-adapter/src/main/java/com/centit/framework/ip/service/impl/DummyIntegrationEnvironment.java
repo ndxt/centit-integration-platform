@@ -1,23 +1,11 @@
 package com.centit.framework.ip.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.SysParametersUtils;
-import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
-import com.centit.framework.ip.po.UserAccessToken;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.support.database.DBConnect;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DatabaseAccess;
-import com.centit.support.database.DbcpConnectPools;
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.DocumentException;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
