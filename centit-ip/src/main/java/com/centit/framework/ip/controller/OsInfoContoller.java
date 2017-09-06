@@ -1,10 +1,9 @@
 package com.centit.framework.ip.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.ObjectException;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.ip.po.OsInfo;
@@ -65,7 +64,8 @@ public class OsInfoContoller extends  BaseController {
     @RequestMapping(method = {RequestMethod.POST})
     public void saveOsInfo(@Valid OsInfo osinfo,HttpServletRequest request, HttpServletResponse response) {
         if (osinfo == null) {
-        	throw new ObjectException("对象不能为空");            
+            JsonResultUtils.writeErrorMessageJson("对象不能为空", response);
+            return;
         }
         
     	CentitUserDetails userInfo = super.getLoginUser(request);
