@@ -892,7 +892,7 @@ SELECT a.unit_code AS top_unit_code,  b.unit_code,b.unit_type, b.parent_unit, b.
 
  
  create or replace view F_V_Opt_Role_Map as
-select c.opt_url || b.opt_url as opt_url, b.opt_req, a.role_code, c.opt_id, b.opt_code
+select concat(`c`.`opt_url`,`b`.`OPT_URL`) as opt_url, b.opt_req, a.role_code, c.opt_id, b.opt_code
   from F_ROLEPOWER a
   join F_OPTDEF b
     on (a.opt_code = b.opt_code)
