@@ -1,9 +1,10 @@
 package com.centit.framework.ip.dao;
 
 import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
-import com.centit.framework.hibernate.dao.DatabaseOptUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.DataSourceDescription;
 import org.springframework.stereotype.Repository;
 
@@ -57,8 +58,15 @@ public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo,String> {
 		DatabaseInfo dbi=this.getObjectById(databaseCode);
 		return dbi;
 	}
-	
-	public String getNextKey() {
+
+	//hibernate
+	/*public String getNextKey() {
 		return DatabaseOptUtils.getNextKeyBySequence(this, "S_DATABASECODE", 10);
+	}*/
+
+	//jdbc
+	public String getNextKey() {
+		return StringBaseOpt.fillZeroForString(
+		        String.valueOf(DatabaseOptUtils.getSequenceNextValue(this, "S_DATABASECODE")), 10);
 	}
 }

@@ -1,9 +1,9 @@
 package com.centit.framework.ip.service;
 
-import java.util.List;
-
-import com.centit.framework.hibernate.service.BaseEntityManager;
 import com.centit.framework.ip.po.UserAccessToken;
+import com.centit.framework.jdbc.service.BaseEntityManager;
+
+import java.util.List;
 
 public interface UserAccessTokenManager extends BaseEntityManager<UserAccessToken,String> {
   

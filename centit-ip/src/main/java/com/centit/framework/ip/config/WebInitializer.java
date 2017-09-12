@@ -2,7 +2,6 @@ package com.centit.framework.ip.config;
 
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
-import com.centit.framework.hibernate.config.HibernateWebConfig;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -24,29 +23,16 @@ public class WebInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
 
         initializeSpringConfig(servletContext);
-
         initializeSpringMvcConfig(servletContext);
-
         WebConfig.registerSpringSecurityFilter(servletContext);
-
         WebConfig.registerSpringSessionRepositoryFilter(servletContext);
-
         WebConfig.registerRequestContextListener(servletContext);
-
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
-
         WebConfig.registerResponseCorsFilter(servletContext);
-
         WebConfig.registerCharacterEncodingFilter(servletContext);
-
         WebConfig.registerHttpPutFormContentFilter(servletContext);
-
         WebConfig.registerHiddenHttpMethodFilter(servletContext);
-
         WebConfig.registerRequestThreadLocalFilter(servletContext);
-
-        HibernateWebConfig.registerOpenSessionInViewFilter(servletContext);
-
     }
 
     /**

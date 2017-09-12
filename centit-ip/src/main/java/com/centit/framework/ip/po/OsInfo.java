@@ -1,17 +1,13 @@
 package com.centit.framework.ip.po;
 
-import java.util.Date;
+import com.centit.framework.core.po.EntityWithTimestamp;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.validator.constraints.Length;
-
-import com.centit.framework.core.po.EntityWithTimestamp;
+import java.util.Date;
 
 @Entity
 @Table(name = "F_OS_INFO")
@@ -21,8 +17,8 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
 
     @Id
     @Column(name = "OS_ID")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+//    @GeneratedValue(generator = "assignedGenerator")
+//    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String osId;
     
     @Column(name = "OS_NAME")

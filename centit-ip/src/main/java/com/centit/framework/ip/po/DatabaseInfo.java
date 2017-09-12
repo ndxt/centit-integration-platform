@@ -2,10 +2,12 @@ package com.centit.framework.ip.po;
 
 import com.centit.framework.core.po.EntityWithTimestamp;
 import com.centit.support.security.DESSecurityUtils;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,8 +20,8 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     // 数据库名
     @Id
     @Column(name = "DATABASE_CODE")
-    @GeneratedValue(generator = "assignedGenerator")
-    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+//    @GeneratedValue(generator = "assignedGenerator")
+//    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String databaseCode;
     
     @Column(name = "OS_ID")

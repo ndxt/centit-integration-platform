@@ -1,6 +1,8 @@
 package com.centit.framework.ip.service;
-import com.centit.framework.hibernate.service.BaseEntityManager;
+
+import com.centit.framework.core.dao.PageDesc;
 import com.centit.framework.ip.po.DatabaseInfo;
+import com.centit.framework.jdbc.service.BaseEntityManager;
 
 import java.util.List;
 import java.util.Map;
@@ -17,4 +19,7 @@ public interface DatabaseInfoManager extends BaseEntityManager<DatabaseInfo,Stri
 	String getNextKey();
 
 	Map<String, DatabaseInfo> listObjectToDBRepo();
+
+    List<DatabaseInfo> listObjects(Map<String, Object> map);
+    List<DatabaseInfo> listObjects(Map<String, Object> map, PageDesc pageDesc);
 }

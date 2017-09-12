@@ -1,13 +1,12 @@
 package com.centit.framework.ip.dao;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.ip.po.UserAccessToken;
+import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import org.springframework.stereotype.Repository;
 
-import com.centit.framework.core.dao.CodeBook;
-import com.centit.framework.hibernate.dao.BaseDaoImpl;
+import java.util.HashMap;
+import java.util.Map;
 
 @Repository
 public class UserAccessTokenDao extends BaseDaoImpl<UserAccessToken,String> {
