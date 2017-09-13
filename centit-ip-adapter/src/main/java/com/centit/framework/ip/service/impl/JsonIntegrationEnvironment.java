@@ -29,18 +29,23 @@ public class JsonIntegrationEnvironment implements IntegrationEnvironment {
     private List<DatabaseInfo> databaseInfos;
     private List<UserAccessToken> accessTokens;
 
+
+    private static String loadJsonStringFormConfigFile(String fileName) throws IOException {
+        String jsonFile = SysParametersUtils.getConfigHome()+ fileName;
+        if(FileSystemOpt.existFile(jsonFile)) {
+            return FileIOOpt.readStringFromFile(jsonFile,"UTF-8");
+        }else{
+
+            return FileIOOpt.readStringFromInputStream(
+                    new ClassPathResource(fileName).getInputStream(),"UTF-8");
+
+        }
+    }
+
     @Override
     public boolean reloadIPEnvironmen() {
         try {
-            String jsonFile = SysParametersUtils.getConfigHome()+"/ip_environmen.json";
-            if(!FileSystemOpt.existFile(jsonFile)){
-                FileSystemOpt.createDirect(  SysParametersUtils.getConfigHome());
-                FileSystemOpt.fileCopy(
-                        new ClassPathResource("ip_environmen.json").getFile() ,
-                        new File(jsonFile)
-                );
-            }
-            String jsonStr = FileIOOpt.readStringFromFile(jsonFile,"UTF-8");
+            String jsonStr = loadJsonStringFormConfigFile("/ip_environmen.json");
             JSONObject json = (JSONObject) JSON.parseObject(jsonStr);
             osInfos = (List<OsInfo>)JSON.parseArray(json.getString("osInfos"), OsInfo.class);
             databaseInfos = (List<DatabaseInfo>)JSON.parseArray(json.getString("databaseInfos"),

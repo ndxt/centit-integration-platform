@@ -2,6 +2,7 @@ package com.centit.framework.ip.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.components.CodeRepositoryUtil;
+import com.centit.framework.core.dao.ExtendedQueryPool;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
@@ -77,7 +78,7 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
 
     public boolean reloadIPEnvironmenFromJdbc() throws IOException, DocumentException, SQLException {
 
-        CodeRepositoryUtil.loadExtendedSqlMap("ExtendedSqlMap.xml");
+        ExtendedQueryPool.loadResourceExtendedSqlMap(dataSource.getDbType());
 
         try(Connection conn = getConnection()) {
             JSONArray userJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
