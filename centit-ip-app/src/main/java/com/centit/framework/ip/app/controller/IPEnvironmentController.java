@@ -1,7 +1,6 @@
 package com.centit.framework.ip.app.controller;
 
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.ip.service.IntegrationEnvironment;
