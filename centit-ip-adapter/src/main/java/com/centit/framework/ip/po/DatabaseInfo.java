@@ -1,5 +1,7 @@
 package com.centit.framework.ip.po;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.support.security.AESSecurityUtils;
 import com.centit.support.security.DESSecurityUtils;
 
 import java.io.Serializable;
@@ -189,11 +191,17 @@ public class DatabaseInfo implements  Serializable {
         this.databaseDesc = null;
         this.created = null;
         this.createTime = null;
-    }   
-    
+    }
+
+    @JSONField(serialize = false)
     public String getClearPassword(){
-    	return DESSecurityUtils.decryptBase64String(
+    	return AESSecurityUtils.decryptBase64String(
     			getPassword(),DatabaseInfo.DESKEY);
+    }
+
+    public void setClearPassword(String clearPassword){
+        this.password = AESSecurityUtils.encryptAndBase64(
+                clearPassword, DatabaseInfo.DESKEY);
     }
 
 }

@@ -1,7 +1,8 @@
 package com.centit.framework.ip.po;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.po.EntityWithTimestamp;
-import com.centit.support.security.DESSecurityUtils;
+import com.centit.support.security.AESSecurityUtils;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
@@ -37,6 +38,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     @Column(name = "USERNAME")
     @Length(max = 100, message = "字段长度不能大于{max}")
     private String username;
+
     @Column(name = "PASSWORD")
     @Length(max = 100, message = "字段长度不能大于{max}")
     private String password;
@@ -217,11 +219,15 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
         this.createTime = null;
     }
 
-   
-    
+
+    @JSONField(serialize = false)
     public String getClearPassword(){
-    	return DESSecurityUtils.decryptBase64String(
-    			getPassword(),DatabaseInfo.DESKEY);
+        return AESSecurityUtils.decryptBase64String(
+                getPassword(),DatabaseInfo.DESKEY);
     }
 
+    public void setClearPassword(String clearPassword){
+        this.password = AESSecurityUtils.encryptAndBase64(
+                clearPassword, DatabaseInfo.DESKEY);
+    }
 }
