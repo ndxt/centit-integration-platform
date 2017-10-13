@@ -1,6 +1,6 @@
 package com.centit.framework.ip.service.impl;
 
-import com.centit.framework.core.dao.PageDesc;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.dao.DatabaseInfoDao;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
