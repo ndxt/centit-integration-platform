@@ -65,7 +65,7 @@ public class DatabaseInfoController extends BaseController {
         JsonResultUtils.writeResponseDataAsJson(resData, response, simplePropertyPreFilter);
     }
 
-	/**
+	/*
 	 * 新增
 	 */
     @RequestMapping(method = {RequestMethod.POST})
@@ -93,12 +93,11 @@ public class DatabaseInfoController extends BaseController {
 
     /**
      * 连接测试
-     * @param databaseInfo
-     * @param request
-     * @param response
+     * @param databaseInfo 数据库信息
+     * @param response 返回
      */
     @RequestMapping(value = "testConnect", method = {RequestMethod.GET})
-    public void testConnect(@Valid DatabaseInfo databaseInfo,HttpServletRequest request, HttpServletResponse response) {
+    public void testConnect(@Valid DatabaseInfo databaseInfo, HttpServletResponse response) {
 
 
         boolean result = DataSourceDescription.testConntect(new DataSourceDescription(
@@ -114,7 +113,7 @@ public class DatabaseInfoController extends BaseController {
 
     }
 
-    /**
+    /*
      * 编辑保存
      */
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.PUT})
