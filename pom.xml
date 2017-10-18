@@ -6,7 +6,7 @@
 
     <groupId>com.centit.framework</groupId>
     <artifactId>centit-integration-platform</artifactId>
-    <version>1.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <modules>
         <module>centit-cas</module>
         <module>centit-ip</module>
@@ -18,11 +18,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.ip.version>1.0</centit.ip.version>
+        <centit.ip.version>1.0.1-SNAPSHOT</centit.ip.version>
         <jdk.version>1.8</jdk.version>
-        <centit.framework.version>4.0.1</centit.framework.version>
-        <centit.commons.version>2.2.4</centit.commons.version>
-        <centit.ui.version>3.0.1</centit.ui.version>
+
+        <centit.framework.version>4.0.2-SNAPSHOT</centit.framework.version>
+        <centit.commons.version>2.2.5-SNAPSHOT</centit.commons.version>
+        <centit.persistence.version>1.0.1-SNAPSHOT</centit.persistence.version>
+        <centit.ui.version>3.0.1-SNAPSHOT</centit.ui.version>
+
         <cas.version>5.1.2</cas.version>
         <servlet-api.version>3.1.0</servlet-api.version>
 
@@ -100,25 +103,13 @@
             <name>sonatype-releases</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <name>sonatype-snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
-    <!--<distributionManagement>
-        <repository>
-            <id>centit-releases</id>
-            <name>centit-release</name>
-            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-releases/</url>
-        </repository>
         <snapshotRepository>
             <id>centit-snapshots</id>
             <name>centit-snapshots</name>
             <url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
         </snapshotRepository>
-    </distributionManagement>-->
+    </distributionManagement>
 
     <build>
         <plugins>
