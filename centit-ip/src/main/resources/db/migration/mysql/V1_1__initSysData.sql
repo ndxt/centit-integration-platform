@@ -262,25 +262,22 @@ insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CO
 values ('OPT_LOG_QUERY', '系统日志', 'SYS_CONFIG', 'modules/sys/loginfo/loginfo.html', '/system/optlog', null, 'O', null, null, 'Y', null, null, null, null, 'D', null, null, null, str_to_date('27-11-2015 11:19:09', '%d-%m-%Y %H:%i:%s'), null,'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('USER_SETTING', '设置中心', 'SYS_CONFIG', '/modules/sys/usersetting.html', '/system/usersetting', null, 'N', null, null, 'N', null, null, null, null, 'D', null, null, null, str_to_date('23-12-2014 16:52:40', '%d-%m-%Y %H:%i:%s'), str_to_date('23-12-2014 16:52:40', '%d-%m-%Y %H:%i:%s'),'u0000000','u0000000');
+values ('USER_SETTING', '设置中心', 'SYS_CONFIG', '/modules/sys/usersetting.html', '/system/usersetting', null, 'O', null, null, 'N', null, null, null, null, 'D', null, null, null, str_to_date('23-12-2014 16:52:40', '%d-%m-%Y %H:%i:%s'), str_to_date('23-12-2014 16:52:40', '%d-%m-%Y %H:%i:%s'),'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('CALENDAR', '日历', 'SYS_CONFIG', '/modules/sys/schedule/schedule.html', '/system/calendar', null, 'O', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-calendar', null, null, str_to_date('04-03-2015 09:55:31', '%d-%m-%Y %H:%i:%s'), str_to_date('04-03-2015 09:55:31', '%d-%m-%Y %H:%i:%s'),'u0000000','u0000000');
-
-insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('DEPLOY', '实施菜单', '0', '...', '...', null, 'S', null, null, 'Y', null, null, null, null, 'D', '444', null, null, str_to_date('15-12-2014 14:10:08', '%d-%m-%Y %H:%i:%s'), str_to_date('15-12-2014 14:10:08', '%d-%m-%Y %H:%i:%s'),'u0000000','u0000000');
+values ('DEPLOY', '实施菜单', '0', '...', '...', null, 'O', null, null, 'Y', null, null, null, null, 'D', '444', null, null, str_to_date('15-12-2014 14:10:08', '%d-%m-%Y %H:%i:%s'), str_to_date('15-12-2014 14:10:08', '%d-%m-%Y %H:%i:%s'),'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
 values ('SYSCONF', '系统配置', 'DEPLOY', '...', '...', null, 'O', null, null, 'Y', null, null, null, null, 'I', 'icon-base icon-base-gear', null, null, null, null,'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('DICTSET', '数据字典管理', 'SYSCONF', 'modules/sys/dictionary/dictionary.admin.html', '/system/dictionary', null, 'S', null, null, 'Y', null, null, 0, null, 'D', 'icon-base icon-base-gear', null, null, str_to_date('18-02-2016 17:48:18', '%d-%m-%Y %H:%i:%s'), null,'u0000000','u0000000');
+values ('DICTSET', '数据字典管理', 'SYSCONF', 'modules/sys/dictionary/dictionary.admin.html', '/system/dictionary', null, 'O', null, null, 'Y', null, null, 0, null, 'D', 'icon-base icon-base-gear', null, null, str_to_date('18-02-2016 17:48:18', '%d-%m-%Y %H:%i:%s'), null,'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('OPTINFO', '系统业务', 'SYSCONF', 'modules/sys/optinfo/optinfo.html', '/system/optinfo', null, 'S', null, null, 'Y', null, null, 4, null, 'D', null, null, null, str_to_date('30-01-2016 19:50:37', '%d-%m-%Y %H:%i:%s'), null,'u0000000','u0000000');
+values ('OPTINFO', '系统业务', 'SYSCONF', 'modules/sys/optinfo/optinfo.html', '/system/optinfo', null, 'O', null, null, 'Y', null, null, 4, null, 'D', null, null, null, str_to_date('30-01-2016 19:50:37', '%d-%m-%Y %H:%i:%s'), null,'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('OPTLOG', '系统日志', 'SYSCONF', 'modules/sys/loginfo/loginfo.admin.html', '/system/optlog', null, 'S', null, null, 'Y', null, null, null, null, 'D', null, null, null, null, null,'u0000000','u0000000');
+values ('OPTLOG', '系统日志', 'SYSCONF', 'modules/sys/loginfo/loginfo.admin.html', '/system/optlog', null, 'O', null, null, 'Y', null, null, null, null, 'D', null, null, null, null, null,'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
 values ('ROLEMAG', '角色定义', 'ORGMAG', 'modules/sys/roleinfo/roleinfo.html', '/system/roleinfo', null, 'O', null, null, 'Y', null, null, null, null, 'D', null, null, null, null, null,'u0000000','u0000000');
