@@ -59,15 +59,14 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
     @Transactional(readOnly = true)
 	public Map<String, DatabaseInfo> listDatabaseToDBRepo() {
 		List<DatabaseInfo> dbList=baseDao.listObjects();
-		Map<String, DatabaseInfo>dbmap=new HashMap<String, DatabaseInfo>();
-		if(dbList!=null){
-            for (DatabaseInfo db : dbList) {
+		Map<String, DatabaseInfo> dbmap = new HashMap<>();
+		if(dbList != null){
+            for(DatabaseInfo db : dbList){
             	dbmap.put(db.getDatabaseCode(),db);
             }
         }
 		return dbmap;
 	}
-
 
 	public List<DatabaseInfo> listObjects(Map<String, Object> map){
 		return baseDao.listObjects(map);

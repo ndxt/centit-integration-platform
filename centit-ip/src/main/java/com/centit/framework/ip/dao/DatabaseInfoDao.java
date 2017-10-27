@@ -9,6 +9,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -63,6 +64,9 @@ public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo,String> {
 	}
 
     public JSONArray queryDatabaseAsJson(String databaseName, PageDesc pageDesc){
+        if(StringUtils.isBlank(databaseName)){
+            return super.listObjectsAsJson(new HashMap<>(1), pageDesc);
+        }
         String matchStr = QueryUtils.getMatchString(databaseName);
         return super.listObjectsByFilterAsJson("where DATABASE_NAME like ? or DATABASE_URL like ?", new Object[]{matchStr,matchStr},pageDesc);
     }
