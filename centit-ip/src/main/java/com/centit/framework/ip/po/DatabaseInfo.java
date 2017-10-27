@@ -2,6 +2,10 @@ package com.centit.framework.ip.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.po.EntityWithTimestamp;
+import com.centit.support.database.orm.GeneratorCondition;
+import com.centit.support.database.orm.GeneratorTime;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.ValueGenerator;
 import com.centit.support.security.AESSecurityUtils;
 import org.hibernate.validator.constraints.Length;
 
@@ -46,13 +50,15 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     @Column(name = "DATABASE_DESC")
     @Length(max = 100, message = "字段长度不能大于{max}")
     private String databaseDesc;
-    
+
+    @ValueGenerator( strategy= GeneratorType.FUNCTIION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
     @Column(name = "LAST_MODIFY_DATE")
     private Date lastModifyDate;
     
     @Column(name = "CREATED")    
     private String created;
 
+    @ValueGenerator( strategy= GeneratorType.FUNCTIION, value = "now")
     @Column(name = "CREATE_TIME")
     private Date createTime;
   

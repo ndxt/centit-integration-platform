@@ -68,14 +68,17 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
 		return dbmap;
 	}
 
+	@Override
 	public List<DatabaseInfo> listObjects(Map<String, Object> map){
 		return baseDao.listObjects(map);
 	}
 
+	@Override
 	public JSONArray listDatabaseAsJson(Map<String, Object> filterMap, PageDesc pageDesc){
 	    return baseDao.listObjectsAsJson(filterMap, pageDesc);
     }
 
+	@Override
 	public JSONArray queryDatabaseAsJson(String databaseName, PageDesc pageDesc){
 		return baseDao.queryDatabaseAsJson(databaseName, pageDesc);
 	}

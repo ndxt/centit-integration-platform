@@ -71,7 +71,6 @@ public class DatabaseInfoController extends BaseController {
         //加密
       	databaseinfo.setClearPassword(databaseinfo.getPassword());
     	databaseinfo.setCreated(userInfo.getUserCode());
-        databaseinfo.setCreateTime(new Date());
         databaseInfoMag.saveNewObject(databaseinfo);
 
         JsonResultUtils.writeBlankJson(response);
