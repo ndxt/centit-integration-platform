@@ -52,6 +52,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     
     @Column(name = "CREATED")    
     private String created;
+
     @Column(name = "CREATE_TIME")
     private Date createTime;
   

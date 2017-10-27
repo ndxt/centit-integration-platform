@@ -1,10 +1,12 @@
 package com.centit.framework.ip.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
@@ -13,6 +15,7 @@ import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.json.JsonPropertyUtils;
+import com.centit.support.security.AESSecurityUtils;
 import com.centit.support.security.DESSecurityUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
@@ -41,28 +44,15 @@ public class DatabaseInfoController extends BaseController {
 	@RequestMapping(method = RequestMethod.GET)
 	public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        String[] field=null;
-        List<DatabaseInfo> listObjects = null;
-        if (null == pageDesc) {
-            listObjects = databaseInfoMag.listObjects(searchColumn);
-        } else {
-            listObjects = databaseInfoMag.listObjects(searchColumn, pageDesc);
-        }
 
-        SimplePropertyPreFilter simplePropertyPreFilter = null;
-        if (!ArrayUtils.isEmpty(field)) {
-            simplePropertyPreFilter = new SimplePropertyPreFilter(OsInfo.class, field);
-        }
-        if (null == pageDesc) {
-            JsonResultUtils.writeSingleDataJson(listObjects, response, simplePropertyPreFilter);
-            return;
-        }
+        JSONArray listObjects = databaseInfoMag.queryDatabaseAsJson(
+                StringBaseOpt.objectToString(searchColumn.get("databaseName")), pageDesc);
 
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
 
-        JsonResultUtils.writeResponseDataAsJson(resData, response, simplePropertyPreFilter);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
 	/*
@@ -78,7 +68,8 @@ public class DatabaseInfoController extends BaseController {
             return;
         }
     	CentitUserDetails userInfo = super.getLoginUser(request);
-      	databaseinfo.setPassword(DESSecurityUtils.encryptAndBase64(databaseinfo.getPassword(),DatabaseInfo.DESKEY));
+        //加密
+      	databaseinfo.setClearPassword(databaseinfo.getPassword());
     	databaseinfo.setCreated(userInfo.getUserCode());
         databaseinfo.setCreateTime(new Date());
         databaseInfoMag.saveNewObject(databaseinfo);
