@@ -15,17 +15,19 @@
 	layoutH=".search"
 	idField="databaseCode"
 	search=".search"
+	sortName="createTime"
+	sortOrder="desc"
 	toolbar=".temp-toolbar"
 	>
 	<thead data-options="frozen:true">
 		<tr>
-			<th data-options="field:'databaseCode'" hidden="true">数据库标识</th>
-			<th data-options="field:'databaseName'" width="15%" >数据库名</th>
-			<th data-options="field:'databaseUrl'" width="30%"  align="center">数据库连接URL</th>
-			<th data-options="field:'username'" width="10%"  align="center">用户名</th>
-			<th data-options="field:'osId'" width="20%"  align="center">业务系统名称</th>
+			<th data-options="field:'databaseCode'" hidden="true" sortable="true">数据库标识</th>
+			<th data-options="field:'databaseName'" width="15%" sortable="true">数据库名</th>
+			<th data-options="field:'databaseUrl'" width="30%"  align="center" sortable="true">数据库连接URL</th>
+			<th data-options="field:'username'" width="10%"  align="center" sortable="true">用户名</th>
+			<th data-options="field:'osId'" width="20%"  align="center" sortable="true">业务系统名称</th>
 			<th data-options="field:'createTime'" width="15%" sortable="true" align="center">创建时间</th>
-			<th data-options="field:'created'" width="10%"  align="center" format="User">创建人员</th>
+			<th data-options="field:'created'" width="10%"  align="center" format="User" sortable="true">创建人员</th>
 			<!-- <th data-options="field:'dataDesc'" width="8%" >数据库描述</th> -->
 		</tr>
 	</thead>
