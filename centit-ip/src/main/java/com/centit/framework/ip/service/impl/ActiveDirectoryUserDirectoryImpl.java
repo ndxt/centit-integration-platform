@@ -160,7 +160,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 			Map<String,UnitInfo> allUnits = new HashMap<>();
 			String searchFilter = "(objectCategory=group)";// 
-			String returnedAtts[] = {"name","description","distinguishedName","managedBy"};
+			String[] returnedAtts = {"name","description","distinguishedName","managedBy"};
 			searchCtls.setReturningAttributes(returnedAtts);
 			NamingEnumeration<SearchResult> answer = ctx.search(searchBase, searchFilter,searchCtls);
 			while (answer.hasMoreElements()) {
@@ -188,7 +188,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 			}			
 	
 			searchFilter = "(&(objectCategory=person)(objectClass=user))";//"(objectCategory=group)"
-			String userReturnedAtts[] = {"memberOf","displayName","sAMAccountName",
+			String[] userReturnedAtts = {"memberOf","displayName","sAMAccountName",
 					"mail","distinguishedName"};
 			searchCtls.setReturningAttributes(userReturnedAtts);
 			answer = ctx.search(searchBase, searchFilter,searchCtls);

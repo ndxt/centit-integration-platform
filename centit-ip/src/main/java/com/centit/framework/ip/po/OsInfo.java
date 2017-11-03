@@ -1,6 +1,10 @@
 package com.centit.framework.ip.po;
 
 import com.centit.framework.core.po.EntityWithTimestamp;
+import com.centit.support.database.orm.GeneratorCondition;
+import com.centit.support.database.orm.GeneratorTime;
+import com.centit.support.database.orm.GeneratorType;
+import com.centit.support.database.orm.ValueGenerator;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
@@ -41,10 +45,12 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
     @Column(name = "CREATED")
     @Length(max = 8, message = "字段长度不能大于{max}")
     private String created;
- 
+
+    @ValueGenerator( strategy= GeneratorType.FUNCTIION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
     @Column(name = "LAST_MODIFY_DATE")
     private Date lastModifyDate;
-    
+
+    @ValueGenerator( strategy= GeneratorType.FUNCTIION, value = "now")
     @Column(name = "CREATE_TIME")
     private Date createTime;
 

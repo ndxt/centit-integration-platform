@@ -1,10 +1,12 @@
 package com.centit.framework.ip.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.OsInfoManager;
@@ -38,28 +40,14 @@ public class OsInfoContoller extends  BaseController {
     @RequestMapping(method = RequestMethod.GET)
     public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = convertSearchColumn(request);
-        String[] field=null;
-        List<OsInfo> listObjects = null;
-        if (null == pageDesc) {
-            listObjects = osInfoMag.listObjects(searchColumn);
-        } else {
-            listObjects = osInfoMag.listObjects(searchColumn, pageDesc);
-        }
 
-        SimplePropertyPreFilter simplePropertyPreFilter = null;
-        if (!ArrayUtils.isEmpty(field)) {
-            simplePropertyPreFilter = new SimplePropertyPreFilter(OsInfo.class, field);
-        }
-        if (null == pageDesc) {
-            JsonResultUtils.writeSingleDataJson(listObjects, response, simplePropertyPreFilter);
-            return;
-        }
+        JSONArray listObjects = osInfoMag.listOsInfoAsJson(searchColumn, pageDesc);
 
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
 
-        JsonResultUtils.writeResponseDataAsJson(resData, response, simplePropertyPreFilter);
+        JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
     @RequestMapping(method = {RequestMethod.POST})
     public void saveOsInfo(@Valid OsInfo osinfo,HttpServletRequest request, HttpServletResponse response) {
