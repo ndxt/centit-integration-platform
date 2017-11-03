@@ -1,23 +1,17 @@
 package com.centit.framework.ip.controller;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JsonPropertyUtils;
-import com.centit.support.security.AESSecurityUtils;
-import com.centit.support.security.DESSecurityUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,8 +22,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -112,7 +104,7 @@ public class DatabaseInfoController extends BaseController {
                                    HttpServletRequest request, HttpServletResponse response) {
     	DatabaseInfo temp = databaseInfoMag.getObjectById(databaseCode);
     	if (!databaseinfo.getPassword().equals(temp.getPassword())){
-    		databaseinfo.setPassword(DESSecurityUtils.encryptAndBase64(databaseinfo.getPassword(),DatabaseInfo.DESKEY));
+    		databaseinfo.setClearPassword(databaseinfo.getPassword());
     	}
 
     	DatabaseInfo oldValue = new DatabaseInfo();

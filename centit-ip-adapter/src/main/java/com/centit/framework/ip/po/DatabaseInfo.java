@@ -2,7 +2,6 @@ package com.centit.framework.ip.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.support.security.AESSecurityUtils;
-import com.centit.support.security.DESSecurityUtils;
 
 import java.io.Serializable;
 import java.util.Date;
