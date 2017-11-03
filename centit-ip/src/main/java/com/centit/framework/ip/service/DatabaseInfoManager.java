@@ -1,5 +1,6 @@
 package com.centit.framework.ip.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.jdbc.service.BaseEntityManager;
@@ -18,8 +19,12 @@ public interface DatabaseInfoManager extends BaseEntityManager<DatabaseInfo,Stri
     
 	String getNextKey();
 
-	Map<String, DatabaseInfo> listObjectToDBRepo();
+	Map<String, DatabaseInfo> listDatabaseToDBRepo();
 
     List<DatabaseInfo> listObjects(Map<String, Object> map);
-    List<DatabaseInfo> listObjects(Map<String, Object> map, PageDesc pageDesc);
+
+    JSONArray listDatabaseAsJson(Map<String, Object> filterMap, PageDesc pageDesc);
+
+    JSONArray queryDatabaseAsJson(String databaseName, PageDesc pageDesc);
 }
+

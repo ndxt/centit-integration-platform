@@ -1,8 +1,6 @@
 package com.centit.framework.ip.app.test;
 
-import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
 import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.support.security.AESSecurityUtils;
 
 public class TestPlatSystem {

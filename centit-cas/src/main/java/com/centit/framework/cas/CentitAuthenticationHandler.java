@@ -10,6 +10,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import javax.sql.DataSource;
 import java.util.Map;
 
+/**
+ * 关于单点登录的配置说明可以看下面的文章
+ * http://blog.csdn.net/u010475041/article/details/77886765
+ */
 public class CentitAuthenticationHandler extends QueryDatabaseAuthenticationHandler {
 
 

@@ -1,5 +1,6 @@
 package com.centit.framework.ip.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.dao.DatabaseInfoDao;
 import com.centit.framework.ip.po.DatabaseInfo;
@@ -56,24 +57,30 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
 	@Override
     @Cacheable(value="DBInfo",key="'databaseMap'")
     @Transactional(readOnly = true)
-	public Map<String, DatabaseInfo> listObjectToDBRepo() {
+	public Map<String, DatabaseInfo> listDatabaseToDBRepo() {
 		List<DatabaseInfo> dbList=baseDao.listObjects();
-		Map<String, DatabaseInfo>dbmap=new HashMap<String, DatabaseInfo>();
-		if(dbList!=null){
-            for (DatabaseInfo db : dbList) {
+		Map<String, DatabaseInfo> dbmap = new HashMap<>();
+		if(dbList != null){
+            for(DatabaseInfo db : dbList){
             	dbmap.put(db.getDatabaseCode(),db);
             }
         }
 		return dbmap;
 	}
 
-
+	@Override
 	public List<DatabaseInfo> listObjects(Map<String, Object> map){
 		return baseDao.listObjects(map);
 	}
-	public List<DatabaseInfo> listObjects(Map<String, Object> map, PageDesc pageDesc){
-	    return baseDao.listObjectsByProperties(map, pageDesc);
+
+	@Override
+	public JSONArray listDatabaseAsJson(Map<String, Object> filterMap, PageDesc pageDesc){
+	    return baseDao.listObjectsAsJson(filterMap, pageDesc);
     }
-	
+
+	@Override
+	public JSONArray queryDatabaseAsJson(String databaseName, PageDesc pageDesc){
+		return baseDao.queryDatabaseAsJson(databaseName, pageDesc);
+	}
 }
 
