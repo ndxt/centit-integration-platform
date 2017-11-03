@@ -24,14 +24,14 @@ CREATE TABLE F_DATABASE_INFO  (
 );
     
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('OS_INFO', 'ºØ≥…“µŒÒœµÕ≥', 'SYSCONF', 'modules/sys/osinfo/osinfo.html', '/service/sys/os', null, 'O', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-gear', null, null, null, null,'u0000000','u0000000');
+values ('OS_INFO', 'ÈõÜÊàê‰∏öÂä°Á≥ªÁªü', 'SYSCONF', 'modules/sys/osinfo/osinfo.html', '/service/sys/os', null, 'O', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-gear', null, null, null, null,'u0000000','u0000000');
 
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
-values ('DATABASE', 'ºØ≥… ˝æ›ø‚', 'SYSCONF', 'modules/sys/databaseinfo/databaseinfo.html', '/service/sys/databaseinfo', null, 'O', null, null, 'Y', null, null, null, null, 'D', null, null, null, sysdate, null,'u0000000','u0000000');
+values ('DATABASE', 'ÈõÜÊàêÊï∞ÊçÆÂ∫ì', 'SYSCONF', 'modules/sys/databaseinfo/databaseinfo.html', '/service/sys/databaseinfo', null, 'O', null, null, 'Y', null, null, null, null, 'D', null, null, null, sysdate, null,'u0000000','u0000000');
 insert into F_OPTDEF (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_DESC, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_URL, OPT_REQ,CREATOR,UPDATOR)
-values ('1000101', 'OS_INFO', 'À˘”–»®œﬁ', 'ALL', '∏¸–¬ª˙ππ◊¥Ã¨', 'F', sysdate, null, '/*', 'CRUD','u0000000','u0000000');
+values ('1000101', 'OS_INFO', 'ÊâÄÊúâÊùÉÈôê', 'ALL', 'Êõ¥Êñ∞Êú∫ÊûÑÁä∂ÊÄÅ', 'F', sysdate, null, '/*', 'CRUD','u0000000','u0000000');
 insert into F_OPTDEF (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_DESC, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_URL, OPT_REQ,CREATOR,UPDATOR)
-values ('1000102', 'DATABASE', 'À˘”–»®œﬁ','ALL', null, null, null, null, '/°¡', 'CRUD','u0000000','u0000000');
+values ('1000102', 'DATABASE', 'ÊâÄÊúâÊùÉÈôê','ALL', null, null, null, null, '/√ó', 'CRUD','u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
   values('G-SYSADMIN','1000101',sysdate,sysdate,null,'u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
