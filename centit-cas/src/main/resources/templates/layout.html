@@ -1,14 +1,13 @@
-<!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">CAS &#8211; Central Authentication Service</title>
 
-
-    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css"/>
     <link type="text/css" rel="stylesheet" href="bootstrap/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="style.css"/>
 
     <link rel="stylesheet" th:href="@{${#themes.code('standard.custom.css.file')}}"/>
 
@@ -16,42 +15,29 @@
 
     <script type="text/javascript" src="js/zxcvbn.js"></script>
     <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="style.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>
     <script type="text/javascript" src="js/jquery.cookie.min.js"></script>
-    <script src="//www.google.com/recaptcha/api.js" async defer th:if="${recaptchaSiteKey}"></script>
-    <script src="bootstrap/bootstrap.min.js"></script>
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-
-        var trackGeoLocation = /*[[${trackGeoLocation}]]*/ === "true";
-
-        var googleAnalyticsTrackingId = /*[[${googleAnalyticsTrackingId}]]*/;
-
-        if (googleAnalyticsTrackingId != null && googleAnalyticsTrackingId != '') {
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-
-            ga('create', googleAnalyticsTrackingId, 'auto');
-            ga('send', 'pageview');
+    <style>
+        #notices {
+            display: none;
         }
-
-        /*]]>*/
-    </script>
+        .col-sm-12.col-md-6.col-md-pull-6 {
+            right: auto;
+            left: 25%;
+        }
+    </style>
 </head>
-
 <body>
-<div id="container" class="container">
-    <div th:replace="fragments/logo"/>
-    <div layout:fragment="content" id="content">
-        <h1/>
-        <p/>
-    </div>
-    <div th:replace="fragments/footer"/>
+<div class="header">
+    <span class="#title">南大先腾CAS</span>
 </div>
-<div th:insert="fragments/bottom"/>
-
+<div class="cloud1"></div>
+<div class="cloud2"></div>
+<div layout:fragment="content" id="content" style="margin-top: 100px;">
+</div>
+<div class="footer">
+    技术支持服务信息
+</div>
 </body>
 </html>
