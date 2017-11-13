@@ -46,8 +46,8 @@ insert into F_DATACATALOG (CATALOG_CODE, CATALOG_NAME, CATALOG_STYLE, CATALOG_TY
 values ('SUPPORT_LANG', '系统支持的语言', 'U', 'L', '系统支持的语言,需要在system.properties中把参数sys.multi_lang设置为true才会生效', null,  parsedatetime('25-02-2016', 'dd-MM-yyyy','en'), null, 'DICTSET', '1','u0000000','u0000000');
 
 insert into F_DATACATALOG (CATALOG_CODE, CATALOG_NAME, CATALOG_STYLE, CATALOG_TYPE, CATALOG_DESC, FIELD_DESC, UPDATE_DATE, CREATE_DATE, OPT_ID, NEED_CACHE,CREATOR,UPDATOR)
-values ('LogLevel', '日志类型', 'F', 'L', '日志类型', '日志类型', parsedatetime('07-04-2016', 'dd-MM-yyyy'), parsedatetime('07-04-2016', 'dd-MM-yyyy'), 'OptLog', '1','u0000000','u0000000');
-INSERT INTO f_datacatalog VALUES ('YesOrNo', '是否', 'S', 'L', null, null, null, null, null, '1', null, null);
+values ('LogLevel', '日志类型', 'F', 'L', '日志类型', '日志类型', str_to_date('07-04-2016', '%d-%m-%Y'), str_to_date('07-04-2016', '%d-%m-%Y'), 'OPT_LOG_QUERY', '1','u0000000','u0000000');
+INSERT INTO f_datacatalog VALUES ('YesOrNo', '是否', 'S', 'L', null, null, null, null, 'ORGMAG', '1', null, null);
 
 insert into F_DATADICTIONARY (CATALOG_CODE, DATA_CODE, EXTRA_CODE, EXTRA_CODE2, DATA_TAG, DATA_VALUE, DATA_STYLE, DATA_DESC, LAST_MODIFY_DATE, CREATE_DATE, DATA_ORDER)
 values ('MsgType', 'P', null, null, 'T', '个人消息', 'U', null, parsedatetime('25-02-2016', 'dd-MM-yyyy','en'), null, null);
