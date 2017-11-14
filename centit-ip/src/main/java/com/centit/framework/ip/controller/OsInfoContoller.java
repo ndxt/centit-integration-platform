@@ -103,6 +103,7 @@ public class OsInfoContoller extends  BaseController {
         OsInfo dbOsInfo = osInfoMag.getObjectById(osId);
 
         if (databaseInfoMag.listDatabaseByOsId(osId).size() > 0) {
+            JsonResultUtils.writeErrorMessageJson("该业务系统被集成数据库关联，不能删除！", response);
             return;
         }
 
