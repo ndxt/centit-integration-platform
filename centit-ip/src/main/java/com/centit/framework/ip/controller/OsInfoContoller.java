@@ -6,6 +6,7 @@ import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.po.OsInfo;
@@ -34,6 +35,9 @@ public class OsInfoContoller extends  BaseController {
 
     @Resource
     private OsInfoManager osInfoMag;
+
+    @Resource
+    private DatabaseInfoManager databaseInfoMag;
 
     private String optId = "OS";
 
@@ -97,11 +101,17 @@ public class OsInfoContoller extends  BaseController {
                              HttpServletRequest request, HttpServletResponse response) {
 
         OsInfo dbOsInfo = osInfoMag.getObjectById(osId);
+
+        if (databaseInfoMag.listDatabaseByOsId(osId).size() > 0) {
+            return;
+        }
+
     	osInfoMag.deleteObjectById(osId);
 
     	JsonResultUtils.writeBlankJson(response);
 
         /********************log***********************/
+
         OperationLogCenter.logDeleteObject(request, optId, osId, OperationLog.P_OPT_LOG_METHOD_D,
                 "删除业务系统", dbOsInfo);
         /********************log***********************/

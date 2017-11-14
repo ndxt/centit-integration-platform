@@ -82,5 +82,11 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
 	public JSONArray queryDatabaseAsJson(String databaseName, PageDesc pageDesc){
 		return baseDao.queryDatabaseAsJson(databaseName, pageDesc);
 	}
+
+	@Override
+	@Transactional
+	public List<DatabaseInfo> listDatabaseByOsId(String osId) {
+		return baseDao.listObjectsByProperty("osId",osId);
+	}
 }
 
