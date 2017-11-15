@@ -26,5 +26,7 @@ public interface DatabaseInfoManager extends BaseEntityManager<DatabaseInfo,Stri
     JSONArray listDatabaseAsJson(Map<String, Object> filterMap, PageDesc pageDesc);
 
     JSONArray queryDatabaseAsJson(String databaseName, PageDesc pageDesc);
+
+    List<DatabaseInfo> listDatabaseByOsId(String osId);
 }
 
