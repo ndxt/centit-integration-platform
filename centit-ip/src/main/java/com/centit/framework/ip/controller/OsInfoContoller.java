@@ -59,10 +59,7 @@ public class OsInfoContoller extends  BaseController {
             JsonResultUtils.writeErrorMessageJson("对象不能为空", response);
             return;
         }
-        
-    	CentitUserDetails userInfo = super.getLoginUser(request);
-
-        osinfo.setCreated(userInfo.getUserCode());
+        osinfo.setCreated(super.getLoginUserCode(request));
         osinfo.setCreateTime(new Date());
         osInfoMag.saveNewObject(osinfo);
 

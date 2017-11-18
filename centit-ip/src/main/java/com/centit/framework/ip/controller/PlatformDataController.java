@@ -323,9 +323,10 @@ public class PlatformDataController extends BaseController {
 			userRoles.add(auth.getAuthority());
 		}
 		ResponseMapData resData = new ResponseMapData();
-		resData.addResponseData("userInfo", userDetails);
+		resData.addResponseData("userInfo", userDetails.getUserInfo());
 		resData.addResponseData("userRoles", userRoles);
-		resData.addResponseData("userUnits", userDetails.getUserUnits());
+        resData.addResponseData("userSettings", userDetails.getUserSettings());
+		resData.addResponseData("userUnits", userDetails.getUserInfo().getUserUnits());
 		//resData.addResponseData("optList", userDetails.getUserOptList());
 		//resData.addResponseData("userSettings", userDetails.getUserSettings());
 		JsonResultUtils.writeResponseDataAsJson(resData, response);			

@@ -10,6 +10,8 @@ import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.OptTreeNode;
 import com.centit.framework.staticsystem.po.*;
+import com.centit.framework.staticsystem.security.StaticCentitUserDetails;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HttpExecutor;
 import org.apache.commons.lang3.StringUtils;
@@ -343,8 +345,22 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 		List<String> userRoles = resJson.getDataAsArray("userRoles",String.class);
 		List<UserUnit> userUnits = resJson.getDataAsArray("userUnits",UserUnit.class);
 		userInfo.setUserUnits(userUnits);
-		userInfo.setAuthoritiesByRoles(userRoles);
-		return userInfo;
+
+        StaticCentitUserDetails userDetails = new StaticCentitUserDetails(userInfo);
+        Object userSettingsObj = resJson.getData("userSettings");
+        if(userSettingsObj != null) {
+            if( userSettingsObj instanceof Map){
+                Map<String, String> userSettings = new HashMap<>();
+                Map<String, Object> userSettingsMap = ( Map<String, Object>)userSettingsObj;
+                for(Map.Entry<String, Object> ent : userSettingsMap.entrySet()){
+                    userSettings.put(ent.getKey(),
+                            StringBaseOpt.castObjectToString(ent.getValue()));
+                }
+                userDetails.setUserSettings(userSettings);
+            }
+        }
+        userDetails.setAuthoritiesByRoles(userRoles);
+		return userDetails;
 	}
 	
 	@Override

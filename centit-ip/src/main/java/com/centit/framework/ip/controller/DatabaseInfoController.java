@@ -60,10 +60,9 @@ public class DatabaseInfoController extends BaseController {
     		JsonResultUtils.writeErrorMessageJson("该数据库标识已存在", response);
             return;
         }
-    	CentitUserDetails userInfo = super.getLoginUser(request);
         //加密
       	databaseinfo.setClearPassword(databaseinfo.getPassword());
-    	databaseinfo.setCreated(userInfo.getUserCode());
+    	databaseinfo.setCreated(super.getLoginUserCode(request));
         databaseInfoMag.saveNewObject(databaseinfo);
 
         JsonResultUtils.writeBlankJson(response);
