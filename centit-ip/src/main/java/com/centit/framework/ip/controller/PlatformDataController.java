@@ -14,6 +14,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptInfo;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.OptInfo;
+import com.centit.framework.system.po.RoleInfo;
 import com.centit.framework.system.po.UserSetting;
 import com.centit.framework.system.service.SysRoleManager;
 import com.centit.framework.system.service.UserSettingManager;
@@ -318,13 +319,10 @@ public class PlatformDataController extends BaseController {
 					"没有指定的用户："+qtype+"="+queryParam, response);
 			return;
 		}
-		List<String> userRoles = new ArrayList<String>();
-		for(GrantedAuthority auth: userDetails.getAuthorities()){
-			userRoles.add(auth.getAuthority());
-		}
+
 		ResponseMapData resData = new ResponseMapData();
 		resData.addResponseData("userInfo", userDetails.getUserInfo());
-		resData.addResponseData("userRoles", userRoles);
+		resData.addResponseData("userRoles", userDetails.getUserRoles());
         resData.addResponseData("userSettings", userDetails.getUserSettings());
 		resData.addResponseData("userUnits", userDetails.getUserInfo().getUserUnits());
 		//resData.addResponseData("optList", userDetails.getUserOptList());

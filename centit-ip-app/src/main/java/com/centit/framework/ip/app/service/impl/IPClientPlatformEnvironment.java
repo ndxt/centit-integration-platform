@@ -342,7 +342,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 		if(userInfo==null)
 			return null;
 		
-		List<String> userRoles = resJson.getDataAsArray("userRoles",String.class);
+		List<RoleInfo> userRoles = resJson.getDataAsArray("userRoles",RoleInfo.class);
 		List<UserUnit> userUnits = resJson.getDataAsArray("userUnits",UserUnit.class);
 		userInfo.setUserUnits(userUnits);
 
