@@ -123,6 +123,50 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return null;
     }
 
+    @Override
+    public List<? extends IRoleInfo> listUserRolesByUserCode(String userCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IRoleInfo> value =
+                    evrnManger.listUserRolesByUserCode(userCode);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    @Override
+    public List<? extends IUserInfo> listRoleUserByRoleCode(String roleCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IUserInfo> value =
+                    evrnManger.listRoleUserByRoleCode(roleCode);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    @Override
+    public List<? extends IUserRole> listUserRoles(String userCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IUserRole> value =
+                    evrnManger.listUserRoles(userCode);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    @Override
+    public List<? extends IUserRole> listRoleUsers(String roleCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IUserRole> value =
+                    evrnManger.listRoleUsers(roleCode);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
     /**
      * 根据用户代码获取用户信息，
      *

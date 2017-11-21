@@ -6,6 +6,9 @@ import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.common.ResponseJSON;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.IRoleInfo;
+import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.model.basedata.IUserRole;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.OptTreeNode;
@@ -106,7 +109,39 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
 	}
 
-	@Override
+    @Override
+    public List<RoleInfo> listUserRolesByUserCode(String userCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/userroleinfos/"+userCode,
+                RoleInfo.class);
+    }
+
+    @Override
+    public List<UserInfo> listRoleUserByRoleCode(String roleCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/roleuserinfos/"+roleCode,
+                UserInfo.class);
+    }
+
+    @Override
+    public List<UserRole> listUserRoles(String userCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/userroles/"+userCode,
+                UserRole.class);
+    }
+
+    @Override
+    public List<UserRole> listRoleUsers(String roleCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/roleusers/"+roleCode,
+                UserRole.class);
+    }
+
+    @Override
 	public UserInfo getUserInfoByUserCode(String userCode) {
 		return RestfulHttpRequest.getResponseObject(
 				appSession,
