@@ -357,7 +357,7 @@ public class PlatformDataController extends BaseController {
 
 		ResponseMapData resData = new ResponseMapData();
 		resData.addResponseData("userInfo", userDetails.getUserInfo());
-		resData.addResponseData("userRoles", userDetails.getUserRoles());
+//		resData.addResponseData("userRoles", userDetails.getUserRoles());
         resData.addResponseData("userSettings", userDetails.getUserSettings());
 		resData.addResponseData("userUnits", userDetails.getUserInfo().getUserUnits());
 		//resData.addResponseData("optList", userDetails.getUserOptList());
