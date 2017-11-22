@@ -7,6 +7,7 @@ import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.common.ResponseJSON;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IRoleInfo;
+import com.centit.framework.model.basedata.IUnitRole;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.model.basedata.IUserRole;
 import com.centit.framework.security.model.CentitSecurityMetadata;
@@ -139,6 +140,22 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
                 appSession,
                 "/roleusers/"+roleCode,
                 UserRole.class);
+    }
+
+    @Override
+    public List<? extends IUnitRole> listUnitRoles(String unitCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/unitroles/"+unitCode,
+                IUnitRole.class);
+    }
+
+    @Override
+    public List<? extends IUnitRole> listRoleUnits(String roleCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/roleunits/"+roleCode,
+                IUnitRole.class);
     }
 
     @Override

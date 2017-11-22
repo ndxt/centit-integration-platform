@@ -272,6 +272,23 @@ public class PlatformDataController extends BaseController {
                 platformEnvironment.listRoleUserByRoleCode(roleCode),response);
     }
 
+    @RequestMapping(value = "/unitroles/{unitCode}",
+            method = RequestMethod.GET)
+    public void listUnitRoles(@PathVariable String unitCode,
+                              HttpServletResponse response) {
+
+        JsonResultUtils.writeSingleDataJson(
+                platformEnvironment.listUnitRoles(unitCode),response);
+    }
+
+    @RequestMapping(value = "/roleunits/{roleCode}",
+            method = RequestMethod.GET)
+    public void listRoleUnits(@PathVariable String roleCode,
+                              HttpServletResponse response) {
+        JsonResultUtils.writeSingleDataJson(
+                platformEnvironment.listRoleUnits(roleCode),response);
+    }
+
 	@RequestMapping(value = "/optinforepo/{appName}", 
 			method = RequestMethod.GET)
 	public void getOptInfoRepo(@PathVariable String appName,

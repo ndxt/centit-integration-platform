@@ -39,7 +39,7 @@ public class DatabaseInfoController extends BaseController {
 
 //        JSONArray listObjects = databaseInfoMag.queryDatabaseAsJson(
 //                StringBaseOpt.objectToString(searchColumn.get("databaseName")), pageDesc);
-        JSONArray listObjects = databaseInfoMag.listObjectsBySqlAsJson(searchColumn, pageDesc);
+        JSONArray listObjects = databaseInfoMag.listObjectsAsJson(searchColumn, pageDesc);
 
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);

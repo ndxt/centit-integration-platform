@@ -167,6 +167,28 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return null;
     }
 
+    @Override
+    public List<? extends IUnitRole> listUnitRoles(String unitCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IUnitRole> value =
+                    evrnManger.listUnitRoles(unitCode);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    @Override
+    public List<? extends IUnitRole> listRoleUnits(String roleCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IUnitRole> value =
+                    evrnManger.listRoleUnits(roleCode);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
     /**
      * 根据用户代码获取用户信息，
      *
