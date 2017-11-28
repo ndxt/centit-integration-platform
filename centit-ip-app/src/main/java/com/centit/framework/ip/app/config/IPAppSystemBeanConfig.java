@@ -9,12 +9,11 @@ import com.centit.framework.ip.service.impl.JdbcIntegrationEnvironment;
 import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
 import com.centit.framework.listener.InitialWebRuntimeEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.security.model.CentitPasswordEncoder;
-import com.centit.framework.security.model.CentitPasswordEncoderImpl;
-import com.centit.framework.security.model.CentitSessionRegistry;
-import com.centit.framework.security.model.MemorySessionRegistryImpl;
+import com.centit.framework.security.model.*;
 import com.centit.framework.staticsystem.service.impl.JdbcPlatformEnvironment;
 import com.centit.framework.staticsystem.service.impl.JsonPlatformEnvironment;
+import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -58,7 +57,7 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     }
 
     @Bean
-    public CentitPasswordEncoderImpl passwordEncoder() {
+    public CentitPasswordEncoder passwordEncoder() {
         return  new CentitPasswordEncoderImpl();
     }
 
@@ -119,7 +118,7 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
 
         IntegrationEnvironment staticIntegrationEnvironment=null;
 
-        Boolean jdbcEnable = env.getProperty("centit.jdbcplatform.enable", Boolean.class);// = false
+        Boolean jdbcEnable = env.getProperty("centit.jdbcplatform.ip.enable", Boolean.class);// = false
         if (jdbcEnable != null && jdbcEnable) {
             JdbcIntegrationEnvironment jdbcIntegrationEnvironment = new JdbcIntegrationEnvironment();
             jdbcIntegrationEnvironment.setDataBaseConnectInfo(
@@ -156,6 +155,13 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
         integrationEnvironment.setEvrnMangers(evrnMangers);
 
         return integrationEnvironment;
+    }
+
+    @Bean
+    public CentitUserDetailsService centitUserDetailsService(@Autowired PlatformEnvironment platformEnvironment) {
+        UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl();
+        userDetailsService.setPlatformEnvironment(platformEnvironment);
+        return userDetailsService;
     }
 
     @Bean
