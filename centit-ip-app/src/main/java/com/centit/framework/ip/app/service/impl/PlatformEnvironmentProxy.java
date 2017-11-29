@@ -3,6 +3,7 @@ package com.centit.framework.ip.app.service.impl;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.staticsystem.po.UserSetting;
 
 import java.util.List;
 import java.util.Map;
@@ -77,13 +78,20 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return 用户设置参数
      */
     @Override
-    public String getUserSetting(String userCode, String paramCode) {
+    public IUserSetting getUserSetting(String userCode, String paramCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            String svalue = evrnManger.getUserSetting(userCode,paramCode);
+            IUserSetting svalue = evrnManger.getUserSetting(userCode,paramCode);
             if(svalue!=null)
                 return svalue;
         }
         return null;
+    }
+
+    @Override
+    public void saveUserSetting(IUserSetting userSetting) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            evrnManger.saveUserSetting(userSetting);
+        }
     }
 
     /**
@@ -534,5 +542,12 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
                 return value;
         }
         return null;
+    }
+
+    @Override
+    public void updateUserInfo(IUserInfo userInfo) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            evrnManger.updateUserInfo(userInfo);
+        }
     }
 }

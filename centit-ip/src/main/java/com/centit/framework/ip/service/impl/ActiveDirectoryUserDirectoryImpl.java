@@ -164,14 +164,15 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 			searchCtls.setReturningAttributes(returnedAtts);
 			NamingEnumeration<SearchResult> answer = ctx.search(searchBase, searchFilter,searchCtls);
 			while (answer.hasMoreElements()) {
-				SearchResult sr = (SearchResult) answer.next();
+				SearchResult sr = answer.next();
 				Attributes attrs = sr.getAttributes();
 				String distinguishedName = getAttributeString(attrs,"distinguishedName");
 				String unitName = getAttributeString(attrs,"description");
 				if(unitName==null || distinguishedName==null)
 					continue;
 				UnitInfo unitInfo = unitInfoDao.getUnitByTag(distinguishedName);
-				if(unitInfo==null){
+				boolean createNew = unitInfo==null;
+				if(createNew){
 					unitInfo = new UnitInfo();
 					unitInfo.setUnitCode(unitInfoDao.getNextKey());
 					unitInfo.setUnitTag(distinguishedName);
@@ -179,11 +180,16 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 					unitInfo.setUnitType("L");
 					unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
 					unitInfo.setCreateDate(now);
-				}
-				unitInfo.setUnitName(unitName);
-				unitInfo.setUnitDesc(getAttributeString(attrs,"managedBy"));
-				unitInfo.setLastModifyDate(now);
-				unitInfoDao.mergeObject(unitInfo);
+                    //-----------------------------
+  				}
+                unitInfo.setUnitName(unitName);
+                unitInfo.setUnitDesc(getAttributeString(attrs, "managedBy"));
+                unitInfo.setLastModifyDate(now);
+                if(createNew){
+                    unitInfoDao.saveNewObject(unitInfo);
+                }else {
+                    unitInfoDao.updateUnit(unitInfo);
+                }
 				allUnits.put(distinguishedName, unitInfo);
 			}			
 	
@@ -235,7 +241,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 if(createUser)
                     userInfoDao.saveNewObject(userInfo);
                 else
-                    userInfoDao.mergeObject(userInfo);
+                    userInfoDao.updateUser(userInfo);
 			
 				if(createUser && StringUtils.isNoneBlank(this.defaultUserRole)){
 					UserRole role = new UserRole(

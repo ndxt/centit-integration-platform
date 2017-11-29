@@ -3,19 +3,16 @@ package com.centit.framework.ip.app.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
-import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.common.ResponseJSON;
+import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.basedata.IRoleInfo;
 import com.centit.framework.model.basedata.IUnitRole;
 import com.centit.framework.model.basedata.IUserInfo;
-import com.centit.framework.model.basedata.IUserRole;
+import com.centit.framework.model.basedata.IUserSetting;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.OptTreeNode;
 import com.centit.framework.staticsystem.po.*;
-import com.centit.framework.staticsystem.security.StaticCentitUserDetails;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HttpExecutor;
 import org.apache.commons.lang3.StringUtils;
@@ -54,15 +51,6 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	private AppSession appSession;
 
 
-
-	public CloseableHttpClient getHttpClient() throws Exception {
-		return appSession.getHttpClient();
-	}
-
-	public void releaseHttpClient(CloseableHttpClient httpClient) {
-		appSession.releaseHttpClient(httpClient);
-	}
-
 	public void setPlatServerUrl(String platServerUrl) {
 		appSession = new AppSession(platServerUrl,false,null,null);
 	}
@@ -73,8 +61,6 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 			return ;
 		reloadSecurityMetadata();
 	}
-	
-	
 
 	@Override
 	public String getSystemParameter(String paramCode) {
@@ -82,7 +68,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	}
 
 	@Override
-	public String getUserSetting(String userCode, String paramCode) {
+	public UserSetting getUserSetting(String userCode, String paramCode) {
 
 			ResponseJSON resJson = RestfulHttpRequest.getResponseData(
 					appSession,
@@ -90,10 +76,28 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
 			if(resJson==null)
 				return null;
-			return resJson.getDataAsString("paramValue");
+			return resJson.getDataAsObject(UserSetting.class);
 	}
 
-	@Override
+    @Override
+    public void saveUserSetting(IUserSetting userSetting) {
+        CloseableHttpClient httpClient = null;
+        try {
+            httpClient = appSession.getHttpClient();
+            /*String resStr =*/ HttpExecutor.jsonPost(
+                    httpClient,
+                    appSession.completeQueryUrl("/usersetting"),
+                    userSetting);
+            //ResponseJSON resJson = ResponseJSON.valueOfJson(resStr);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(),e);
+        } finally {
+            if(httpClient!=null)
+                appSession.releaseHttpClient(httpClient);
+        }
+    }
+
+    @Override
 	public List<OptInfo> listUserMenuOptInfos(String userCode, boolean asAdmin) {
 
 		return listUserMenuOptInfosUnderSuperOptId(userCode,topOptId,asAdmin);
@@ -387,32 +391,10 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
 				appSession,"/userdetails/"+topOptId+"/"+queryParam+"?qtype="+qtype);
 		
-		if(resJson==null || resJson.getCode()!=0){
-			return null;
-		}
-		UserInfo userInfo =  resJson.getDataAsObject("userInfo",UserInfo.class);
-		if(userInfo==null)
-			return null;
-		
-		List<RoleInfo> userRoles = resJson.getDataAsArray("userRoles",RoleInfo.class);
-		List<UserUnit> userUnits = resJson.getDataAsArray("userUnits",UserUnit.class);
-		userInfo.setUserUnits(userUnits);
-
-        StaticCentitUserDetails userDetails = new StaticCentitUserDetails(userInfo);
-        Object userSettingsObj = resJson.getData("userSettings");
-        if(userSettingsObj != null) {
-            if( userSettingsObj instanceof Map){
-                Map<String, String> userSettings = new HashMap<>();
-                Map<String, Object> userSettingsMap = ( Map<String, Object>)userSettingsObj;
-                for(Map.Entry<String, Object> ent : userSettingsMap.entrySet()){
-                    userSettings.put(ent.getKey(),
-                            StringBaseOpt.castObjectToString(ent.getValue()));
-                }
-                userDetails.setUserSettings(userSettings);
-            }
+		if(resJson==null || resJson.getCode()!=0) {
+            return null;
         }
-        userDetails.setAuthoritiesByRoles(userRoles);
-		return userDetails;
+        return resJson.getDataAsObject(CentitUserDetails.class);
 	}
 	
 	@Override
@@ -434,8 +416,27 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	public CentitUserDetails loadUserDetailsByRegCellPhone(String regCellPhone) {
 		return loadUserDetails(regCellPhone,"regCellPhone");
 	}
-	
-	@Override
+
+    @Override
+    public void updateUserInfo(IUserInfo userInfo) {
+        CloseableHttpClient httpClient = null;
+        try {
+            httpClient = appSession.getHttpClient();
+            /*String resStr =*/ HttpExecutor.jsonPost(
+                    httpClient,
+                    appSession.completeQueryUrl("/userinfo"),
+                    userInfo,
+                    true);
+            //ResponseJSON resJson = ResponseJSON.valueOfJson(resStr);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(),e);
+        } finally {
+            if(httpClient!=null)
+                appSession.releaseHttpClient(httpClient);
+        }
+    }
+
+    @Override
 	@CacheEvict(value ={
 			 "DataDictionary","OptInfo","RoleInfo","UserInfo","UnitInfo",
 			 "UnitUsers","UserUnits","AllUserUnits"},allEntries = true)
