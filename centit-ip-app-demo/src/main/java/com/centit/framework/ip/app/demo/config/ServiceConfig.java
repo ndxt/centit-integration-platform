@@ -6,6 +6,7 @@ import com.centit.framework.ip.app.demo.listener.InstantiationServiceBeanPostPro
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
@@ -13,6 +14,8 @@ import org.springframework.context.annotation.Lazy;
  * Created by codefan on 17-7-18.
  */
 @Configuration
+@ComponentScan(basePackages = "com.otherpackage",
+        excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 public class ServiceConfig {
 
     @Bean

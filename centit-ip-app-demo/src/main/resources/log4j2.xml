@@ -2,7 +2,7 @@
     <Configuration status="info" monitorInterval="1800">
 
     <properties>
-        <property name="LOG_HOME">D:/Projects/RunData/webim_home/logs</property>
+        <property name="LOG_HOME">D:/Projects/RunData/demo_home/logs</property>
          <property name="FILE_NAME">mylog</property>
     </properties>
 
@@ -16,7 +16,7 @@
              <PatternLayout
                  pattern="%date{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread][%file:%line] - %msg%n" />
              <Policies>
-                 <TimeBasedTriggeringPolicy interval="" />
+                 <!--<TimeBasedTriggeringPolicy interval="" />-->
                  <SizeBasedTriggeringPolicy size="10 MB" />
              </Policies>
              <DefaultRolloverStrategy max="20" />
