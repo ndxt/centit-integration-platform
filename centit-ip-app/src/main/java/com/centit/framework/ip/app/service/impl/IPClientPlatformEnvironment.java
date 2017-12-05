@@ -13,6 +13,7 @@ import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.OptTreeNode;
 import com.centit.framework.staticsystem.po.*;
+import com.centit.framework.staticsystem.security.StaticCentitUserDetails;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HttpExecutor;
 import org.apache.commons.lang3.StringUtils;
@@ -394,7 +395,10 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 		if(resJson==null || resJson.getCode()!=0) {
             return null;
         }
-        return resJson.getDataAsObject(CentitUserDetails.class);
+        StaticCentitUserDetails userDetails =
+                resJson.getDataAsObject(StaticCentitUserDetails.class);
+        userDetails.setAuthoritiesByRoles(userDetails.getUserRoles());
+        return userDetails;
 	}
 	
 	@Override
