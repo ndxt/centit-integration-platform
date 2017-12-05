@@ -8,9 +8,10 @@ create sequence s_usercode;
 create sequence S_MSGCODE ;
 create sequence S_RECIPIENT ;
 create sequence S_ADDRESSID ;
+create sequence S_ROLECODE;
 
 create table F_ADDRESS_BOOK
-( 
+(
    ADDRBOOKID           number(10,0) not null,
    BodyType             varchar2(2) not null ,
    BodyCode             varchar2(16) not null ,
@@ -105,7 +106,7 @@ create table F_DATADICTIONARY
    DATA_DESC            varchar2(256),
    Last_Modify_Date     date,
    Create_Date          date,
-   DATA_ORDER           number(6,0) 
+   DATA_ORDER           number(6,0)
 );
 comment on column F_DATADICTIONARY.EXTRA_CODE is  '树型字典的父类代码' ;
 comment on column F_DATADICTIONARY.DATA_TAG is    'N正常，D已停用，用户可以自解释这个字段';
@@ -159,7 +160,7 @@ create table F_OPT_LOG
    Old_Value            clob ,
    Opt_ID               varchar2(64) not null  ,
    OPT_Method           varchar2(64)  ,
-   opt_Tag              varchar2(200)  
+   opt_Tag              varchar2(200)
 );
 comment on column F_OPT_LOG.Opt_ID is  '模块，或者表';
 comment on column F_OPT_LOG.Opt_ID is  '方法，或者字段';
@@ -219,16 +220,6 @@ comment on column F_OptInfo.Order_Ind is     '这个顺序只需在同一个父�
 comment on column F_OptInfo.Page_Type is    'D : DIV I:iFrame'   ;
 alter table F_OptInfo add primary key (Opt_ID);
 
-create table F_OptInfoData
-(
-   TBCODE               varchar2(32) not null,
-   OptID                varchar2(8) not null,
-   LastModifyDate       date,
-   CreateDate           date
-);
-
-comment on table F_OptInfoData is '业务模块和表是多对多的关系,这个表仅仅是作为数据权限设置时的一个辅助表的';
-alter table F_OptInfoData  add primary key (TBCODE, OptID);
 
 create table F_QUERY_FILTER_CONDITION
 (
@@ -242,7 +233,7 @@ create table F_QUERY_FILTER_CONDITION
    Select_Data_type     char(1)  default 'N' not null ,
    Select_Data_Catalog  varchar2(64) ,
    Select_SQL           varchar2(1000)  ,
-   Select_JSON          varchar2(2000)  
+   Select_JSON          varchar2(2000)
 );
 comment on column F_QUERY_FILTER_CONDITION.Table_Class_Name is  '数据库表代码或者po的类名'     ;
 comment on column F_QUERY_FILTER_CONDITION.Param_Type is    '参数类型：S 字符串，L 数字， N 有小数点数据， D 日期， T 时间戳， Y 年， M 月'    ;
@@ -282,7 +273,7 @@ create table F_ROLEINFO
    creator              varchar2(32),
    updator              varchar2(32)
 );
-comment on column F_ROLEINFO.ROLE_TYPE is  'S为系统功能角色 I 为项目角色 W工作量角色';
+comment on column F_ROLEINFO.ROLE_TYPE is  'F 为系统 固有的 G 全局的 P 公用的 D 部门的 I 为项目角色 W工作量角色';
 alter table F_ROLEINFO add primary key (ROLE_CODE);
 
 create table F_ROLEPOWER
@@ -304,7 +295,7 @@ create table F_STAT_MONTH
    BeginDay             date not null,
    EendDay              date not null,
    EndSchedule          char(1) ,
-   BeginSchedule        char(1) 
+   BeginSchedule        char(1)
 );
 comment on table F_STAT_MONTH  is'OA业务统计月，可以自定义统计月的起止日期';
 alter table F_STAT_MONTH add primary key (YEARMONTH);
@@ -322,7 +313,7 @@ create table F_SYS_NOTIFY
    Notify_Time          date,
    opt_Tag              varchar2(200)  ,
    OPT_Method           varchar2(64)  ,
-   Opt_ID               varchar2(64) not null  
+   Opt_ID               varchar2(64) not null
 );
 comment on column F_SYS_NOTIFY.Notify_State is '0 成功， 1 失败 2 部分成功'  ;
 comment on column F_SYS_NOTIFY.opt_Tag is  '一般用于关联到业务主体' ;
@@ -457,7 +448,7 @@ create table F_USER_QUERY_FILTER
    user_Code            varchar2(8) not null,
    modle_code           varchar2(64) not null  ,
    filter_name          varchar2(200) not null ,
-   filter_value         varchar2(3200) not null  
+   filter_value         varchar2(3200) not null
 );
 comment on column F_USER_QUERY_FILTER. modle_code is '开发人员自行定义，单不能重复，建议用系统的模块名加上当前的操作方法'  ;
 comment on column F_USER_QUERY_FILTER.  filter_name is   '用户自行定义的名称' ;
@@ -478,8 +469,8 @@ create table F_WORK_CLASS
    record_date          date,
    recorder             varchar2(8)
 );
-comment on column F_WORK_CLASS. begin_time   is   '9:00'   ;       
-comment on column F_WORK_CLASS.   end_time is  '+4:00 ''+''表示第二天'    ;         
+comment on column F_WORK_CLASS. begin_time   is   '9:00'   ;
+comment on column F_WORK_CLASS.   end_time is  '+4:00 ''+''表示第二天'    ;
 comment on table  F_WORK_CLASS is 'CLASS_ID
  为 0 的表示休息，可以不在这个表中出现
  为 1 的为默认班次信息';
@@ -493,7 +484,7 @@ create table F_WORK_DAY
    WorkDayDesc          varchar2(255)
 );
 comment on column F_WORK_DAY.DayType is '非正常作业时间日
-A:工作日放假 B:周末调休成工作时间  C: 正常上班  D:正常休假  
+A:工作日放假 B:周末调休成工作时间  C: 正常上班  D:正常休假
 ';
 alter table F_WORK_DAY add primary key (WorkDay);
 
@@ -513,7 +504,7 @@ create table M_InnerMsg
    Email_Id             varchar2(8)  ,
    Opt_ID               varchar2(64) not null  ,
    OPT_Method           varchar2(64) ,
-   opt_Tag              varchar2(200)  
+   opt_Tag              varchar2(200)
 );
 comment on column M_InnerMsg.     Msg_Code    is     '消息主键自定义，通过S_M_INNERMSG序列生成'      ;
 comment on column M_InnerMsg.    Msg_Type    is       'P= 个人为消息  A= 机构为公告（通知） M=邮件'    ;
@@ -548,7 +539,7 @@ comment on column M_InnerMsg_Recipient. Mail_Type       is  'T=收件人
             C=抄送
             B=密送'  ;
 comment on column M_InnerMsg_Recipient.    msg_State    is  '未读/已读/删除，收件人在线时弹出提示
-            
+
             U=未读
             R=已读
             D=删除'  ;
@@ -586,7 +577,7 @@ create table P_TASK_LIST
    noticeSign           varchar2(1) ,
    lastNoticeTime       date  ,
    taskdeadline         date,
-   taskvalue            varchar2(2048) 
+   taskvalue            varchar2(2048)
 );
 comment on column P_TASK_LIST. tasktag    is   '类似与outlook中的邮件标记，可以用不同的颜色的旗子图表标识' ;
 comment on column P_TASK_LIST.  taskrank   is   '任务的优先级' ;
@@ -599,7 +590,20 @@ comment on column P_TASK_LIST.   finishmemo  is  '简要记录任务的执行过
 comment on column P_TASK_LIST.  noticeSign   is    '提醒标志为：禁止提醒、未提醒、已提醒' ;
 comment on column P_TASK_LIST. lastNoticeTime    is  '最后一次提醒时间，根据提醒策略可以提醒多次'  ;
 alter table P_TASK_LIST  add primary key (taskid);
- 
+
+create table F_UNITROLE
+(
+   UNIT_CODE            varchar2(32) not null,
+   ROLE_CODE            varchar2(32) not null,
+   OBTAIN_DATE          date not null,
+   SECEDE_DATE          date,
+   CHANGE_DESC          varchar2(256),
+   update_Date          date,
+   Create_Date          date,
+   creator              varchar2(32),
+   updator              varchar2(32)
+);
+
 CREATE OR REPLACE VIEW v_hi_unitinfo AS
 SELECT a.unit_code AS top_unit_code,  b.unit_code,b.unit_type, b.parent_unit, b.is_valid,     b.unit_name,b.unit_desc,b.unit_short_name,b.addrbook_id,b.unit_order,b.dep_no,
        b.unit_word,b.unit_grade,
@@ -608,8 +612,18 @@ SELECT a.unit_code AS top_unit_code,  b.unit_code,b.unit_type, b.parent_unit, b.
   FROM F_UNITINFO a , F_UNITINFO b
  WHERE b.Unit_Path LIKE CONCAT(a.Unit_Path,'%' );
 
- 
- create or replace view F_V_Opt_Role_Map as
+create or replace view F_V_USERROLES as
+  select b.ROLE_CODE, b.ROLE_NAME, b.IS_VALID, 'D' as OBTAIN_TYPE, b.ROLE_TYPE, b.UNIT_CODE,
+    b.ROLE_DESC, b.CREATE_DATE, b.UPDATE_DATE ,a.USER_CODE, null as INHERITED_FROM
+  from F_USERROLE a join F_ROLEINFO b on (a.ROLE_CODE=b.ROLE_CODE)
+  where a.OBTAIN_DATE <=  sysdate and (a.SECEDE_DATE is null or a.SECEDE_DATE > sysdate) and b.IS_VALID='T'
+  union
+  select b.ROLE_CODE, b.ROLE_NAME, b.IS_VALID, 'I' as OBTAIN_TYPE, b.ROLE_TYPE, b.UNIT_CODE,
+    b.ROLE_DESC, b.CREATE_DATE, b.UPDATE_DATE ,c.USER_CODE, a.UNIT_CODE as INHERITED_FROM
+  from F_UNITROLE a join F_ROLEINFO b on (a.ROLE_CODE = b.ROLE_CODE) JOIN F_USERUNIT c on( a.UNIT_CODE = c.UNIT_CODE)
+  where a.OBTAIN_DATE <=  sysdate and (a.SECEDE_DATE is null or a.SECEDE_DATE > sysdate) and b.IS_VALID='T';
+
+create or replace view F_V_Opt_Role_Map as
 select c.opt_url||b.OPT_URL as opt_url, b.opt_req, a.role_code, c.opt_id, b.opt_code
   from F_ROLEPOWER a
   join F_OPTDEF b
@@ -619,21 +633,12 @@ select c.opt_url||b.OPT_URL as opt_url, b.opt_req, a.role_code, c.opt_id, b.opt_
  where c.Opt_Type <> 'W'
    and c.opt_url <> '...'
  order by c.opt_url, b.opt_req, a.role_code;
- 
-create or replace view F_V_USERROLES as
-select distinct b.ROLE_CODE,b.ROLE_NAME,b.IS_VALID,b.ROLE_DESC,b.CREATE_DATE,b.UPDATE_DATE ,a.user_code
-    from F_USERROLE a join F_ROLEINFO b on (a.ROLE_CODE=b.ROLE_CODE)
-    where a.OBTAIN_DATE <=  sysdate and (a.SECEDE_DATE is null or a.SECEDE_DATE > sysdate) and b.IS_VALID='T'
-union all
-  select d.ROLE_CODE,d.ROLE_NAME,d.IS_VALID,d.ROLE_DESC,d.CREATE_DATE,d.UPDATE_DATE , c.user_code
-   from F_USERINFO c , F_ROLEINFO d
-   where d.role_code = 'G-public';
 
 create or replace view F_V_UserOptDataScopes as
 select  distinct a.User_Code, c. OPT_ID ,  c.OPT_METHOD , b.opt_Scope_Codes
 from F_V_USERROLES a  join F_ROLEPOWER   b on (a.Role_Code=b.Role_Code)
          join F_OPTDEF  c on(b.OPT_CODE=c.OPT_CODE);
-         
+
 create or replace view F_V_UserOptList as
 select  distinct a.User_Code,  c.OPT_CODE,  c.OPT_NAME  ,  c. OPT_ID ,  c.OPT_METHOD
 from F_V_USERROLES a  join F_ROLEPOWER   b on (a.Role_Code=b.Role_Code)
@@ -657,10 +662,10 @@ from F_OPTDEF b join F_OptInfo c
    and c.opt_url <> '...' and b.opt_req is not null;
 
 create or replace view v_opt_tree as
-   select i.opt_id as MENU_ID,i.pre_opt_id as PARENT_ID,i.opt_name as MENU_NAME,i.order_ind 
+   select i.opt_id as MENU_ID,i.pre_opt_id as PARENT_ID,i.opt_name as MENU_NAME,i.order_ind
    from F_OptInfo i where i.is_in_toolbar ='Y'
-   union all 
-   select d.opt_code as MENU_ID,d.opt_id as PARENT_ID,d.opt_name as MENU_NAME,0 as order_ind 
+   union all
+   select d.opt_code as MENU_ID,d.opt_id as PARENT_ID,d.opt_name as MENU_NAME,0 as order_ind
    from F_OPTDEF d
 ;
 
