@@ -1,43 +1,48 @@
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="renderer" content="webkit">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">CAS &#8211; Central Authentication Service</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title th:text="#{cas.login.pagetitle}"></title>
 
-    <link type="text/css" rel="stylesheet" href="bootstrap/bootstrap.min.css"/>
-    <link type="text/css" rel="stylesheet" href="style.css"/>
-
-    <link rel="stylesheet" th:href="@{${#themes.code('standard.custom.css.file')}}"/>
-
-    <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon"/>
-
-    <script type="text/javascript" src="js/zxcvbn.js"></script>
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="style.js"></script>
-    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="js/jquery.cookie.min.js"></script>
-    <style>
-        #notices {
-            display: none;
-        }
-        .col-sm-12.col-md-6.col-md-pull-6 {
-            right: auto;
-            left: 25%;
-        }
-    </style>
+  <link rel="stylesheet" href="css/dome.css">
+  <link type="text/css" rel="stylesheet" th:href="@{#{webjars.bootstrapmin.css}}"/>
+  <script type="text/javascript" th:src="@{#{webjars.jquerymin.js}}"></script>
+  <script th:src="@{#{webjars.bootstrapmin.js}}"></script>
 </head>
+
 <body>
-<div class="header">
-    <span class="#title">南大先腾CAS</span>
-</div>
-<div class="cloud1"></div>
-<div class="cloud2"></div>
-<div layout:fragment="content" id="content" style="margin-top: 100px;">
-</div>
-<div class="footer">
-    技术支持服务信息
+<div class="box">
+  <div class="cnt">
+    <p id="huanying">
+      <span id="cnt_one">CAS登录</span>
+    </p>
+    <div>
+
+      <div layout:fragment="content" id="content"></div>
+
+    </div>
+  </div>
 </div>
 </body>
+<script>
+  var currentMode = $(':radio:checked').val();
+
+  $(':radio').on('change', function() {
+    select($(this).val())
+  });
+
+  $('#oimg').on('click', function() {
+    $(this).attr('src', 'captcha?' + Math.random())
+  }).click();
+
+  function login() {
+    $('#fmLogin').submit();
+  }
+
+  function select(mode) {
+    if (currentMode === mode) return;
+
+    login();
+  }
+</script>
 </html>

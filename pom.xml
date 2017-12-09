@@ -26,7 +26,7 @@
         <centit.persistence.version>1.0.2-SNAPSHOT</centit.persistence.version>
         <centit.ui.version>3.0.1-SNAPSHOT</centit.ui.version>
 
-        <cas.version>5.1.5</cas.version>
+        <cas.version>5.2.0</cas.version>
         <servlet-api.version>3.1.0</servlet-api.version>
 
         <spring-security-oauth2.version>2.1.1.RELEASE</spring-security-oauth2.version>

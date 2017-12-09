@@ -5,31 +5,30 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.components.OperationLogCenter;
+import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.ip.service.OsInfoManager;
 import com.centit.framework.ip.service.UserAccessTokenManager;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptInfo;
-import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.OptInfo;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
-import com.centit.framework.system.po.UserUnit;
 import com.centit.framework.system.service.SysRoleManager;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.UserSettingManager;
 import com.centit.support.algorithm.StringBaseOpt;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 /**
@@ -40,11 +39,11 @@ import java.util.List;
 @Controller
 @RequestMapping("/platform")
 public class PlatformDataController extends BaseController {
-	
+
 	@Resource
 	@NotNull
 	private UserSettingManager userSettingManager;
-	
+
 	@Resource
     @NotNull
     private SysRoleManager sysRoleManager;
@@ -63,8 +62,8 @@ public class PlatformDataController extends BaseController {
 
 	@Resource
 	@NotNull
-	protected DatabaseInfoManager oatabaseInfoManager;  
-	
+	protected DatabaseInfoManager oatabaseInfoManager;
+
 	@Resource
 	@NotNull
 	protected UserAccessTokenManager userAccessTokenManager;
@@ -87,9 +86,9 @@ public class PlatformDataController extends BaseController {
         JsonResultUtils.writeSuccessJson(response);
     }
 
-	@RequestMapping(value = "/usersettings/{userCode}/{optID}", 
+	@RequestMapping(value = "/usersettings/{userCode}/{optID}",
 			method = RequestMethod.GET)
-	public void getUserAllSettings(@PathVariable String optID, @PathVariable String userCode, 
+	public void getUserAllSettings(@PathVariable String optID, @PathVariable String userCode,
 			HttpServletResponse response) {
 
 		JsonResultUtils.writeSingleDataJson(
@@ -103,6 +102,13 @@ public class PlatformDataController extends BaseController {
 		JsonResultUtils.writeSingleDataJson(
 				userSettingManager.getUserSetting(userCode, paramCode), response);
 	}
+
+    @RequestMapping(value = "/allsetting",
+        method = RequestMethod.GET)
+    public void getUserSetting(HttpServletResponse response) {
+        JsonResultUtils.writeSingleDataJson(
+            userSettingManager.getAllSettings(), response);
+    }
 
 	@RequestMapping(value = "/usersetting",
 			method = RequestMethod.PUT)
@@ -397,13 +403,13 @@ public class PlatformDataController extends BaseController {
 			return;
 		}
 
-		/*ResponseMapData resData = new ResponseMapData();
-		resData.addResponseData("userInfo", userDetails.getUserInfo());
-		resData.addResponseData("userRoles", userDetails.getUserRoles());
-        resData.addResponseData("userSettings", userDetails.getUserSettings());
+		ResponseMapData resData = new ResponseMapData();
+		resData.addResponseData("userDetails", userDetails);
+		//resData.addResponseData("userRoles", userDetails.getUserRoles());
+        //resData.addResponseData("userSettings", userDetails.getUserSettings());
 		resData.addResponseData("userUnits", userDetails.getUserInfo().getUserUnits());
-        resData.addResponseData("userOptList", userDetails.getUserOptList());*/
-		JsonResultUtils.writeSingleDataJson(userDetails, response);
+        //resData.addResponseData("userOptList", userDetails.getUserOptList());*/
+		JsonResultUtils.writeResponseDataAsJson(resData, response);
 	}
 
 	@RequestMapping(value = "/ipenvironment/databaseinfo",

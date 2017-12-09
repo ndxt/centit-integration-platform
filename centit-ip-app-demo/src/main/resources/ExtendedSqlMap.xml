@@ -20,7 +20,7 @@
     <sql id="LIST_ALL_USER">
         <![CDATA[
             select USERCODE as userCode, USERPIN as userPin , ISVALID as isValid, USERTYPE as userType,
-                LOGINNAME as loginName, USERNAMEas userName, ENGLISHNAME as englishName, USERDESC as userDesc,
+                LOGINNAME as loginName, USERNAMEas username, ENGLISHNAME as englishName, USERDESC as userDesc,
                 LOGINTIMES as loginTimes, ACTIVETIME as activeTime, PWDEXPIREDTIME as pwdExpiredTime, LOGINIP as loginIp,
                 ADDRBOOKID as addrbookId, REGEMAIL as regEmail ,  REGCELLPHONE as regCellPhone, USERWORD as userWord,
                 USERTAG as userTag, USERORDER as userOrder, PRIMARYUNIT as primaryUnit

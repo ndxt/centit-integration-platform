@@ -88,6 +88,17 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     @Override
+    public List<? extends IUserSetting> getAllSettings() {
+        for (PlatformEnvironment evrnManger : evrnMangers) {
+            List<? extends IUserSetting> svalue = evrnManger.getAllSettings();
+            if (svalue != null && svalue.size() > 0) {
+                return svalue;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void saveUserSetting(IUserSetting userSetting) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             evrnManger.saveUserSetting(userSetting);

@@ -42,9 +42,9 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	private String topOptId;
 
 	public IPClientPlatformEnvironment() {
-		
+
 	}
-	
+
 	public void setTopOptId(String topOptId) {
 		this.topOptId = topOptId;
 	}
@@ -55,7 +55,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	public void setPlatServerUrl(String platServerUrl) {
 		appSession = new AppSession(platServerUrl,false,null,null);
 	}
-	
+
 	//初始化  这个要定时刷新
 	public void init(){
 		if(appSession==null)
@@ -372,14 +372,14 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 				DataDictionary.class);
 	}
 
-	
+
 	public List<RolePower>  listAllRolePower(){
 		return RestfulHttpRequest.getResponseObjectList(
 				appSession,
 				"/allrolepowers/"+topOptId,
 				RolePower.class);
 	}
-	
+
 	public List<OptMethod> listAllOptMethod(){
 		return RestfulHttpRequest.getResponseObjectList(
 				appSession,
@@ -391,16 +391,19 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	private CentitUserDetails loadUserDetails(String queryParam, String qtype) {
 		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
 				appSession,"/userdetails/"+topOptId+"/"+queryParam+"?qtype="+qtype);
-		
+
 		if(resJson==null || resJson.getCode()!=0) {
             return null;
         }
         StaticCentitUserDetails userDetails =
-                resJson.getDataAsObject(StaticCentitUserDetails.class);
+                resJson.getDataAsObject("userDetails", StaticCentitUserDetails.class);
+        userDetails.getUserInfo().setUserUnits(
+                resJson.getDataAsArray("userUnits", UserUnit.class) );
         userDetails.setAuthoritiesByRoles(userDetails.getUserRoles());
+        userDetails.getUserInfo().setUserPin("$2a$11$0As9Gn84D2gt.KvLJU3ceuf5MtMnITLhhzms6vZXJDj/SpW789HR.");
         return userDetails;
 	}
-	
+
 	@Override
 	public CentitUserDetails loadUserDetailsByLoginName(String loginName) {
 		return loadUserDetails(loginName,"loginName");
@@ -475,17 +478,25 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
             	String  optDefUrl = oi.getOptUrl()+ou.getOptUrl();
                 List<List<String>> sOpt = CentitSecurityMetadata.parseUrl(
                 		optDefUrl,ou.getOptReq());
-                
+
                 for(List<String> surls : sOpt){
                     OptTreeNode opt = CentitSecurityMetadata.optTreeNode;
                     for(String surl : surls)
-                        opt = opt.setChildPath(surl); 
+                        opt = opt.setChildPath(surl);
                     opt.setOptCode(ou.getOptCode());
                 }
         	}
-        }        
+        }
         //CentitSecurityMetadata.optTreeNode.printTreeNode();
 		return true;
 	}
+
+	@Override
+    public List<UserSetting> getAllSettings(){
+        return RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/allsettings/"+topOptId,
+            UserSetting.class);
+    }
 
 }
