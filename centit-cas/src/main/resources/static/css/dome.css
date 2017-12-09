@@ -1,0 +1,56 @@
+
+*{
+    margin:0px auto;	
+ }
+.box{
+	margin:100px auto 0;
+	max-width:1440px;
+	height:600px;
+	background:url(hr_login.png) no-repeat center;
+	padding-top:30px;
+}
+.cnt{
+	width:380px;
+	height:400px;
+	background:#fff;
+	
+	margin-right:100px;
+	padding:40px 40px 40px 40px;
+ }
+ 
+ #cnt_one{
+	 
+	color:#000;
+	font-size:20px; 
+	font-weight:600;
+	padding-right:120px;
+	
+}
+
+ #cnt_two{
+	color:blue;
+	font-size:18px;
+	//padding-left:50px;
+	
+ }
+ 
+ #huanying{
+	padding-bottom:10px; 
+ }
+ 
+ #oimg{
+	 padding-left:30px;
+ }
+
+.alert.alert-danger {
+	position: fixed;
+	left: 0;
+	top: 1px;
+	width: 100%;
+}
+
+.checkbox-inline.current {
+	padding-left:0;
+	color:blue;
+	padding-right:10px;
+}

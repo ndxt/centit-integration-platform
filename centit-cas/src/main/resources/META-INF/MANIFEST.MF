@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Implementation-Title: centit-cas
+Implementation-Version: v1.0.2
+Implementation-Date: 2017-12-7
+Created-By: com.centit.framework
+Specification-Version: v1.0.2
+Implementation-Vendor: com.centit.framework
+

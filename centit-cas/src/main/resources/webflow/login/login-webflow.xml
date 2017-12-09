@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.springframework.org/schema/webflow"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+                          http://www.springframework.org/schema/webflow/spring-webflow.xsd">
+
+    <var name="fingerMarkCredential" class="com.centit.framework.cas.model.FingerMarkCredential"/>
+    <var name="usbKeyCredential" class="com.centit.framework.cas.model.UsbKeyCredential"/>
+    <var name="md5PwdCredential" class="com.centit.framework.cas.model.Md5PasswordCredential"/>
+    <var name="activeDirectoryCredential" class="com.centit.framework.cas.model.ActiveDirectoryCredential"/>
+
+    <action-state id="initialAuthenticationRequestValidationCheck">
+        <evaluate expression="initialAuthenticationRequestValidationAction"/>
+        <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
+        <transition on="error" to="initializeLoginForm"/>
+        <transition on="success" to="ticketGrantingTicketCheck"/>
+        <transition on="successWithWarnings" to="ticketGrantingTicketCheck"/>
+    </action-state>
+
+    <action-state id="ticketGrantingTicketCheck">
+        <evaluate expression="ticketGrantingTicketCheckAction"/>
+        <transition on="notExists" to="gatewayRequestCheck"/>
+        <transition on="invalid" to="terminateSession"/>
+        <transition on="valid" to="hasServiceCheck"/>
+    </action-state>
+        
+    <action-state id="initializeLoginForm">
+        <evaluate expression="initializeLoginAction" />
+        <transition on="success" to="passwordLoginForm"/>
+    </action-state>
+
+    <view-state id="passwordLoginForm" view="casPasswordLoginView" model="md5PwdCredential">
+        <binder>
+            <binding property="authType" required="true"/>
+            <binding property="username" required="true"/>
+            <binding property="password" required="true"/>
+            <binding property="validateCode" required="false"/>
+        </binder>
+        <transition on="submit" bind="true" validate="true" to="passwordLoginSubmit" history="invalidate"/>
+    </view-state>
+
+    <view-state id="activeDirectoryLoginForm" view="casActiveDirectoryLoginView" model="activeDirectoryCredential">
+        <binder>
+            <binding property="authType" required="true"/>
+            <binding property="username" required="true"/>
+            <binding property="password" required="true"/>
+            <binding property="validateCode" required="false"/>
+        </binder>
+        <transition on="submit" bind="true" validate="true" to="activeDirectoryLoginSubmit" history="invalidate"/>
+    </view-state>
+
+    <view-state id="usbKeyLoginForm" view="casUsbKeyLoginView" model="usbKeyCredential">
+        <binder>
+            <binding property="authType" required="true"/>
+            <binding property="username" required="false"/>
+        </binder>
+        <transition on="submit" bind="true" validate="true" to="usbKeyLoginSubmit" history="invalidate"/>
+    </view-state>
+
+    <view-state id="fingerMarkLoginForm" view="casFingerMarkLoginView" model="fingerMarkCredential">
+        <binder>
+            <binding property="authType" required="true"/>
+            <binding property="username" required="false"/>
+        </binder>
+        <transition on="submit" bind="true" validate="true" to="fingerMarkLoginSubmit" history="invalidate"/>
+    </view-state>
+
+    <!--authenticationViaFormAction-->
+    <action-state id="passwordLoginSubmit">
+        <evaluate expression="md5PasswordAuthenticationAction"/>
+        <transition on="changeAuth" to="changeAuth"/>
+        <transition on="warn" to="warn"/>
+        <transition on="success" to="sendTicketGrantingTicket"/>
+        <transition on="successWithWarnings" to="showAuthenticationWarningMessages"/>
+        <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
+        <transition on="error" to="initializeLoginForm"/>
+    </action-state>
+
+    <action-state id="activeDirectoryLoginSubmit">
+        <evaluate expression="activeDirectoryAuthenticationAction"/>
+        <transition on="changeAuth" to="changeAuth"/>
+        <transition on="warn" to="warn"/>
+        <transition on="success" to="sendTicketGrantingTicket"/>
+        <transition on="successWithWarnings" to="showAuthenticationWarningMessages"/>
+        <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
+        <transition on="error" to="activeDirectoryLoginForm"/>
+    </action-state>
+
+    <action-state id="usbKeyLoginSubmit">
+        <evaluate expression="usbKeyAuthenticationAction"/>
+        <transition on="changeAuth" to="changeAuth"/>
+        <transition on="warn" to="warn"/>
+        <transition on="success" to="sendTicketGrantingTicket"/>
+        <transition on="successWithWarnings" to="showAuthenticationWarningMessages"/>
+        <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
+        <transition on="error" to="usbKeyLoginForm"/>
+    </action-state>
+
+    <action-state id="fingerMarkLoginSubmit">
+        <evaluate expression="fingerMarkAuthenticationAction"/>
+        <transition on="changeAuth" to="changeAuth"/>
+        <transition on="warn" to="warn"/>
+        <transition on="success" to="sendTicketGrantingTicket"/>
+        <transition on="successWithWarnings" to="showAuthenticationWarningMessages"/>
+        <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
+        <transition on="error" to="fingerMarkLoginForm"/>
+    </action-state>
+
+    <action-state id="changeAuth">
+        <evaluate expression="changeAuthenticationAction"/>
+        <transition on="password" to="passwordLoginForm"/>
+        <transition on="usbKey" to="usbKeyLoginForm"/>
+        <transition on="fingerMark" to="fingerMarkLoginForm"/>
+        <transition on="activeDirectory" to="activeDirectoryLoginForm"/>
+    </action-state>
+
+</flow>

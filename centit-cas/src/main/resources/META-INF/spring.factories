@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.centit.framework.cas.config.ComplexAuthWebflowConfiguation,\
+  com.centit.framework.cas.config.ComplexAuthEventExecutionPlanConfiguration
+
