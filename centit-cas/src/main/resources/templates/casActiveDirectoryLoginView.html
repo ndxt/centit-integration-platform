@@ -38,7 +38,7 @@
           <input type="password" class="form-control" name="password" placeholder="请输入您的密码">
         </div>
         <br>
-        <div class="input-group" style="position:absolute;" th:if="${#httpServletRequest.getParameter('_needValidateCode')}">
+        <div class="input-group" style="position:absolute;" th:if="${session._needValidateCode}">
           <input type="text" name="validateCode" class="form-control" placeholder="请输入验证码"
                  style="position:relative;width:191px;height:33px;">
           <img id="oimg">

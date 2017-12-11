@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class CaptchaController extends AbstractDelegateController {
     private static Logger logger = LoggerFactory.getLogger(CaptchaController.class);

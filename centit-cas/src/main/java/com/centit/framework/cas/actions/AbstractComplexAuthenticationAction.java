@@ -215,10 +215,13 @@ public abstract class AbstractComplexAuthenticationAction extends AbstractAction
                 httpSession.getAttribute("_failValidateTimes"),0);
         failTimes ++;
         if(failTimes>=this.strategyConfig.getMaxFailTimesBeforeValidateCode()) {
-            request.setAttribute("_needValidateCode", true);
+            httpSession.setAttribute("_needValidateCode", true);
+            httpSession.setAttribute(CaptchaImageUtil.SESSIONCHECKCODE,"session_checkcode_need_change");
+        }else{
+            httpSession.setAttribute("_needValidateCode", false);
         }
         httpSession.setAttribute("_failValidateTimes",failTimes);
-        httpSession.setAttribute(CaptchaImageUtil.SESSIONCHECKCODE,"session_checkcode_need_change");
+
     }
 
     public void setAuditPolicy(AuditPolicy auditPolicy) {

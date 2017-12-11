@@ -45,6 +45,7 @@ public class ComplexAuthWebflowConfiguation {
     public CaptchaController captchaController() {
         return new CaptchaController();
     }
+
     @Bean
     public AuditPolicy auditPolicy(){
         return new IpMacAuditPolicy();
