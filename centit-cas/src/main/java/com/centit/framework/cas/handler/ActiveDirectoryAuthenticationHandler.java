@@ -6,30 +6,19 @@ package com.centit.framework.cas.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.framework.cas.config.QueryUserProperties;
-import com.centit.framework.cas.model.AbstractPasswordCredential;
+import com.centit.framework.cas.audit.JdbcLoginLogger;
+import com.centit.framework.cas.config.ActiveDirectoryProperties;
 import com.centit.framework.cas.model.ActiveDirectoryCredential;
-import com.centit.framework.cas.model.Md5PasswordCredential;
-import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.DbcpConnectPools;
-import org.apache.commons.lang3.StringUtils;
 import org.apereo.cas.authentication.Credential;
 import org.apereo.cas.authentication.HandlerResult;
 import org.apereo.cas.authentication.PreventedException;
-import org.apereo.cas.authentication.exceptions.AccountDisabledException;
-import org.apereo.cas.authentication.exceptions.AccountPasswordMustChangeException;
 import org.apereo.cas.authentication.handler.support.AbstractPreAndPostProcessingAuthenticationHandler;
 import org.apereo.cas.authentication.principal.PrincipalFactory;
 import org.apereo.cas.services.ServicesManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.security.auth.login.AccountNotFoundException;
-import javax.security.auth.login.FailedLoginException;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 
 /**
@@ -39,16 +28,21 @@ import java.sql.SQLException;
  */
 public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProcessingAuthenticationHandler {
 
+    private static Logger logger = LoggerFactory.getLogger(JdbcLoginLogger.class);
+    private ActiveDirectoryProperties activeDirectory;
 
     public ActiveDirectoryAuthenticationHandler(String name, ServicesManager servicesManager, PrincipalFactory principalFactory, Integer order) {
         super(name, servicesManager, principalFactory, order);
     }
 
+   /*
+    https://fileserver.centit.com/svn/centit/framework/framework-sys-module2.0/src/main/resources/spring-security-ad.xml
+
+    */
+
     @Override
     protected HandlerResult doAuthentication(Credential credential) throws GeneralSecurityException, PreventedException {
         ActiveDirectoryCredential adCredential = (ActiveDirectoryCredential) credential;
-
-
         return createHandlerResult(credential,
             this.principalFactory.createPrincipal( adCredential.getId(),
                 (JSONObject)JSON.toJSON(adCredential)), null);
@@ -60,5 +54,8 @@ public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProc
         return credential instanceof ActiveDirectoryCredential;
     }
 
+    public void setActiveDirectory(ActiveDirectoryProperties activeDirectory) {
+        this.activeDirectory = activeDirectory;
+    }
 
 }

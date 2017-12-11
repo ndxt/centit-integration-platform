@@ -19,6 +19,19 @@ public class ComplexConfigurationProperties implements Serializable {
     @NestedConfigurationProperty
     private JdbcLoggerProperties jdbcLogger = new JdbcLoggerProperties();
 
+    @NestedConfigurationProperty
+    private ActiveDirectoryProperties activeDirectory = new ActiveDirectoryProperties();
+    @NestedConfigurationProperty
+    private StrategyProperties strategy = new StrategyProperties();
+
+    public ActiveDirectoryProperties getActiveDirectory() {
+        return activeDirectory;
+    }
+
+    public void setActiveDirectory(ActiveDirectoryProperties activeDirectory) {
+        this.activeDirectory = activeDirectory;
+    }
+
     public QueryUserProperties getQueryUser() {
         return queryUser;
     }
@@ -33,5 +46,13 @@ public class ComplexConfigurationProperties implements Serializable {
 
     public void setJdbcLogger(JdbcLoggerProperties jdbcLogger) {
         this.jdbcLogger = jdbcLogger;
+    }
+
+    public StrategyProperties getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(StrategyProperties strategy) {
+        this.strategy = strategy;
     }
 }

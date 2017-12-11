@@ -1,5 +1,6 @@
 package com.centit.framework.cas.config;
 
+import com.centit.framework.cas.handler.ActiveDirectoryAuthenticationHandler;
 import com.centit.framework.cas.handler.Md5PasswordAuthenticationHandler;
 import com.centit.framework.cas.utils.CentitPasswordEncoder;
 import org.apereo.cas.authentication.AuthenticationEventExecutionPlan;
@@ -34,19 +35,30 @@ public class ComplexAuthEventExecutionPlanConfiguration implements Authenticatio
      * @return
      */
     @Bean
-    public AuthenticationHandler customAuthenticationHandler() {
+    public AuthenticationHandler md5PasswordAuthenticationHandler() {
         //优先验证
         Md5PasswordAuthenticationHandler authenticationHandler =
-            new Md5PasswordAuthenticationHandler("customAuthenticationHandler",
+            new Md5PasswordAuthenticationHandler("md5PasswordAuthenticationHandler",
                 servicesManager, new DefaultPrincipalFactory(), 1);
         authenticationHandler.setPasswordEncoder(new CentitPasswordEncoder());
         authenticationHandler.setQueryUserProperties(complexProperties.getQueryUser());
         return authenticationHandler;
     }
 
+    @Bean
+    public AuthenticationHandler activeDirectoryAuthenticationHandler() {
+        //优先验证
+        ActiveDirectoryAuthenticationHandler authenticationHandler =
+                new ActiveDirectoryAuthenticationHandler("activeDirectoryAuthenticationHandler",
+                        servicesManager, new DefaultPrincipalFactory(), 1);
+        authenticationHandler.setActiveDirectory(complexProperties.getActiveDirectory());
+        return authenticationHandler;
+    }
+
     //注册自定义认证器
     @Override
     public void configureAuthenticationExecutionPlan(final AuthenticationEventExecutionPlan plan) {
-        plan.registerAuthenticationHandler(customAuthenticationHandler());
+        plan.registerAuthenticationHandler(md5PasswordAuthenticationHandler());
+        plan.registerAuthenticationHandler(activeDirectoryAuthenticationHandler());
     }
 }

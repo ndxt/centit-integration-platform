@@ -66,6 +66,7 @@ public class ComplexAuthWebflowConfiguation {
                 adaptiveAuthenticationPolicy);
         action.setAuditPolicy(auditPolicy);
         action.setLoginLogger(loginLogger);
+        action.setStrategyConfig(complexProperties.getStrategy());
         return action;
     }
 
@@ -78,6 +79,7 @@ public class ComplexAuthWebflowConfiguation {
             adaptiveAuthenticationPolicy);
         action.setAuditPolicy(auditPolicy);
         action.setLoginLogger(loginLogger);
+        action.setStrategyConfig(complexProperties.getStrategy());
         return action;
     }
 
@@ -90,6 +92,7 @@ public class ComplexAuthWebflowConfiguation {
             adaptiveAuthenticationPolicy);
         action.setAuditPolicy(auditPolicy);
         action.setLoginLogger(loginLogger);
+        action.setStrategyConfig(complexProperties.getStrategy());
         return action;
     }
 
@@ -102,6 +105,7 @@ public class ComplexAuthWebflowConfiguation {
             adaptiveAuthenticationPolicy);
         action.setAuditPolicy(auditPolicy);
         action.setLoginLogger(loginLogger);
+        action.setStrategyConfig(complexProperties.getStrategy());
         return action;
     }
 
