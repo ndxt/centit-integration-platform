@@ -49,6 +49,7 @@ public class LoginByLdap {
         }
 
     }
+
     public static void main(String[] args) throws Exception {
         //MessageFormat sayHello = new MessageFormat("hello {0}!");
         //System.out.println(MessageFormat.format("hello {0}!","world"));
