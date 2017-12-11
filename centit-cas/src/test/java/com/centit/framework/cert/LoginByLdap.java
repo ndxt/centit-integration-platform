@@ -1,7 +1,10 @@
 package com.centit.framework.cert;
 
 import javax.naming.Context;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import java.text.MessageFormat;
@@ -24,6 +27,11 @@ public class LoginByLdap {
         LdapContext ctx = null;
         try {
             ctx = new InitialLdapContext(env, null);
+            Attributes attrs = ctx.getAttributes("CN="+username+",CN=Users,DC=centit,DC=com",
+                    new String[] {"sAMAccountName","displayName"});
+            NamingEnumeration<? extends Attribute>  a = attrs.getAll();
+            System.out.println(a.next());
+            System.out.println(a.next());
             //ctx.get
             ctx.close();
             System.out.println(username + "login ok!");
@@ -42,9 +50,9 @@ public class LoginByLdap {
 
     }
     public static void main(String[] args) throws Exception {
-        MessageFormat sayHello = new MessageFormat("hello {0}!");
-        System.out.println(sayHello.format(new Object[]{"world"}));
-        //loginLdapAsUser("codefan@centit.com","");
+        //MessageFormat sayHello = new MessageFormat("hello {0}!");
+        //System.out.println(MessageFormat.format("hello {0}!","world"));
+        loginLdapAsUser("杨淮生","");
     }
      /*   DefaultSpringSecurityContextSource contextSource =
                 new DefaultSpringSecurityContextSource(
