@@ -26,7 +26,7 @@
         
     <action-state id="initializeLoginForm">
         <evaluate expression="initializeLoginAction" />
-        <transition on="success" to="passwordLoginForm"/>
+        <transition on="success" to="changeAuth"/>
     </action-state>
 
     <view-state id="passwordLoginForm" view="casPasswordLoginView" model="md5PwdCredential">
@@ -73,7 +73,7 @@
         <transition on="success" to="sendTicketGrantingTicket"/>
         <transition on="successWithWarnings" to="showAuthenticationWarningMessages"/>
         <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
-        <transition on="error" to="initializeLoginForm"/>
+        <transition on="error" to="passwordLoginForm"/>
     </action-state>
 
     <action-state id="activeDirectoryLoginSubmit">

@@ -112,6 +112,8 @@ public class ComplexAuthWebflowConfiguation {
 
     @Bean
     public Action changeAuthenticationAction() {
-        return new ChangeAuthenticationAction();
+        ChangeAuthenticationAction changeAuthenticationAction = new ChangeAuthenticationAction();
+        changeAuthenticationAction.setStrategyConfig(complexProperties.getStrategy());
+        return changeAuthenticationAction;
     }
 }

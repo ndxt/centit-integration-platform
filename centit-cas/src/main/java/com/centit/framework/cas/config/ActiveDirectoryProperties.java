@@ -1,6 +1,8 @@
 package com.centit.framework.cas.config;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ActiveDirectoryProperties implements Serializable {
 
@@ -10,7 +12,10 @@ public class ActiveDirectoryProperties implements Serializable {
     private String username;//=accounts@centit.com
     private String password;//=yhs@yhs1
     private String searchBase;//=CN=Users,DC=centit,DC=com
-
+    private String principalField;
+    private String principalAttributes;
+    private String dnFormat;
+    private List<String> searchFilter = new ArrayList<>(5);
     public String getUrl() {
         return url;
     }
@@ -41,5 +46,42 @@ public class ActiveDirectoryProperties implements Serializable {
 
     public void setSearchBase(String searchBase) {
         this.searchBase = searchBase;
+    }
+
+    public String getPrincipalField() {
+        return principalField;
+    }
+
+    public void setPrincipalField(String principalField) {
+        this.principalField = principalField;
+    }
+
+    public String getPrincipalAttributes() {
+        return principalAttributes;
+    }
+
+    public String [] getPrincipalAttributesAsArray() {
+        return principalAttributes.split(",");
+    }
+
+
+    public void setPrincipalAttributes(String principalAttributes) {
+        this.principalAttributes = principalAttributes;
+    }
+
+    public List<String> getSearchFilter() {
+        return searchFilter;
+    }
+
+    public void setSearchFilter(List<String> searchFilter) {
+        this.searchFilter = searchFilter;
+    }
+
+    public String getDnFormat() {
+        return dnFormat;
+    }
+
+    public void setDnFormat(String dnFormat) {
+        this.dnFormat = dnFormat;
     }
 }

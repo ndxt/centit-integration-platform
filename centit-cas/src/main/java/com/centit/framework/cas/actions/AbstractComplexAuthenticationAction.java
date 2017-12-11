@@ -91,17 +91,22 @@ public abstract class AbstractComplexAuthenticationAction extends AbstractAction
         if(!doPrepareExecute(requestContext)){
             return makeError(requestContext,"credentialError","请输入正确的验证信息！") ;
         }
+
         ComplexAuthCredential credential = (ComplexAuthCredential) WebUtils.getCredential(requestContext);
-        if(credential != null && StringUtils.isNotBlank(credential.getAuthType())
+
+        if(StringUtils.isNotBlank(credential.getAuthType())
              && ! StringUtils.equals(this.supportAuthType, credential.getAuthType())
              /*&& StringUtils.equalsAny( credential.getAuthType(),
                 "password","usbKey", "fingerMark","activeDirectory" )*/ ) {
                 return new Event(this, "changeAuth");
         }
+
+        HttpServletRequest request = WebUtils.getHttpServletRequestFromExternalWebflowContext(requestContext);
+        HttpSession httpSession = request.getSession();
+        httpSession.setAttribute("_currentAuthType", credential.getAuthType());
         //check validateCod
         if(credential instanceof AbstractPasswordCredential ) {
-            HttpServletRequest request = WebUtils.getHttpServletRequestFromExternalWebflowContext(requestContext);
-            HttpSession httpSession = request.getSession();
+
             //校验码
             String captchaCode = StringBaseOpt.castObjectToString(
                 httpSession.getAttribute(CaptchaImageUtil.SESSIONCHECKCODE));
