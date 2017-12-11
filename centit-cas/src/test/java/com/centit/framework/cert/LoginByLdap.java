@@ -1,11 +1,51 @@
 package com.centit.framework.cert;
 
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import java.text.MessageFormat;
+import java.util.Properties;
+
 /**
  * https://fileserver.centit.com/svn/centit/framework/framework-sys-module2.0/src/main/resources/spring-security-ad.xml
  */
 public class LoginByLdap {
 
+    public static boolean loginLdapAsUser(String username, String password){
+
+        Properties env = new Properties();
+        //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
+        env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
+        env.put(Context.SECURITY_PRINCIPAL,username);
+        env.put(Context.SECURITY_CREDENTIALS, password);
+        env.put(Context.PROVIDER_URL, "LDAP://192.168.128.5:389");
+        LdapContext ctx = null;
+        try {
+            ctx = new InitialLdapContext(env, null);
+            //ctx.get
+            ctx.close();
+            System.out.println(username + "login ok!");
+            return true;
+        }catch (NamingException e) {
+            System.out.println(e.getLocalizedMessage());
+            if(ctx != null){
+                try {
+                    ctx.close();
+                } catch (NamingException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            return false;
+        }
+
+    }
     public static void main(String[] args) throws Exception {
+        MessageFormat sayHello = new MessageFormat("hello {0}!");
+        System.out.println(sayHello.format(new Object[]{"world"}));
+        //loginLdapAsUser("codefan@centit.com","");
+    }
      /*   DefaultSpringSecurityContextSource contextSource =
                 new DefaultSpringSecurityContextSource(
                         "ldap://192.168.128.5:389");
@@ -33,5 +73,4 @@ public class LoginByLdap {
         DirContextOperations user = authenticator.authenticate(userToken);
 
         System.out.println(user.getNameInNamespace());*/
-    }
 }
