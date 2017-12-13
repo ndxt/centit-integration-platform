@@ -4,7 +4,7 @@
   "name" : "HTTP,IMAP,HTTPS and IMAPS",
   "id" : 10000001,
   "description" : "This service definition authorizes all application urls that support HTTP IMAP HTTPS and IMAPS protocols.",
-  "evaluationOrder" : 10000,
+  "evaluationOrder" : 1,
   "attributeReleasePolicy" : {
     "@class" : "org.apereo.cas.services.ReturnAllAttributeReleasePolicy"
   }

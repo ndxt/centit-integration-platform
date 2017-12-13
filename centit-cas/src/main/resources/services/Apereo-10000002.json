@@ -5,5 +5,5 @@
   "theme" : "apereo",
   "id" : 10000002,
   "description" : "Apereo foundation sample service",
-  "evaluationOrder" : 1
+  "evaluationOrder" : 10000
 }
