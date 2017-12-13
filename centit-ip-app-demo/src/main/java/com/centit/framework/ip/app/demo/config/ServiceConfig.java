@@ -17,7 +17,7 @@ import org.springframework.context.annotation.*;
 @Import({IPAppSystemBeanConfig.class,
         SpringSecurityCasConfig.class,
         SpringSecurityDaoConfig.class})
-@ComponentScan(basePackages = "com.otherpackage",
+@ComponentScan(basePackages = {"com.centit","com.otherpackage"},
         excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 public class ServiceConfig {
 
