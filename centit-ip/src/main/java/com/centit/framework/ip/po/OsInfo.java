@@ -46,11 +46,11 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
     @Length(max = 8, message = "字段长度不能大于{max}")
     private String created;
 
-    @ValueGenerator( strategy= GeneratorType.FUNCTIION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
+    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
     @Column(name = "LAST_MODIFY_DATE")
     private Date lastModifyDate;
 
-    @ValueGenerator( strategy= GeneratorType.FUNCTIION, value = "now")
+    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now")
     @Column(name = "CREATE_TIME")
     private Date createTime;
 
@@ -139,10 +139,12 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
 		this.sysDataPushOption = sysDataPushOption;
 	}
 
+	@Override
 	public Date getLastModifyDate() {
 		return lastModifyDate;
 	}
 
+	@Override
 	public void setLastModifyDate(Date lastModifyDate) {
 		this.lastModifyDate = lastModifyDate;
 	}
