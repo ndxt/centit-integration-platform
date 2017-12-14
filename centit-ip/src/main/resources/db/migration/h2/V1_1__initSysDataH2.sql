@@ -78,7 +78,7 @@ INSERT INTO f_optdatascope VALUES ('118', 'USERMAG', '所有用户', 'all', '维
 
 
 -- 初始化业务菜单
-INSERT INTO f_optinfo VALUES ('DATABASE', '集成数据库', 'DEPLOY', 'modules/sys/databaseinfo/databaseinfo.html', '/service/sys/databaseinfo', null, 'S', null, null, 'Y', null, null, null, null, 'D', '', null, null, parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), null, 'u0000000', 'u0000000');
+--INSERT INTO f_optinfo VALUES ('DATABASE', '集成数据库', 'DEPLOY', 'modules/sys/databaseinfo/databaseinfo.html', '/service/sys/databaseinfo', null, 'S', null, null, 'Y', null, null, null, null, 'D', '', null, null, parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), null, 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('DEPLOY', '实施菜单', '0', '...', '...', null, 'S', null, null, 'Y', null, null, null, null, 'D', 'icon-ok', null, null, parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('DEPTMAG', '部门管理', '0', '13', '...', null, 'O', null, null, 'Y', null, null, null, null, 'I', 'icon-base icon-base-computer', null, null, parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), null, 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('DEPTPOW', '下属部门管理', 'DEPTMAG', 'modules/sys/deptpow/deptpow.html', '/system/deptManager', null, 'O', null, null, 'Y', null, null, '0', null, 'D', 'icon-base icon-base-user', null, null, parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), null, 'u0000000', 'u0000000');
@@ -91,7 +91,7 @@ INSERT INTO f_optinfo VALUES ('OPTINFO', '系统业务', 'DEPLOY', 'modules/sys/
 INSERT INTO f_optinfo VALUES ('OPTLOG', '系统日志', 'DEPLOY', 'modules/sys/loginfo/loginfo.admin.html', '/system/optlog', null, 'S', null, null, 'Y', null, null, null, null, 'D', 'icon-ok', null, null, null, null, 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('OPT_LOG_QUERY', '系统日志', 'SYS_CONFIG', 'modules/sys/loginfo/loginfo.html', '/system/optlog', null, 'O', null, null, 'Y', null, null, null, null, 'D', null, null, null, parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), null, 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('ORGMAG', '组织管理', '0', '...', '...', null, 'O', null, null, 'Y', null, null, '3', null, 'I', 'icon-base icon-base-user', null, null, parsedatetime('01-12-2015', 'dd-MM-yyyy','en'), null, 'u0000000', 'u0000000');
-INSERT INTO f_optinfo VALUES ('OS_INFO', '集成业务系统', 'DEPLOY', 'modules/sys/osinfo/osinfo.html', '/service/sys/os', null, 'S', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-gear', null, null, null, null, 'u0000000', 'u0000000');
+--INSERT INTO f_optinfo VALUES ('OS_INFO', '集成业务系统', 'DEPLOY', 'modules/sys/osinfo/osinfo.html', '/service/sys/os', null, 'S', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-gear', null, null, null, null, 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('ROLEMAG', '角色定义', 'DEPLOY', 'modules/sys/roleinfo/roleinfo.html', '/system/roleinfo', null, 'S', null, null, 'Y', null, null, null, null, 'D', '', null, null, null, null, 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('SYS_CONFIG', '系统维护', '0', '...', '...', null, 'O', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-gear', null, null, null, null, 'u0000000', 'u0000000');
 INSERT INTO f_optinfo VALUES ('UNITINFO', '机构维护', 'SYS_CONFIG', 'modules/sys/unitinfo/unitinfo.html', '/system/unitinfo', null, 'O', null, null, 'Y', null, null, null, null, 'D', '', null, null, null, null, null, null);
@@ -131,8 +131,8 @@ INSERT INTO f_optdef VALUES ('1000071', 'USERMAG', '创建用户', null, '/', '�
 INSERT INTO f_optdef VALUES ('1000072', 'USERMAG', '更新用户', null, '/*', '更新用户', null, null, null, null, 'U', 'u0000000', 'u0000000');
 INSERT INTO f_optdef VALUES ('1000073', 'USERMAG', '删除用户', null, '/*', '删除用户', null, null, null, null, 'D', 'u0000000', 'u0000000');
 INSERT INTO f_optdef VALUES ('1000080', 'LOGINCAS', 'CAS登录入口', null, '/logincas', null, null, null, null, null, 'RCU', 'u0000000', 'u0000000');
-INSERT INTO f_optdef VALUES ('1000101', 'OS_INFO', '所有权限', 'ALL', '/*', '更新机构状态', null, 'F', null, null, 'CRUD', 'u0000000', 'u0000000');
-INSERT INTO f_optdef VALUES ('1000102', 'DATABASE', '所有权限', 'ALL', '/*', null, null, null, null, null, 'CRUD', 'u0000000', 'u0000000');
+--INSERT INTO f_optdef VALUES ('1000101', 'OS_INFO', '所有权限', 'ALL', '/*', '更新机构状态', null, 'F', null, null, 'CRUD', 'u0000000', 'u0000000');
+--INSERT INTO f_optdef VALUES ('1000102', 'DATABASE', '所有权限', 'ALL', '/*', null, null, null, null, null, 'CRUD', 'u0000000', 'u0000000');
 INSERT INTO f_optdef VALUES ('120', 'OPTLOG', '删除日志', 'delete', '/*', '删除日志', null, null, null, null, 'D', null, null);
 INSERT INTO f_optdef VALUES ('124', 'OPTINFO', '新增', 'create', '/', '新建菜单（顶级和下级）', null, null, null, null, 'C', null, null);
 INSERT INTO f_optdef VALUES ('125', 'OPTINFO', '删除', 'delete', '/*', '删除菜单', null, null, null, null, 'D', null, null);
