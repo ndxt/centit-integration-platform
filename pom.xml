@@ -25,7 +25,7 @@
         <centit.commons.version>2.2.5-SNAPSHOT</centit.commons.version>
         <centit.persistence.version>1.0.2-SNAPSHOT</centit.persistence.version>
         <centit.msgpusher.version>0.0.4-SNAPSHOT</centit.msgpusher.version>
-
+        <centit.stat.version>2.0.1-SNAPSHOT</centit.stat.version>
         <centit.ui.version>3.0.1-SNAPSHOT</centit.ui.version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <spring.ldap.version>2.2.0.RELEASE</spring.ldap.version>
