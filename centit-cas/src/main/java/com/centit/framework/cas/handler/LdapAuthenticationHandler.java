@@ -5,8 +5,8 @@
 package com.centit.framework.cas.handler;
 
 import com.centit.framework.cas.audit.JdbcLoginLogger;
-import com.centit.framework.cas.config.ActiveDirectoryProperties;
-import com.centit.framework.cas.model.ActiveDirectoryCredential;
+import com.centit.framework.cas.config.LdapProperties;
+import com.centit.framework.cas.model.LdapCredential;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.StringUtils;
@@ -43,12 +43,12 @@ import java.util.Properties;
  * @author codefan@sina.comc
  * @since 1.0.2
  */
-public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProcessingAuthenticationHandler {
+public class LdapAuthenticationHandler extends AbstractPreAndPostProcessingAuthenticationHandler {
 
     private static Logger logger = LoggerFactory.getLogger(JdbcLoginLogger.class);
-    private ActiveDirectoryProperties activeDirectory;
+    private LdapProperties ldapProperties;
 
-    public ActiveDirectoryAuthenticationHandler(String name, ServicesManager servicesManager, PrincipalFactory principalFactory, Integer order) {
+    public LdapAuthenticationHandler(String name, ServicesManager servicesManager, PrincipalFactory principalFactory, Integer order) {
         super(name, servicesManager, principalFactory, order);
     }
 
@@ -60,7 +60,7 @@ public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProc
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
         env.put(Context.SECURITY_PRINCIPAL,username);
         env.put(Context.SECURITY_CREDENTIALS, password);
-        env.put(Context.PROVIDER_URL, activeDirectory.getUrl());
+        env.put(Context.PROVIDER_URL, ldapProperties.getUrl());
         LdapContext ctx = null;
         try {
             ctx = new InitialLdapContext(env, null);
@@ -91,26 +91,26 @@ public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProc
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
-        env.put(Context.SECURITY_PRINCIPAL,activeDirectory.getUsername());
-        env.put(Context.SECURITY_CREDENTIALS, activeDirectory.getPassword());
-        env.put(Context.PROVIDER_URL, activeDirectory.getUrl());
+        env.put(Context.SECURITY_PRINCIPAL, ldapProperties.getUsername());
+        env.put(Context.SECURITY_CREDENTIALS, ldapProperties.getPassword());
+        env.put(Context.PROVIDER_URL, ldapProperties.getUrl());
         LdapContext ctx = null;
         try {
             ctx = new InitialLdapContext(env, null);
             SearchControls searchCtls = new SearchControls();
             searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            for(String filterStr : activeDirectory.getSearchFilter()) {
+            for(String filterStr : ldapProperties.getSearchFilter()) {
 
                 String searchFilter = MessageFormat.format(filterStr,credential.getId());
 
-                searchCtls.setReturningAttributes(activeDirectory.getPrincipalAttributesAsArray());
-                NamingEnumeration<SearchResult> answer = ctx.search(activeDirectory.getSearchBase(), searchFilter, searchCtls);
+                searchCtls.setReturningAttributes(ldapProperties.getPrincipalAttributesAsArray());
+                NamingEnumeration<SearchResult> answer = ctx.search(ldapProperties.getSearchBase(), searchFilter, searchCtls);
                 if (answer.hasMoreElements()) {
                     SearchResult sr = answer.next();
 
                     Attributes attrs = sr.getAttributes();
 
-                    String principalId = getAttributeString(attrs, activeDirectory.getPrincipalField());
+                    String principalId = getAttributeString(attrs, ldapProperties.getPrincipalIdField());
                     if (StringUtils.isNotBlank(principalId)) {
                         Map<String, Object> attributes = new HashMap<>(20);
                         NamingEnumeration<? extends Attribute> enumeration = attrs.getAll();
@@ -146,7 +146,7 @@ public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProc
 
     @Override
     protected HandlerResult doAuthentication(Credential credential) throws GeneralSecurityException, PreventedException {
-        ActiveDirectoryCredential adCredential = (ActiveDirectoryCredential) credential;
+        LdapCredential adCredential = (LdapCredential) credential;
         Principal principal = searchPrincipalByCredential(credential);
         if(principal==null){
             throw new AccountNotFoundException("用户找不到！");
@@ -154,7 +154,7 @@ public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProc
 
         try {
             boolean passed = checkUserPasswordByDn(
-                    Pretreatment.mapTemplateString(activeDirectory.getDnFormat(),principal.getAttributes()),
+                    Pretreatment.mapTemplateString(ldapProperties.getDnFormat(),principal.getAttributes()),
                     adCredential.getPassword());
             if(!passed){
                 throw new FailedLoginException("用户名密码不匹配。");
@@ -169,11 +169,11 @@ public class ActiveDirectoryAuthenticationHandler extends AbstractPreAndPostProc
 
     @Override
     public boolean supports(Credential credential) {
-        return credential instanceof ActiveDirectoryCredential;
+        return credential instanceof LdapCredential;
     }
 
-    public void setActiveDirectory(ActiveDirectoryProperties activeDirectory) {
-        this.activeDirectory = activeDirectory;
+    public void setLdapProperties(LdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
     }
 
 }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActiveDirectoryProperties implements Serializable {
+public class LdapProperties implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -12,7 +12,7 @@ public class ActiveDirectoryProperties implements Serializable {
     private String username;//=accounts@centit.com
     private String password;//=yhs@yhs1
     private String searchBase;//=CN=Users,DC=centit,DC=com
-    private String principalField;
+    private String principalIdField;
     private String principalAttributes;
     private String dnFormat;
     private List<String> searchFilter = new ArrayList<>(5);
@@ -48,12 +48,12 @@ public class ActiveDirectoryProperties implements Serializable {
         this.searchBase = searchBase;
     }
 
-    public String getPrincipalField() {
-        return principalField;
+    public String getPrincipalIdField() {
+        return principalIdField;
     }
 
-    public void setPrincipalField(String principalField) {
-        this.principalField = principalField;
+    public void setPrincipalIdField(String principalIdField) {
+        this.principalIdField = principalIdField;
     }
 
     public String getPrincipalAttributes() {

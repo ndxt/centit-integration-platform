@@ -9,7 +9,7 @@
 
 <div layout:fragment="content">
   <form action="login" class="bs-example bs-example-form"
-        role="form" method="post" id="fmLogin" th:object="${activeDirectoryCredential}">
+        role="form" method="post" id="fmLogin" th:object="${ldapCredential}">
 
     <div class="alert alert-danger" th:if="${#fields.hasErrors('*')}">
       <span th:each="err : ${#fields.errors('*')}" th:utext="${err}"/>
@@ -20,7 +20,7 @@
         <input type="radio" name="authType" value="password" >账号密码
       </label>
       <label class="checkbox-inline" style="padding-right:10px;">
-        <input type="radio" name="authType" value="activeDirectory" checked >LDAP
+        <input type="radio" name="authType" value="ldap" checked >LDAP
       </label>
 
       <label class="checkbox-inline" style="padding-right:10px;">

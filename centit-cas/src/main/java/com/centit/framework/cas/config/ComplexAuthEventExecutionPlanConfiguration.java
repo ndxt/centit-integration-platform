@@ -1,6 +1,6 @@
 package com.centit.framework.cas.config;
 
-import com.centit.framework.cas.handler.ActiveDirectoryAuthenticationHandler;
+import com.centit.framework.cas.handler.LdapAuthenticationHandler;
 import com.centit.framework.cas.handler.Md5PasswordAuthenticationHandler;
 import com.centit.framework.cas.utils.CentitPasswordEncoder;
 import org.apereo.cas.authentication.AuthenticationEventExecutionPlan;
@@ -46,12 +46,12 @@ public class ComplexAuthEventExecutionPlanConfiguration implements Authenticatio
     }
 
     @Bean
-    public AuthenticationHandler activeDirectoryAuthenticationHandler() {
+    public AuthenticationHandler ldapAuthenticationHandler() {
         //优先验证
-        ActiveDirectoryAuthenticationHandler authenticationHandler =
-                new ActiveDirectoryAuthenticationHandler("activeDirectoryAuthenticationHandler",
+        LdapAuthenticationHandler authenticationHandler =
+                new LdapAuthenticationHandler("ldapAuthenticationHandler",
                         servicesManager, new DefaultPrincipalFactory(), 1);
-        authenticationHandler.setActiveDirectory(complexProperties.getActiveDirectory());
+        authenticationHandler.setLdapProperties(complexProperties.getLdap());
         return authenticationHandler;
     }
 
@@ -59,6 +59,6 @@ public class ComplexAuthEventExecutionPlanConfiguration implements Authenticatio
     @Override
     public void configureAuthenticationExecutionPlan(final AuthenticationEventExecutionPlan plan) {
         plan.registerAuthenticationHandler(md5PasswordAuthenticationHandler());
-        plan.registerAuthenticationHandler(activeDirectoryAuthenticationHandler());
+        plan.registerAuthenticationHandler(ldapAuthenticationHandler());
     }
 }

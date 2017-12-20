@@ -97,7 +97,7 @@ public abstract class AbstractComplexAuthenticationAction extends AbstractAction
         if(StringUtils.isNotBlank(credential.getAuthType())
              && ! StringUtils.equals(this.supportAuthType, credential.getAuthType())
              /*&& StringUtils.equalsAny( credential.getAuthType(),
-                "password","usbKey", "fingerMark","activeDirectory" )*/ ) {
+                "password","usbKey", "fingerMark","ldap" )*/ ) {
                 return new Event(this, "changeAuth");
         }
 

@@ -7,7 +7,7 @@
     <var name="fingerMarkCredential" class="com.centit.framework.cas.model.FingerMarkCredential"/>
     <var name="usbKeyCredential" class="com.centit.framework.cas.model.UsbKeyCredential"/>
     <var name="md5PwdCredential" class="com.centit.framework.cas.model.Md5PasswordCredential"/>
-    <var name="activeDirectoryCredential" class="com.centit.framework.cas.model.ActiveDirectoryCredential"/>
+    <var name="ldapCredential" class="com.centit.framework.cas.model.LdapCredential"/>
 
     <action-state id="initialAuthenticationRequestValidationCheck">
         <evaluate expression="initialAuthenticationRequestValidationAction"/>
@@ -39,14 +39,14 @@
         <transition on="submit" bind="true" validate="true" to="passwordLoginSubmit" history="invalidate"/>
     </view-state>
 
-    <view-state id="activeDirectoryLoginForm" view="casActiveDirectoryLoginView" model="activeDirectoryCredential">
+    <view-state id="ldapLoginForm" view="casLdapLoginView" model="ldapCredential">
         <binder>
             <binding property="authType" required="true"/>
             <binding property="username" required="true"/>
             <binding property="password" required="true"/>
             <binding property="validateCode" required="false"/>
         </binder>
-        <transition on="submit" bind="true" validate="true" to="activeDirectoryLoginSubmit" history="invalidate"/>
+        <transition on="submit" bind="true" validate="true" to="ldapLoginSubmit" history="invalidate"/>
     </view-state>
 
     <view-state id="usbKeyLoginForm" view="casUsbKeyLoginView" model="usbKeyCredential">
@@ -76,14 +76,14 @@
         <transition on="error" to="passwordLoginForm"/>
     </action-state>
 
-    <action-state id="activeDirectoryLoginSubmit">
-        <evaluate expression="activeDirectoryAuthenticationAction"/>
+    <action-state id="ldapLoginSubmit">
+        <evaluate expression="ldapAuthenticationAction"/>
         <transition on="changeAuth" to="changeAuth"/>
         <transition on="warn" to="warn"/>
         <transition on="success" to="sendTicketGrantingTicket"/>
         <transition on="successWithWarnings" to="showAuthenticationWarningMessages"/>
         <transition on="authenticationFailure" to="handleAuthenticationFailure"/>
-        <transition on="error" to="activeDirectoryLoginForm"/>
+        <transition on="error" to="ldapLoginForm"/>
     </action-state>
 
     <action-state id="usbKeyLoginSubmit">
@@ -111,7 +111,7 @@
         <transition on="password" to="passwordLoginForm"/>
         <transition on="usbKey" to="usbKeyLoginForm"/>
         <transition on="fingerMark" to="fingerMarkLoginForm"/>
-        <transition on="activeDirectory" to="activeDirectoryLoginForm"/>
+        <transition on="ldap" to="ldapLoginForm"/>
     </action-state>
 
 </flow>

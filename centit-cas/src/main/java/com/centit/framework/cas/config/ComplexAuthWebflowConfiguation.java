@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.webflow.execution.Action;
@@ -71,11 +70,11 @@ public class ComplexAuthWebflowConfiguation {
         return action;
     }
 
-    @ConditionalOnMissingBean(name = "activeDirectoryAuthenticationAction")
+    @ConditionalOnMissingBean(name = "ldapAuthenticationAction")
     @Bean
-    public Action activeDirectoryAuthenticationAction(@Autowired AuditPolicy auditPolicy,
+    public Action ldapAuthenticationAction(@Autowired AuditPolicy auditPolicy,
                                                       @Autowired LoginLogger loginLogger) {
-        ActiveDirectoryAuthenticationAction action =  new ActiveDirectoryAuthenticationAction(initialAuthenticationAttemptWebflowEventResolver,
+        LdapAuthenticationAction action =  new LdapAuthenticationAction(initialAuthenticationAttemptWebflowEventResolver,
             serviceTicketRequestWebflowEventResolver,
             adaptiveAuthenticationPolicy);
         action.setAuditPolicy(auditPolicy);

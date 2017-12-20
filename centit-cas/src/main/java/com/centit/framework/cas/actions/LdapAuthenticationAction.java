@@ -1,6 +1,6 @@
 package com.centit.framework.cas.actions;
 
-import com.centit.framework.cas.model.ActiveDirectoryCredential;
+import com.centit.framework.cas.model.LdapCredential;
 import org.apereo.cas.authentication.adaptive.AdaptiveAuthenticationPolicy;
 import org.apereo.cas.web.flow.resolver.CasDelegatingWebflowEventResolver;
 import org.apereo.cas.web.flow.resolver.CasWebflowEventResolver;
@@ -14,20 +14,20 @@ import org.springframework.webflow.execution.RequestContext;
  * 官方文档 https://apereo.github.io/cas/5.2.x/index.html
  */
 
-public class ActiveDirectoryAuthenticationAction extends AbstractComplexAuthenticationAction {
+public class LdapAuthenticationAction extends AbstractComplexAuthenticationAction {
 
-    public ActiveDirectoryAuthenticationAction(final CasDelegatingWebflowEventResolver delegatingWebflowEventResolver,
-                                               final CasWebflowEventResolver webflowEventResolver,
-                                               final AdaptiveAuthenticationPolicy adaptiveAuthenticationPolicy) {
+    public LdapAuthenticationAction(final CasDelegatingWebflowEventResolver delegatingWebflowEventResolver,
+                                    final CasWebflowEventResolver webflowEventResolver,
+                                    final AdaptiveAuthenticationPolicy adaptiveAuthenticationPolicy) {
         super(delegatingWebflowEventResolver, webflowEventResolver, adaptiveAuthenticationPolicy);
-        super.setSupportAuthType("activeDirectory");
+        super.setSupportAuthType("ldap");
     }
 
     @Override
     public boolean doPrepareExecute(RequestContext requestContext) {
         //HttpServletRequest request =WebUtils.getHttpServletRequestFromExternalWebflowContext(requestContext);
-        ActiveDirectoryCredential credential = (ActiveDirectoryCredential)
-            requestContext.getFlowScope().get("activeDirectoryCredential");
+        LdapCredential credential = (LdapCredential)
+            requestContext.getFlowScope().get("ldapCredential");
         if(credential != null) {
             requestContext.getFlowScope().put("credential", credential);
             return true;
