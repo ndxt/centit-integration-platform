@@ -400,7 +400,6 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         userDetails.getUserInfo().setUserUnits(
                 resJson.getDataAsArray("userUnits", UserUnit.class) );
         userDetails.setAuthoritiesByRoles(userDetails.getUserRoles());
-        userDetails.getUserInfo().setUserPin("$2a$11$0As9Gn84D2gt.KvLJU3ceuf5MtMnITLhhzms6vZXJDj/SpW789HR.");
         return userDetails;
 	}
 
