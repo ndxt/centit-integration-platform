@@ -8,7 +8,6 @@
     <artifactId>centit-integration-platform</artifactId>
     <version>1.0.2-SNAPSHOT</version>
     <modules>
-        <module>centit-cas</module>
         <module>centit-ip</module>
         <module>centit-ip-app</module>
         <module>centit-ip-adapter</module>
