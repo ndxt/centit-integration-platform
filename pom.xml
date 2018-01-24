@@ -11,7 +11,6 @@
         <module>centit-ip</module>
         <module>centit-ip-app</module>
         <module>centit-ip-adapter</module>
-        <module>centit-ip-app-demo</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -20,12 +19,12 @@
         <centit.ip.version>1.0.2-SNAPSHOT</centit.ip.version>
         <jdk.version>1.8</jdk.version>
 
-        <centit.framework.version>4.0.4-SNAPSHOT</centit.framework.version>
-        <centit.commons.version>2.2.5-SNAPSHOT</centit.commons.version>
-        <centit.persistence.version>1.0.2-SNAPSHOT</centit.persistence.version>
-        <centit.msgpusher.version>0.0.4-SNAPSHOT</centit.msgpusher.version>
-        <centit.stat.version>2.0.1-SNAPSHOT</centit.stat.version>
-        <centit.ui.version>3.0.1-SNAPSHOT</centit.ui.version>
+        <centit.framework.version>4.0.4</centit.framework.version>
+        <centit.commons.version>2.2.5</centit.commons.version>
+        <centit.persistence.version>1.0.2</centit.persistence.version>
+
+        <centit.ui.version>3.1.0</centit.ui.version>
+
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <spring.ldap.version>2.2.0.RELEASE</spring.ldap.version>
         <cas.version>5.2.0</cas.version>

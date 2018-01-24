@@ -14,6 +14,10 @@
     <packaging>war</packaging>
     <description>先腾集成平台应用开发示例</description>
 
+    <properties>
+        <centit.stat.version>2.0.1-SNAPSHOT</centit.stat.version>
+    </properties>
+
     <dependencies>
 
         <dependency>
