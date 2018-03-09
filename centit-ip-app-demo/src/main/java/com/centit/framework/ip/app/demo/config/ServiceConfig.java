@@ -2,6 +2,7 @@ package com.centit.framework.ip.app.demo.config;
 
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
+import com.centit.framework.config.InitialWebRuntimeEnvironment;
 import com.centit.framework.config.SpringSecurityCasConfig;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.ip.app.config.IPAppSystemBeanConfig;
@@ -20,6 +21,12 @@ import org.springframework.context.annotation.*;
 @ComponentScan(basePackages = {"com.centit","com.otherpackage"},
         excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 public class ServiceConfig {
+
+    @Bean(initMethod = "initialEnvironment")
+    @Lazy(value = false)
+    public InitialWebRuntimeEnvironment initialEnvironment() {
+        return new InitialWebRuntimeEnvironment();
+    }
 
     @Bean
     public NotificationCenter notificationCenter() {

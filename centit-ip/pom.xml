@@ -20,17 +20,24 @@
             <artifactId>framework-persistence-jdbc</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-module</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-config</artifactId>
+            <version>${centit.framework.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-view-easyui</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
-
 
         <!-- spring-security-oauth 这个包中同时实现了OAuth2 的服务端和客户端
             http://blog.csdn.net/monkeyking1987/article/details/16828059

@@ -19,7 +19,7 @@
         <centit.ip.version>1.0.2-SNAPSHOT</centit.ip.version>
         <jdk.version>1.8</jdk.version>
 
-        <centit.framework.version>4.0.4</centit.framework.version>
+        <centit.framework.version>4.0-SNAPSHOT</centit.framework.version>
         <centit.commons.version>2.2.5</centit.commons.version>
         <centit.persistence.version>1.0.2</centit.persistence.version>
 

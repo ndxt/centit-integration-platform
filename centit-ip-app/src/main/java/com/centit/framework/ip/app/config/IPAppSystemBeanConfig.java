@@ -7,7 +7,6 @@ import com.centit.framework.ip.app.service.impl.PlatformEnvironmentProxy;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.ip.service.impl.JdbcIntegrationEnvironment;
 import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
-import com.centit.framework.listener.InitialWebRuntimeEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.*;
 import com.centit.framework.staticsystem.service.impl.JdbcPlatformEnvironment;
@@ -48,12 +47,6 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     @Bean
     public AutowiredAnnotationBeanPostProcessor autowiredAnnotationBeanPostProcessor() {
         return new AutowiredAnnotationBeanPostProcessor();
-    }
-
-    @Bean(initMethod = "initialEnvironment")
-    @Lazy(value = false)
-    public InitialWebRuntimeEnvironment initialEnvironment() {
-        return new InitialWebRuntimeEnvironment();
     }
 
     @Bean
