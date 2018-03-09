@@ -35,6 +35,18 @@
 
         <dependency>
             <groupId>com.centit.framework</groupId>
+            <artifactId>centit-persistence-jdbc-config</artifactId>
+            <version>${centit.persistence.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-system-config</artifactId>
+            <version>${centit.framework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-view-easyui</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>

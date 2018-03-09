@@ -11,6 +11,7 @@
         <module>centit-ip</module>
         <module>centit-ip-app</module>
         <module>centit-ip-adapter</module>
+        <module>centit-ip-app-config</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -20,11 +21,12 @@
         <jdk.version>1.8</jdk.version>
 
         <centit.framework.version>4.0-SNAPSHOT</centit.framework.version>
-        <centit.commons.version>2.2.5</centit.commons.version>
-        <centit.persistence.version>1.0.2</centit.persistence.version>
+        <centit.persistence.version>1.0-SNAPSHOT</centit.persistence.version>
 
+        <centit.commons.version>2.2.5</centit.commons.version>
         <centit.ui.version>3.1.0</centit.ui.version>
 
+        <spring.version>4.3.12.RELEASE</spring.version>
         <spring.security.version>4.2.3.RELEASE</spring.security.version>
         <spring.ldap.version>2.2.0.RELEASE</spring.ldap.version>
         <cas.version>5.2.0</cas.version>
@@ -106,7 +108,7 @@
         <snapshotRepository>
             <id>centit-snapshots</id>
             <name>centit-snapshots</name>
-            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
+            <url>http://nexus.centit.com:8081/nexus/content/repositories/centit-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
