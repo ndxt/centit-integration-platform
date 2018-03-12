@@ -1,6 +1,5 @@
 package com.centit.framework.ip.service.impl;
 
-import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.IntegrationEnvironment;
@@ -25,7 +24,7 @@ public class DummyIntegrationEnvironment implements IntegrationEnvironment {
     public OsInfo getOsInfo(String osId) {
         OsInfo osInfo = new OsInfo();
         osInfo.setOsId(osId);
-        osInfo.setOsName(SysParametersUtils.getStringValue("app.key"));
+        osInfo.setOsName("dummy.app.key");
         return osInfo;
     }
 
@@ -34,10 +33,10 @@ public class DummyIntegrationEnvironment implements IntegrationEnvironment {
         DatabaseInfo databaseInfo = new DatabaseInfo();
         databaseInfo.setOsId(databaseCode);
         databaseInfo.setDatabaseCode(databaseCode);
-        databaseInfo.setDatabaseUrl(SysParametersUtils.getStringValue("jdbc.url"));
-        databaseInfo.setUsername(SysParametersUtils.getStringValue("jdbc.user"));
-        databaseInfo.setPassword(SysParametersUtils.getStringValue("jdbc.password"));
-        databaseInfo.setDatabaseDesc(SysParametersUtils.getStringValue("jdbc.dialect"));
+        databaseInfo.setDatabaseUrl("placeholder");
+        databaseInfo.setUsername("placeholder");
+        databaseInfo.setPassword("placeholder");
+        databaseInfo.setDatabaseDesc("placeholder");
         return databaseInfo;
     }
 

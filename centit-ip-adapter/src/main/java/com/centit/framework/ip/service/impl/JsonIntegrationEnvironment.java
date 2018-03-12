@@ -2,7 +2,6 @@ package com.centit.framework.ip.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.framework.common.SysParametersUtils;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +27,14 @@ public class JsonIntegrationEnvironment implements IntegrationEnvironment {
     private List<DatabaseInfo> databaseInfos;
     private List<UserAccessToken> accessTokens;
 
+    protected String appHome;
 
-    private static String loadJsonStringFormConfigFile(String fileName) throws IOException {
-        String jsonFile = SysParametersUtils.getConfigHome()+ fileName;
+    public void setAppHome(String appHome) {
+        this.appHome = appHome;
+    }
+
+    private String loadJsonStringFormConfigFile(String fileName) throws IOException {
+        String jsonFile = appHome +"/config" +  fileName;
         if(FileSystemOpt.existFile(jsonFile)) {
             return FileIOOpt.readStringFromFile(jsonFile,"UTF-8");
         }else{
@@ -46,11 +49,11 @@ public class JsonIntegrationEnvironment implements IntegrationEnvironment {
     public boolean reloadIPEnvironmen() {
         try {
             String jsonStr = loadJsonStringFormConfigFile("/ip_environmen.json");
-            JSONObject json = (JSONObject) JSON.parseObject(jsonStr);
-            osInfos = (List<OsInfo>)JSON.parseArray(json.getString("osInfos"), OsInfo.class);
-            databaseInfos = (List<DatabaseInfo>)JSON.parseArray(json.getString("databaseInfos"),
+            JSONObject json = JSON.parseObject(jsonStr);
+            osInfos = JSON.parseArray(json.getString("osInfos"), OsInfo.class);
+            databaseInfos = JSON.parseArray(json.getString("databaseInfos"),
                     DatabaseInfo.class);
-            accessTokens = (List<UserAccessToken>)JSON.parseArray(json.getString("userAccessTokens"),
+            accessTokens = JSON.parseArray(json.getString("userAccessTokens"),
                     UserAccessToken.class);
         } catch (IOException e) {
             osInfos = new ArrayList<>();

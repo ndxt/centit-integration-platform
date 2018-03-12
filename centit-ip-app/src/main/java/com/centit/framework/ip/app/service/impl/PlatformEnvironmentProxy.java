@@ -53,23 +53,6 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return res;
     }
 
-
-    /**
-     * 获取系统配置参数
-     *
-     * @param paramCode paramCode
-     * @return 系统配置参数
-     */
-    @Override
-    public String getSystemParameter(String paramCode) {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            String svalue = evrnManger.getSystemParameter(paramCode);
-            if(svalue!=null)
-                return svalue;
-        }
-        return null;
-    }
-
     /**
      * 获得用户设置参数
      *

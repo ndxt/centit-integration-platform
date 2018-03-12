@@ -79,6 +79,7 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
             }
         } else{
             JsonPlatformEnvironment jsonPlatformEnvironment = new JsonPlatformEnvironment();
+            jsonPlatformEnvironment.setAppHome(env.getProperty("app.home"));
             jsonPlatformEnvironment.setPasswordEncoder(passwordEncoder);
             jsonPlatformEnvironment.init();
             if(ipEnable==null || !ipEnable) {
@@ -126,7 +127,9 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
                 staticIntegrationEnvironment = jdbcIntegrationEnvironment;
             }
         } else{
-            IntegrationEnvironment jsonIntegrationEnvironment = new JsonIntegrationEnvironment();
+            JsonIntegrationEnvironment jsonIntegrationEnvironment = new JsonIntegrationEnvironment();
+            jsonIntegrationEnvironment.setAppHome(env.getProperty("app.home"));
+
             jsonIntegrationEnvironment.reloadIPEnvironmen();
             if(ipEnable==null || !ipEnable) {
                 return jsonIntegrationEnvironment;
