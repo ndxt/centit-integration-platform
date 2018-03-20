@@ -5,9 +5,7 @@ import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.common.ResponseJSON;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.basedata.IUnitRole;
-import com.centit.framework.model.basedata.IUserInfo;
-import com.centit.framework.model.basedata.IUserSetting;
+import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.OptTreeNode;
@@ -23,6 +21,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
+import sun.net.www.http.HttpClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -492,4 +491,27 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
             UserSetting.class);
     }
 
+	/**
+	 * 新增菜单和操作
+	 * @param optInfos 菜单对象集合
+	 * @param optMethods 操作对象集合
+	 */
+	@Override
+	public void insertOpt(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
+		CloseableHttpClient httpClient = null;
+		Map<String, Object> param = new HashMap<>(4);
+		param.put("optInfos", optInfos);
+		param.put("optMethods", optMethods);
+		try {
+			httpClient = appSession.getHttpClient();
+		HttpExecutor.jsonPost(
+				httpClient,
+				appSession.completeQueryUrl("/insertopt"), param);
+		} catch (Exception e) {
+
+		} finally {
+			if(httpClient!=null)
+				appSession.releaseHttpClient(httpClient);
+		}
+	}
 }

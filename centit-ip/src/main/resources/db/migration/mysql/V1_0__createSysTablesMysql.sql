@@ -303,8 +303,8 @@ alter table F_OptFlowNoPool
 create table F_OptInfo
 (
    Opt_ID               varchar(32) not null,
-   Opt_Name             varchar(100) not null,
-   Pre_Opt_ID           varchar(32) not null,
+   Opt_Name             varchar(100) not null COMMENT '菜单名称',
+   Pre_Opt_ID           varchar(32) not null COMMENT '父级菜单ID',
    opt_Route            varchar(256) comment '与angularjs路由匹配',
    opt_url              varchar(256),
    Form_Code            varchar(4),

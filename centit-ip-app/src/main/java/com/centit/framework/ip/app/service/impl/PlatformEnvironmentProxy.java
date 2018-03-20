@@ -88,6 +88,13 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         }
     }
 
+    @Override
+    public void insertOpt(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            evrnManger.insertOpt(optInfos, optMethods);
+        }
+    }
+
     /**
      * 获取用户所有菜单功能
      *

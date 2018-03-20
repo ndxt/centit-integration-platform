@@ -14,6 +14,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptInfo;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.OptInfo;
+import com.centit.framework.system.po.OptMethod;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
 import com.centit.framework.system.service.SysRoleManager;
@@ -30,7 +31,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author codefan
@@ -433,5 +437,17 @@ public class PlatformDataController extends BaseController {
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				userAccessTokenManager.getObjectById(tokenId),response);
+	}
+
+	/**
+	 * 新增菜单和操作
+	 */
+	@RequestMapping(value = "/insertopt", method = RequestMethod.POST)
+	public void insertOpt(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Map<String, Object> param = JSON.parseObject(request.getInputStream(),Map.class);
+		List<OptInfo> optInfos = JSON.parseArray(param.get("optInfos").toString(),OptInfo.class);
+		List<OptMethod> optMethods = JSON.parseArray(param.get("optMethods").toString(),OptMethod.class);
+		platformEnvironment.insertOpt(optInfos, optMethods);
+		JsonResultUtils.writeSuccessJson(response);
 	}
 }
