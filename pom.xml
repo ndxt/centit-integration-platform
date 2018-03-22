@@ -6,7 +6,7 @@
 
     <groupId>com.centit.framework</groupId>
     <artifactId>centit-integration-platform</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <modules>
         <module>centit-ip</module>
         <module>centit-ip-app</module>
@@ -17,17 +17,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.ip.version>1.0.2-SNAPSHOT</centit.ip.version>
+        <centit.ip.version>1.1-SNAPSHOT</centit.ip.version>
         <jdk.version>1.8</jdk.version>
 
-        <centit.framework.version>4.0-SNAPSHOT</centit.framework.version>
-        <centit.persistence.version>1.0-SNAPSHOT</centit.persistence.version>
+        <centit.framework.version>4.1.1803</centit.framework.version>
+        <centit.persistence.version>1.1.1803</centit.persistence.version>
 
-        <centit.commons.version>2.2.5</centit.commons.version>
+        <centit.commons.version>2.2.1803</centit.commons.version>
         <centit.ui.version>3.1.0</centit.ui.version>
 
-        <spring.version>4.3.12.RELEASE</spring.version>
-        <spring.security.version>4.2.3.RELEASE</spring.security.version>
+        <spring.version>4.3.14.RELEASE</spring.version>
+        <spring.security.version>4.2.4.RELEASE</spring.security.version>
+
         <spring.ldap.version>2.2.0.RELEASE</spring.ldap.version>
         <cas.version>5.2.0</cas.version>
         <servlet-api.version>3.1.0</servlet-api.version>
@@ -99,10 +100,15 @@
 
     <!-- mvn deploy -DpomFile=pom.xml -->
     <distributionManagement>
-        <repository>
+        <!--<repository>
             <id>ossrh</id>
             <name>sonatype-releases</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>-->
+        <repository>
+            <id>centit-releases</id>
+            <name>centit-release</name>
+            <url>http://nexus.centit.com:8081/nexus/content/repositories/centit-releases/</url>
         </repository>
 
         <snapshotRepository>
