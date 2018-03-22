@@ -12,6 +12,7 @@
         <module>centit-ip-app</module>
         <module>centit-ip-adapter</module>
         <module>centit-ip-app-config</module>
+        <module>centit-ip-module</module>
     </modules>
     <packaging>pom</packaging>
 

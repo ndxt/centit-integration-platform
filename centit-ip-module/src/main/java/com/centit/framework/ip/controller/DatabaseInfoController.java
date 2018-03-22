@@ -35,15 +35,15 @@ public class DatabaseInfoController extends BaseController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> searchColumn = convertSearchColumn(request);
+        Map<String, Object> searchColumn = BaseController.convertSearchColumn(request);
 
 //        JSONArray listObjects = databaseInfoMag.queryDatabaseAsJson(
 //                StringBaseOpt.objectToString(searchColumn.get("databaseName")), pageDesc);
         JSONArray listObjects = databaseInfoMag.listObjectsAsJson(searchColumn, pageDesc);
 
         ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData(OBJLIST, listObjects);
-        resData.addResponseData(PAGE_DESC, pageDesc);
+        resData.addResponseData(BaseController.OBJLIST, listObjects);
+        resData.addResponseData(BaseController.PAGE_DESC, pageDesc);
 
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }

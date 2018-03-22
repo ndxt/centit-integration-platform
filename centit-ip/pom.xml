@@ -17,14 +17,8 @@
     <dependencies>
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>framework-persistence-jdbc</artifactId>
-            <version>${centit.framework.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-web</artifactId>
-            <version>${centit.framework.version}</version>
+            <artifactId>centit-ip-module</artifactId>
+            <version>${centit.ip.version}</version>
         </dependency>
 
         <dependency>

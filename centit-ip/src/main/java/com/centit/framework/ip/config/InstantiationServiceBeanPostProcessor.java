@@ -1,4 +1,4 @@
-package com.centit.framework.ip.listener;
+package com.centit.framework.ip.config;
 
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.MessageSender;
