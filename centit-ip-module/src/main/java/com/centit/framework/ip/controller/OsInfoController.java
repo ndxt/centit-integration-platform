@@ -31,7 +31,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/sys/os")
-public class OsInfoContoller extends  BaseController {
+public class OsInfoController extends  BaseController {
 
     @Resource
     private OsInfoManager osInfoMag;
