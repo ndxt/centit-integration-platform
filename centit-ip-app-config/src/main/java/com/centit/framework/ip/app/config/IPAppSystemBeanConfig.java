@@ -16,32 +16,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @PropertySource("classpath:system.properties")
-@EnableAspectJAutoProxy(proxyTargetClass = true)
-@Lazy
 public class IPAppSystemBeanConfig  implements EnvironmentAware{
-
 
     private Environment env;
 
     @Override
     public void setEnvironment(final Environment environment) {
         this.env = environment;
-    }
-
-    @Bean
-    public PersistenceExceptionTranslationPostProcessor persistenceExceptionTranslationPostProcessor() {
-        return new PersistenceExceptionTranslationPostProcessor();
     }
 
     @Bean

@@ -27,6 +27,11 @@
             <version>${centit.framework.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-database-datasource</artifactId>
+            <version>${centit.commons.version}</version>
+        </dependency>
         <!-- test library -->
 
         <dependency>

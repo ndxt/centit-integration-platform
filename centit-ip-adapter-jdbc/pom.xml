@@ -9,16 +9,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>centit-ip-app-config</artifactId>
-    <name>com.centit.framework:centit-ip-app-config</name>
-    <packaging>jar</packaging>
-    <description>先腾集成平台应用，配置类</description>
+    <artifactId>centit-ip-adapter-jdbc</artifactId>
+    <name>com.centit.framework:centit-ip-adapter-jdbc</name>
+    <description>南大先腾集成平台适配器，实现了jdbc适配异构数据库的基础数据访问
+    </description>
 
     <dependencies>
-
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app</artifactId>
+            <artifactId>centit-ip-adapter</artifactId>
             <version>${centit.ip.version}</version>
         </dependency>
 
@@ -26,12 +25,6 @@
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-static-jdbc</artifactId>
             <version>${centit.framework.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-adapter-jdbc</artifactId>
-            <version>${centit.ip.version}</version>
         </dependency>
 
     </dependencies>

@@ -15,6 +15,7 @@ import org.springframework.context.annotation.*;
  * Created by codefan on 17-7-18.
  */
 @Configuration
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @Import({IPAppSystemBeanConfig.class,
         SpringSecurityCasConfig.class,
         SpringSecurityDaoConfig.class})

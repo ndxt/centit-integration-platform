@@ -13,6 +13,7 @@
         <module>centit-ip-adapter</module>
         <module>centit-ip-app-config</module>
         <module>centit-ip-module</module>
+        <module>centit-ip-adapter-jdbc</module>
     </modules>
     <packaging>pom</packaging>
 
