@@ -29,13 +29,13 @@ insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CO
 values ('DATABASE', '集成数据库', 'SYS_CONFIG', 'modules/sys/databaseinfo/databaseinfo.html', '/service/sys/databaseinfo', null, 'O', null, null, 'Y', null, null, null, null, 'D', null, null, null, str_to_date('07-04-2016 15:06:08', '%d-%m-%Y %H:%i:%s'), null,'u0000000','u0000000');
 
 insert into F_OPTDEF (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_DESC, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_URL, OPT_REQ,CREATOR,UPDATOR)
-values ('1000101', 'OS_INFO', '所有权限', 'ALL', '更新机构状态', 'F', str_to_date('14-03-2016 14:41:07', '%d-%m-%Y %H:%i:%s'), null, '/*', 'CRUD','u0000000','u0000000');
+values ('45', 'OS_INFO', '所有权限', 'ALL', '更新机构状态', 'F', str_to_date('14-03-2016 14:41:07', '%d-%m-%Y %H:%i:%s'), null, '/*', 'CRUD','u0000000','u0000000');
 insert into F_OPTDEF (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_DESC, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_URL, OPT_REQ,CREATOR,UPDATOR)
-values ('1000102', 'DATABASE', '所有权限','ALL', null, null, null, null, '/×', 'CRUD','u0000000','u0000000');
+values ('46', 'DATABASE', '所有权限','ALL', null, null, null, null, '/×', 'CRUD','u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
-	values('G-SYSADMIN','1000101',now(),now(),null,'u0000000','u0000000');
+	values('G-SYSADMIN','45',now(),now(),null,'u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
-	values('G-SYSADMIN','1000102',now(),now(),null,'u0000000','u0000000');
+	values('G-SYSADMIN','46',now(),now(),null,'u0000000','u0000000');
 
 INSERT INTO F_MYSQL_SEQUENCE (NAME, CURRVALUE , INCREMENT) VALUES
   ('S_DATABASECODE', 0, 1);

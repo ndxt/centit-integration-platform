@@ -483,12 +483,12 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	}
 
 	@Override
-    public List<UserSetting> getAllSettings(){
-        return RestfulHttpRequest.getResponseObjectList(
-            appSession,
-            "/allsettings/"+topOptId,
-            UserSetting.class);
-    }
+	public List<UserSetting> getAllSettings(){
+		return RestfulHttpRequest.getResponseObjectList(
+				appSession,
+				"/allsettings/"+topOptId,
+				UserSetting.class);
+	}
 
 	/**
 	 * 新增菜单和操作
@@ -496,7 +496,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	 * @param optMethods 操作对象集合
 	 */
 	@Override
-	public void insertOpt(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
+	public void insertOrUpdateMenu(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
 		CloseableHttpClient httpClient = null;
 		Map<String, Object> param = new HashMap<>(4);
 		param.put("optInfos", optInfos);

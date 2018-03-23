@@ -447,7 +447,7 @@ public class PlatformDataController extends BaseController {
 		Map<String, Object> param = JSON.parseObject(request.getInputStream(),Map.class);
 		List<OptInfo> optInfos = JSON.parseArray(param.get("optInfos").toString(),OptInfo.class);
 		List<OptMethod> optMethods = JSON.parseArray(param.get("optMethods").toString(),OptMethod.class);
-		platformEnvironment.insertOpt(optInfos, optMethods);
+		platformEnvironment.insertOrUpdateMenu(optInfos, optMethods);
 		JsonResultUtils.writeSuccessJson(response);
 	}
 }

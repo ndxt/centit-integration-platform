@@ -26,7 +26,7 @@ INSERT INTO f_mysql_sequence (name, currvalue , increment) VALUES
 ('S_ADDRESSID', 0, 1);
 
 INSERT INTO f_mysql_sequence (name, currvalue , increment) VALUES
-('S_OPTDEFCODE', 0, 1);
+('S_OPTDEFCODE', 100, 1);
 
 INSERT INTO f_mysql_sequence (name, currvalue , increment) VALUES
 ('S_SYS_LOG', 0, 1);

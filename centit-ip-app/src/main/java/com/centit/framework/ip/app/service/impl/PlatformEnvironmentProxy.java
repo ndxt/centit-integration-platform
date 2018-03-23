@@ -89,9 +89,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     @Override
-    public void insertOpt(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
+    public void insertOrUpdateMenu(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            evrnManger.insertOpt(optInfos, optMethods);
+            evrnManger.insertOrUpdateMenu(optInfos, optMethods);
         }
     }
 
