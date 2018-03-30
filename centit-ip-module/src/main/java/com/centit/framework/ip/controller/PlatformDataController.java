@@ -161,7 +161,7 @@ public class PlatformDataController extends BaseController {
 				platformEnvironment.getUserInfoByLoginName(loginName),response);
 	}
 
-	@RequestMapping(value = "/changepassword/{userCode}",
+	@RequestMapping(value = "/checkpassword/{userCode}",
 			method = RequestMethod.PUT)
 	public void changeUserPassword(@PathVariable String userCode,@RequestBody String jsonData ,
 			HttpServletResponse response) {
@@ -173,7 +173,7 @@ public class PlatformDataController extends BaseController {
 	}
 
 
-	@RequestMapping(value = "/checkpassword/{userCode}",
+	@RequestMapping(value = "/changepassword/{userCode}",
 			method = RequestMethod.PUT)
 	public void checkUserPassword(@PathVariable String userCode,@RequestBody String jsonData ,
 			HttpServletResponse response) {
