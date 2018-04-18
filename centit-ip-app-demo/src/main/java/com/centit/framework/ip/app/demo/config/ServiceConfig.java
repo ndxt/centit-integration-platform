@@ -9,6 +9,7 @@ import com.centit.framework.ip.app.config.IPAppSystemBeanConfig;
 import com.centit.framework.ip.app.demo.listener.InstantiationServiceBeanPostProcessor;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 
 /**
@@ -22,6 +23,9 @@ import org.springframework.context.annotation.*;
 @ComponentScan(basePackages = {"com.centit","com.otherpackage"},
         excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 public class ServiceConfig {
+
+    @Value("${app.home}")
+    private String appHome;
 
     @Bean(initMethod = "initialEnvironment")
     @Lazy(value = false)
@@ -41,6 +45,7 @@ public class ServiceConfig {
     @Lazy(value = false)
     public OperationLogWriter operationLogWriter() {
         TextOperationLogWriterImpl  operationLog =  new TextOperationLogWriterImpl();
+        operationLog.setOptLogHomePath(appHome+"/logs");
         operationLog.init();
         return operationLog;
     }
