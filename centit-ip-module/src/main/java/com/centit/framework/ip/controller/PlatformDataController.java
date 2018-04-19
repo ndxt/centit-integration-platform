@@ -22,10 +22,7 @@ import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.UserSettingManager;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -72,6 +69,11 @@ public class PlatformDataController extends BaseController {
 	@NotNull
 	protected UserAccessTokenManager userAccessTokenManager;
 
+    @RequestMapping
+    @ResponseBody
+    public String apiInfo() {
+        return "This the apis for platform data.";
+    }
 
     @RequestMapping(value = "/userinfo", method = RequestMethod.PUT)
     public void updateUserInfo(@RequestBody UserInfo userInfo,
