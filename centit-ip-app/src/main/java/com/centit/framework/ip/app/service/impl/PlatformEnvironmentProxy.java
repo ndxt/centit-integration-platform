@@ -3,7 +3,6 @@ package com.centit.framework.ip.app.service.impl;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.staticsystem.po.UserSetting;
 
 import java.util.List;
 import java.util.Map;

@@ -467,7 +467,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         	OptInfo oi = optRepo.get(ou.getOptId());
         	if(oi!=null){
             	String  optDefUrl = oi.getOptUrl()+ou.getOptUrl();
-                List<List<String>> sOpt = CentitSecurityMetadata.parseUrl(
+                List<List<String>> sOpt = CentitSecurityMetadata.parsePowerDefineUrl(
                 		optDefUrl,ou.getOptReq());
 
                 for(List<String> surls : sOpt){
@@ -478,6 +478,8 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
                 }
         	}
         }
+
+		CentitSecurityMetadata.confirmLoginCasMustBeAuthed();
         //CentitSecurityMetadata.optTreeNode.printTreeNode();
 		return true;
 	}
