@@ -1,4 +1,4 @@
-package com.centit.framework.ip.app.demo.listener;
+package com.centit.framework.ip.app.demo.config;
 
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.MessageSender;
@@ -22,7 +22,6 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
 
     @Autowired(required = false)
     private MessageSender innerMessageManager;
-
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event)
