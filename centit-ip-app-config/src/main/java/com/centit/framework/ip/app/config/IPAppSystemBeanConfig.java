@@ -40,8 +40,8 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     }
 
     @Bean
-    public CentitPasswordEncoder passwordEncoder() {
-        return  new CentitPasswordEncoderImpl();
+    public StandardPasswordEncoderImpl passwordEncoder() {
+        return new StandardPasswordEncoderImpl();
     }
 
     @Bean
