@@ -21,6 +21,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +30,12 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
 
     private Environment env;
 
+    @Resource
     @Override
     public void setEnvironment(final Environment environment) {
-        this.env = environment;
+        if(environment!=null) {
+            this.env = environment;
+        }
     }
 
     @Bean
