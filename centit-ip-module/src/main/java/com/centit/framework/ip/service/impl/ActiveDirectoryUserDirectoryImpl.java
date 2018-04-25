@@ -49,28 +49,29 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     @NotNull
     private UserInfoDao userInfoDao;
 
-    @Value("${userdirectory.ldap.url}")
+    @Value("${userdirectory.ldap.url:}")
     private String ldapUrl;
 
-	@Value("${userdirectory.ldap.username}")
+	@Value("${userdirectory.ldap.username:}")
 	private String ldapUser;
 	
-	@Value("${userdirectory.ldap.userpassword}")
+	@Value("${userdirectory.ldap.userpassword:}")
     private String ldapUserPwd;
     
-	@Value("${userdirectory.ldap.searchbase}")
+	@Value("${userdirectory.ldap.searchbase:}")
     private String searchBase;
  
-	
-	@Value("${userdirectory.default.rank:'YG'}")
+	//等级默认为普通员工 YG
+	@Value("${userdirectory.default.rank:YG}")
 	@NotNull
 	private String defaultRank;
-	
-	@Value("${userdirectory.default.station:'ZY'}")
+
+	//岗位默认为普通职员 ZY
+	@Value("${userdirectory.default.station:ZY}")
 	@NotNull
 	private String defaultStation;
 	
-	@Value("${userdirectory.default.rolecode}")
+	@Value("${userdirectory.default.rolecode:}")
 	private String defaultUserRole;
 	
     public String getDefaultUserRole() {

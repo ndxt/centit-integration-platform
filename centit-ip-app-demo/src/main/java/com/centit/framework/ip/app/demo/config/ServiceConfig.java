@@ -23,7 +23,7 @@ import org.springframework.context.annotation.*;
         excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 public class ServiceConfig {
 
-    @Value("${app.home}")
+    @Value("${app.home:./}")
     private String appHome;
 
     @Bean(initMethod = "initialEnvironment")
