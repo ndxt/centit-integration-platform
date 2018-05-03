@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-module</artifactId>
-            <version>${centit.ip.version}</version>
+            <version>${version}</version>
         </dependency>
 
         <dependency>
@@ -66,7 +66,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -76,7 +75,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-            <version>${junit.version}</version>
         </dependency>
         <!-- server runtime library -->
         <dependency>
@@ -90,7 +88,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
