@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>centit-integration-platform</artifactId>
+        <artifactId>framework-release-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-ip</artifactId>
@@ -18,37 +18,31 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-module</artifactId>
-            <version>${version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-config</artifactId>
-            <version>${centit.framework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-jdbc-config</artifactId>
-            <version>${centit.persistence.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-config</artifactId>
-            <version>${centit.framework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-view-easyui</artifactId>
-            <version>${centit.framework.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-web</artifactId>
-            <version>${centit.framework.version}</version>
         </dependency>
 
         <!-- spring-security-oauth 这个包中同时实现了OAuth2 的服务端和客户端
