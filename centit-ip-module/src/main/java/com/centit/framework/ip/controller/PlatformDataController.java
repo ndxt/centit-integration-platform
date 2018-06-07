@@ -21,6 +21,7 @@ import com.centit.framework.system.service.SysRoleManager;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.UserSettingManager;
 import com.centit.support.algorithm.StringBaseOpt;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -134,11 +135,14 @@ public class PlatformDataController extends BaseController {
 	public void listUserMenuOptInfos(@PathVariable String optid, @PathVariable String userCode, boolean asAdmin,
 			HttpServletResponse response) {
 
-	        List<? extends IOptInfo> menuFunsByUser = platformEnvironment.
-	        		listUserMenuOptInfosUnderSuperOptId(
-	        				userCode,optid ,asAdmin);
+		List<? extends IOptInfo> menuFunsByUser = null;
+    	if(StringUtils.isBlank(optid)){
+			 menuFunsByUser = platformEnvironment.listUserMenuOptInfos(userCode ,asAdmin);
+		}else {
+			 menuFunsByUser = platformEnvironment.listUserMenuOptInfosUnderSuperOptId(userCode, optid, asAdmin);
+		}
 
-	        JsonResultUtils.writeSingleDataJson(menuFunsByUser, response);
+		JsonResultUtils.writeSingleDataJson(menuFunsByUser, response);
 	}
 
 
