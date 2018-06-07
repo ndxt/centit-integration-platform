@@ -136,7 +136,7 @@ public class PlatformDataController extends BaseController {
 			HttpServletResponse response) {
 
 		List<? extends IOptInfo> menuFunsByUser = null;
-    	if(StringUtils.isBlank(optid)){
+    	if(StringUtils.isBlank(optid) || "null".equals(optid)){
 			 menuFunsByUser = platformEnvironment.listUserMenuOptInfos(userCode ,asAdmin);
 		}else {
 			 menuFunsByUser = platformEnvironment.listUserMenuOptInfosUnderSuperOptId(userCode, optid, asAdmin);
