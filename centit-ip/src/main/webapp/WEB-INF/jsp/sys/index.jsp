@@ -17,11 +17,11 @@
 			// Js全局变量，在Js文件中使用
 	        var GLOBAL_IDENTIFY = {
 	            // 登录入口类型 是否为实施人员入口
-	            IS_DEVELOP: '${"DEPLOY" eq sessionScope.ENTRANCE_TYPE}' == 'true',
+	            IS_DEVELOP: '${"DEPLOY" eq sessionScope.ENTRANCE_TYPE}',
 	            userCode: '${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal.userCode}',
 	            socket_host: '${cp:SYS_VALUE("socketio.host")}',
 	            socket_port: '${cp:SYS_VALUE("socketio.port")}',
-	            enable: '${cp:SYS_VALUE("socketio.enable")}' == 'true'
+	            enable: '${cp:SYS_VALUE("socketio.enable")}'
 	        };
 		</script>
 	</head>
