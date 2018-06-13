@@ -33,9 +33,9 @@ values ('45', 'OS_INFO', '所有权限', 'ALL', '更新机构状态', 'F', str_t
 insert into F_OPTDEF (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_DESC, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_URL, OPT_REQ,CREATOR,UPDATOR)
 values ('46', 'DATABASE', '所有权限','ALL', null, null, null, null, '/×', 'CRUD','u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
-	values('G-SYSADMIN','45',now(),now(),null,'u0000000','u0000000');
+	values('sysadmin','45',now(),now(),null,'u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
-	values('G-SYSADMIN','46',now(),now(),null,'u0000000','u0000000');
+	values('sysadmin','46',now(),now(),null,'u0000000','u0000000');
 
 INSERT INTO F_MYSQL_SEQUENCE (NAME, CURRVALUE , INCREMENT) VALUES
   ('S_DATABASECODE', 0, 1);
