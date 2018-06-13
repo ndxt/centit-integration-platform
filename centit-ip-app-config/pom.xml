@@ -19,13 +19,13 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-app</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-adapter-jdbc</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
