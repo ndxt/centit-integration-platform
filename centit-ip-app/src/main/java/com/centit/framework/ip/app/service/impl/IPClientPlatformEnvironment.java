@@ -13,6 +13,7 @@ import com.centit.framework.staticsystem.po.*;
 import com.centit.framework.staticsystem.security.StaticCentitUserDetails;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
@@ -76,9 +77,9 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public void saveUserSetting(IUserSetting userSetting) {
         CloseableHttpClient httpClient = null;
         try {
-            httpClient = appSession.getHttpClient();
+            httpClient = appSession.allocHttpClient();
             /*String resStr =*/ HttpExecutor.jsonPost(
-                    httpClient,
+                    HttpExecutorContext.create(httpClient),
                     appSession.completeQueryUrl("/usersetting"),
                     userSetting);
             //ResponseJSON resJson = ResponseJSON.valueOfJson(resStr);
@@ -184,12 +185,12 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	public void changeUserPassword(String userCode, String userPassword) {
 		CloseableHttpClient httpClient = null;
 		try {
-			httpClient = appSession.getHttpClient();
+			httpClient = appSession.allocHttpClient();
 			Map<String,String> userInfo = new HashMap<>();
 			userInfo.put("userCode", userCode);
 			userInfo.put("password", userPassword);
 			userInfo.put("newPassword", userPassword);
-			HttpExecutor.jsonPost(httpClient,
+			HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
 					appSession.completeQueryUrl("/changepassword/"+userCode),
 					JSON.toJSONString(userInfo), true);
 		} catch (Exception e) {
@@ -205,12 +206,12 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 	public boolean checkUserPassword(String userCode, String userPassword) {
 		CloseableHttpClient httpClient = null;
 		try {
-			httpClient = appSession.getHttpClient();
+			httpClient = appSession.allocHttpClient();
 			Map<String,String> userInfo = new HashMap<>();
 			userInfo.put("userCode", userCode);
 			userInfo.put("password", userPassword);
 			userInfo.put("newPassword", userPassword);
-			String sret = HttpExecutor.jsonPost(httpClient,
+			String sret = HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
 					appSession.completeQueryUrl("/checkpassword/"+userCode),
 					JSON.toJSONString(userInfo), true);
 			return StringRegularOpt.isTrue(sret);
@@ -419,9 +420,9 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public void updateUserInfo(IUserInfo userInfo) {
         CloseableHttpClient httpClient = null;
         try {
-            httpClient = appSession.getHttpClient();
+            httpClient = appSession.allocHttpClient();
             /*String resStr =*/ HttpExecutor.jsonPost(
-                    httpClient,
+					HttpExecutorContext.create(httpClient),
                     appSession.completeQueryUrl("/userinfo"),
                     userInfo,
                     true);
@@ -504,9 +505,9 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 		param.put("optInfos", optInfos);
 		param.put("optMethods", optMethods);
 		try {
-			httpClient = appSession.getHttpClient();
+			httpClient = appSession.allocHttpClient();
 		HttpExecutor.jsonPost(
-				httpClient,
+				HttpExecutorContext.create(httpClient),
 				appSession.completeQueryUrl("/insertopt"), param);
 		} catch (Exception e) {
 

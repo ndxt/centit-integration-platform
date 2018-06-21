@@ -25,8 +25,8 @@ public class IPClientIntegrationEnvironment implements IntegrationEnvironment {
 
 
 
-    public CloseableHttpClient getHttpClient() throws Exception {
-        return appSession.getHttpClient();
+    public CloseableHttpClient allocHttpClient() throws Exception {
+        return appSession.allocHttpClient();
     }
 
     public void releaseHttpClient(CloseableHttpClient httpClient) {
