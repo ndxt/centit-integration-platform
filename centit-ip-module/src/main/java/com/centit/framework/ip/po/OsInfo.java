@@ -40,8 +40,15 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
     @Column(name = "SYS_DATA_PUSH_OPTION")
     @Length(max = 32, message = "字段长度不能大于{max}")
     private String sysDataPushOption;
- 
-    
+
+    @Column(name = "LOGIN_USER_NAME")
+    @Length(max = 64, message = "字段长度不能大于{max}")
+    private String loginUserName;
+
+    @Column(name = "LOGIN_USER_PASSWORD")
+    @Length(max = 64, message = "字段长度不能大于{max}")
+    private String loginUserPassword;
+
     @Column(name = "CREATED")
     @Length(max = 8, message = "字段长度不能大于{max}")
     private String created;
@@ -86,8 +93,6 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
         this.createTime = createTime;
     }
 
-
-   
 
     public String getOsId() {
         return this.osId;
@@ -139,6 +144,22 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
 		this.sysDataPushOption = sysDataPushOption;
 	}
 
+    public String getLoginUserName() {
+        return loginUserName;
+    }
+
+    public void setLoginUserName(String loginUserName) {
+        this.loginUserName = loginUserName;
+    }
+
+    public String getLoginUserPassword() {
+        return loginUserPassword;
+    }
+
+    public void setLoginUserPassword(String loginUserPassword) {
+        this.loginUserPassword = loginUserPassword;
+    }
+
 	@Override
 	public Date getLastModifyDate() {
 		return lastModifyDate;
@@ -159,7 +180,6 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
 
 
     public void copy(OsInfo other) {
-
         this.setOsId(other.getOsId());
         this.osName = other.getOsName();
         this.ddeSyncUrl=other.getDdeSyncUrl();
@@ -168,31 +188,35 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
         this.lastModifyDate= other.getLastModifyDate();
         this.createTime = other.getCreateTime();
         this.created = other.getCreated();
+        this.loginUserName = other.getLoginUserName();
+        this.loginUserPassword = other.getLoginUserPassword();
     }
 
     public void copyNotNullProperty(OsInfo other) {
-
         if (other.getOsId() != null)
             this.setOsId(other.getOsId());
         if (other.getOsName() != null)
-            this.osName = other.getOsName();       
+            this.osName = other.getOsName();
         if (other.getDdeSyncUrl() != null)
-        	this.ddeSyncUrl=other.getDdeSyncUrl();
+            this.ddeSyncUrl=other.getDdeSyncUrl();
         if (other.getSysDataPushOption() != null)
-        	this.sysDataPushOption=other.getSysDataPushOption();
+            this.sysDataPushOption=other.getSysDataPushOption();
         if (other.getOsUrl() != null)
-        	this.osUrl = other.getOsUrl();
+            this.osUrl = other.getOsUrl();
         if (other.getLastModifyDate() != null)
-        	this.lastModifyDate= other.getLastModifyDate();
+            this.lastModifyDate= other.getLastModifyDate();
         if (other.getCreated() != null)
-        	this.created = other.getCreated();        
+            this.created = other.getCreated();
         if (other.getCreateTime() != null)
             this.createTime = other.getCreateTime();
+        if (other.getLoginUserName() != null)
+            this.loginUserName = other.getLoginUserName();
+        if (other.getLoginUserPassword() != null)
+            this.loginUserPassword = other.getLoginUserPassword();
     }
 
     public void clearProperties() {
-
-    	this.osId = null;
+        this.osId = null;
         this.osName = null;
         this.ddeSyncUrl=null;
         this.sysDataPushOption=null;
@@ -200,6 +224,7 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
         this.created = null;
         this.lastModifyDate= null;
         this.createTime = null;
-
+        this.loginUserName = null;
+        this.loginUserPassword = null;
     }
 }

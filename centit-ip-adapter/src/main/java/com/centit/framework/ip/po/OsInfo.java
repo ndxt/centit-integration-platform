@@ -13,8 +13,8 @@ public class OsInfo implements java.io.Serializable {
     private String created;
     private Date lastModifyDate;
     private Date createTime;
-
-
+    private String loginUserName;
+    private String loginUserPassword;
     // Constructors
 
     /**
@@ -114,9 +114,23 @@ public class OsInfo implements java.io.Serializable {
         this.createTime = createTime;
     }
 
+    public String getLoginUserName() {
+        return loginUserName;
+    }
+
+    public void setLoginUserName(String loginUserName) {
+        this.loginUserName = loginUserName;
+    }
+
+    public String getLoginUserPassword() {
+        return loginUserPassword;
+    }
+
+    public void setLoginUserPassword(String loginUserPassword) {
+        this.loginUserPassword = loginUserPassword;
+    }
 
     public void copy(OsInfo other) {
-
         this.setOsId(other.getOsId());
         this.osName = other.getOsName();
         this.ddeSyncUrl=other.getDdeSyncUrl();
@@ -125,10 +139,11 @@ public class OsInfo implements java.io.Serializable {
         this.lastModifyDate= other.getLastModifyDate();
         this.createTime = other.getCreateTime();
         this.created = other.getCreated();
+        this.loginUserName = other.getLoginUserName();
+        this.loginUserPassword = other.getLoginUserPassword();
     }
 
     public void copyNotNullProperty(OsInfo other) {
-
         if (other.getOsId() != null)
             this.setOsId(other.getOsId());
         if (other.getOsName() != null)
@@ -145,10 +160,13 @@ public class OsInfo implements java.io.Serializable {
         	this.created = other.getCreated();        
         if (other.getCreateTime() != null)
             this.createTime = other.getCreateTime();
+        if (other.getLoginUserName() != null)
+            this.loginUserName = other.getLoginUserName();
+        if (other.getLoginUserPassword() != null)
+            this.loginUserPassword = other.getLoginUserPassword();
     }
 
     public void clearProperties() {
-
     	this.osId = null;
         this.osName = null;
         this.ddeSyncUrl=null;
@@ -157,6 +175,7 @@ public class OsInfo implements java.io.Serializable {
         this.created = null;
         this.lastModifyDate= null;
         this.createTime = null;
-
+        this.loginUserName = null;
+        this.loginUserPassword = null;
     }
 }
