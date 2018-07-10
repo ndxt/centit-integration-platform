@@ -14,11 +14,13 @@ import com.centit.framework.staticsystem.service.impl.JsonPlatformEnvironment;
 import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import javax.annotation.Resource;
@@ -163,6 +165,17 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     @Bean
     public HttpSessionCsrfTokenRepository csrfTokenRepository() {
         return new HttpSessionCsrfTokenRepository();
+    }
+
+    /**
+     * 缓存配置信息
+     * @return
+     */
+    @Bean
+    public EhCacheManagerFactoryBean cacheManagerFactory() {
+        EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
+        ehCacheManagerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
+        return ehCacheManagerFactoryBean;
     }
 
 }
