@@ -15,7 +15,7 @@ public interface IntegrationEnvironment {
 	 * @return  boolean 刷新集成环境相关信息
 	 */
 	boolean reloadIPEnvironmen();
-	
+
 	/**
 	 * 获取框架中注册的业务系统
 	 * @param osId osId

@@ -6,24 +6,16 @@ import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.common.ResponseJSON;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
-import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.security.model.OptTreeNode;
 import com.centit.framework.staticsystem.po.*;
 import com.centit.framework.staticsystem.security.StaticCentitUserDetails;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.SecurityConfig;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,43 +27,49 @@ import java.util.Map;
  */
 public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
-	private Logger logger = LoggerFactory.getLogger(IPClientPlatformEnvironment.class);
+    private Logger logger = LoggerFactory.getLogger(IPClientPlatformEnvironment.class);
 
-	private String topOptId;
+    private String topOptId;
 
-	public IPClientPlatformEnvironment() {
+    public IPClientPlatformEnvironment() {
 
-	}
+    }
 
-	public void setTopOptId(String topOptId) {
-		this.topOptId = topOptId;
-	}
+    public void setTopOptId(String topOptId) {
+        this.topOptId = topOptId;
+    }
 
-	private AppSession appSession;
+    private AppSession appSession;
 
 
-	public void setPlatServerUrl(String platServerUrl) {
-		appSession = new AppSession(platServerUrl,false,null,null);
-	}
+    public void setPlatServerUrl(String platServerUrl) {
+        appSession = new AppSession(platServerUrl,false,null,null);
+    }
 
-	//初始化  这个要定时刷新
-	public void init(){
-		if(appSession==null)
-			return ;
-		reloadSecurityMetadata();
-	}
+    @Override
+    public UserSetting getUserSetting(String userCode, String paramCode) {
+        ResponseJSON resJson = RestfulHttpRequest.getResponseData(
+                appSession,
+                "/usersetting/"+userCode+"/"+paramCode);
 
-	@Override
-	public UserSetting getUserSetting(String userCode, String paramCode) {
+        if(resJson==null)
+            return null;
+        return resJson.getDataAsObject(UserSetting.class);
+    }
 
-			ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-					appSession,
-					"/usersetting/"+userCode+"/"+paramCode);
-
-			if(resJson==null)
-				return null;
-			return resJson.getDataAsObject(UserSetting.class);
-	}
+    /**
+     * 获取全部个人设置
+     *
+     * @param userCode 用户编码
+     * @return 个人设置列表
+     */
+    @Override
+    public List<? extends IUserSetting> listUserSettings(String userCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/usersettings/"+userCode+"/"+topOptId,
+            UserSetting.class);
+    }
 
     @Override
     public void saveUserSetting(IUserSetting userSetting) {
@@ -92,36 +90,19 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
-	public List<OptInfo> listUserMenuOptInfos(String userCode, boolean asAdmin) {
+    public List<OptInfo> listUserMenuOptInfos(String userCode, boolean asAdmin) {
 
-		return listUserMenuOptInfosUnderSuperOptId(userCode,topOptId,asAdmin);
-	}
-
-	@Override
-	public List<OptInfo> listUserMenuOptInfosUnderSuperOptId(String userCode, String superOptId,
-                                                             boolean asAdmin) {
-
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/usermenu/"+superOptId+"/"+userCode+"?asAdmin="+asAdmin,
-				OptInfo.class);
-
-	}
-
-    @Override
-    public List<RoleInfo> listUserRolesByUserCode(String userCode) {
-        return RestfulHttpRequest.getResponseObjectList(
-                appSession,
-                "/userroleinfos/"+userCode,
-                RoleInfo.class);
+        return listUserMenuOptInfosUnderSuperOptId(userCode,topOptId,asAdmin);
     }
 
     @Override
-    public List<UserInfo> listRoleUserByRoleCode(String roleCode) {
+    public List<OptInfo> listUserMenuOptInfosUnderSuperOptId(String userCode, String superOptId,
+                                                             boolean asAdmin) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/roleuserinfos/"+roleCode,
-                UserInfo.class);
+                "/usermenu/"+superOptId+"/"+userCode+"?asAdmin="+asAdmin,
+                OptInfo.class);
+
     }
 
     @Override
@@ -157,264 +138,183 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
-	public UserInfo getUserInfoByUserCode(String userCode) {
-		return RestfulHttpRequest.getResponseObject(
-				appSession,
-				"/userinfo/"+userCode,
-				UserInfo.class);
-	}
+    public void changeUserPassword(String userCode, String userPassword) {
+        CloseableHttpClient httpClient = null;
+        try {
+            httpClient = appSession.allocHttpClient();
+            Map<String,String> userInfo = new HashMap<>();
+            userInfo.put("userCode", userCode);
+            userInfo.put("password", userPassword);
+            userInfo.put("newPassword", userPassword);
+            HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
+                    appSession.completeQueryUrl("/changepassword/"+userCode),
+                    JSON.toJSONString(userInfo), true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取httpClient出错",e);
+        } finally {
+            if(httpClient!=null)
+                appSession.releaseHttpClient(httpClient);
+        }
+    }
+
+    @Override
+    public boolean checkUserPassword(String userCode, String userPassword) {
+        CloseableHttpClient httpClient = null;
+        try {
+            httpClient = appSession.allocHttpClient();
+            Map<String,String> userInfo = new HashMap<>();
+            userInfo.put("userCode", userCode);
+            userInfo.put("password", userPassword);
+            userInfo.put("newPassword", userPassword);
+            String sret = HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
+                    appSession.completeQueryUrl("/checkpassword/"+userCode),
+                    JSON.toJSONString(userInfo), true);
+            return StringRegularOpt.isTrue(sret);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取httpClient出错",e);
+            return false;
+        } finally {
+            if(httpClient!=null)
+                appSession.releaseHttpClient(httpClient);
+        }
+    }
+
+    @Override
+    public List<UserInfo> listAllUsers() {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/allusers/"+topOptId,
+                UserInfo.class);
+    }
+
+    @Override
+    public List<UnitInfo> listAllUnits() {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/allunits/"+topOptId,
+                UnitInfo.class);
+    }
+
+    @Override
+    public List<UserUnit> listAllUserUnits() {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/alluserunits/"+topOptId,
+                UserUnit.class);
+    }
+
+    @Override
+    public List<UserUnit> listUserUnits(String userCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/userunits/"+topOptId+"/"+userCode,
+                UserUnit.class);
+    }
+
+    @Override
+    public List<UserUnit> listUnitUsers(String unitCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/unitusers/"+topOptId+"/"+unitCode,
+                UserUnit.class);
+    }
+
+    /**
+     * 获取所有角色信息
+     *
+     * @return List 操作方法信息
+     */
+    @Override
+    public List<? extends IRoleInfo> listAllRoleInfo() {
+        return RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/rolerepo/"+topOptId,
+            RoleInfo.class);
+    }
 
 
-	@Override
-	public UnitInfo getUnitInfoByUnitCode(String unitCode){
-		return RestfulHttpRequest.getResponseObject(
-				appSession,
-				"/unitinfo/"+unitCode,
-				UnitInfo.class);
-	}
+    @Override
+    public List<DataCatalog> listAllDataCatalogs() {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/catalogs/"+topOptId,
+                DataCatalog.class);
+    }
 
-	@Override
-	public UserInfo getUserInfoByLoginName(String loginName) {
-		return RestfulHttpRequest.getResponseObject(
-				appSession,
-				"/userinfobyloginname/"+loginName,
-				UserInfo.class);
-	}
-
-	@Override
-	public void changeUserPassword(String userCode, String userPassword) {
-		CloseableHttpClient httpClient = null;
-		try {
-			httpClient = appSession.allocHttpClient();
-			Map<String,String> userInfo = new HashMap<>();
-			userInfo.put("userCode", userCode);
-			userInfo.put("password", userPassword);
-			userInfo.put("newPassword", userPassword);
-			HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
-					appSession.completeQueryUrl("/changepassword/"+userCode),
-					JSON.toJSONString(userInfo), true);
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("获取httpClient出错",e);
-		} finally {
-			if(httpClient!=null)
-				appSession.releaseHttpClient(httpClient);
-		}
-	}
-
-	@Override
-	public boolean checkUserPassword(String userCode, String userPassword) {
-		CloseableHttpClient httpClient = null;
-		try {
-			httpClient = appSession.allocHttpClient();
-			Map<String,String> userInfo = new HashMap<>();
-			userInfo.put("userCode", userCode);
-			userInfo.put("password", userPassword);
-			userInfo.put("newPassword", userPassword);
-			String sret = HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
-					appSession.completeQueryUrl("/checkpassword/"+userCode),
-					JSON.toJSONString(userInfo), true);
-			return StringRegularOpt.isTrue(sret);
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("获取httpClient出错",e);
-			return false;
-		} finally {
-			if(httpClient!=null)
-				appSession.releaseHttpClient(httpClient);
-		}
-	}
-
-	@Override
-	@Cacheable(value = "UserInfo",key = "'userList'" )
-	public List<UserInfo> listAllUsers() {
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/allusers/"+topOptId,
-				UserInfo.class);
-	}
-
-	@Override
-	@Cacheable(value="UnitInfo",key="'unitList'")
-	public List<UnitInfo> listAllUnits() {
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/allunits/"+topOptId,
-				UnitInfo.class);
-	}
-
-	@Override
-	@Cacheable(value="AllUserUnits",key="'allUserUnits'")
-	public List<UserUnit> listAllUserUnits() {
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/alluserunits/"+topOptId,
-				UserUnit.class);
-	}
-
-	@Override
-	@Cacheable(value="UserUnits",key="#userCode")
-	public List<UserUnit> listUserUnits(String userCode) {
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/userunits/"+topOptId+"/"+userCode,
-				UserUnit.class);
-	}
-
-	@Override
-	@Cacheable(value="UnitUsers",key="#unitCode")
-	public List<UserUnit> listUnitUsers(String unitCode) {
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/unitusers/"+topOptId+"/"+unitCode,
-				UserUnit.class);
-	}
-
-	@Override
-	@Cacheable(value="UnitInfo",key="'unitCodeMap'")
-	public Map<String, UnitInfo> getUnitRepo() {
-
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession,
-				"/unitrepo/"+topOptId);
-
-		if(resJson==null)
-			return null;
-		return resJson.getDataAsMap(UnitInfo.class);
-	}
-
-	@Override
-	@Cacheable(value = "UserInfo",key = "'userCodeMap'" )
-	public Map<String, UserInfo> getUserRepo() {
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession,
-				"/userrepo/"+topOptId);
-
-		if(resJson==null)
-			return null;
-		return resJson.getDataAsMap(UserInfo.class);
-	}
-
-	@Override
-	@Cacheable(value = "UserInfo",key = "'loginNameMap'")
-	public Map<String, UserInfo> getLoginNameRepo() {
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession,
-				"/loginnamerepo/"+topOptId);
-		if(resJson==null)
-			return null;
-		return resJson.getDataAsMap(UserInfo.class);
-	}
-
-	@Override
-	@Cacheable(value="UnitInfo",key="'depNoMap'")
-	public Map<String, UnitInfo> getDepNoRepo() {
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession,
-				"/depnorepo/"+topOptId);
-		if(resJson==null)
-			return null;
-		return resJson.getDataAsMap(UnitInfo.class);
-	}
-
-	@Override
-	@Cacheable(value="RoleInfo",key="'roleCodeMap'")
-	public Map<String, RoleInfo> getRoleRepo() {
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession, "/rolerepo/"+topOptId);
-		if(resJson==null)
-			return null;
-		return resJson.getDataAsMap(RoleInfo.class);
-	}
-
-	@Override
-	@Cacheable(value="OptInfo",key="'optIdMap'")
-	public Map<String, OptInfo> getOptInfoRepo() {
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession,"/optinforepo/"+topOptId);
-		if(resJson==null)
-			return null;
-		return resJson.getDataAsMap(OptInfo.class);
-	}
-
-	@Override
-	@Cacheable(value="OptInfo",key="'optCodeMap'")
-	public Map<String, OptMethod> getOptMethodRepo() {
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession, "/optmethodrepo/"+topOptId);
-		if(resJson==null)
-			return null;
-		return resJson.getDataAsMap(OptMethod.class);
-	}
-
-	@Override
-	@Cacheable(value = "DataDictionary",key="'CatalogCode'")
-	public List<DataCatalog> listAllDataCatalogs() {
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/catalogs/"+topOptId,
-				DataCatalog.class);
-	}
-
-	@Override
-	@Cacheable(value = "DataDictionary",key="#catalogCode")
-	public List<DataDictionary> listDataDictionaries(String catalogCode) {
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/dictionary/"+topOptId+"/"+catalogCode,
-				DataDictionary.class);
-	}
+    @Override
+    public List<DataDictionary> listDataDictionaries(String catalogCode) {
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/dictionary/"+topOptId+"/"+catalogCode,
+                DataDictionary.class);
+    }
 
 
-	public List<RolePower>  listAllRolePower(){
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/allrolepowers/"+topOptId,
-				RolePower.class);
-	}
+    public List<RolePower>  listAllRolePower(){
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/allrolepowers/"+topOptId,
+                RolePower.class);
+    }
 
-	public List<OptMethod> listAllOptMethod(){
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/alloptmethods/"+topOptId,
-				OptMethod.class);
-	}
+    /**
+     * 获取业务操作信息
+     *
+     * @return List 业务信息
+     */
+    @Override
+    public List<? extends IOptInfo> listAllOptInfo() {
+        return RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/optinforepo/"+topOptId,
+            OptInfo.class);
+    }
+
+    @Override
+    public List<OptMethod> listAllOptMethod(){
+        return RestfulHttpRequest.getResponseObjectList(
+                appSession,
+                "/alloptmethods/"+topOptId,
+                OptMethod.class);
+    }
 
 
-	private CentitUserDetails loadUserDetails(String queryParam, String qtype) {
-		ResponseJSON resJson = RestfulHttpRequest.getResponseData(
-				appSession,"/userdetails/"+topOptId+"/"+queryParam+"?qtype="+qtype);
+    private CentitUserDetails loadUserDetails(String queryParam, String qtype) {
+        ResponseJSON resJson = RestfulHttpRequest.getResponseData(
+                appSession,"/userdetails/"+topOptId+"/"+queryParam+"?qtype="+qtype);
 
-		if(resJson==null || resJson.getCode()!=0) {
+        if(resJson==null || resJson.getCode()!=0) {
             return null;
         }
         StaticCentitUserDetails userDetails =
                 resJson.getDataAsObject("userDetails", StaticCentitUserDetails.class);
-        userDetails.getUserInfo().setUserUnits(
+        userDetails.setUserUnits(
                 resJson.getDataAsArray("userUnits", UserUnit.class) );
         userDetails.setAuthoritiesByRoles(userDetails.getUserRoles());
         return userDetails;
-	}
+    }
 
-	@Override
-	public CentitUserDetails loadUserDetailsByLoginName(String loginName) {
-		return loadUserDetails(loginName,"loginName");
-	}
+    @Override
+    public CentitUserDetails loadUserDetailsByLoginName(String loginName) {
+        return loadUserDetails(loginName,"loginName");
+    }
 
-	@Override
-	public CentitUserDetails loadUserDetailsByUserCode(String userCode) {
-		return loadUserDetails(userCode,"userCode");
-	}
+    @Override
+    public CentitUserDetails loadUserDetailsByUserCode(String userCode) {
+        return loadUserDetails(userCode,"userCode");
+    }
 
-	@Override
-	public CentitUserDetails loadUserDetailsByRegEmail(String regEmail) {
-		return loadUserDetails(regEmail,"regEmail");
-	}
+    @Override
+    public CentitUserDetails loadUserDetailsByRegEmail(String regEmail) {
+        return loadUserDetails(regEmail,"regEmail");
+    }
 
-	@Override
-	public CentitUserDetails loadUserDetailsByRegCellPhone(String regCellPhone) {
-		return loadUserDetails(regCellPhone,"regCellPhone");
-	}
+    @Override
+    public CentitUserDetails loadUserDetailsByRegCellPhone(String regCellPhone) {
+        return loadUserDetails(regCellPhone,"regCellPhone");
+    }
 
     @Override
     public void updateUserInfo(IUserInfo userInfo) {
@@ -422,7 +322,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         try {
             httpClient = appSession.allocHttpClient();
             /*String resStr =*/ HttpExecutor.jsonPost(
-					HttpExecutorContext.create(httpClient),
+                    HttpExecutorContext.create(httpClient),
                     appSession.completeQueryUrl("/userinfo"),
                     userInfo,
                     true);
@@ -435,85 +335,27 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         }
     }
 
+    /**
+     * 新增菜单和操作
+     * @param optInfos 菜单对象集合
+     * @param optMethods 操作对象集合
+     */
     @Override
-	@CacheEvict(value ={
-			 "DataDictionary","OptInfo","RoleInfo","UserInfo","UnitInfo",
-			 "UnitUsers","UserUnits","AllUserUnits"},allEntries = true)
-	public boolean reloadDictionary() {
-		return true;
-	}
+    public void insertOrUpdateMenu(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
+        CloseableHttpClient httpClient = null;
+        Map<String, Object> param = new HashMap<>(4);
+        param.put("optInfos", optInfos);
+        param.put("optMethods", optMethods);
+        try {
+            httpClient = appSession.allocHttpClient();
+        HttpExecutor.jsonPost(
+                HttpExecutorContext.create(httpClient),
+                appSession.completeQueryUrl("/insertopt"), param);
+        } catch (Exception e) {
 
-	@Override
-	public boolean reloadSecurityMetadata() {
-		//这个要定时刷新 或者 通过集成平台来主动刷新
-		CentitSecurityMetadata.optMethodRoleMap.clear();
-        List<RolePower> rplist = listAllRolePower();
-        if(rplist==null || rplist.size()==0)
-        	return false;
-        for(RolePower rp: rplist ){
-            List<ConfigAttribute/*roleCode*/> roles = CentitSecurityMetadata.optMethodRoleMap.get(rp.getOptCode());
-            if(roles == null){
-                roles = new ArrayList<ConfigAttribute/*roleCode*/>();
-            }
-            roles.add(new SecurityConfig(CentitSecurityMetadata.ROLE_PREFIX + StringUtils.trim(rp.getRoleCode())));
-            CentitSecurityMetadata.optMethodRoleMap.put(rp.getOptCode(), roles);
+        } finally {
+            if(httpClient!=null)
+                appSession.releaseHttpClient(httpClient);
         }
-        //将操作和角色对应关系中的角色排序，便于权限判断中的比较
-        CentitSecurityMetadata.sortOptMethodRoleMap();
-        Map<String, OptInfo> optRepo = getOptInfoRepo();
-        List<OptMethod> oulist = listAllOptMethod();
-        CentitSecurityMetadata.optTreeNode.setChildList(null);
-        CentitSecurityMetadata.optTreeNode.setOptCode(null);
-        for(OptMethod ou:oulist){
-        	OptInfo oi = optRepo.get(ou.getOptId());
-        	if(oi!=null){
-            	String  optDefUrl = oi.getOptUrl()+ou.getOptUrl();
-                List<List<String>> sOpt = CentitSecurityMetadata.parsePowerDefineUrl(
-                		optDefUrl,ou.getOptReq());
-
-                for(List<String> surls : sOpt){
-                    OptTreeNode opt = CentitSecurityMetadata.optTreeNode;
-                    for(String surl : surls)
-                        opt = opt.setChildPath(surl);
-                    opt.setOptCode(ou.getOptCode());
-                }
-        	}
-        }
-
-		CentitSecurityMetadata.confirmLoginCasMustBeAuthed();
-        //CentitSecurityMetadata.optTreeNode.printTreeNode();
-		return true;
-	}
-
-	@Override
-	public List<UserSetting> getAllSettings(){
-		return RestfulHttpRequest.getResponseObjectList(
-				appSession,
-				"/allsettings/"+topOptId,
-				UserSetting.class);
-	}
-
-	/**
-	 * 新增菜单和操作
-	 * @param optInfos 菜单对象集合
-	 * @param optMethods 操作对象集合
-	 */
-	@Override
-	public void insertOrUpdateMenu(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
-		CloseableHttpClient httpClient = null;
-		Map<String, Object> param = new HashMap<>(4);
-		param.put("optInfos", optInfos);
-		param.put("optMethods", optMethods);
-		try {
-			httpClient = appSession.allocHttpClient();
-		HttpExecutor.jsonPost(
-				HttpExecutorContext.create(httpClient),
-				appSession.completeQueryUrl("/insertopt"), param);
-		} catch (Exception e) {
-
-		} finally {
-			if(httpClient!=null)
-				appSession.releaseHttpClient(httpClient);
-		}
-	}
+    }
 }

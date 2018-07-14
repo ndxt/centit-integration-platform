@@ -1,5 +1,6 @@
 package com.centit.framework.ip.config;
 
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.model.adapter.MessageSender;
 import com.centit.framework.model.adapter.NotificationCenter;
@@ -8,8 +9,6 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Created by codefan on 17-7-6.
@@ -26,12 +25,12 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     private MessageSender innerMessageManager;
 
     @Autowired
-    @NotNull
     private PlatformEnvironment platformEnvironment;
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        platformEnvironment.reloadSecurityMetadata();
+    public void onApplicationEvent(ContextRefreshedEvent event)
+    {
+        CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
 
         if(innerMessageManager!=null) {
             notificationCenter.registerMessageSender("innerMsg", innerMessageManager);

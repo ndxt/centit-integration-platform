@@ -145,28 +145,6 @@ public class PlatformDataController extends BaseController {
 		JsonResultUtils.writeSingleDataJson(menuFunsByUser, response);
 	}
 
-
-	@RequestMapping(value = "/userinfo/{userCode}",
-			method = RequestMethod.GET)
-	public void getUserInfoByUserCode(@PathVariable String userCode,HttpServletResponse response) {
-		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getUserInfoByUserCode(userCode),response);
-	}
-
-	@RequestMapping(value = "/unitinfo/{unitCode}",
-			method = RequestMethod.GET)
-	public void getUnitInfoByUnitCode(@PathVariable String unitCode,HttpServletResponse response) {
-		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getUnitInfoByUnitCode(unitCode),response);
-	}
-
-	@RequestMapping(value = "/userinfobyloginname/{loginName}",
-			method = RequestMethod.GET)
-	public void getUserInfoByLoginName(@PathVariable String loginName ,HttpServletResponse response) {
-		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getUserInfoByLoginName(loginName),response);
-	}
-
 	@RequestMapping(value = "/checkpassword/{userCode}",
 			method = RequestMethod.PUT)
 	public void changeUserPassword(@PathVariable String userCode,@RequestBody String jsonData ,
@@ -240,7 +218,7 @@ public class PlatformDataController extends BaseController {
 	public void getUnitRepo(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getUnitRepo(),response);
+				platformEnvironment.listAllUnits(),response);
 	}
 
 	@RequestMapping(value = "/userrepo/{appName}",
@@ -248,23 +226,7 @@ public class PlatformDataController extends BaseController {
 	public void getUserRepo(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getUserRepo(),response);
-	}
-
-	@RequestMapping(value = "/loginnamerepo/{appName}",
-			method = RequestMethod.GET)
-	public void getLoginNameRepo(@PathVariable String appName,
-			HttpServletResponse response) {
-		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getLoginNameRepo(),response);
-	}
-
-	@RequestMapping(value = "/depnorepo/{appName}",
-			method = RequestMethod.GET)
-	public void getDepNoRepo(@PathVariable String appName,
-			HttpServletResponse response) {
-		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getDepNoRepo(),response);
+				platformEnvironment.listAllUsers(),response);
 	}
 
 	@RequestMapping(value = "/rolerepo/{appName}",
@@ -273,7 +235,7 @@ public class PlatformDataController extends BaseController {
 			HttpServletResponse response) {
 
 		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getRoleRepo(),response);
+				platformEnvironment.listAllRoleInfo(),response);
 	}
 
     @RequestMapping(value = "/userroles/{userCode}",
@@ -300,7 +262,7 @@ public class PlatformDataController extends BaseController {
                               HttpServletResponse response) {
 
         JsonResultUtils.writeSingleDataJson(
-                platformEnvironment.listUserRolesByUserCode(userCode),response);
+                platformEnvironment.listUserRoles(userCode),response);
     }
 
     @RequestMapping(value = "/roleuserinfos/{roleCode}",
@@ -309,7 +271,7 @@ public class PlatformDataController extends BaseController {
                               HttpServletResponse response) {
 
         JsonResultUtils.writeSingleDataJson(
-                platformEnvironment.listRoleUserByRoleCode(roleCode),response);
+                platformEnvironment.listRoleUsers(roleCode),response);
     }
 
     @RequestMapping(value = "/unitroles/{unitCode}",
@@ -333,20 +295,10 @@ public class PlatformDataController extends BaseController {
 			method = RequestMethod.GET)
 	public void getOptInfoRepo(@PathVariable String appName,
 			HttpServletResponse response) {
-		SimplePropertyPreFilter simplePropertyPreFilter =
-				 new SimplePropertyPreFilter(OptInfo.class);
-		simplePropertyPreFilter.getExcludes().add("children");
 		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getOptInfoRepo(),response,simplePropertyPreFilter);
+				platformEnvironment.listAllOptInfo(),response);
 	}
 
-	@RequestMapping(value = "/optmethodrepo/{appName}",
-			method = RequestMethod.GET)
-	public void getOptMethodRepo(@PathVariable String appName,
-			HttpServletResponse response) {
-		JsonResultUtils.writeSingleDataJson(
-				platformEnvironment.getOptMethodRepo(),response);
-	}
 
 	@RequestMapping(value = "/catalogs/{appName}",
 			method = RequestMethod.GET)
@@ -417,7 +369,7 @@ public class PlatformDataController extends BaseController {
 		resData.addResponseData("userDetails", userDetails);
 		//resData.addResponseData("userRoles", userDetails.getUserRoles());
         //resData.addResponseData("userSettings", userDetails.getUserSettings());
-		resData.addResponseData("userUnits", userDetails.getUserInfo().getUserUnits());
+		resData.addResponseData("userUnits", userDetails.getUserUnits());
         //resData.addResponseData("userOptList", userDetails.getUserOptList());*/
 		JsonResultUtils.writeResponseDataAsJson(resData, response);
 	}
@@ -444,6 +396,13 @@ public class PlatformDataController extends BaseController {
 		JsonResultUtils.writeSingleDataJson(
 				userAccessTokenManager.getObjectById(tokenId),response);
 	}
+
+    @RequestMapping(value = "/ipenvironment/allUserToken",
+        method = RequestMethod.GET)
+    public void listAllUserToken(HttpServletResponse response) {
+        JsonResultUtils.writeSingleDataJson(
+            userAccessTokenManager.listObjects(),response);
+    }
 
 	/**
 	 * 新增菜单和操作

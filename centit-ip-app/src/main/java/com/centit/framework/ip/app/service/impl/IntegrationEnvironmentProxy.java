@@ -21,7 +21,6 @@ public class IntegrationEnvironmentProxy implements IntegrationEnvironment
         this.evrnMangers = evrnMangers;
     }
 
-
     /**
      * 刷新集成环境相关信息
      * 包括：业务系统、数据库信息

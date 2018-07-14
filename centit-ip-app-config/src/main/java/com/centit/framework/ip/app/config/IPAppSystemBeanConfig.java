@@ -14,13 +14,11 @@ import com.centit.framework.staticsystem.service.impl.JsonPlatformEnvironment;
 import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import javax.annotation.Resource;
@@ -67,7 +65,6 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
                     env.getProperty("centit.jdbcplatform.password")
             );
             jdbcPlatformEnvironment.setPasswordEncoder(passwordEncoder);
-            jdbcPlatformEnvironment.init();
             if(ipEnable==null || !ipEnable) {
                 return jdbcPlatformEnvironment;
             }else {
@@ -77,7 +74,6 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
             JsonPlatformEnvironment jsonPlatformEnvironment = new JsonPlatformEnvironment();
             jsonPlatformEnvironment.setAppHome(env.getProperty("app.home"));
             jsonPlatformEnvironment.setPasswordEncoder(passwordEncoder);
-            jsonPlatformEnvironment.init();
             if(ipEnable==null || !ipEnable) {
                 return jsonPlatformEnvironment;
             }else {
@@ -88,7 +84,6 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
         IPClientPlatformEnvironment ipPlatformEnvironment = new IPClientPlatformEnvironment();
         ipPlatformEnvironment.setTopOptId(env.getProperty("centit.ip.topoptid"));
         ipPlatformEnvironment.setPlatServerUrl(env.getProperty("centit.ip.home"));
-        ipPlatformEnvironment.init();
 
         List<PlatformEnvironment> evrnMangers = new ArrayList<>();
         evrnMangers.add(ipPlatformEnvironment);
@@ -167,15 +162,5 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
         return new HttpSessionCsrfTokenRepository();
     }
 
-    /**
-     * 缓存配置信息
-     * @return
-     */
-    @Bean
-    public EhCacheManagerFactoryBean cacheManagerFactory() {
-        EhCacheManagerFactoryBean ehCacheManagerFactoryBean = new EhCacheManagerFactoryBean();
-        ehCacheManagerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
-        return ehCacheManagerFactoryBean;
-    }
 
 }

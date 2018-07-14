@@ -1,22 +1,26 @@
 package com.centit.framework.ip.app.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.framework.ip.service.impl.AbstractIntegrationEnvironment;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * Created by codefan on 17-7-3.
  */
-public class IPClientIntegrationEnvironment implements IntegrationEnvironment {
+public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironment {
 
     public IPClientIntegrationEnvironment() {
 
@@ -38,47 +42,28 @@ public class IPClientIntegrationEnvironment implements IntegrationEnvironment {
     }
 
 
-
     @Override
-    @CacheEvict(value ="IPEnvironmen",allEntries = true)
-    public boolean reloadIPEnvironmen() {
-        return true;
-    }
-
-    @Override
-    public OsInfo getOsInfo(String osId) {
-        for(OsInfo oi : listOsInfos()){
-            if(StringUtils.equals(oi.getOsId(),osId))
-                return oi;
-        }
-        return null;
-    }
-
-    @Override
-    public DatabaseInfo getDatabaseInfo(String databaseCode) {
-        for(DatabaseInfo di : listDatabaseInfo()){
-            if(StringUtils.equals(di.getDatabaseCode(),databaseCode))
-                return di;
-        }
-        return null;
-    }
-
-    @Override
-    @Cacheable(value="IPEnvironment",key="'OsInfo'")
-    public List<OsInfo> listOsInfos() {
+    public List<OsInfo> reloadOsInfos() {
         return  RestfulHttpRequest.getResponseObjectList(
-                appSession,
-                "/ipenvironment/osinfo",
-                OsInfo.class);
+            appSession,
+            "/ipenvironment/osinfo",
+            OsInfo.class);
     }
 
     @Override
-    @Cacheable(value="IPEnvironment",key="'DatabaseInfo'")
-    public List<DatabaseInfo> listDatabaseInfo() {
+    public List<DatabaseInfo> reloadDatabaseInfos() {
         return  RestfulHttpRequest.getResponseObjectList(
-                appSession,
-                "/ipenvironment/databaseinfo",
-                DatabaseInfo.class);
+            appSession,
+            "/ipenvironment/databaseinfo",
+            DatabaseInfo.class);
+    }
+
+    @Override
+    public List<UserAccessToken> reloadAccessTokens() {
+        return  RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/ipenvironment/allUserToken",
+            UserAccessToken.class);
     }
 
     @Override

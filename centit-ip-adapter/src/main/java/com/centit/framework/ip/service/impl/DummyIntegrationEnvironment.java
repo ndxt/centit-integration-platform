@@ -13,12 +13,16 @@ import java.util.List;
 public class DummyIntegrationEnvironment implements IntegrationEnvironment {
 
 
-
+    /**
+     * 刷新集成环境相关信息
+     * 包括：业务系统、数据库信息
+     *
+     * @return boolean 刷新集成环境相关信息
+     */
     @Override
-    public boolean reloadIPEnvironmen(){
-       return true;
+    public boolean reloadIPEnvironmen() {
+        return true;
     }
-
 
     @Override
     public OsInfo getOsInfo(String osId) {

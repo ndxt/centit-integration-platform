@@ -6,11 +6,9 @@ import com.centit.framework.core.dao.ExtendedQueryPool;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
-import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.DbcpConnectPools;
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +22,11 @@ import java.util.List;
 /**
  * Created by codefan on 17-7-3.
  */
-public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
+public class JdbcIntegrationEnvironment extends AbstractIntegrationEnvironment  {
 
     private Logger logger = LoggerFactory.getLogger(JdbcIntegrationEnvironment.class);
 
-    private List<OsInfo> osInfos;
-    private List<DatabaseInfo> databaseInfos;
-    private List<UserAccessToken> accessTokens;
+
 
     private DataSourceDescription dataSource;
 
@@ -40,34 +36,17 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
 
     public void setDataBaseConnectInfo(String connectURI, String username, String pswd){
         this.dataSource = new DataSourceDescription( connectURI,  username,  pswd);
+        try {
+            ExtendedQueryPool.loadResourceExtendedSqlMap(dataSource.getDbType());
+        } catch (DocumentException | IOException e) {
+            logger.error(e.getLocalizedMessage());
+        }
     }
 
     public void close(Connection conn){
-        if(conn!=null){
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                logger.error("关闭连接出错",e);
-            }
-        }
+        DbcpConnectPools.closeConnect(conn);
     }
 
-
-    @Override
-    public boolean reloadIPEnvironmen(){
-
-        try {
-            reloadIPEnvironmenFromJdbc();
-            return true;
-        } catch (IOException | SQLException | DocumentException e) {
-            osInfos = new ArrayList<>();
-            databaseInfos = new ArrayList<>();
-            accessTokens = new ArrayList<>();
-            e.printStackTrace();
-            logger.error("加载集成数据出错",e);
-            return false;
-        }
-    }
 
     private <T> List<T> jsonArrayToObjectList(JSONArray jsonArray, Class<T> clazz) {
         if(jsonArray==null)
@@ -75,72 +54,39 @@ public class JdbcIntegrationEnvironment implements IntegrationEnvironment {
         return jsonArray.toJavaList(clazz);
     }
 
-
-    public boolean reloadIPEnvironmenFromJdbc() throws IOException, DocumentException, SQLException {
-
-        ExtendedQueryPool.loadResourceExtendedSqlMap(dataSource.getDbType());
-
+    @Override
+    public List<OsInfo> reloadOsInfos() {
         try(Connection conn = getConnection()) {
             JSONArray userJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
-                    CodeRepositoryUtil.getExtendedSql("LIST_ALL_OS"));
-            osInfos = jsonArrayToObjectList(userJSONArray, OsInfo.class);
+                CodeRepositoryUtil.getExtendedSql("LIST_ALL_OS"));
+            return jsonArrayToObjectList(userJSONArray, OsInfo.class);
+        }catch (IOException | SQLException e ){
+            logger.error(e.getLocalizedMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<DatabaseInfo> reloadDatabaseInfos() {
+        try(Connection conn = getConnection()) {
             JSONArray optInfoJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
-                    CodeRepositoryUtil.getExtendedSql("LIST_ALL_DATABASE"));
-            databaseInfos = jsonArrayToObjectList(optInfoJSONArray,  DatabaseInfo.class);
+                CodeRepositoryUtil.getExtendedSql("LIST_ALL_DATABASE"));
+            return jsonArrayToObjectList(optInfoJSONArray,  DatabaseInfo.class);
+        }catch (IOException | SQLException e ){
+            logger.error(e.getLocalizedMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<UserAccessToken> reloadAccessTokens() {
+        try(Connection conn = getConnection()) {
             JSONArray optMethodsJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
-                    CodeRepositoryUtil.getExtendedSql("LIST_ALL_ACCESSTOKEN"));
-            accessTokens = jsonArrayToObjectList(optMethodsJSONArray,  UserAccessToken.class);
-        }
-
-        return true;
-    }
-
-    @Override
-    public OsInfo getOsInfo(String osId) {
-        if(osInfos==null)
+                CodeRepositoryUtil.getExtendedSql("LIST_ALL_ACCESSTOKEN"));
+            return jsonArrayToObjectList(optMethodsJSONArray,  UserAccessToken.class);
+        }catch (IOException | SQLException e ){
+            logger.error(e.getLocalizedMessage());
             return null;
-        for(OsInfo oi : osInfos){
-            if(StringUtils.equals(oi.getOsId(),osId))
-                return oi;
         }
-        return null;
     }
-
-    @Override
-    public DatabaseInfo getDatabaseInfo(String databaseCode) {
-        if(databaseInfos==null)
-            return null;
-        for(DatabaseInfo di : databaseInfos){
-            if(StringUtils.equals(di.getDatabaseCode(),databaseCode))
-                return di;
-        }
-        return null;
-    }
-
-    @Override
-    public List<OsInfo> listOsInfos() {
-        return osInfos;
-    }
-
-    @Override
-    public List<DatabaseInfo> listDatabaseInfo() {
-        return databaseInfos;
-    }
-
-    @Override
-    public String checkAccessToken(String tokenId, String accessKey) {
-        if(accessTokens==null)
-            return null;
-        for(UserAccessToken at : accessTokens){
-            if(StringUtils.equals(at.getTokenId(),tokenId)){
-                if( StringUtils.equals(at.getIsValid(),"T")
-                        && StringUtils.equals(at.getSecretAccessKey(), accessKey) )
-                    return at.getUserCode();
-                else
-                    return null;
-            }
-        }
-        return null;
-    }
-
 }

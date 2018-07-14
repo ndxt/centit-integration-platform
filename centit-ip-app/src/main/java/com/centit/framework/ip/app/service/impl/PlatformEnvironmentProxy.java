@@ -21,37 +21,6 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         this.evrnMangers = evrnMangers;
     }
 
-
-    /**
-     * 刷新数据字典
-     *
-     * @return boolean 刷新数据字典
-     */
-    @Override
-    public boolean reloadDictionary() {
-        boolean res=true;
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            if(!evrnManger.reloadDictionary())
-                res = false;
-        }
-        return res;
-    }
-
-    /**
-     * 刷新权限相关的元数据
-     *
-     * @return boolean 刷新权限相关的元数据
-     */
-    @Override
-    public boolean reloadSecurityMetadata() {
-        boolean res=true;
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            if(!evrnManger.reloadSecurityMetadata())
-                res = false;
-        }
-        return res;
-    }
-
     /**
      * 获得用户设置参数
      *
@@ -69,14 +38,14 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return null;
     }
 
+    /**
+     * 获取全部个人设置
+     *
+     * @param userCode 用户编码
+     * @return 个人设置列表
+     */
     @Override
-    public List<? extends IUserSetting> getAllSettings() {
-        for (PlatformEnvironment evrnManger : evrnMangers) {
-            List<? extends IUserSetting> svalue = evrnManger.getAllSettings();
-            if (svalue != null && svalue.size() > 0) {
-                return svalue;
-            }
-        }
+    public List<? extends IUserSetting> listUserSettings(String userCode) {
         return null;
     }
 
@@ -132,28 +101,6 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     @Override
-    public List<? extends IRoleInfo> listUserRolesByUserCode(String userCode) {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IRoleInfo> value =
-                    evrnManger.listUserRolesByUserCode(userCode);
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    @Override
-    public List<? extends IUserInfo> listRoleUserByRoleCode(String roleCode) {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IUserInfo> value =
-                    evrnManger.listRoleUserByRoleCode(roleCode);
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    @Override
     public List<? extends IUserRole> listUserRoles(String userCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserRole> value =
@@ -191,47 +138,6 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUnitRole> value =
                     evrnManger.listRoleUnits(roleCode);
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    /**
-     * 根据用户代码获取用户信息，
-     *
-     * @param userCode userCode
-     * @return 用户信息，
-     */
-    @Override
-    public IUserInfo getUserInfoByUserCode(String userCode) {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            IUserInfo value = evrnManger.getUserInfoByUserCode(userCode);
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    @Override
-    public IUnitInfo getUnitInfoByUnitCode(String unitCode){
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            IUnitInfo value = evrnManger.getUnitInfoByUnitCode(unitCode);
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-    /**
-     * 根据登录名获取用户信息，
-     *
-     * @param loginName loginName
-     * @return 用户信息，
-     */
-    @Override
-    public IUserInfo getUserInfoByLoginName(String loginName) {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            IUserInfo value = evrnManger.getUserInfoByLoginName(loginName);
             if(value!=null)
                 return value;
         }
@@ -345,74 +251,14 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     /**
-     * 获取机构代码映射表
-     *
-     * @return 机构代码映射表
-     */
-    @Override
-    public Map<String, ? extends IUnitInfo> getUnitRepo() {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            Map<String, ? extends IUnitInfo> value = evrnManger.getUnitRepo();
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    /**
-     * 获取部门编码映射表
-     *
-     * @return 部门编码映射表
-     */
-    @Override
-    public Map<String, ? extends IUserInfo> getUserRepo() {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            Map<String, ? extends IUserInfo> value = evrnManger.getUserRepo();
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    /**
-     * 获取机构代码映射表
-     *
-     * @return 机构代码映射表
-     */
-    @Override
-    public Map<String, ? extends IUserInfo> getLoginNameRepo() {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            Map<String, ? extends IUserInfo> value = evrnManger.getLoginNameRepo();
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    /**
-     * 获取部门编码映射表
-     *
-     * @return 部门编码映射表
-     */
-    @Override
-    public Map<String, ? extends IUnitInfo> getDepNoRepo() {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            Map<String, ? extends IUnitInfo> value = evrnManger.getDepNoRepo();
-            if(value!=null)
-                return value;
-        }
-        return null;
-    }
-
-    /**
      * 获取所有角色信息
      *
-     * @return 所有角色信息
+     * @return List 操作方法信息
      */
     @Override
-    public Map<String, ? extends IRoleInfo> getRoleRepo() {
+    public List<? extends IRoleInfo> listAllRoleInfo() {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            Map<String, ? extends IRoleInfo> value = evrnManger.getRoleRepo();
+            List<? extends IRoleInfo> value = evrnManger.listAllRoleInfo();
             if(value!=null)
                 return value;
         }
@@ -420,14 +266,29 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     /**
-     * 获取业务信息
+     * 获取所有角色和权限对应关系
      *
-     * @return 业务信息
+     * @return List 操作方法信息
      */
     @Override
-    public Map<String, ? extends IOptInfo> getOptInfoRepo() {
+    public List<? extends IRolePower> listAllRolePower() {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            Map<String, ? extends IOptInfo> value = evrnManger.getOptInfoRepo();
+            List<? extends IRolePower> value = evrnManger.listAllRolePower();
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    /**
+     * 获取业务操作信息
+     *
+     * @return List 业务信息
+     */
+    @Override
+    public List<? extends IOptInfo> listAllOptInfo() {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IOptInfo> value = evrnManger.listAllOptInfo();
             if(value!=null)
                 return value;
         }
@@ -437,12 +298,12 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     /**
      * 获取操作方法信息
      *
-     * @return 操作方法信息
+     * @return List 操作方法信息
      */
     @Override
-    public Map<String, ? extends IOptMethod> getOptMethodRepo() {
+    public List<? extends IOptMethod> listAllOptMethod() {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            Map<String, ? extends IOptMethod> value = evrnManger.getOptMethodRepo();
+            List<? extends IOptMethod> value = evrnManger.listAllOptMethod();
             if(value!=null)
                 return value;
         }

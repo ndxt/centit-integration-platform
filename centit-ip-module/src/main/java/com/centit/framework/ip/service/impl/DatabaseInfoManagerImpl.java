@@ -22,7 +22,7 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
 
     @Override
-    @Resource(name = "databaseInfoDao") 
+    @Resource(name = "databaseInfoDao")
     public void setBaseDao(DatabaseInfoDao baseDao) {
         super.baseDao = baseDao;
     }
@@ -47,7 +47,7 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
 	public String getNextKey() {
 		return baseDao.getNextKey();
 	}
-	
+
 	public void mergeObject(DatabaseInfo databaseInfo){
 		if(null==databaseInfo.getDatabaseCode())
 			databaseInfo.setDatabaseCode(getNextKey());
@@ -55,7 +55,6 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
 	}
 
 	@Override
-    @Cacheable(value="DBInfo",key="'databaseMap'")
     @Transactional(readOnly = true)
 	public Map<String, DatabaseInfo> listDatabaseToDBRepo() {
 		List<DatabaseInfo> dbList=baseDao.listObjects();
