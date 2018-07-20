@@ -50,98 +50,20 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
 
     @Bean
     @Lazy(value = false)
-    public PlatformEnvironment platformEnvironment(
-            CentitPasswordEncoder passwordEncoder) {
-
-        Boolean ipEnable = env.getProperty("centit.ip.enable",Boolean.class);// = false
-        PlatformEnvironment staticPlatformEnvironment=null;
-
-        Boolean jdbcEnable = env.getProperty("centit.jdbcplatform.enable", Boolean.class);// = false
-        if (jdbcEnable != null && jdbcEnable) {
-            JdbcPlatformEnvironment jdbcPlatformEnvironment = new JdbcPlatformEnvironment();
-            jdbcPlatformEnvironment.setDataBaseConnectInfo(
-                 env.getProperty("centit.jdbcplatform.url"),
-                    env.getProperty("centit.jdbcplatform.username"),
-                    env.getProperty("centit.jdbcplatform.password")
-            );
-            jdbcPlatformEnvironment.setPasswordEncoder(passwordEncoder);
-            if(ipEnable==null || !ipEnable) {
-                return jdbcPlatformEnvironment;
-            }else {
-                staticPlatformEnvironment = jdbcPlatformEnvironment;
-            }
-        } else{
-            JsonPlatformEnvironment jsonPlatformEnvironment = new JsonPlatformEnvironment();
-            jsonPlatformEnvironment.setAppHome(env.getProperty("app.home"));
-            jsonPlatformEnvironment.setPasswordEncoder(passwordEncoder);
-            if(ipEnable==null || !ipEnable) {
-                return jsonPlatformEnvironment;
-            }else {
-                staticPlatformEnvironment = jsonPlatformEnvironment;
-            }
-        }
-
+    public PlatformEnvironment platformEnvironment() {
         IPClientPlatformEnvironment ipPlatformEnvironment = new IPClientPlatformEnvironment();
         ipPlatformEnvironment.setTopOptId(env.getProperty("centit.ip.topoptid"));
         ipPlatformEnvironment.setPlatServerUrl(env.getProperty("centit.ip.home"));
-
-        List<PlatformEnvironment> evrnMangers = new ArrayList<>();
-        evrnMangers.add(ipPlatformEnvironment);
-        evrnMangers.add(staticPlatformEnvironment);
-
-        PlatformEnvironmentProxy platformEnvironment = new PlatformEnvironmentProxy();
-        platformEnvironment.setEvrnMangers(evrnMangers);
-
-        return platformEnvironment;
+        return ipPlatformEnvironment;
     }
 
     @Bean
     @Lazy(value = false)
     public IntegrationEnvironment integrationEnvironment() {
-
-        Boolean ipEnable = env.getProperty("centit.ip.enable",Boolean.class);// = false
-
-        IntegrationEnvironment staticIntegrationEnvironment=null;
-
-        Boolean jdbcEnable = env.getProperty("centit.jdbcplatform.ip.enable", Boolean.class);// = false
-        if (jdbcEnable != null && jdbcEnable) {
-            JdbcIntegrationEnvironment jdbcIntegrationEnvironment = new JdbcIntegrationEnvironment();
-            jdbcIntegrationEnvironment.setDataBaseConnectInfo(
-                    env.getProperty("centit.jdbcplatform.url"),
-                    env.getProperty("centit.jdbcplatform.username"),
-                    env.getProperty("centit.jdbcplatform.password")
-            );
-            jdbcIntegrationEnvironment.reloadIPEnvironmen();
-            if(ipEnable==null || !ipEnable) {
-                return jdbcIntegrationEnvironment;
-            }else {
-                staticIntegrationEnvironment = jdbcIntegrationEnvironment;
-            }
-        } else{
-            JsonIntegrationEnvironment jsonIntegrationEnvironment = new JsonIntegrationEnvironment();
-            jsonIntegrationEnvironment.setAppHome(env.getProperty("app.home"));
-
-            jsonIntegrationEnvironment.reloadIPEnvironmen();
-            if(ipEnable==null || !ipEnable) {
-                return jsonIntegrationEnvironment;
-            }else {
-                staticIntegrationEnvironment = jsonIntegrationEnvironment;
-            }
-        }
-
-
         IPClientIntegrationEnvironment ipIntegrationEnvironment = new IPClientIntegrationEnvironment();
         ipIntegrationEnvironment.setPlatServerUrl(env.getProperty("centit.ip.home"));
         //ipPlatformEnvironment.init();
-
-        List<IntegrationEnvironment> evrnMangers = new ArrayList<>();
-        evrnMangers.add(ipIntegrationEnvironment);
-        evrnMangers.add(staticIntegrationEnvironment);
-
-        IntegrationEnvironmentProxy integrationEnvironment = new IntegrationEnvironmentProxy();
-        integrationEnvironment.setEvrnMangers(evrnMangers);
-
-        return integrationEnvironment;
+        return ipIntegrationEnvironment;
     }
 
     @Bean

@@ -370,7 +370,7 @@ public class PlatformDataController extends BaseController {
 		//resData.addResponseData("userRoles", userDetails.getUserRoles());
         //resData.addResponseData("userSettings", userDetails.getUserSettings());
 		resData.addResponseData("userUnits", userDetails.getUserUnits());
-        //resData.addResponseData("userOptList", userDetails.getUserOptList());*/
+        resData.addResponseData("userPin", userDetails.getUserInfo().getUserPin());
 		JsonResultUtils.writeResponseDataAsJson(resData, response);
 	}
 
@@ -406,6 +406,9 @@ public class PlatformDataController extends BaseController {
 
 	/**
 	 * 新增菜单和操作
+     * @param request HttpServletRequest
+     * @param response HttpServletResponse
+     * @throws IOException 异常
 	 */
 	@RequestMapping(value = "/insertopt", method = RequestMethod.POST)
 	public void insertOpt(HttpServletRequest request, HttpServletResponse response) throws IOException {
