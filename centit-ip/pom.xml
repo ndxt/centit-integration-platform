@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>framework-snapshot-dependencies</artifactId>
+        <artifactId>framework-release-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1.1808</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-ip</artifactId>
@@ -51,12 +51,12 @@
             http://www.open-open.com/lib/view/open1412731740452.html
             http://www.oschina.net/translate/oauth-2-developers-guide -->
 
-<!--        <dependency>
+        <!--
+        <dependency>
           <groupId>org.springframework.security.oauth</groupId>
           <artifactId>spring-security-oauth2</artifactId>
           <version>${spring-security-oauth2.version}</version>
         </dependency>-->
-
 
         <dependency>
             <groupId>mysql</groupId>

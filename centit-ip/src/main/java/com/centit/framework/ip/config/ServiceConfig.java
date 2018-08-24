@@ -2,6 +2,7 @@ package com.centit.framework.ip.config;
 
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.components.impl.TextOperationLogWriterImpl;
+import com.centit.framework.config.InitialWebRuntimeEnvironment;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
@@ -21,6 +22,14 @@ import org.springframework.context.annotation.*;
         SpringSecurityDaoConfig.class,
         JdbcConfig.class})
 public class ServiceConfig {
+
+    @Bean
+    @Lazy(value = false)
+    public InitialWebRuntimeEnvironment initialEnvironment() {
+        InitialWebRuntimeEnvironment initialWebRuntimeEnvironment = new InitialWebRuntimeEnvironment();
+        initialWebRuntimeEnvironment.initialEnvironment();
+        return initialWebRuntimeEnvironment;
+    }
 
     @Bean
     public NotificationCenter notificationCenter() {

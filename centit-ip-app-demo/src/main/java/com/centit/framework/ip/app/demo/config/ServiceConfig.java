@@ -29,8 +29,11 @@ public class ServiceConfig {
     @Bean(initMethod = "initialEnvironment")
     @Lazy(value = false)
     public InitialWebRuntimeEnvironment initialEnvironment() {
-        return new InitialWebRuntimeEnvironment();
+        InitialWebRuntimeEnvironment initialWebRuntimeEnvironment = new InitialWebRuntimeEnvironment();
+        initialWebRuntimeEnvironment.initialEnvironment();
+        return initialWebRuntimeEnvironment;
     }
+
 
     @Bean
     public NotificationCenter notificationCenter() {

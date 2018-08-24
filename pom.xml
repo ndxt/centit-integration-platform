@@ -6,12 +6,12 @@
     <parent>
         <artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>1.1.1806</version>
+        <version>1.1.1808</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.framework</groupId>
     <artifactId>centit-integration-platform</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1.1808</version>
     <modules>
         <module>centit-ip-app</module>
         <module>centit-ip-adapter</module>
@@ -23,10 +23,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.framework.version>4.2-SNAPSHOT</centit.framework.version>
-        <centit.persistence.version>1.1-SNAPSHOT</centit.persistence.version>
-        <centit.commons.version>2.2-SNAPSHOT</centit.commons.version>
-        <centit.ui.version>3.1-SNAPSHOT</centit.ui.version>
+        <centit.framework.version>4.2.1808</centit.framework.version>
+        <centit.persistence.version>1.1.1808</centit.persistence.version>
+        <centit.commons.version>2.2.1808</centit.commons.version>
+        <centit.ui.version>3.1.1808</centit.ui.version>
     </properties>
 
     <name>com.centit.framework:centit-integration-platform</name>
