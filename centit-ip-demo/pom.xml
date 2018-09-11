@@ -8,11 +8,11 @@
         <version>1.1.1808</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>centit-ip</artifactId>
+    <artifactId>centit-ip-demo</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>com.centit.framework:centit-ip</name>
+    <name>com.centit.framework:centit-ip-demo</name>
     <description>先腾集成平台，统一管理用户和主数据并提供http接口</description>
 
     <dependencies>
