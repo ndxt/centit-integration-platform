@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
-import com.centit.framework.jdbc.dao.DatabaseOptUtils;
+import com.centit.framework.jdbc.dao.JdbcTemplateUtils;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.PageDesc;
@@ -42,26 +42,23 @@ public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo,String> {
                 databaseInfo.getUsername(),
                 databaseInfo.getPassword()));
     }
-    
-	public List<DatabaseInfo> listDatabase() {
+
+    public List<DatabaseInfo> listDatabase() {
         return this.listObjects();
     }
 
-	public DatabaseInfo getDatabaseInfoById(String databaseCode) {
-		DatabaseInfo dbi=this.getObjectById(databaseCode);
-		return dbi;
-	}
+    public DatabaseInfo getDatabaseInfoById(String databaseCode) {
+        DatabaseInfo dbi=this.getObjectById(databaseCode);
+        return dbi;
+    }
 
-	//hibernate
-	/*public String getNextKey() {
-		return DatabaseOptUtils.getNextKeyBySequence(this, "S_DATABASECODE", 10);
-	}*/
-
-	//jdbc
-	public String getNextKey() {
-		return StringBaseOpt.fillZeroForString(
-		        String.valueOf(DatabaseOptUtils.getSequenceNextValue(this, "S_DATABASECODE")), 10);
-	}
+    //jdbc
+    public String getNextKey() {
+        return StringBaseOpt.fillZeroForString(
+                String.valueOf(
+                    JdbcTemplateUtils.getSequenceNextValue(
+                        this.jdbcTemplate, "S_DATABASECODE")), 10);
+    }
 
     public JSONArray queryDatabaseAsJson(String databaseName, PageDesc pageDesc){
         if(StringUtils.isBlank(databaseName)){

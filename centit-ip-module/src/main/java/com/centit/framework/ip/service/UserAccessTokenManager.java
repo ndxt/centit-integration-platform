@@ -6,8 +6,8 @@ import com.centit.framework.jdbc.service.BaseEntityManager;
 import java.util.List;
 
 public interface UserAccessTokenManager extends BaseEntityManager<UserAccessToken,String> {
-  
-	public UserAccessToken	createNewAccessToken(String userCode);
-	
-	public List<UserAccessToken> listAccessTokenByUser(String userCode);
+
+    public UserAccessToken    createNewAccessToken(String userCode);
+
+    public List<UserAccessToken> listAccessTokenByUser(String userCode);
 }

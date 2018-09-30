@@ -6,7 +6,7 @@ public class OsInfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     private String osId;
-    private String osName;     
+    private String osName;
     private String osUrl;
     private String ddeSyncUrl;
     private String sysDataPushOption;
@@ -32,7 +32,7 @@ public class OsInfo implements java.io.Serializable {
 
     public OsInfo(
             String osId
-            , String osName, 
+            , String osName,
             String sysDataPushOption, String osUrl,String ddeSyncUrl,
             String created, Date lastUpdateTime, Date createTime) {
         this.osId = osId;
@@ -46,7 +46,7 @@ public class OsInfo implements java.io.Serializable {
     }
 
 
-   
+
 
     public String getOsId() {
         return this.osId;
@@ -73,40 +73,40 @@ public class OsInfo implements java.io.Serializable {
         this.created = created;
     }
 
-   
+
     public String getOsUrl() {
 		return osUrl;
-	}
+    }
 
-	public void setOsUrl(String osUrl) {
+    public void setOsUrl(String osUrl) {
 		this.osUrl = osUrl;
-	}
+    }
 
-	public String getDdeSyncUrl() {
+    public String getDdeSyncUrl() {
 		return ddeSyncUrl;
-	}
+    }
 
-	public void setDdeSyncUrl(String ddeSyncUrl) {
+    public void setDdeSyncUrl(String ddeSyncUrl) {
 		this.ddeSyncUrl = ddeSyncUrl;
-	}
+    }
 
-	public String getSysDataPushOption() {
+    public String getSysDataPushOption() {
 		return sysDataPushOption;
-	}
+    }
 
-	public void setSysDataPushOption(String sysDataPushOption) {
+    public void setSysDataPushOption(String sysDataPushOption) {
 		this.sysDataPushOption = sysDataPushOption;
-	}
+    }
 
-	public Date getLastModifyDate() {
+    public Date getLastModifyDate() {
 		return lastModifyDate;
-	}
+    }
 
-	public void setLastModifyDate(Date lastModifyDate) {
+    public void setLastModifyDate(Date lastModifyDate) {
 		this.lastModifyDate = lastModifyDate;
-	}
+    }
 
-	public Date getCreateTime() {
+    public Date getCreateTime() {
         return this.createTime;
     }
 
@@ -147,17 +147,17 @@ public class OsInfo implements java.io.Serializable {
         if (other.getOsId() != null)
             this.setOsId(other.getOsId());
         if (other.getOsName() != null)
-            this.osName = other.getOsName();       
+            this.osName = other.getOsName();
         if (other.getDdeSyncUrl() != null)
-        	this.ddeSyncUrl=other.getDdeSyncUrl();
+            this.ddeSyncUrl=other.getDdeSyncUrl();
         if (other.getSysDataPushOption() != null)
-        	this.sysDataPushOption=other.getSysDataPushOption();
+            this.sysDataPushOption=other.getSysDataPushOption();
         if (other.getOsUrl() != null)
-        	this.osUrl = other.getOsUrl();
+            this.osUrl = other.getOsUrl();
         if (other.getLastModifyDate() != null)
-        	this.lastModifyDate= other.getLastModifyDate();
+            this.lastModifyDate= other.getLastModifyDate();
         if (other.getCreated() != null)
-        	this.created = other.getCreated();        
+            this.created = other.getCreated();
         if (other.getCreateTime() != null)
             this.createTime = other.getCreateTime();
         if (other.getLoginUserName() != null)
@@ -167,7 +167,7 @@ public class OsInfo implements java.io.Serializable {
     }
 
     public void clearProperties() {
-    	this.osId = null;
+        this.osId = null;
         this.osName = null;
         this.ddeSyncUrl=null;
         this.sysDataPushOption=null;

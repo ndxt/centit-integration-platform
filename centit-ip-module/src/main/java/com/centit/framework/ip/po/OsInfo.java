@@ -24,11 +24,11 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
 //    @GeneratedValue(generator = "assignedGenerator")
 //    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String osId;
-    
+
     @Column(name = "OS_NAME")
     @Length(max = 200, message = "字段长度不能大于{max}")
     private String osName;
-    
+
     @Column(name = "OS_URL")
     @Length(max = 200, message = "字段长度不能大于{max}")
     private String osUrl;
@@ -36,7 +36,7 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
     @Column(name = "DDE_SYNC_URL")
     @Length(max = 200, message = "字段长度不能大于{max}")
     private String ddeSyncUrl;
-    
+
     @Column(name = "SYS_DATA_PUSH_OPTION")
     @Length(max = 32, message = "字段长度不能大于{max}")
     private String sysDataPushOption;
@@ -80,7 +80,7 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
 
      public OsInfo(
             String osId
-            , String osName, 
+            , String osName,
             String sysDataPushOption, String osUrl,String ddeSyncUrl,
             String created, Date lastUpdateTime, Date createTime) {
         this.osId = osId;
@@ -119,30 +119,30 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
         this.created = created;
     }
 
-   
+
     public String getOsUrl() {
 		return osUrl;
-	}
+    }
 
-	public void setOsUrl(String osUrl) {
+    public void setOsUrl(String osUrl) {
 		this.osUrl = osUrl;
-	}
+    }
 
-	public String getDdeSyncUrl() {
+    public String getDdeSyncUrl() {
 		return ddeSyncUrl;
-	}
+    }
 
-	public void setDdeSyncUrl(String ddeSyncUrl) {
+    public void setDdeSyncUrl(String ddeSyncUrl) {
 		this.ddeSyncUrl = ddeSyncUrl;
-	}
+    }
 
-	public String getSysDataPushOption() {
+    public String getSysDataPushOption() {
 		return sysDataPushOption;
-	}
+    }
 
-	public void setSysDataPushOption(String sysDataPushOption) {
+    public void setSysDataPushOption(String sysDataPushOption) {
 		this.sysDataPushOption = sysDataPushOption;
-	}
+    }
 
     public String getLoginUserName() {
         return loginUserName;
@@ -160,17 +160,17 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
         this.loginUserPassword = loginUserPassword;
     }
 
-	@Override
-	public Date getLastModifyDate() {
+    @Override
+    public Date getLastModifyDate() {
 		return lastModifyDate;
-	}
+    }
 
-	@Override
-	public void setLastModifyDate(Date lastModifyDate) {
+    @Override
+    public void setLastModifyDate(Date lastModifyDate) {
 		this.lastModifyDate = lastModifyDate;
-	}
+    }
 
-	public Date getCreateTime() {
+    public Date getCreateTime() {
         return this.createTime;
     }
 

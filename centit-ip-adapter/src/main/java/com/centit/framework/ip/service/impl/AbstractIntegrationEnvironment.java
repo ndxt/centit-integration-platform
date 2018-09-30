@@ -30,9 +30,9 @@ public abstract class AbstractIntegrationEnvironment implements IntegrationEnvir
 
 
     public AbstractIntegrationEnvironment(){
-        osInfoCache = new CachedObject<>(this::reloadOsInfos, CodeRepositoryCache.CACHE_FRESH_PERIOD_MINITES);
-        databaseInfoCache = new CachedObject<>(this::reloadDatabaseInfos, CodeRepositoryCache.CACHE_FRESH_PERIOD_MINITES);
-        accessTokenCache = new CachedObject<>(this::reloadAccessTokens, CodeRepositoryCache.CACHE_FRESH_PERIOD_MINITES);
+        osInfoCache = new CachedObject<>(this::reloadOsInfos, CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
+        databaseInfoCache = new CachedObject<>(this::reloadDatabaseInfos, CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
+        accessTokenCache = new CachedObject<>(this::reloadAccessTokens, CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
     }
 
     public abstract List<OsInfo> reloadOsInfos();

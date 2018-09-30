@@ -16,54 +16,54 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/ipenvironment")
 public class IPEnvironmentController extends BaseController {
 
-	@Resource
-	protected IntegrationEnvironment integrationEnvironment;
-	
-	@RequestMapping(value ="/test",method = RequestMethod.GET)
+    @Resource
+    protected IntegrationEnvironment integrationEnvironment;
+
+    @RequestMapping(value ="/test",method = RequestMethod.GET)
     public void test(
             HttpServletRequest request,HttpServletResponse response) {
 		String testSessionString = new String("hello");
 		request.getSession().setAttribute("test", (String) testSessionString);
 		JsonResultUtils.writeSingleDataJson("test=zouwuyang", response);
-	}
+    }
 
 
-	
-	@RequestMapping(value ="/reload/ipenvironment",method = RequestMethod.GET)
+
+    @RequestMapping(value ="/reload/ipenvironment",method = RequestMethod.GET)
     public void reloadIPEnvironment(
             HttpServletRequest request,HttpServletResponse response) {
 		if(integrationEnvironment.reloadIPEnvironmen())
 			JsonResultUtils.writeSuccessJson(response);
 		else
 			JsonResultUtils.writeErrorMessageJson("reloadIPEnvironmen failed！", response);
-	}
+    }
 
-	@RequestMapping(value ="/reload/refreshall",method = RequestMethod.GET)
-	public void environmentRefreshAll(
+    @RequestMapping(value ="/reload/refreshall",method = RequestMethod.GET)
+    public void environmentRefreshAll(
 			HttpServletRequest request,HttpServletResponse response) {
 		boolean reloadEv = integrationEnvironment.reloadIPEnvironmen();
 		if(reloadEv )
 			JsonResultUtils.writeSuccessJson(response);
 		else
 			JsonResultUtils.writeErrorMessageJson("environmentRefreshAll failed！", response);
-	}
+    }
 
 
-	@RequestMapping(value ="/osinfos",method = RequestMethod.GET)
+    @RequestMapping(value ="/osinfos",method = RequestMethod.GET)
     public void listOsInfos(
             HttpServletRequest request,HttpServletResponse response) {
 
 		ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, integrationEnvironment.listOsInfos());
 		JsonResultUtils.writeResponseDataAsJson(resData, response);
-	}
-	
-	@RequestMapping(value ="/databaseinfos",method = RequestMethod.GET)
+    }
+
+    @RequestMapping(value ="/databaseinfos",method = RequestMethod.GET)
     public void listDatabaseInfos(
             HttpServletRequest request,HttpServletResponse response) {
 
 		ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, integrationEnvironment.listDatabaseInfo());
 		JsonResultUtils.writeResponseDataAsJson(resData, response);
-	}
+    }
 }

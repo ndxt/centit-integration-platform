@@ -17,16 +17,16 @@ public class UserAccessToken implements java.io.Serializable {
 //    @GeneratedValue(generator = "assignedGenerator")
 //    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String tokenId;
-    
+
     @Column(name = "USER_CODE")
     private String userCode;
-    
+
     @Column(name = "SECRET_ACCESS_KEY")
     private String secretAccessKey;
 
     @Column(name = "ISVALID")
     private String isValid;
-    
+
     @Column(name = "CREATE_TIME")
     private Date createTime;
 
@@ -37,62 +37,62 @@ public class UserAccessToken implements java.io.Serializable {
      * default constructor
      */
     public UserAccessToken() {
-    	this.isValid = "T";
+        this.isValid = "T";
     }
 
     public UserAccessToken(String userCode) {
-    	this.userCode = userCode;
-    	this.isValid = "T";
+        this.userCode = userCode;
+        this.isValid = "T";
     }
 
-	public String getTokenId() {
+    public String getTokenId() {
 		return tokenId;
-	}
+    }
 
 
-	public void setTokenId(String tokenId) {
+    public void setTokenId(String tokenId) {
 		this.tokenId = tokenId;
-	}
+    }
 
 
-	public String getUserCode() {
+    public String getUserCode() {
 		return userCode;
-	}
+    }
 
 
-	public void setUserCode(String userCode) {
+    public void setUserCode(String userCode) {
 		this.userCode = userCode;
-	}
+    }
 
 
-	public String getSecretAccessKey() {
+    public String getSecretAccessKey() {
 		return secretAccessKey;
-	}
+    }
 
 
-	public void setSecretAccessKey(String secretAccessKey) {
+    public void setSecretAccessKey(String secretAccessKey) {
 		this.secretAccessKey = secretAccessKey;
-	}
+    }
 
 
-	public String getIsValid() {
+    public String getIsValid() {
 		return isValid;
-	}
+    }
 
 
-	public void setIsValid(String isValid) {
+    public void setIsValid(String isValid) {
 		this.isValid = isValid;
-	}
+    }
 
 
-	public Date getCreateTime() {
+    public Date getCreateTime() {
 		return createTime;
-	}
+    }
 
 
-	public void setCreateTime(Date createTime) {
+    public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
-	}
+    }
 
-   
+
 }

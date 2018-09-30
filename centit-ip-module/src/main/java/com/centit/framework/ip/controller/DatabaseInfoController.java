@@ -27,14 +27,14 @@ import java.util.Map;
 @Controller
 @RequestMapping("/sys/database")
 public class DatabaseInfoController extends BaseController {
-	
-	@Resource
+
+    @Resource
     private DatabaseInfoManager databaseInfoMag;
 
     private String optId = "DATABASE";
 
-	@RequestMapping(method = RequestMethod.GET)
-	public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(method = RequestMethod.GET)
+    public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = BaseController.convertSearchColumn(request);
 
 //        JSONArray listObjects = databaseInfoMag.queryDatabaseAsJson(
@@ -48,21 +48,21 @@ public class DatabaseInfoController extends BaseController {
         JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
-	/*
-	 * 新增
-	 */
+    /*
+     * 新增
+     */
     @RequestMapping(method = {RequestMethod.POST})
     public void saveDatabaseInfo(@Valid DatabaseInfo databaseinfo,
                                  HttpServletRequest request, HttpServletResponse response) {
-    	
-    	DatabaseInfo temp = databaseInfoMag.getObjectById(databaseInfoMag.getNextKey());
-    	if (temp!=null){
+
+        DatabaseInfo temp = databaseInfoMag.getObjectById(databaseInfoMag.getNextKey());
+        if (temp!=null){
     		JsonResultUtils.writeErrorMessageJson("该数据库标识已存在", response);
             return;
         }
         //加密
-      	databaseinfo.setClearPassword(databaseinfo.getPassword());
-    	databaseinfo.setCreated(super.getLoginUserCode(request));
+          databaseinfo.setClearPassword(databaseinfo.getPassword());
+        databaseinfo.setCreated(super.getLoginUserCode(request));
         databaseInfoMag.saveNewObject(databaseinfo);
 
         JsonResultUtils.writeBlankJson(response);
@@ -88,9 +88,9 @@ public class DatabaseInfoController extends BaseController {
                 databaseInfo.getPassword()));
 
         if (result) {
-        	JsonResultUtils.writeSingleDataJson("连接测试成功",response);
+            JsonResultUtils.writeSingleDataJson("连接测试成功",response);
         } else {
-        	JsonResultUtils.writeErrorMessageJson("数据库连接测试失败！", response);
+            JsonResultUtils.writeErrorMessageJson("数据库连接测试失败！", response);
         }
 
     }
@@ -101,12 +101,12 @@ public class DatabaseInfoController extends BaseController {
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.PUT})
     public void updateDatabaseInfo(@PathVariable String databaseCode, @Valid DatabaseInfo databaseinfo,
                                    HttpServletRequest request, HttpServletResponse response) {
-    	DatabaseInfo temp = databaseInfoMag.getObjectById(databaseCode);
-    	if (!databaseinfo.getPassword().equals(temp.getPassword())){
+        DatabaseInfo temp = databaseInfoMag.getObjectById(databaseCode);
+        if (!databaseinfo.getPassword().equals(temp.getPassword())){
     		databaseinfo.setClearPassword(databaseinfo.getPassword());
-    	}
+        }
 
-    	DatabaseInfo oldValue = new DatabaseInfo();
+        DatabaseInfo oldValue = new DatabaseInfo();
         BeanUtils.copyProperties(temp, oldValue);
         databaseInfoMag.mergeObject(databaseinfo);
 
@@ -120,7 +120,7 @@ public class DatabaseInfoController extends BaseController {
 
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.GET})
     public void getDatabaseInhfo(@PathVariable String databaseCode, HttpServletResponse response) {
-    	DatabaseInfo databaseInfo = databaseInfoMag.getObjectById(databaseCode);
+        DatabaseInfo databaseInfo = databaseInfoMag.getObjectById(databaseCode);
 
         JsonResultUtils.writeSingleDataJson(databaseInfo, response,
                 JsonPropertyUtils.getExcludePropPreFilter(DatabaseInfo.class, "databaseInfo"));
@@ -129,9 +129,9 @@ public class DatabaseInfoController extends BaseController {
     public void deleteDatabase(@PathVariable String databaseCode,
                                HttpServletRequest request, HttpServletResponse response) {
         DatabaseInfo databaseInfo = databaseInfoMag.getObjectById(databaseCode);
-    	databaseInfoMag.deleteObjectById(databaseCode);
+        databaseInfoMag.deleteObjectById(databaseCode);
 
-    	JsonResultUtils.writeBlankJson(response);
+        JsonResultUtils.writeBlankJson(response);
 
         /******************************log********************************/
         OperationLogCenter.logDeleteObject(request, optId, databaseCode, OperationLog.P_OPT_LOG_METHOD_D,
@@ -139,6 +139,6 @@ public class DatabaseInfoController extends BaseController {
         /******************************log********************************/
     }
 
-   
-    
+
+
 }

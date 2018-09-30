@@ -104,9 +104,9 @@ public class OsInfoController extends  BaseController {
             return;
         }
 
-    	osInfoMag.deleteObjectById(osId);
+        osInfoMag.deleteObjectById(osId);
 
-    	JsonResultUtils.writeBlankJson(response);
+        JsonResultUtils.writeBlankJson(response);
 
         /********************log***********************/
 

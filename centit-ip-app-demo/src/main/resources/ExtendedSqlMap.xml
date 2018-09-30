@@ -13,7 +13,7 @@
 				where 1=1 {projectOwner:a,projectInfo:b}
 				[projectType:pt| and b.projectType=:pt]
 				[:companyType,:companyName | and
-				 	 c.companyType=:companyType and c.companyName like :companyName]
+				      c.companyType=:companyType and c.companyName like :companyName]
 				 order by b.name ]]>
     </sql>
 

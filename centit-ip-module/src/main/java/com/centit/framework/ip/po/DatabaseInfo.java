@@ -28,17 +28,17 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
 //    @GeneratedValue(generator = "assignedGenerator")
 //    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String databaseCode;
-    
+
     @Column(name = "OS_ID")
     private String osId;
-    
+
     @Column(name = "DATABASE_NAME")
     private String databaseName;
 
     @Column(name = "DATABASE_URL")
     @Length(max = 1000, message = "字段长度不能大于{max}")
     private String databaseUrl;
-    
+
     @Column(name = "USERNAME")
     @Length(max = 100, message = "字段长度不能大于{max}")
     private String username;
@@ -46,7 +46,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     @Column(name = "PASSWORD")
     @Length(max = 100, message = "字段长度不能大于{max}")
     private String password;
-    
+
     @Column(name = "DATABASE_DESC")
     @Length(max = 100, message = "字段长度不能大于{max}")
     private String databaseDesc;
@@ -54,14 +54,14 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
     @Column(name = "LAST_MODIFY_DATE")
     private Date lastModifyDate;
-    
-    @Column(name = "CREATED")    
+
+    @Column(name = "CREATED")
     private String created;
 
     @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now")
     @Column(name = "CREATE_TIME")
     private Date createTime;
-  
+
     // Constructors
 
     /**
@@ -71,14 +71,14 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     }
 
     public DatabaseInfo(String databaseCode,String databaseName) {
-    	this.databaseCode = databaseCode;
+        this.databaseCode = databaseCode;
         this.databaseName = databaseName;
     }
 
     public DatabaseInfo(String databaseCode, String databaseName, String databaseUrl,
     		String username, String password,
                         String dataDesc) {
-    	this.databaseCode = databaseCode;
+        this.databaseCode = databaseCode;
         this.databaseName = databaseName;
         this.databaseUrl = databaseUrl;
         this.username = username;
@@ -103,12 +103,12 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     }
     public String getDatabaseCode() {
 		return databaseCode;
-	}
+    }
 
-	public void setDatabaseCode(String databaseCode) {
+    public void setDatabaseCode(String databaseCode) {
 		this.databaseCode = databaseCode;
-	}
-   
+    }
+
 
     public String getCreated() {
         return created;
@@ -129,18 +129,18 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     @Override
     public Date getLastModifyDate() {
 		return lastModifyDate;
-	}
+    }
 
     @Override
-	public void setLastModifyDate(Date lastModifyDate) {
+    public void setLastModifyDate(Date lastModifyDate) {
 		this.lastModifyDate = lastModifyDate;
-	}
+    }
 
-	public static long getSerialversionuid() {
+    public static long getSerialversionuid() {
 		return serialVersionUID;
-	}
+    }
 
-	public String getDatabaseUrl() {
+    public String getDatabaseUrl() {
         return this.databaseUrl;
     }
 
@@ -177,7 +177,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
      */
 
     public void copy(DatabaseInfo other) {
-    	this.databaseCode = other.getDatabaseCode();
+        this.databaseCode = other.getDatabaseCode();
         this.setDatabaseName(other.getDatabaseName());
         this.databaseUrl = other.getDatabaseUrl();
         this.username = other.getUsername();
@@ -205,18 +205,18 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
         if (other.getDatabaseDesc() != null)
             this.databaseDesc = other.getDatabaseDesc();
         if (other.getOsId() != null)
-        	this.osId = other.getOsId();
+            this.osId = other.getOsId();
         if (other.getCreated() != null)
-        	this.created = other.getCreated();
+            this.created = other.getCreated();
         if (other.getCreateTime() != null)
-        	this.createTime = other.getCreateTime();
+            this.createTime = other.getCreateTime();
         if (other.getLastModifyDate() != null)
-        	this.lastModifyDate = other.getLastModifyDate();
+            this.lastModifyDate = other.getLastModifyDate();
     }
 
     public void clearProperties() {
 
-    	this.databaseCode = null;
+        this.databaseCode = null;
         this.databaseName = null;
         this.databaseUrl = null;
         this.lastModifyDate = null;

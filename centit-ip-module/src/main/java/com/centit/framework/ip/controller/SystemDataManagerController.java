@@ -17,15 +17,15 @@ import com.centit.framework.ip.service.UserDirectory;
 @RequestMapping("/datamanager")
 public class SystemDataManagerController  extends BaseController {
 
-	@Resource(name="activeDirectoryUserDirectory")
-	@NotNull
-	private UserDirectory activeDirectoryUserDirectory;
-	
-	@RequestMapping(value = "/syncuserdirectory/{directory}", 
+    @Resource(name="activeDirectoryUserDirectory")
+    @NotNull
+    private UserDirectory activeDirectoryUserDirectory;
+
+    @RequestMapping(value = "/syncuserdirectory/{directory}",
 			method = RequestMethod.GET)
-	public void syncUserDirectory(@PathVariable String directory, 
+    public void syncUserDirectory(@PathVariable String directory,
 			HttpServletResponse response) {
 		activeDirectoryUserDirectory.synchroniseUserDirectory();
 		JsonResultUtils.writeSuccessJson(response);
-	}
+    }
 }

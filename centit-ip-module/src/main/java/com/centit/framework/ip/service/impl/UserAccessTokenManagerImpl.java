@@ -25,29 +25,29 @@ public class UserAccessTokenManagerImpl extends BaseEntityManagerImpl<UserAccess
         super.baseDao = baseDao;
     }
 
-	@Override
-	@Transactional
-	public UserAccessToken createNewAccessToken(String userCode) {
+    @Override
+    @Transactional
+    public UserAccessToken createNewAccessToken(String userCode) {
 		UserAccessToken userToken = new UserAccessToken(userCode);
 		userToken.setTokenId(UuidOpt.getUuidAsString32());
 		userToken.setSecretAccessKey(UuidOpt.getUuidAsString36());
 		userToken.setCreateTime(DatetimeOpt.currentUtilDate());
 		baseDao.saveNewObject(userToken);
 		return userToken;
-	}
+    }
 
-	/*@Override
-	@Transactional
-	public List<UserAccessToken> listAccessTokenByUser(String userCode) {
+    /*@Override
+    @Transactional
+    public List<UserAccessToken> listAccessTokenByUser(String userCode) {
 		return baseDao.listObjects("from UserAccessToken where userCode=?",userCode);
-	}*/
+    }*/
 
-	//jdbc
-	@Override
-	@Transactional
-	public List<UserAccessToken> listAccessTokenByUser(String userCode) {
+    //jdbc
+    @Override
+    @Transactional
+    public List<UserAccessToken> listAccessTokenByUser(String userCode) {
 		return baseDao.listObjectsByProperty("userCode",userCode);
-	}
+    }
 
 }
 

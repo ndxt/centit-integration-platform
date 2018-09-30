@@ -14,12 +14,12 @@ public interface DatabaseInfoManager extends BaseEntityManager<DatabaseInfo,Stri
     List<DatabaseInfo> listDatabase();
 
     void saveNewObject(DatabaseInfo databaseInfo);
-    
-    void mergeObject(DatabaseInfo databaseInfo);
-    
-	String getNextKey();
 
-	Map<String, DatabaseInfo> listDatabaseToDBRepo();
+    void mergeObject(DatabaseInfo databaseInfo);
+
+    String getNextKey();
+
+    Map<String, DatabaseInfo> listDatabaseToDBRepo();
 
     List<DatabaseInfo> listObjects(Map<String, Object> map);
 

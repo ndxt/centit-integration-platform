@@ -13,14 +13,14 @@ public class DatabaseInfo implements  Serializable {
     private String databaseCode;
     private String osId;
     private String databaseName;
-    private String databaseUrl;   
+    private String databaseUrl;
     private String username;
     private String password;
     private String databaseDesc;
     private Date lastModifyDate;
     private String created;
     private Date createTime;
-  
+
     // Constructors
 
     /**
@@ -30,14 +30,14 @@ public class DatabaseInfo implements  Serializable {
     }
 
     public DatabaseInfo(String databaseCode,String databaseName) {
-    	this.databaseCode = databaseCode;
+        this.databaseCode = databaseCode;
         this.databaseName = databaseName;
     }
 
     public DatabaseInfo(String databaseCode, String databaseName, String databaseUrl,
     		String username, String password,
                         String dataDesc) {
-    	this.databaseCode = databaseCode;
+        this.databaseCode = databaseCode;
         this.databaseName = databaseName;
         this.databaseUrl = databaseUrl;
         this.username = username;
@@ -62,12 +62,12 @@ public class DatabaseInfo implements  Serializable {
     }
     public String getDatabaseCode() {
 		return databaseCode;
-	}
+    }
 
-	public void setDatabaseCode(String databaseCode) {
+    public void setDatabaseCode(String databaseCode) {
 		this.databaseCode = databaseCode;
-	}
-   
+    }
+
 
     public String getCreated() {
         return created;
@@ -87,17 +87,17 @@ public class DatabaseInfo implements  Serializable {
 
     public Date getLastModifyDate() {
 		return lastModifyDate;
-	}
+    }
 
-	public void setLastModifyDate(Date lastModifyDate) {
+    public void setLastModifyDate(Date lastModifyDate) {
 		this.lastModifyDate = lastModifyDate;
-	}
+    }
 
-	public static long getSerialversionuid() {
+    public static long getSerialversionuid() {
 		return serialVersionUID;
-	}
+    }
 
-	public String getDatabaseUrl() {
+    public String getDatabaseUrl() {
         return this.databaseUrl;
     }
 
@@ -141,7 +141,7 @@ public class DatabaseInfo implements  Serializable {
      */
 
     public void copy(DatabaseInfo other) {
-    	this.databaseCode = other.getDatabaseCode();
+        this.databaseCode = other.getDatabaseCode();
         this.setDatabaseName(other.getDatabaseName());
         this.databaseUrl = other.getDatabaseUrl();
         this.username = other.getUsername();
@@ -169,18 +169,18 @@ public class DatabaseInfo implements  Serializable {
         if (other.getDatabaseDesc() != null)
             this.databaseDesc = other.getDatabaseDesc();
         if (other.getOsId() != null)
-        	this.osId = other.getOsId();
+            this.osId = other.getOsId();
         if (other.getCreated() != null)
-        	this.created = other.getCreated();
+            this.created = other.getCreated();
         if (other.getCreateTime() != null)
-        	this.createTime = other.getCreateTime();
+            this.createTime = other.getCreateTime();
         if (other.getLastModifyDate() != null)
-        	this.lastModifyDate = other.getLastModifyDate();
+            this.lastModifyDate = other.getLastModifyDate();
     }
 
     public void clearProperties() {
 
-    	this.databaseCode = null;
+        this.databaseCode = null;
         this.databaseName = null;
         this.databaseUrl = null;
         this.lastModifyDate = null;
@@ -194,7 +194,7 @@ public class DatabaseInfo implements  Serializable {
 
     @JSONField(serialize = false)
     public String getClearPassword(){
-    	return AESSecurityUtils.decryptBase64String(
+        return AESSecurityUtils.decryptBase64String(
     			getPassword(),DatabaseInfo.DESKEY);
     }
 

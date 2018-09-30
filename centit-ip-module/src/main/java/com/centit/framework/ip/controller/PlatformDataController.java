@@ -42,33 +42,33 @@ import java.util.Map;
 @RequestMapping("/platform")
 public class PlatformDataController extends BaseController {
 
-	@Resource
-	@NotNull
-	private UserSettingManager userSettingManager;
+    @Resource
+    @NotNull
+    private UserSettingManager userSettingManager;
 
-	@Resource
+    @Resource
     @NotNull
     private SysRoleManager sysRoleManager;
 
-	@Resource(name="platformEnvironment")
-	@NotNull
-	protected PlatformEnvironment platformEnvironment;
+    @Resource(name="platformEnvironment")
+    @NotNull
+    protected PlatformEnvironment platformEnvironment;
 
     @Resource
     @NotNull
     private SysUserManager sysUserManager;
 
-	@Resource
-	@NotNull
-	protected OsInfoManager osInfoManager;
+    @Resource
+    @NotNull
+    protected OsInfoManager osInfoManager;
 
-	@Resource
-	@NotNull
-	protected DatabaseInfoManager oatabaseInfoManager;
+    @Resource
+    @NotNull
+    protected DatabaseInfoManager oatabaseInfoManager;
 
-	@Resource
-	@NotNull
-	protected UserAccessTokenManager userAccessTokenManager;
+    @Resource
+    @NotNull
+    protected UserAccessTokenManager userAccessTokenManager;
 
     @RequestMapping
     @ResponseBody
@@ -93,22 +93,22 @@ public class PlatformDataController extends BaseController {
         JsonResultUtils.writeSuccessJson(response);
     }
 
-	@RequestMapping(value = "/usersettings/{userCode}/{optID}",
+    @RequestMapping(value = "/usersettings/{userCode}/{optID}",
 			method = RequestMethod.GET)
-	public void getUserAllSettings(@PathVariable String optID, @PathVariable String userCode,
+    public void getUserAllSettings(@PathVariable String optID, @PathVariable String userCode,
 			HttpServletResponse response) {
 
 		JsonResultUtils.writeSingleDataJson(
 				userSettingManager.getUserSettings(userCode, optID), response);
-	}
+    }
 
-	@RequestMapping(value = "/usersetting/{userCode}/{paramCode}",
+    @RequestMapping(value = "/usersetting/{userCode}/{paramCode}",
 			method = RequestMethod.GET)
-	public void getUserSetting(@PathVariable String userCode,
+    public void getUserSetting(@PathVariable String userCode,
 			@PathVariable String paramCode,HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				userSettingManager.getUserSetting(userCode, paramCode), response);
-	}
+    }
 
     @RequestMapping(value = "/allsetting",
         method = RequestMethod.GET)
@@ -117,9 +117,9 @@ public class PlatformDataController extends BaseController {
             userSettingManager.getAllSettings(), response);
     }
 
-	@RequestMapping(value = "/usersetting",
+    @RequestMapping(value = "/usersetting",
 			method = RequestMethod.PUT)
-	public void setUserSetting(@RequestBody String settingJson,HttpServletResponse response) {
+    public void setUserSetting(@RequestBody String settingJson,HttpServletResponse response) {
 		UserSetting us = JSON.parseObject(settingJson, UserSetting.class);
 		if(us!=null){
 			//userSettingManager.saveUserSetting(us);
@@ -128,38 +128,38 @@ public class PlatformDataController extends BaseController {
 		}else {
             JsonResultUtils.writeErrorMessageJson("put 的用户设置不正确！", response);
         }
-	}
+    }
 
-	@RequestMapping(value = "/usermenu/{optid}/{userCode}",
+    @RequestMapping(value = "/usermenu/{optid}/{userCode}",
 			method = RequestMethod.GET)
-	public void listUserMenuOptInfos(@PathVariable String optid, @PathVariable String userCode, boolean asAdmin,
+    public void listUserMenuOptInfos(@PathVariable String optid, @PathVariable String userCode, boolean asAdmin,
 			HttpServletResponse response) {
 
 		List<? extends IOptInfo> menuFunsByUser = null;
-    	if(StringUtils.isBlank(optid) || "null".equals(optid)){
+        if(StringUtils.isBlank(optid) || "null".equals(optid)){
 			 menuFunsByUser = platformEnvironment.listUserMenuOptInfos(userCode ,asAdmin);
 		}else {
 			 menuFunsByUser = platformEnvironment.listUserMenuOptInfosUnderSuperOptId(userCode, optid, asAdmin);
 		}
 
 		JsonResultUtils.writeSingleDataJson(menuFunsByUser, response);
-	}
+    }
 
-	@RequestMapping(value = "/checkpassword/{userCode}",
+    @RequestMapping(value = "/checkpassword/{userCode}",
 			method = RequestMethod.PUT)
-	public void changeUserPassword(@PathVariable String userCode,@RequestBody String jsonData ,
+    public void changeUserPassword(@PathVariable String userCode,@RequestBody String jsonData ,
 			HttpServletResponse response) {
 		JSONObject json = (JSONObject)JSON.parse(jsonData);
 		String password = StringBaseOpt.objectToString(json.get("password"));
 		//String newPassword = StringBaseOpt.objectToString(json.get("newPassword"));
 		JsonResultUtils.writeOriginalObject(
 				platformEnvironment.checkUserPassword(userCode, password), response);
-	}
+    }
 
 
-	@RequestMapping(value = "/changepassword/{userCode}",
+    @RequestMapping(value = "/changepassword/{userCode}",
 			method = RequestMethod.PUT)
-	public void checkUserPassword(@PathVariable String userCode,@RequestBody String jsonData ,
+    public void checkUserPassword(@PathVariable String userCode,@RequestBody String jsonData ,
 			HttpServletResponse response) {
 		JSONObject json = (JSONObject)JSON.parse(jsonData);
 		//String password = StringBaseOpt.objectToString(json.get("password"));
@@ -168,75 +168,75 @@ public class PlatformDataController extends BaseController {
 			platformEnvironment.changeUserPassword(userCode, newPassword);
 			JsonResultUtils.writeSuccessJson(response);
 		//}else
-		//	JsonResultUtils.writeErrorMessageJson("用户提供的密码不正确！", response);
-	}
+		//    JsonResultUtils.writeErrorMessageJson("用户提供的密码不正确！", response);
+    }
 
 
-	@RequestMapping(value = "/allusers/{appName}",
+    @RequestMapping(value = "/allusers/{appName}",
 			method = RequestMethod.GET)
-	public void listAllUsers(@PathVariable String appName,
+    public void listAllUsers(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllUsers(),response);
-	}
+    }
 
 
-	@RequestMapping(value = "/allunits/{appName}",
+    @RequestMapping(value = "/allunits/{appName}",
 			method = RequestMethod.GET)
-	public void listAllUnits(@PathVariable String appName,
+    public void listAllUnits(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllUnits(),response);
-	}
+    }
 
-	@RequestMapping(value = "/alluserunits/{appName}",
+    @RequestMapping(value = "/alluserunits/{appName}",
 			method = RequestMethod.GET)
-	public void listAllUserUnits(@PathVariable String appName,
+    public void listAllUserUnits(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllUserUnits(),response);
-	}
+    }
 
-	@RequestMapping(value = "/userunits/{appName}/{userCode}",
+    @RequestMapping(value = "/userunits/{appName}/{userCode}",
 			method = RequestMethod.GET)
-	public void listUserUnits(@PathVariable String appName,@PathVariable String userCode,
+    public void listUserUnits(@PathVariable String appName,@PathVariable String userCode,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listUserUnits(userCode),response);
-	}
+    }
 
-	@RequestMapping(value = "/unitusers/{appName}/{unitCode}",
+    @RequestMapping(value = "/unitusers/{appName}/{unitCode}",
 			method = RequestMethod.GET)
-	public void listUnitUsers(@PathVariable String appName,@PathVariable String unitCode,
+    public void listUnitUsers(@PathVariable String appName,@PathVariable String unitCode,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listUnitUsers(unitCode),response);
-	}
+    }
 
-	@RequestMapping(value = "/unitrepo/{appName}",
+    @RequestMapping(value = "/unitrepo/{appName}",
 			method = RequestMethod.GET)
-	public void getUnitRepo(@PathVariable String appName,
+    public void getUnitRepo(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllUnits(),response);
-	}
+    }
 
-	@RequestMapping(value = "/userrepo/{appName}",
+    @RequestMapping(value = "/userrepo/{appName}",
 			method = RequestMethod.GET)
-	public void getUserRepo(@PathVariable String appName,
+    public void getUserRepo(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllUsers(),response);
-	}
+    }
 
-	@RequestMapping(value = "/rolerepo/{appName}",
+    @RequestMapping(value = "/rolerepo/{appName}",
 			method = RequestMethod.GET)
-	public void getRoleRepo(@PathVariable String appName,
+    public void getRoleRepo(@PathVariable String appName,
 			HttpServletResponse response) {
 
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllRoleInfo(),response);
-	}
+    }
 
     @RequestMapping(value = "/userroles/{userCode}",
             method = RequestMethod.GET)
@@ -291,51 +291,51 @@ public class PlatformDataController extends BaseController {
                 platformEnvironment.listRoleUnits(roleCode),response);
     }
 
-	@RequestMapping(value = "/optinforepo/{appName}",
+    @RequestMapping(value = "/optinforepo/{appName}",
 			method = RequestMethod.GET)
-	public void getOptInfoRepo(@PathVariable String appName,
+    public void getOptInfoRepo(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllOptInfo(),response);
-	}
+    }
 
 
-	@RequestMapping(value = "/catalogs/{appName}",
+    @RequestMapping(value = "/catalogs/{appName}",
 			method = RequestMethod.GET)
-	public void listAllDataCatalogs(@PathVariable String appName,
+    public void listAllDataCatalogs(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listAllDataCatalogs(),response);
-	}
+    }
 
-	@RequestMapping(value = "/dictionary/{appName}/{catalogCode}",
+    @RequestMapping(value = "/dictionary/{appName}/{catalogCode}",
 			method = RequestMethod.GET)
-	public void listDataDictionaries(@PathVariable String appName,@PathVariable String catalogCode,
+    public void listDataDictionaries(@PathVariable String appName,@PathVariable String catalogCode,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				platformEnvironment.listDataDictionaries(catalogCode),response);
-	}
+    }
 
-	@RequestMapping(value = "/allrolepowers/{appName}",
+    @RequestMapping(value = "/allrolepowers/{appName}",
 			method = RequestMethod.GET)
-	public void listAllRolePower(@PathVariable String appName,
+    public void listAllRolePower(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				sysRoleManager.listAllRolePowers(),response);
-	}
+    }
 
-	@RequestMapping(value = "/alloptmethods/{appName}",
+    @RequestMapping(value = "/alloptmethods/{appName}",
 			method = RequestMethod.GET)
-	public void listAllOptMethod(@PathVariable String appName,
+    public void listAllOptMethod(@PathVariable String appName,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				sysRoleManager.listAllOptMethods(),response);
-	}
+    }
 
 
-	@RequestMapping(value = "/userdetails/{appName}/{queryParam}",
+    @RequestMapping(value = "/userdetails/{appName}/{queryParam}",
 			method = RequestMethod.GET)
-	public void loadUserDetails(@PathVariable String appName,
+    public void loadUserDetails(@PathVariable String appName,
 			@PathVariable String queryParam,String qtype,
 			HttpServletResponse response) {
 		if(qtype==null) {
@@ -372,30 +372,30 @@ public class PlatformDataController extends BaseController {
 		resData.addResponseData("userUnits", userDetails.getUserUnits());
         resData.addResponseData("userPin", userDetails.getUserInfo().getUserPin());
 		JsonResultUtils.writeResponseDataAsJson(resData, response);
-	}
+    }
 
-	@RequestMapping(value = "/ipenvironment/databaseinfo",
+    @RequestMapping(value = "/ipenvironment/databaseinfo",
 			method = RequestMethod.GET)
-	public void listAllDatabase(HttpServletResponse response) {
+    public void listAllDatabase(HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				oatabaseInfoManager.listDatabase(),response);
-	}
+    }
 
-	@RequestMapping(value = "/ipenvironment/osinfo",
+    @RequestMapping(value = "/ipenvironment/osinfo",
 			method = RequestMethod.GET)
-	public void listAllOS(
+    public void listAllOS(
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				osInfoManager.listObjects(),response);
-	}
+    }
 
-	@RequestMapping(value = "/ipenvironment/userToken/{tokenId}",
+    @RequestMapping(value = "/ipenvironment/userToken/{tokenId}",
 			method = RequestMethod.GET)
-	public void getUserToken(@PathVariable String tokenId,
+    public void getUserToken(@PathVariable String tokenId,
 			HttpServletResponse response) {
 		JsonResultUtils.writeSingleDataJson(
 				userAccessTokenManager.getObjectById(tokenId),response);
-	}
+    }
 
     @RequestMapping(value = "/ipenvironment/allUserToken",
         method = RequestMethod.GET)
@@ -404,18 +404,18 @@ public class PlatformDataController extends BaseController {
             userAccessTokenManager.listObjects(),response);
     }
 
-	/**
-	 * 新增菜单和操作
+    /**
+     * 新增菜单和操作
      * @param request HttpServletRequest
      * @param response HttpServletResponse
      * @throws IOException 异常
-	 */
-	@RequestMapping(value = "/insertopt", method = RequestMethod.POST)
-	public void insertOpt(HttpServletRequest request, HttpServletResponse response) throws IOException {
+     */
+    @RequestMapping(value = "/insertopt", method = RequestMethod.POST)
+    public void insertOpt(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> param = JSON.parseObject(request.getInputStream(),Map.class);
 		List<OptInfo> optInfos = JSON.parseArray(param.get("optInfos").toString(),OptInfo.class);
 		List<OptMethod> optMethods = JSON.parseArray(param.get("optMethods").toString(),OptMethod.class);
 		platformEnvironment.insertOrUpdateMenu(optInfos, optMethods);
 		JsonResultUtils.writeSuccessJson(response);
-	}
+    }
 }
