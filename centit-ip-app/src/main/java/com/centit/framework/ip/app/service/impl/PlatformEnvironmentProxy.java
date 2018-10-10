@@ -5,7 +5,6 @@ import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by codefan on 16-12-16.
