@@ -1,23 +1,23 @@
 package com.centit.framework.ip.controller;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.ip.service.DatabaseInfoManager;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.po.OsInfo;
+import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.ip.service.OsInfoManager;
 import com.centit.framework.model.basedata.OperationLog;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JsonPropertyUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -25,6 +25,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,27 @@ public class OsInfoController extends  BaseController {
     private DatabaseInfoManager databaseInfoMag;
 
     private String optId = "OS";
+    private String refreshUrl = "/system/environment/reload/refreshall";
+
+    @RequestMapping(value = "/data/refresh" ,method = {RequestMethod.POST})
+    public void refresh(@RequestBody List<OsInfo> osInfoList, HttpServletResponse response){
+
+        if(osInfoList == null){
+            return;
+        }
+
+        boolean flag = true;
+        for(OsInfo osInfo : osInfoList){
+            try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
+                HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),osInfo.getOsUrl() + refreshUrl);
+            }catch (IOException e){
+                e.printStackTrace();
+                flag = false;
+                break;
+            }
+        }
+        JsonResultUtils.writeSingleDataJson(flag, response);
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
