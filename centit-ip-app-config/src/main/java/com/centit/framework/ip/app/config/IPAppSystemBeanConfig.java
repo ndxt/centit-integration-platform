@@ -2,15 +2,11 @@ package com.centit.framework.ip.app.config;
 
 import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
-import com.centit.framework.ip.app.service.impl.IntegrationEnvironmentProxy;
-import com.centit.framework.ip.app.service.impl.PlatformEnvironmentProxy;
 import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.framework.ip.service.impl.JdbcIntegrationEnvironment;
-import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.security.model.*;
-import com.centit.framework.staticsystem.service.impl.JdbcPlatformEnvironment;
-import com.centit.framework.staticsystem.service.impl.JsonPlatformEnvironment;
+import com.centit.framework.security.model.CentitSessionRegistry;
+import com.centit.framework.security.model.CentitUserDetailsService;
+import com.centit.framework.security.model.MemorySessionRegistryImpl;
 import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
@@ -22,8 +18,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 @PropertySource("classpath:system.properties")
 public class IPAppSystemBeanConfig  implements EnvironmentAware{
