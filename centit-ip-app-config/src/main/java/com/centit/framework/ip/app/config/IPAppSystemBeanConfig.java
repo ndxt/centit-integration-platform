@@ -4,7 +4,6 @@ import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.security.model.CentitSessionRegistry;
 import com.centit.framework.security.model.CentitUserDetailsService;
 import com.centit.framework.security.model.MemorySessionRegistryImpl;
 import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
@@ -15,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import javax.annotation.Resource;
@@ -70,10 +70,9 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     }
 
     @Bean
-    public CentitSessionRegistry centitSessionRegistry(){
+    public SessionRegistry sessionRegistry(){
         return new MemorySessionRegistryImpl();
     }
-
 
     @Bean
     public HttpSessionCsrfTokenRepository csrfTokenRepository() {
