@@ -43,10 +43,12 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
         return new AutowiredAnnotationBeanPostProcessor();
     }
 
-    @Bean
-    public StandardPasswordEncoderImpl passwordEncoder() {
-        return new StandardPasswordEncoderImpl();
-    }
+    /*  这bean从框架中移除，由开发人员自行定义
+        @Bean("passwordEncoder")
+        public StandardPasswordEncoderImpl passwordEncoder() {
+            return  new StandardPasswordEncoderImpl();
+        }
+    */
 
     @Bean
     @Lazy(value = false)
