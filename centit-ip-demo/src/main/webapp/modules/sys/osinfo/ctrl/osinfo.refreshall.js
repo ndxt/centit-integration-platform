@@ -8,14 +8,12 @@
 
 		// @override
 		this.submit = function(table) {
-      var data=$('#osinfoTable').datagrid("getData");
 
       $.ajax({
-        type: 'POST',
-        url: Config.ContextPath+'system/sys/os/data/refresh',
+        type: 'GET',
+        url: Config.ContextPath+'system/sys/os/data/refresh/all',
         dataType:"json",
         contentType:"application/json",
-        data: JSON.stringify(data.rows),
         success: function (e) {
           if(e.data){
             $.messager.alert("操作提示", "所有系统数据刷新成功！","info");
