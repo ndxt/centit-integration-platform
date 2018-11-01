@@ -52,8 +52,7 @@ create table F_DATACATALOG
    CATALOG_CODE         varchar(16) not null,
    CATALOG_NAME         varchar(64) not null,
    CATALOG_STYLE        char(1) not null comment 'F : 框架固有的 U:用户 S：系统  G国标',
-   CATALOG_TYPE         char(1) not null comment 'T：树状表格 L:列表
-            ',
+   CATALOG_TYPE         char(1) not null comment 'T：树状表格 L:列表',
    CATALOG_DESC         varchar(256),
    Field_Desc           varchar(1024) comment '字段描述，不同字段用分号隔开',
    update_Date          datetime,
