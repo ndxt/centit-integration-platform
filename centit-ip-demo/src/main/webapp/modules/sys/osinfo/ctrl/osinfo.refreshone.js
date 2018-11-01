@@ -9,14 +9,12 @@
 		// @override
 		this.submit = function(table, data) {
 
-		  var dataList = [];
-		  dataList.push(data);
       $.ajax({
         type: 'POST',
-        url: Config.ContextPath+'system/sys/os/data/refresh',
+        url: Config.ContextPath+'system/sys/os/data/refresh/single',
         dataType:"json",
         contentType:"application/json",
-        data: JSON.stringify(dataList),
+        data: JSON.stringify(data),
         success: function (e) {
           if(e.data){
             $.messager.alert("操作提示", "所选系统数据刷新成功！","info");

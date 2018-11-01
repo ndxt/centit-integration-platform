@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,15 +44,40 @@ public class OsInfoController extends  BaseController {
     private String optId = "OS";
     private String refreshUrl = "/system/environment/reload/refreshall";
 
-    @RequestMapping(value = "/data/refresh" ,method = {RequestMethod.POST})
-    public void refresh(@RequestBody List<OsInfo> osInfoList, HttpServletResponse response){
+    /**
+     * 刷新单个系统数据
+     * @param osInfo 系统对象
+     * @param response HttpServletResponse
+     */
+    @RequestMapping(value = "/data/refresh/single" ,method = {RequestMethod.POST})
+    public void refreshSingle(@RequestBody OsInfo osInfo, HttpServletResponse response){
 
-        if(osInfoList == null){
+        if(osInfo == null){
             return;
         }
 
         boolean flag = true;
-        for(OsInfo osInfo : osInfoList){
+        try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
+            HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),osInfo.getOsUrl() + refreshUrl);
+        }catch (IOException e){
+            e.printStackTrace();
+            flag = false;
+        }
+        JsonResultUtils.writeSingleDataJson(flag, response);
+    }
+
+    /**
+     * 刷新查询的所有系统的数据
+     * @param response HttpServletResponse
+     */
+    @RequestMapping(value = "/data/refresh/all" ,method = {RequestMethod.GET})
+    public void refreshAll(HttpServletResponse response){
+        List<OsInfo> osInfos = osInfoMag.listObjects(new HashMap<>());
+        if(osInfos.isEmpty()){
+            return;
+        }
+        boolean flag = true;
+        for(OsInfo osInfo : osInfos){
             try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
                 HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),osInfo.getOsUrl() + refreshUrl);
             }catch (IOException e){
