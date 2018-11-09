@@ -1,6 +1,5 @@
 package com.centit.framework.ip.app.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.common.ResponseJSON;
@@ -10,9 +9,6 @@ import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.staticsystem.po.*;
 import com.centit.framework.staticsystem.security.StaticCentitUserDetails;
 import com.centit.support.algorithm.StringRegularOpt;
-import com.centit.support.network.HttpExecutor;
-import com.centit.support.network.HttpExecutorContext;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,20 +69,8 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     @Override
     public void saveUserSetting(IUserSetting userSetting) {
-        CloseableHttpClient httpClient = null;
-        try {
-            httpClient = appSession.allocHttpClient();
-            /*String resStr =*/ HttpExecutor.jsonPost(
-                    HttpExecutorContext.create(httpClient),
-                    appSession.completeQueryUrl("/usersetting"),
-                    userSetting);
-            //ResponseJSON resJson = ResponseJSON.valueOfJson(resStr);
-        } catch (Exception e) {
-            logger.error(e.getLocalizedMessage(),e);
-        } finally {
-            if(httpClient!=null)
-                appSession.releaseHttpClient(httpClient);
-        }
+        RestfulHttpRequest.jsonPost(appSession,"/usersetting",
+            userSetting);
     }
 
     @Override
@@ -139,46 +123,28 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     @Override
     public void changeUserPassword(String userCode, String userPassword) {
-        CloseableHttpClient httpClient = null;
-        try {
-            httpClient = appSession.allocHttpClient();
-            Map<String,String> userInfo = new HashMap<>();
-            userInfo.put("userCode", userCode);
-            userInfo.put("password", userPassword);
-            userInfo.put("newPassword", userPassword);
-            HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
-                    appSession.completeQueryUrl("/changepassword/"+userCode),
-                    JSON.toJSONString(userInfo), true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("获取httpClient出错",e);
-        } finally {
-            if(httpClient!=null)
-                appSession.releaseHttpClient(httpClient);
-        }
+
+        Map<String,String> userInfo = new HashMap<>();
+        userInfo.put("userCode", userCode);
+        userInfo.put("password", userPassword);
+        userInfo.put("newPassword", userPassword);
+        RestfulHttpRequest.jsonPost(appSession,
+            "/changepassword/"+userCode,
+            userInfo);
     }
 
     @Override
     public boolean checkUserPassword(String userCode, String userPassword) {
-        CloseableHttpClient httpClient = null;
-        try {
-            httpClient = appSession.allocHttpClient();
-            Map<String,String> userInfo = new HashMap<>();
-            userInfo.put("userCode", userCode);
-            userInfo.put("password", userPassword);
-            userInfo.put("newPassword", userPassword);
-            String sret = HttpExecutor.jsonPost(HttpExecutorContext.create(httpClient),
-                    appSession.completeQueryUrl("/checkpassword/"+userCode),
-                    JSON.toJSONString(userInfo), true);
-            return StringRegularOpt.isTrue(sret);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("获取httpClient出错",e);
-            return false;
-        } finally {
-            if(httpClient!=null)
-                appSession.releaseHttpClient(httpClient);
-        }
+
+        Map<String,String> userInfo = new HashMap<>();
+        userInfo.put("userCode", userCode);
+        userInfo.put("password", userPassword);
+        userInfo.put("newPassword", userPassword);
+        String sret = RestfulHttpRequest.jsonPost(
+            appSession,"/checkpassword/"+userCode,
+            userInfo, true);
+        return StringRegularOpt.isTrue(sret);
+
     }
 
     @Override
@@ -319,21 +285,9 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     @Override
     public void updateUserInfo(IUserInfo userInfo) {
-        CloseableHttpClient httpClient = null;
-        try {
-            httpClient = appSession.allocHttpClient();
-            /*String resStr =*/ HttpExecutor.jsonPost(
-                    HttpExecutorContext.create(httpClient),
-                    appSession.completeQueryUrl("/userinfo"),
-                    userInfo,
-                    true);
-            //ResponseJSON resJson = ResponseJSON.valueOfJson(resStr);
-        } catch (Exception e) {
-            logger.error(e.getLocalizedMessage(),e);
-        } finally {
-            if(httpClient!=null)
-                appSession.releaseHttpClient(httpClient);
-        }
+        RestfulHttpRequest.jsonPost(
+            appSession,"/userinfo",
+            userInfo,true);
     }
 
     /**
@@ -343,20 +297,9 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
      */
     @Override
     public void insertOrUpdateMenu(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
-        CloseableHttpClient httpClient = null;
         Map<String, Object> param = new HashMap<>(4);
         param.put("optInfos", optInfos);
         param.put("optMethods", optMethods);
-        try {
-            httpClient = appSession.allocHttpClient();
-        HttpExecutor.jsonPost(
-                HttpExecutorContext.create(httpClient),
-                appSession.completeQueryUrl("/insertopt"), param);
-        } catch (Exception e) {
-
-        } finally {
-            if(httpClient!=null)
-                appSession.releaseHttpClient(httpClient);
-        }
+        RestfulHttpRequest.jsonPost(appSession,"/insertopt", param);
     }
 }

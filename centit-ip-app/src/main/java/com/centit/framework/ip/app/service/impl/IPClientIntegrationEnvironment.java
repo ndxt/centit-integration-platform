@@ -7,7 +7,6 @@ import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
 import com.centit.framework.ip.service.impl.AbstractIntegrationEnvironment;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.util.List;
 
@@ -21,20 +20,9 @@ public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironme
     }
     private AppSession appSession;
 
-
-
-    public CloseableHttpClient allocHttpClient() throws Exception {
-        return appSession.allocHttpClient();
-    }
-
-    public void releaseHttpClient(CloseableHttpClient httpClient) {
-        appSession.releaseHttpClient(httpClient);
-    }
-
     public void setPlatServerUrl(String platServerUrl) {
         appSession = new AppSession(platServerUrl,false,null,null);
     }
-
 
     @Override
     public List<OsInfo> reloadOsInfos() {
