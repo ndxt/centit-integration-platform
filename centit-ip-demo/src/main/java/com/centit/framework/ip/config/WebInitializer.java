@@ -10,18 +10,13 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
-
-
 /**
  * Created by zou_wy on 2017/3/29.
  */
-
-
 public class WebInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
-
         initializeSpringConfig(servletContext);
         initializeSpringMvcConfig(servletContext);
         WebConfig.registerSpringSecurityFilter(servletContext);
@@ -33,6 +28,8 @@ public class WebInitializer implements WebApplicationInitializer {
         WebConfig.registerHttpPutFormContentFilter(servletContext);
         WebConfig.registerHiddenHttpMethodFilter(servletContext);
         WebConfig.registerRequestThreadLocalFilter(servletContext);
+        //Session
+        WebConfig.registerHttpSessionEventPublisher(servletContext);
     }
 
     /**
@@ -51,7 +48,7 @@ public class WebInitializer implements WebApplicationInitializer {
      */
     private void initializeSpringMvcConfig(ServletContext servletContext) {
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(SystemSpringMvcConfig.class);
+        context.register(SystemSpringMvcConfig.class, SwaggerConfig.class);
         Dynamic system  = servletContext.addServlet("system", new DispatcherServlet(context));
         system.addMapping("/system/*");
         system.setLoadOnStartup(1);
