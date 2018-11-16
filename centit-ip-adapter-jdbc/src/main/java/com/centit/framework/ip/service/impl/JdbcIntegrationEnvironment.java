@@ -1,7 +1,6 @@
 package com.centit.framework.ip.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.dao.ExtendedQueryPool;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
@@ -58,7 +57,7 @@ public class JdbcIntegrationEnvironment extends AbstractIntegrationEnvironment  
     public List<OsInfo> reloadOsInfos() {
         try(Connection conn = getConnection()) {
             JSONArray userJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
-                CodeRepositoryUtil.getExtendedSql("LIST_ALL_OS"));
+                ExtendedQueryPool.getExtendedSql("LIST_ALL_OS"));
             return jsonArrayToObjectList(userJSONArray, OsInfo.class);
         }catch (IOException | SQLException e ){
             logger.error(e.getLocalizedMessage());
@@ -70,7 +69,7 @@ public class JdbcIntegrationEnvironment extends AbstractIntegrationEnvironment  
     public List<DatabaseInfo> reloadDatabaseInfos() {
         try(Connection conn = getConnection()) {
             JSONArray optInfoJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
-                CodeRepositoryUtil.getExtendedSql("LIST_ALL_DATABASE"));
+                ExtendedQueryPool.getExtendedSql("LIST_ALL_DATABASE"));
             return jsonArrayToObjectList(optInfoJSONArray,  DatabaseInfo.class);
         }catch (IOException | SQLException e ){
             logger.error(e.getLocalizedMessage());
@@ -82,7 +81,7 @@ public class JdbcIntegrationEnvironment extends AbstractIntegrationEnvironment  
     public List<UserAccessToken> reloadAccessTokens() {
         try(Connection conn = getConnection()) {
             JSONArray optMethodsJSONArray = DatabaseAccess.findObjectsAsJSON(conn,
-                CodeRepositoryUtil.getExtendedSql("LIST_ALL_ACCESSTOKEN"));
+                ExtendedQueryPool.getExtendedSql("LIST_ALL_ACCESSTOKEN"));
             return jsonArrayToObjectList(optMethodsJSONArray,  UserAccessToken.class);
         }catch (IOException | SQLException e ){
             logger.error(e.getLocalizedMessage());
