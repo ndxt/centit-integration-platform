@@ -37,9 +37,12 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     private AppSession appSession;
 
+    public AppSession getPlatAppSession() {
+        return this.appSession;
+    }
 
-    public void setPlatServerUrl(String platServerUrl) {
-        appSession = new AppSession(platServerUrl,false,null,null);
+    public void createPlatAppSession(String appServerUrl,boolean needAuthenticated,String userCode,String password){
+        appSession = new AppSession(appServerUrl,needAuthenticated,userCode,password);
     }
 
     @Override

@@ -20,8 +20,12 @@ public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironme
     }
     private AppSession appSession;
 
-    public void setPlatServerUrl(String platServerUrl) {
-        appSession = new AppSession(platServerUrl,false,null,null);
+    public AppSession getPlatAppSession() {
+        return this.appSession;
+    }
+
+    public void createPlatAppSession(String appServerUrl,boolean needAuthenticated,String userCode,String password){
+        appSession = new AppSession(appServerUrl,needAuthenticated,userCode,password);
     }
 
     @Override
