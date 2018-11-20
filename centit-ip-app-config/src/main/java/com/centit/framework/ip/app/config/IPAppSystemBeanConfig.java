@@ -6,6 +6,7 @@ import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetailsService;
 import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.EnvironmentAware;
@@ -52,7 +53,11 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     public PlatformEnvironment platformEnvironment() {
         IPClientPlatformEnvironment ipPlatformEnvironment = new IPClientPlatformEnvironment();
         ipPlatformEnvironment.setTopOptId(env.getProperty("centit.ip.topoptid"));
-        ipPlatformEnvironment.setPlatServerUrl(env.getProperty("centit.ip.home"));
+        ipPlatformEnvironment.createPlatAppSession(
+            env.getProperty("centit.ip.home"),
+            BooleanBaseOpt.castObjectToBoolean(env.getProperty("centit.ip.auth.enable"),false),
+            env.getProperty("centit.ip.auth.usercode"),
+            env.getProperty("centit.ip.auth.password"));
         return ipPlatformEnvironment;
     }
 
@@ -60,7 +65,11 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     @Lazy(value = false)
     public IntegrationEnvironment integrationEnvironment() {
         IPClientIntegrationEnvironment ipIntegrationEnvironment = new IPClientIntegrationEnvironment();
-        ipIntegrationEnvironment.setPlatServerUrl(env.getProperty("centit.ip.home"));
+        ipIntegrationEnvironment.createPlatAppSession(
+            env.getProperty("centit.ip.home"),
+            BooleanBaseOpt.castObjectToBoolean(env.getProperty("centit.ip.auth.enable"),false),
+            env.getProperty("centit.ip.auth.usercode"),
+            env.getProperty("centit.ip.auth.password"));
         //ipPlatformEnvironment.init();
         return ipIntegrationEnvironment;
     }
