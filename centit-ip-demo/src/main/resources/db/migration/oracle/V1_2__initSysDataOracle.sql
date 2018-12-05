@@ -1,11 +1,11 @@
 insert into F_UNITINFO
 (UNIT_CODE, PARENT_UNIT, UNIT_TYPE, IS_VALID, UNIT_TAG,
-UNIT_NAME, ENGLISH_NAME, DEP_NO, UNIT_DESC, ADDRBOOK_ID,
+UNIT_NAME, ENGLISH_NAME, DEP_NO, UNIT_DESC,
 UNIT_SHORT_NAME, UNIT_WORD, UNIT_GRADE, UNIT_ORDER, UPDATE_DATE,
 CREATE_DATE, EXTJSONINFO, CREATOR, UPDATOR, UNIT_PATH)
 values
 ('U00001', null, 'N', 'T', null,
-'根机构', 'root', null, '根机构', null,
+'根机构', 'root', null, '根机构',
 'root', 'root', null, 1, sysdate,
 sysdate, null, 'u0000000', 'u0000000', '/U00001');
 
