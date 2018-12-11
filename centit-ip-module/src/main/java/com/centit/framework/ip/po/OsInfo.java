@@ -5,6 +5,8 @@ import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
@@ -15,7 +17,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "F_OS_INFO")
-
+@ApiModel(value="系统信息对象",description="系统信息对象 OsInfo")
 public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -23,14 +25,17 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
     @Column(name = "OS_ID")
 //    @GeneratedValue(generator = "assignedGenerator")
 //    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
+    @ApiModelProperty(value = "业务系统ID",name = "osId",required = true)
     private String osId;
 
     @Column(name = "OS_NAME")
     @Length(max = 200, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "系统名",name = "osName")
     private String osName;
 
     @Column(name = "OS_URL")
     @Length(max = 200, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "系统地址",name = "osUrl")
     private String osUrl;
 
     @Column(name = "DDE_SYNC_URL")
@@ -43,10 +48,12 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
 
     @Column(name = "LOGIN_USER_NAME")
     @Length(max = 64, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "登录名",name = "loginUserName")
     private String loginUserName;
 
     @Column(name = "LOGIN_USER_PASSWORD")
     @Length(max = 64, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "登录密码",name = "loginUserPassword")
     private String loginUserPassword;
 
     @Column(name = "CREATED")

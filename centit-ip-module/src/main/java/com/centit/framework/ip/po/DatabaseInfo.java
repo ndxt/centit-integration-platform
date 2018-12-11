@@ -7,6 +7,8 @@ import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import com.centit.support.security.AESSecurityUtils;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
@@ -19,6 +21,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "F_DATABASE_INFO")
+@ApiModel(value="数据库信息对象",description="数据库信息对象 DatabaseInfo")
 public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     private static final long serialVersionUID = 1L;
     public static final String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
@@ -30,25 +33,31 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     private String databaseCode;
 
     @Column(name = "OS_ID")
+    @ApiModelProperty(value = "系统代码",name = "osId")
     private String osId;
 
     @Column(name = "DATABASE_NAME")
+    @ApiModelProperty(value = "数据库名",name = "databaseName")
     private String databaseName;
 
     @Column(name = "DATABASE_URL")
     @Length(max = 1000, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "数据库地址",name = "databaseUrl")
     private String databaseUrl;
 
     @Column(name = "USERNAME")
     @Length(max = 100, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "数据库用户名",name = "username")
     private String username;
 
     @Column(name = "PASSWORD")
     @Length(max = 100, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "数据库密码",name = "password")
     private String password;
 
     @Column(name = "DATABASE_DESC")
     @Length(max = 100, message = "字段长度不能大于{max}")
+    @ApiModelProperty(value = "数据库描述信息",name = "databaseDesc")
     private String databaseDesc;
 
     @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
