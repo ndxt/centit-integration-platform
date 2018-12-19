@@ -1,8 +1,8 @@
 package com.centit.framework.ip.config;
 
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.OperationLogCenter;
-import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.model.adapter.MessageSender;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
@@ -29,8 +29,8 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Autowired
     private PlatformEnvironment platformEnvironment;
 
-    @Value("${login.nouser.exception.ashttperror:true}")
-    protected boolean loginUserNotLoginExceptionAshHttpError;
+    @Value("${http.exception.notAsHttpError:false}")
+    protected boolean httpExceptionNotAsHttpError;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event)
@@ -38,7 +38,7 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
         CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_KEEP_FRESH);
 
-        BaseController.setLoginUserNotLoginExceptionAshHttpError(loginUserNotLoginExceptionAshHttpError);
+        WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
 
         if(innerMessageManager!=null) {
             notificationCenter.registerMessageSender("innerMsg", innerMessageManager);
