@@ -1,13 +1,14 @@
 package com.centit.framework.ip.app.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.common.ResponseJSON;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.security.model.JsonCentitUserDetails;
 import com.centit.framework.staticsystem.po.*;
-import com.centit.framework.staticsystem.security.StaticCentitUserDetails;
 import com.centit.support.algorithm.StringRegularOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,11 +258,11 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         if(resJson==null || resJson.getCode()!=0) {
             return null;
         }
-        StaticCentitUserDetails userDetails =
-                resJson.getDataAsObject("userDetails", StaticCentitUserDetails.class);
-        userDetails.getUserInfo().setUserPin(resJson.getDataAsString("userPin"));
+        JsonCentitUserDetails userDetails =
+                resJson.getDataAsObject("userDetails", JsonCentitUserDetails.class);
+        userDetails.getUserInfo().put("userPin", resJson.getDataAsString("userPin"));
         userDetails.setUserUnits(
-                resJson.getDataAsArray("userUnits", UserUnit.class));
+            (JSONArray) resJson.getData("userUnits"));//, UserUnit.class));
         userDetails.setAuthoritiesByRoles(userDetails.getUserRoles());
         return userDetails;
     }
