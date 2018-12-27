@@ -17,11 +17,10 @@
     <description>先腾集成平台，统一管理用户和主数据并提供http接口</description>
 
     <dependencies>
-        <dependency>
+        <!--<dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-session</artifactId>
-        </dependency>
-
+        </dependency>-->
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-module</artifactId>
@@ -94,17 +93,18 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
-        
+
          <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <scope>runtime</scope>
         </dependency>
-        
+
         <dependency>
-           <groupId>org.postgresql</groupId>
-           <artifactId>postgresql</artifactId>
-           <version>9.4-1201-jdbc4</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.5</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- test library -->
