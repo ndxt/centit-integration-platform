@@ -103,7 +103,7 @@ public class DatabaseInfoController extends BaseController {
     @ApiImplicitParam(
         name = "databaseinfo", value="json格式，数据库对象信息", required = true,
         paramType = "body", dataTypeClass = DatabaseInfo.class)
-    @RequestMapping(value = "testConnect", method = {RequestMethod.GET})
+    @RequestMapping(value = "/testConnect", method = {RequestMethod.POST})
     public void testConnect(@Valid DatabaseInfo databaseInfo, HttpServletResponse response) {
 
 
