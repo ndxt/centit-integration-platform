@@ -3,7 +3,7 @@ package com.centit.framework.ip.app.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.RestfulHttpRequest;
-import com.centit.framework.common.ResponseJSON;
+import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -48,7 +48,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     @Override
     public UserSetting getUserSetting(String userCode, String paramCode) {
-        ResponseJSON resJson = RestfulHttpRequest.getResponseData(
+        HttpReceiveJSON resJson = RestfulHttpRequest.getResponseData(
                 appSession,
                 "/usersetting/"+userCode+"/"+paramCode);
 
@@ -252,7 +252,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
 
     private CentitUserDetails loadUserDetails(String queryParam, String qtype) {
-        ResponseJSON resJson = RestfulHttpRequest.getResponseData(
+        HttpReceiveJSON resJson = RestfulHttpRequest.getResponseData(
                 appSession,"/userdetails/"+topOptId+"/"+queryParam+"?qtype="+qtype);
 
         if(resJson==null || resJson.getCode()!=0) {
