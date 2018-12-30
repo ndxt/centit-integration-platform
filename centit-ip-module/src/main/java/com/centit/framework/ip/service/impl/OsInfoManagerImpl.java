@@ -1,6 +1,7 @@
 package com.centit.framework.ip.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.framework.ip.dao.OsInfoDao;
 import com.centit.framework.ip.po.OsInfo;
@@ -14,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 
-@Service
+@Service("osInfoManager")
 @Transactional
 public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInfoDao>
-        implements OsInfoManager {
- 
+        implements OsInfoManager, CodeRepositoryCache.EvictCacheExtOpt {
+
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
 
     @Override
@@ -42,5 +43,19 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
         return baseDao.listObjectsAsJson(filterMap, pageDesc);
     }
 
+    @Override
+    public void evictCache(String cacheName, String mapKey) {
+
+    }
+
+    @Override
+    public void evictCache(String cacheName) {
+
+    }
+
+    @Override
+    public void evictAllCache() {
+
+    }
 }
 

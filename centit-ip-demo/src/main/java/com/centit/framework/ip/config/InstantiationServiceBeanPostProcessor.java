@@ -32,10 +32,15 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Value("${http.exception.notAsHttpError:false}")
     protected boolean httpExceptionNotAsHttpError;
 
+    @Autowired
+    protected CodeRepositoryCache.EvictCacheExtOpt osInfoManager;
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event)
     {
         CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
+        CodeRepositoryCache.setEvictCacheExtOpt(osInfoManager);
+
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_KEEP_FRESH);
 
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
