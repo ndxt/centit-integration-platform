@@ -43,16 +43,28 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
         return baseDao.listObjectsAsJson(filterMap, pageDesc);
     }
 
+    /**
+     * 刷新某个缓存
+     * @param cacheName 缓存名
+     * @param mapKey 对应额key
+     */
     @Override
     public void evictCache(String cacheName, String mapKey) {
 
     }
 
+    /**
+     * 刷新某个缓存
+     * @param cacheName 缓存名
+     */
     @Override
     public void evictCache(String cacheName) {
 
     }
 
+    /**
+     * 刷新所有缓存
+     */
     @Override
     public void evictAllCache() {
 
