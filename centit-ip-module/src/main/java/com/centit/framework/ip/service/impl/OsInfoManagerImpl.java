@@ -89,11 +89,7 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
      */
     @Override
     public void evictCache(String cacheName, String mapKey) {
-        if(StringUtils.equals(cacheName,"DataDictionary")){
-            CodeRepositoryCache.evictCache(cacheName, mapKey);
-        }else {
-            this.evictCache(cacheName);
-        }
+
     }
 
     /**
@@ -102,7 +98,6 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
      */
     @Override
     public void evictCache(String cacheName) {
-        CodeRepositoryCache.evictCache(cacheName);
     }
 
     /**
@@ -110,7 +105,6 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
      */
     @Override
     public void evictAllCache() {
-        CodeRepositoryCache.evictAllCache();
     }
 }
 
