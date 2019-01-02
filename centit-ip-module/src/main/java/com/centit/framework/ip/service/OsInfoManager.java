@@ -14,4 +14,6 @@ public interface OsInfoManager extends BaseEntityManager<OsInfo,String> {
     List<OsInfo> listObjects(Map<String, Object> map);
     List<OsInfo> listObjects(Map<String, Object> map, PageDesc pageDesc);
     JSONArray listOsInfoAsJson(Map<String, Object> filterMap, PageDesc pageDesc);
+    boolean refreshSingle(OsInfo osInfo);
+    boolean refreshAll();
 }
