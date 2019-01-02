@@ -28,6 +28,7 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
 
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
     private String refreshUrl = "/system/environment/reload/refreshall";
+    private String refreshByNameUrl = "/system/environment/reload/refresh/%s";
 
     @Override
     @Resource(name = "osInfoDao")
@@ -50,6 +51,11 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
         return baseDao.listObjectsAsJson(filterMap, pageDesc);
     }
 
+    /**
+     * 刷新单个系统的全部缓存
+     * @param osInfo 系统信息
+     * @return boolean
+     */
     @Override
     public boolean refreshSingle(OsInfo osInfo) {
         boolean flag = true;
@@ -62,11 +68,15 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
         return flag;
     }
 
+    /**
+     * 刷新所有系统的全部缓存
+     * @return boolean
+     */
     @Override
     public boolean refreshAll() {
         List<OsInfo> osInfoList = this.listObjects(new HashMap<>());
-        if(osInfoList.isEmpty()){
-            return false;
+        if(osInfoList != null && osInfoList.isEmpty()){
+            return true;
         }
 
         boolean flag = true;
@@ -83,28 +93,41 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
     }
 
     /**
-     * 刷新某个缓存
+     * 刷新所有系统的某个缓存
      * @param cacheName 缓存名
      * @param mapKey 对应额key
      */
     @Override
     public void evictCache(String cacheName, String mapKey) {
-
+        this.evictCache(cacheName);
     }
 
     /**
-     * 刷新某个缓存
+     * 刷新所有系统的某个缓存
      * @param cacheName 缓存名
      */
     @Override
     public void evictCache(String cacheName) {
+        List<OsInfo> osInfoList = this.listObjects(new HashMap<>());
+        if(osInfoList != null && osInfoList.isEmpty()){
+            return;
+        }
+        for(OsInfo osInfo : osInfoList) {
+            try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
+                HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
+                    osInfo.getOsUrl() + String.format(refreshByNameUrl,cacheName));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
-     * 刷新所有缓存
+     * 刷新所有系统的全部缓存
      */
     @Override
     public void evictAllCache() {
+        refreshAll();
     }
 }
 
