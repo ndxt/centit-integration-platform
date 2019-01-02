@@ -65,7 +65,7 @@ public class OsInfoController extends  BaseController {
         if(osInfo == null){
             return;
         }
-
+        //TODO 陈志强，请将这部分业务逻辑代码 迁移到 OsInfoManagerImpl 类中
         boolean flag = true;
         try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
             HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),osInfo.getOsUrl() + refreshUrl);
@@ -87,6 +87,8 @@ public class OsInfoController extends  BaseController {
         if(osInfos.isEmpty()){
             return;
         }
+
+        //TODO 陈志强，请将这部分业务逻辑代码 迁移到 OsInfoManagerImpl 类中
         boolean flag = true;
         for(OsInfo osInfo : osInfos){
             try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
