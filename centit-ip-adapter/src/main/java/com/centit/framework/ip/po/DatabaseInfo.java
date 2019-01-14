@@ -6,7 +6,7 @@ import com.centit.support.security.AESSecurityUtils;
 import java.io.Serializable;
 import java.util.Date;
 
-public class DatabaseInfo implements  Serializable {
+public class DatabaseInfo implements Serializable {
     private static final long serialVersionUID = 1L;
     public static final String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
 
@@ -35,7 +35,7 @@ public class DatabaseInfo implements  Serializable {
     }
 
     public DatabaseInfo(String databaseCode, String databaseName, String databaseUrl,
-    		String username, String password,
+            String username, String password,
                         String dataDesc) {
         this.databaseCode = databaseCode;
         this.databaseName = databaseName;
@@ -44,6 +44,10 @@ public class DatabaseInfo implements  Serializable {
         this.password = password;
         this.databaseDesc = dataDesc;
     }
+
+    /*public DataSourceDescription toDataSourceDescription(){
+        // 这个写在  data-business-operation 的 urils
+    }*/
 
     public String getDatabaseName() {
         return this.databaseName;
@@ -60,6 +64,7 @@ public class DatabaseInfo implements  Serializable {
     public void setOsId(String sourceOsId) {
         this.osId = sourceOsId;
     }
+
     public String getDatabaseCode() {
 		return databaseCode;
     }
@@ -67,7 +72,6 @@ public class DatabaseInfo implements  Serializable {
     public void setDatabaseCode(String databaseCode) {
 		this.databaseCode = databaseCode;
     }
-
 
     public String getCreated() {
         return created;
