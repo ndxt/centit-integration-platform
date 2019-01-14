@@ -5,20 +5,16 @@ import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
-import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.ip.service.OsInfoManager;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JsonPropertyUtils;
-import com.centit.support.network.HttpExecutor;
-import com.centit.support.network.HttpExecutorContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,10 +26,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -48,7 +41,6 @@ public class OsInfoController extends  BaseController {
     private DatabaseInfoManager databaseInfoMag;
 
     private String optId = "OS";
-    private String refreshUrl = "/system/environment/reload/refreshall";
 
     /**
      * 刷新单个系统数据
@@ -61,18 +53,10 @@ public class OsInfoController extends  BaseController {
         paramType = "body", dataTypeClass = OsInfo.class)
     @RequestMapping(value = "/data/refresh/single" ,method = {RequestMethod.POST})
     public void refreshSingle(@RequestBody OsInfo osInfo, HttpServletResponse response){
-
         if(osInfo == null){
             return;
         }
-        //TODO 陈志强，请将这部分业务逻辑代码 迁移到 OsInfoManagerImpl 类中
-        boolean flag = true;
-        try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
-            HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),osInfo.getOsUrl() + refreshUrl);
-        }catch (IOException e){
-            e.printStackTrace();
-            flag = false;
-        }
+        boolean flag = osInfoMag.refreshSingle(osInfo);
         JsonResultUtils.writeSingleDataJson(flag, response);
     }
 
@@ -83,22 +67,7 @@ public class OsInfoController extends  BaseController {
     @ApiOperation(value="刷新所有系统的数据",notes="刷新查询的所有系统的数据。")
     @RequestMapping(value = "/data/refresh/all" ,method = {RequestMethod.GET})
     public void refreshAll(HttpServletResponse response){
-        List<OsInfo> osInfos = osInfoMag.listObjects(new HashMap<>());
-        if(osInfos.isEmpty()){
-            return;
-        }
-
-        //TODO 陈志强，请将这部分业务逻辑代码 迁移到 OsInfoManagerImpl 类中
-        boolean flag = true;
-        for(OsInfo osInfo : osInfos){
-            try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
-                HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),osInfo.getOsUrl() + refreshUrl);
-            }catch (IOException e){
-                e.printStackTrace();
-                flag = false;
-                break;
-            }
-        }
+        boolean flag = osInfoMag.refreshAll();
         JsonResultUtils.writeSingleDataJson(flag, response);
     }
 

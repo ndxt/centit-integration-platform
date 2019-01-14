@@ -60,14 +60,14 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     @ApiModelProperty(value = "数据库描述信息",name = "databaseDesc")
     private String databaseDesc;
 
-    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
+    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "today()", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
     @Column(name = "LAST_MODIFY_DATE")
     private Date lastModifyDate;
 
     @Column(name = "CREATED")
     private String created;
 
-    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now")
+    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "today()")
     @Column(name = "CREATE_TIME")
     private Date createTime;
 
