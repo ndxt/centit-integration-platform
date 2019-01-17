@@ -25,8 +25,6 @@ public class JdbcIntegrationEnvironment extends AbstractIntegrationEnvironment  
 
     private Logger logger = LoggerFactory.getLogger(JdbcIntegrationEnvironment.class);
 
-
-
     private DataSourceDescription dataSource;
 
     private Connection getConnection() throws SQLException {
@@ -45,7 +43,6 @@ public class JdbcIntegrationEnvironment extends AbstractIntegrationEnvironment  
     public void close(Connection conn){
         DbcpConnectPools.closeConnect(conn);
     }
-
 
     private <T> List<T> jsonArrayToObjectList(JSONArray jsonArray, Class<T> clazz) {
         if(jsonArray==null)
