@@ -37,7 +37,7 @@ public class JdbcIntegrationEnvironment extends AbstractIntegrationEnvironment  
         this.dataSource = new DataSourceDescription( connectURI,  username,  pswd);
         try {
             ExtendedQueryPool.loadResourceExtendedSqlMap(dataSource.getDbType());
-        } catch (DocumentException | IOException e) {
+        } catch (DocumentException e) {
             logger.error(e.getLocalizedMessage());
         }
     }
