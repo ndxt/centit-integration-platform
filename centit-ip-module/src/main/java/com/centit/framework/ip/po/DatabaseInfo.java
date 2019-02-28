@@ -1,6 +1,7 @@
 package com.centit.framework.ip.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.framework.core.po.EntityWithTimestamp;
 import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;
@@ -65,6 +66,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     private Date lastModifyDate;
 
     @Column(name = "CREATED")
+    @DictionaryMap(fieldName = "createUserName", value = "userCode")
     private String created;
 
     @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "today()")
