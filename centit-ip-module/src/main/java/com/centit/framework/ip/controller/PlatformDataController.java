@@ -682,7 +682,6 @@ public class PlatformDataController extends BaseController {
 		//resData.addResponseData("userRoles", userDetails.getUserRoles());
         //resData.addResponseData("userSettings", userDetails.getUserSettings());
 		resData.addResponseData("userUnits", userDetails.getUserUnits());
-        resData.addResponseData("userPin", userDetails.getUserInfo().getString("UserPin"));
 		JsonResultUtils.writeResponseDataAsJson(resData, response);
     }
 
