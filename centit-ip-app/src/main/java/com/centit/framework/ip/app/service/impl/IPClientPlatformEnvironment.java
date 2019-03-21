@@ -50,7 +50,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public UserSetting getUserSetting(String userCode, String paramCode) {
         HttpReceiveJSON resJson = RestfulHttpRequest.getResponseData(
                 appSession,
-                "/usersetting/"+userCode+"/"+paramCode);
+                "/platform/usersetting/"+userCode+"/"+paramCode);
 
         if(resJson==null)
             return null;
@@ -67,13 +67,13 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<? extends IUserSetting> listUserSettings(String userCode) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
-            "/usersettings/"+userCode+"/"+topOptId,
+            "/platform/usersettings/"+userCode+"/"+topOptId,
             UserSetting.class);
     }
 
     @Override
     public void saveUserSetting(IUserSetting userSetting) {
-        RestfulHttpRequest.jsonPost(appSession,"/usersetting",
+        RestfulHttpRequest.jsonPost(appSession,"/platform/usersetting",
             userSetting);
     }
 
@@ -88,7 +88,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
                                                              boolean asAdmin) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/usermenu/"+superOptId+"/"+userCode+"?asAdmin="+asAdmin,
+                "/platform/usermenu/"+superOptId+"/"+userCode+"?asAdmin="+asAdmin,
                 OptInfo.class);
 
     }
@@ -97,7 +97,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<UserRole> listUserRoles(String userCode) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/userroles/"+userCode,
+                "/platform/userroles/"+userCode,
                 UserRole.class);
     }
 
@@ -105,7 +105,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<UserRole> listRoleUsers(String roleCode) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/roleusers/"+roleCode,
+                "/platform/roleusers/"+roleCode,
                 UserRole.class);
     }
 
@@ -113,7 +113,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<? extends IUnitRole> listUnitRoles(String unitCode) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/unitroles/"+unitCode,
+                "/platform/unitroles/"+unitCode,
                 IUnitRole.class);
     }
 
@@ -121,7 +121,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<? extends IUnitRole> listRoleUnits(String roleCode) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/roleunits/"+roleCode,
+                "/platform/roleunits/"+roleCode,
                 IUnitRole.class);
     }
 
@@ -133,7 +133,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         userInfo.put("password", userPassword);
         userInfo.put("newPassword", userPassword);
         RestfulHttpRequest.jsonPost(appSession,
-            "/changepassword/"+userCode,
+            "/platform/changepassword/"+userCode,
             userInfo);
     }
 
@@ -145,7 +145,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         userInfo.put("password", userPassword);
         userInfo.put("newPassword", userPassword);
         String sret = RestfulHttpRequest.jsonPost(
-            appSession,"/checkpassword/"+userCode,
+            appSession,"/platform/checkpassword/"+userCode,
             userInfo, true);
         return StringRegularOpt.isTrue(sret);
 
@@ -155,7 +155,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<UserInfo> listAllUsers() {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/allusers/"+topOptId,
+                "/platform/allusers/"+topOptId,
                 UserInfo.class);
     }
 
@@ -163,7 +163,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<UnitInfo> listAllUnits() {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/allunits/"+topOptId,
+                "/platform/allunits/"+topOptId,
                 UnitInfo.class);
     }
 
@@ -171,7 +171,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<UserUnit> listAllUserUnits() {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/alluserunits/"+topOptId,
+                "/platform/alluserunits/"+topOptId,
                 UserUnit.class);
     }
 
@@ -179,7 +179,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<UserUnit> listUserUnits(String userCode) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/userunits/"+topOptId+"/"+userCode,
+                "/platform/userunits/"+topOptId+"/"+userCode,
                 UserUnit.class);
     }
 
@@ -187,7 +187,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<UserUnit> listUnitUsers(String unitCode) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/unitusers/"+topOptId+"/"+unitCode,
+                "/platform/unitusers/"+topOptId+"/"+unitCode,
                 UserUnit.class);
     }
 
@@ -200,7 +200,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<? extends IRoleInfo> listAllRoleInfo() {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
-            "/rolerepo/"+topOptId,
+            "/platform/rolerepo/"+topOptId,
             RoleInfo.class);
     }
 
@@ -209,7 +209,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<DataCatalog> listAllDataCatalogs() {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/catalogs/"+topOptId,
+                "/platform/catalogs/"+topOptId,
                 DataCatalog.class);
     }
 
@@ -217,7 +217,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<DataDictionary> listDataDictionaries(String catalogCode) {
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/dictionary/"+topOptId+"/"+catalogCode,
+                "/platform/dictionary/"+topOptId+"/"+catalogCode,
                 DataDictionary.class);
     }
 
@@ -225,7 +225,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<RolePower>  listAllRolePower(){
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/allrolepowers/"+topOptId,
+                "/platform/allrolepowers/"+topOptId,
                 RolePower.class);
     }
 
@@ -238,7 +238,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<? extends IOptInfo> listAllOptInfo() {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
-            "/optinforepo/"+topOptId,
+            "/platform/optinforepo/"+topOptId,
             OptInfo.class);
     }
 
@@ -246,14 +246,14 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     public List<OptMethod> listAllOptMethod(){
         return RestfulHttpRequest.getResponseObjectList(
                 appSession,
-                "/alloptmethods/"+topOptId,
+                "/platform/alloptmethods/"+topOptId,
                 OptMethod.class);
     }
 
 
     private CentitUserDetails loadUserDetails(String queryParam, String qtype) {
         HttpReceiveJSON resJson = RestfulHttpRequest.getResponseData(
-                appSession,"/userdetails/"+topOptId+"/"+queryParam+"?qtype="+qtype);
+                appSession,"/platform/userdetails/"+topOptId+"/"+queryParam+"?qtype="+qtype);
 
         if(resJson==null || resJson.getCode()!=0) {
             return null;
@@ -290,7 +290,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     @Override
     public void updateUserInfo(IUserInfo userInfo) {
         RestfulHttpRequest.jsonPost(
-            appSession,"/userinfo",
+            appSession,"/platform/userinfo",
             userInfo,true);
     }
 
@@ -304,6 +304,6 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         Map<String, Object> param = new HashMap<>(4);
         param.put("optInfos", optInfos);
         param.put("optMethods", optMethods);
-        RestfulHttpRequest.jsonPost(appSession,"/insertopt", param);
+        RestfulHttpRequest.jsonPost(appSession,"/platform/insertopt", param);
     }
 }

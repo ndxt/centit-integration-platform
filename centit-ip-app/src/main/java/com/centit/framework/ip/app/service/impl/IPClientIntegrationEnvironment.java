@@ -32,7 +32,7 @@ public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironme
     public List<OsInfo> reloadOsInfos() {
         return  RestfulHttpRequest.getResponseObjectList(
             appSession,
-            "/ipenvironment/osinfo",
+            "/platform/ipenvironment/osinfo",
             OsInfo.class);
     }
 
@@ -40,7 +40,7 @@ public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironme
     public List<DatabaseInfo> reloadDatabaseInfos() {
         return  RestfulHttpRequest.getResponseObjectList(
             appSession,
-            "/ipenvironment/databaseinfo",
+            "/platform/ipenvironment/databaseinfo",
             DatabaseInfo.class);
     }
 
@@ -48,7 +48,7 @@ public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironme
     public List<UserAccessToken> reloadAccessTokens() {
         return  RestfulHttpRequest.getResponseObjectList(
             appSession,
-            "/ipenvironment/allUserToken",
+            "/platform/ipenvironment/allUserToken",
             UserAccessToken.class);
     }
 
@@ -57,7 +57,7 @@ public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironme
         UserAccessToken at =
                 RestfulHttpRequest.getResponseObject(
                         appSession,
-                        "/ipenvironment/userToken/"+tokenId,
+                        "/platform/ipenvironment/userToken/"+tokenId,
                         UserAccessToken.class);
         if(at==null)
             return null;
