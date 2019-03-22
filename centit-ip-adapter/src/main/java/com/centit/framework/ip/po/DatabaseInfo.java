@@ -117,14 +117,6 @@ public class DatabaseInfo implements Serializable {
         this.username = username;
     }
 
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getDatabaseDesc() {
         return this.databaseDesc;
     }
@@ -196,15 +188,24 @@ public class DatabaseInfo implements Serializable {
         this.createTime = null;
     }
 
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setPassword(String password) {
+        if(password.startsWith("cipher:")) {
+            this.password = password;
+        }else {
+            this.password = "cipher:" + AESSecurityUtils.encryptAndBase64(
+                password, DatabaseInfo.DESKEY);
+        }
+    }
+
+
     @JSONField(serialize = false)
     public String getClearPassword(){
         return AESSecurityUtils.decryptBase64String(
-    			getPassword(),DatabaseInfo.DESKEY);
-    }
-
-    public void setClearPassword(String clearPassword){
-        this.password = AESSecurityUtils.encryptAndBase64(
-                clearPassword, DatabaseInfo.DESKEY);
+            getPassword().substring(7),DatabaseInfo.DESKEY);
     }
 
 }

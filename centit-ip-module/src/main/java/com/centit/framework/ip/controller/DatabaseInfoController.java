@@ -78,11 +78,11 @@ public class DatabaseInfoController extends BaseController {
 
         DatabaseInfo temp = databaseInfoMag.getObjectById(databaseInfoMag.getNextKey());
         if (temp!=null){
-    		JsonResultUtils.writeErrorMessageJson("该数据库标识已存在", response);
+            JsonResultUtils.writeErrorMessageJson("该数据库标识已存在", response);
             return;
         }
         //加密
-          databaseinfo.setClearPassword(databaseinfo.getPassword());
+        databaseinfo.setPassword(databaseinfo.getPassword());
         databaseinfo.setCreated(super.getLoginUserCode(request));
         databaseInfoMag.saveNewObject(databaseinfo);
 
@@ -141,7 +141,7 @@ public class DatabaseInfoController extends BaseController {
                                    HttpServletRequest request, HttpServletResponse response) {
         DatabaseInfo temp = databaseInfoMag.getObjectById(databaseCode);
         if (!databaseinfo.getPassword().equals(temp.getPassword())){
-    		databaseinfo.setClearPassword(databaseinfo.getPassword());
+            databaseinfo.setPassword(databaseinfo.getPassword());
         }
 
         DatabaseInfo oldValue = new DatabaseInfo();
@@ -196,7 +196,5 @@ public class DatabaseInfoController extends BaseController {
                 "删除数据库", databaseInfo);
         /******************************log********************************/
     }
-
-
 
 }
