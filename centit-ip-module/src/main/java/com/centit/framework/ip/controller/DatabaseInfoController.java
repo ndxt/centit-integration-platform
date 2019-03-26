@@ -110,7 +110,7 @@ public class DatabaseInfoController extends BaseController {
         boolean result = DataSourceDescription.testConntect(new DataSourceDescription(
                 databaseInfo.getDatabaseUrl(),
                 databaseInfo.getUsername(),
-                databaseInfo.getPassword()));
+                databaseInfo.getClearPassword()));
 
         if (result) {
             JsonResultUtils.writeSingleDataJson("连接测试成功",response);
