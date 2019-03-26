@@ -3,6 +3,7 @@ package com.centit.framework.ip.po;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.framework.core.po.EntityWithTimestamp;
+import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
@@ -23,7 +24,7 @@ import java.util.Date;
 @Entity
 @Table(name = "F_DATABASE_INFO")
 @ApiModel(value="数据库信息对象",description="数据库信息对象 DatabaseInfo")
-public class DatabaseInfo implements EntityWithTimestamp, Serializable {
+public class DatabaseInfo implements IDatabaseInfo, Serializable {
     private static final long serialVersionUID = 1L;
     public static final String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
     // 数据库名
@@ -96,7 +97,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
         this.password = password;
         this.databaseDesc = dataDesc;
     }
-
+    @Override
     public String getDatabaseName() {
         return this.databaseName;
     }
@@ -104,7 +105,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
-
+    @Override
     public String getOsId() {
         return osId;
     }
@@ -112,12 +113,13 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     public void setOsId(String osId) {
         this.osId = osId;
     }
+    @Override
     public String getDatabaseCode() {
-		return databaseCode;
+        return databaseCode;
     }
 
     public void setDatabaseCode(String databaseCode) {
-		this.databaseCode = databaseCode;
+        this.databaseCode = databaseCode;
     }
 
 
@@ -137,20 +139,14 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
         this.createTime = createTime;
     }
 
-    @Override
     public Date getLastModifyDate() {
-		return lastModifyDate;
+        return lastModifyDate;
     }
 
-    @Override
     public void setLastModifyDate(Date lastModifyDate) {
-		this.lastModifyDate = lastModifyDate;
+        this.lastModifyDate = lastModifyDate;
     }
-
-    public static long getSerialversionuid() {
-		return serialVersionUID;
-    }
-
+    @Override
     public String getDatabaseUrl() {
         return this.databaseUrl;
     }
@@ -158,7 +154,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     public void setDatabaseUrl(String databaseUrl) {
         this.databaseUrl = databaseUrl;
     }
-
+    @Override
     public String getUsername() {
         return this.username;
     }
@@ -166,7 +162,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
     public void setUsername(String username) {
         this.username = username;
     }
-
+    @Override
     public String getDatabaseDesc() {
         return this.databaseDesc;
     }
@@ -231,7 +227,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
         this.createTime = null;
     }
 
-
+    @Override
     public String getPassword() {
         return this.password;
     }
@@ -245,6 +241,7 @@ public class DatabaseInfo implements EntityWithTimestamp, Serializable {
         }
     }
 
+    @Override
     @JSONField(serialize = false)
     public String getClearPassword(){
         return AESSecurityUtils.decryptBase64String(

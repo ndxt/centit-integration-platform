@@ -20,6 +20,13 @@
             <artifactId>framework-core</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-database</artifactId>
+            <version>${centit.commons.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -18,7 +18,7 @@ import java.util.Date;
 @Entity
 @Table(name = "F_OS_INFO")
 @ApiModel(value="系统信息对象",description="系统信息对象 OsInfo")
-public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
+public class OsInfo implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -167,12 +167,10 @@ public class OsInfo implements EntityWithTimestamp, java.io.Serializable {
         this.loginUserPassword = loginUserPassword;
     }
 
-    @Override
     public Date getLastModifyDate() {
 		return lastModifyDate;
     }
 
-    @Override
     public void setLastModifyDate(Date lastModifyDate) {
 		this.lastModifyDate = lastModifyDate;
     }

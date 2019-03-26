@@ -1,12 +1,13 @@
 package com.centit.framework.ip.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.security.AESSecurityUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class DatabaseInfo implements Serializable {
+public class DatabaseInfo implements IDatabaseInfo, Serializable {
     private static final long serialVersionUID = 1L;
     public static final String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
 
@@ -49,6 +50,7 @@ public class DatabaseInfo implements Serializable {
         // 这个写在  data-business-operation 的 urils
     }*/
 
+    @Override
     public String getDatabaseName() {
         return this.databaseName;
     }
@@ -56,7 +58,7 @@ public class DatabaseInfo implements Serializable {
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
     }
-
+    @Override
     public String getOsId() {
         return osId;
     }
@@ -64,13 +66,13 @@ public class DatabaseInfo implements Serializable {
     public void setOsId(String sourceOsId) {
         this.osId = sourceOsId;
     }
-
+    @Override
     public String getDatabaseCode() {
-		return databaseCode;
+        return databaseCode;
     }
 
     public void setDatabaseCode(String databaseCode) {
-		this.databaseCode = databaseCode;
+        this.databaseCode = databaseCode;
     }
 
     public String getCreated() {
@@ -90,17 +92,14 @@ public class DatabaseInfo implements Serializable {
     }
 
     public Date getLastModifyDate() {
-		return lastModifyDate;
+        return lastModifyDate;
     }
 
     public void setLastModifyDate(Date lastModifyDate) {
-		this.lastModifyDate = lastModifyDate;
+        this.lastModifyDate = lastModifyDate;
     }
 
-    public static long getSerialversionuid() {
-		return serialVersionUID;
-    }
-
+    @Override
     public String getDatabaseUrl() {
         return this.databaseUrl;
     }
@@ -108,7 +107,7 @@ public class DatabaseInfo implements Serializable {
     public void setDatabaseUrl(String databaseUrl) {
         this.databaseUrl = databaseUrl;
     }
-
+    @Override
     public String getUsername() {
         return this.username;
     }
@@ -116,7 +115,7 @@ public class DatabaseInfo implements Serializable {
     public void setUsername(String username) {
         this.username = username;
     }
-
+    @Override
     public String getDatabaseDesc() {
         return this.databaseDesc;
     }
@@ -188,6 +187,7 @@ public class DatabaseInfo implements Serializable {
         this.createTime = null;
     }
 
+    @Override
     public String getPassword() {
         return this.password;
     }
@@ -201,7 +201,7 @@ public class DatabaseInfo implements Serializable {
         }
     }
 
-
+    @Override
     @JSONField(serialize = false)
     public String getClearPassword(){
         return AESSecurityUtils.decryptBase64String(
