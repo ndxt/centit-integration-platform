@@ -145,6 +145,7 @@ public class OsInfoController extends  BaseController {
         OsInfo dbOsInfo = osInfoMag.getObjectById(osId);
         OsInfo oldValue = new OsInfo();
         BeanUtils.copyProperties(dbOsInfo, oldValue);
+        osinfo.setLastModifyDate(new Date());
         osInfoMag.mergeObject(osinfo);
         JsonResultUtils.writeBlankJson(response);
 
