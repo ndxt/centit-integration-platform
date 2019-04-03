@@ -5,6 +5,7 @@ import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.model.basedata.OperationLog;
@@ -55,6 +56,7 @@ public class DatabaseInfoController extends BaseController {
 //                StringBaseOpt.objectToString(searchColumn.get("databaseName")), pageDesc);
         JSONArray listObjects = databaseInfoMag.listObjectsAsJson(searchColumn, pageDesc);
 
+        PageQueryResult.createJSONArrayResult(listObjects,pageDesc,DatabaseInfo.class);
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(BaseController.OBJLIST, listObjects);
         resData.addResponseData(BaseController.PAGE_DESC, pageDesc);
