@@ -60,23 +60,20 @@ public class OsInfo implements java.io.Serializable {
     @Length(max = 8, message = "字段长度不能大于{max}")
     private String created;
 
-    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
+    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "today()", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )
     @Column(name = "LAST_MODIFY_DATE")
     private Date lastModifyDate;
 
-    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "now")
+    @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "today()")
     @Column(name = "CREATE_TIME")
     private Date createTime;
 
-
     // Constructors
-
     /**
      * default constructor
      */
     public OsInfo() {
     }
-
 
     public OsInfo(
             String osId
@@ -85,7 +82,7 @@ public class OsInfo implements java.io.Serializable {
         this.osName = osName;
     }
 
-     public OsInfo(
+    public OsInfo(
             String osId
             , String osName,
             String sysDataPushOption, String osUrl,String ddeSyncUrl,
@@ -99,7 +96,6 @@ public class OsInfo implements java.io.Serializable {
         this.lastModifyDate= lastUpdateTime;
         this.createTime = createTime;
     }
-
 
     public String getOsId() {
         return this.osId;
@@ -125,7 +121,6 @@ public class OsInfo implements java.io.Serializable {
     public void setCreated(String created) {
         this.created = created;
     }
-
 
     public String getOsUrl() {
 		return osUrl;
