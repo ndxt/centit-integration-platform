@@ -1,6 +1,6 @@
 package com.centit.framework.ip.po;
 
-import com.centit.framework.core.po.EntityWithTimestamp;
+import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.orm.GeneratorType;
@@ -58,6 +58,7 @@ public class OsInfo implements java.io.Serializable {
 
     @Column(name = "CREATED")
     @Length(max = 8, message = "字段长度不能大于{max}")
+    @DictionaryMap(fieldName = "createUserName", value = "userCode")
     private String created;
 
     @ValueGenerator( strategy= GeneratorType.FUNCTION, value = "today()", condition = GeneratorCondition.ALWAYS, occasion = GeneratorTime.ALWAYS )

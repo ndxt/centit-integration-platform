@@ -5,6 +5,7 @@ import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.ip.service.OsInfoManager;
@@ -86,7 +87,7 @@ public class OsInfoController extends  BaseController {
         Map<String, Object> searchColumn = convertSearchColumn(request);
 
         JSONArray listObjects = osInfoMag.listOsInfoAsJson(searchColumn, pageDesc);
-
+        PageQueryResult.createJSONArrayResult(listObjects,pageDesc, OsInfo.class);
         ResponseMapData resData = new ResponseMapData();
         resData.addResponseData(OBJLIST, listObjects);
         resData.addResponseData(PAGE_DESC, pageDesc);
@@ -145,6 +146,7 @@ public class OsInfoController extends  BaseController {
         OsInfo dbOsInfo = osInfoMag.getObjectById(osId);
         OsInfo oldValue = new OsInfo();
         BeanUtils.copyProperties(dbOsInfo, oldValue);
+        osinfo.setLastModifyDate(new Date());
         osInfoMag.mergeObject(osinfo);
         JsonResultUtils.writeBlankJson(response);
 
