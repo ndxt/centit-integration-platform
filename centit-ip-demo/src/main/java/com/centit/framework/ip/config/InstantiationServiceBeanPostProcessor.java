@@ -36,13 +36,11 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     protected CodeRepositoryCache.EvictCacheExtOpt osInfoManager;
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event)
-    {
+    public void onApplicationEvent(ContextRefreshedEvent event){
+
         CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
         CodeRepositoryCache.setEvictCacheExtOpt(osInfoManager);
-
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_KEEP_FRESH);
-
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
 
         if(innerMessageManager!=null) {
