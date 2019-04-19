@@ -2,11 +2,8 @@ CREATE TABLE F_OS_INFO  (
    OS_ID                VARCHAR(20)                    NOT NULL,
    OS_NAME              VARCHAR(200)                   NOT NULL,
    OS_URL               VARCHAR(200),
-   DDE_SYNC_URL         VARCHAR(200),
-   SYS_DATA_PUSH_OPTION VARCHAR(200),
+   OAUTH_PASSWORD       VARCHAR(100),
    LAST_MODIFY_DATE     DATE,
-   LOGIN_USER_NAME      VARCHAR(64),
-   LOGIN_USER_PASSWORD  VARCHAR(64),
    CREATE_TIME          DATE,
    CREATED              VARCHAR(8),
   PRIMARY KEY (OS_ID)

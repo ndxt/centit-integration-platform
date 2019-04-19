@@ -2,10 +2,7 @@ CREATE TABLE F_OS_INFO  (
    OS_ID                VARCHAR(20)                    NOT NULL,
    OS_NAME              VARCHAR(200)                   NOT NULL,
    OS_URL               VARCHAR(200),
-   DDE_SYNC_URL         VARCHAR(200),
-   SYS_DATA_PUSH_OPTION VARCHAR(200),
-   LOGIN_USER_NAME      VARCHAR(64),
-   LOGIN_USER_PASSWORD  VARCHAR(64),
+   OAUTH_PASSWORD       VARCHAR(100),
    LAST_MODIFY_DATE     DATETIME,
    CREATE_TIME          DATETIME,
    CREATED              VARCHAR(8),
@@ -24,7 +21,7 @@ CREATE TABLE F_DATABASE_INFO  (
    CREATED            VARCHAR(8),
  PRIMARY KEY (DATABASE_CODE)
 );
-	  
+
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
 values ('OS_INFO', '集成业务系统', 'SYS_CONFIG', 'modules/sys/osinfo/osinfo.html', '/system/sys/os', null, 'O', null, null, 'Y', null, null, null, null, 'D', 'icon-base icon-base-gear', null, null, null, null,'u0000000','u0000000');
 insert into F_OptInfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE,CREATOR,UPDATOR)
