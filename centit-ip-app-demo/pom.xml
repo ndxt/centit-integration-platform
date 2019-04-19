@@ -16,7 +16,7 @@
     <description>先腾集成平台应用开发示例</description>
 
     <properties>
-        <centit.stat.version>2.0.1-SNAPSHOT</centit.stat.version>
+        <centit.commons.modules.version>1.0-SNAPSHOT</centit.commons.modules.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <centit.framework.version>4.5.1901</centit.framework.version>
         <centit.persistence.version>1.2.1901</centit.persistence.version>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-report-utils</artifactId>
-            <version>${centit.stat.version}</version>
+            <version>${centit.commons.modules.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
