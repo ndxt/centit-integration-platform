@@ -18,6 +18,7 @@
         <module>centit-ip-app-config</module>
         <module>centit-ip-module</module>
         <module>centit-ip-adapter-jdbc</module>
+        <module>centit-ip-app-boot-config</module>
     </modules>
     <packaging>pom</packaging>
 
