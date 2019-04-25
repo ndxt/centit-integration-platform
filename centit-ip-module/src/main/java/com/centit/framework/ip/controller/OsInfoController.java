@@ -10,6 +10,7 @@ import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.ip.service.OsInfoManager;
 import com.centit.framework.model.basedata.OperationLog;
+import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JsonPropertyUtils;
 import io.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,11 +37,15 @@ import java.util.Map;
 @Api(tags= "业务系统护接口",value = "业务系统护接口")
 public class OsInfoController extends  BaseController {
 
-    @Resource
+    @Autowired
     private OsInfoManager osInfoMag;
 
-    @Resource
+    @Autowired
     private DatabaseInfoManager databaseInfoMag;
+
+    @Autowired
+    private CentitPasswordEncoder passwordEncoder;
+
 
     private String optId = "OS";
 
@@ -113,6 +119,10 @@ public class OsInfoController extends  BaseController {
         }
         osinfo.setCreated(super.getLoginUserCode(request));
         osinfo.setCreateTime(new Date());
+        if(! passwordEncoder.isCorrectPasswordFormat(osinfo.getOauthPassword())){
+            osinfo.setOauthPassword(passwordEncoder.createPassword(
+                osinfo.getOauthPassword(), osinfo.getOsId()));
+        }
         osInfoMag.saveNewObject(osinfo);
 
         JsonResultUtils.writeBlankJson(response);
@@ -147,9 +157,12 @@ public class OsInfoController extends  BaseController {
         OsInfo oldValue = new OsInfo();
         BeanUtils.copyProperties(dbOsInfo, oldValue);
         osinfo.setLastModifyDate(new Date());
+        if(! passwordEncoder.isCorrectPasswordFormat(osinfo.getOauthPassword())){
+            osinfo.setOauthPassword(passwordEncoder.createPassword(
+                osinfo.getOauthPassword(), osinfo.getOsId()));
+        }
         osInfoMag.mergeObject(osinfo);
         JsonResultUtils.writeBlankJson(response);
-
         /**********************log*********************/
         OperationLogCenter.logUpdateObject(request, optId, osId, OperationLog.P_OPT_LOG_METHOD_U,
                 "更新业务系统信息", osinfo, oldValue);
