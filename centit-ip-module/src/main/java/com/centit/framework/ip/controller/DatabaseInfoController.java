@@ -3,6 +3,7 @@ package com.centit.framework.ip.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageQueryResult;
@@ -85,7 +86,7 @@ public class DatabaseInfoController extends BaseController {
         }
         //加密
         databaseinfo.setPassword(databaseinfo.getPassword());
-        databaseinfo.setCreated(super.getLoginUserCode(request));
+        databaseinfo.setCreated(WebOptUtils.getCurrentUserCode(request));
         databaseInfoMag.saveNewObject(databaseinfo);
 
         JsonResultUtils.writeBlankJson(response);

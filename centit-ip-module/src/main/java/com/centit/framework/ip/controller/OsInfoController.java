@@ -3,6 +3,7 @@ package com.centit.framework.ip.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.dao.PageQueryResult;
@@ -117,7 +118,7 @@ public class OsInfoController extends  BaseController {
             JsonResultUtils.writeErrorMessageJson("对象不能为空", response);
             return;
         }
-        osinfo.setCreated(super.getLoginUserCode(request));
+        osinfo.setCreated(WebOptUtils.getCurrentUserCode(request));
         osinfo.setCreateTime(new Date());
         if(! passwordEncoder.isCorrectPasswordFormat(osinfo.getOauthPassword())){
             osinfo.setOauthPassword(passwordEncoder.createPassword(
