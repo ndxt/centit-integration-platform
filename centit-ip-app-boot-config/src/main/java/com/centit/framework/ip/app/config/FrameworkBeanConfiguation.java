@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @EnableConfigurationProperties(FrameworkProperties.class)
-@Configuration("environmentConfiguation")
+@Configuration("frameworkBeanConfiguation")
 public class FrameworkBeanConfiguation {
 
     @Autowired
