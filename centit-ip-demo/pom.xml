@@ -6,6 +6,7 @@
         <!--<artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
         <version>1.2.1901</version>-->
+
         <groupId>com.centit.framework</groupId>
         <artifactId>framework-snapshot-dependencies</artifactId>
         <version>1.2-SNAPSHOT</version>
