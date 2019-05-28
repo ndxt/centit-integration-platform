@@ -3,9 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>centit-framework-dependencies</artifactId>
+        <!--<artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>1.2.1901</version>
+        <version>1.2.1901</version>-->
+
+        <groupId>com.centit.framework</groupId>
+        <artifactId>framework-snapshot-dependencies</artifactId>
+        <version>1.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,7 +22,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.framework.version>4.5.1901</centit.framework.version>
+        <!--<centit.framework.version>4.5.1901</centit.framework.version>-->
         <centit.persistence.version>1.2.1901</centit.persistence.version>
         <centit.commons.version>2.2.1901</centit.commons.version>
         <centit.ip.version>2.0-SNAPSHOT</centit.ip.version>
