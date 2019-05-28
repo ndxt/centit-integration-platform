@@ -16,6 +16,7 @@ import com.centit.framework.system.po.OptInfo;
 import com.centit.framework.system.po.OptMethod;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
+import com.centit.framework.system.service.OptInfoManager;
 import com.centit.framework.system.service.SysRoleManager;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.UserSettingManager;
@@ -25,13 +26,12 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -46,32 +46,28 @@ import java.util.Map;
 @Api(tags= "系统数据服务接口",value = "系统数据服务接口")
 public class PlatformDataController extends BaseController {
 
-    @Resource
-    @NotNull
+    @Autowired
     private UserSettingManager userSettingManager;
 
-    @Resource
-    @NotNull
+    @Autowired
     private SysRoleManager sysRoleManager;
 
-    @Resource(name="platformEnvironment")
-    @NotNull
+    @Autowired
     protected PlatformEnvironment platformEnvironment;
 
-    @Resource
-    @NotNull
+    @Autowired
     private SysUserManager sysUserManager;
 
-    @Resource
-    @NotNull
+    @Autowired
     protected OsInfoManager osInfoManager;
 
-    @Resource
-    @NotNull
+    @Autowired
+    protected OptInfoManager optInfoManager;
+
+    @Autowired
     protected DatabaseInfoManager oatabaseInfoManager;
 
-    @Resource
-    @NotNull
+    @Autowired
     protected UserAccessTokenManager userAccessTokenManager;
 
     @RequestMapping
@@ -626,6 +622,18 @@ public class PlatformDataController extends BaseController {
 				sysRoleManager.listAllOptMethods(),response);
     }
 
+
+    @ApiOperation(value="获取所有操作数据范围设定",notes="获取所有操作数据范围设定。")
+    @ApiImplicitParam(
+        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        required = true, paramType = "path", dataType= "String")
+    @RequestMapping(value = "/alloptdatascopes/{appName}",
+        method = RequestMethod.GET)
+    public void listAllOptDataScopes(@PathVariable String appName,
+                                 HttpServletResponse response) {
+        JsonResultUtils.writeSingleDataJson(
+            optInfoManager.listAllDataScope(),response);
+    }
     /**
      * 获取字典类型代码下的所有字典明细
      * @param appName 客户端名称

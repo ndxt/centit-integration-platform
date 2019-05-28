@@ -63,6 +63,24 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     /**
+     * 获得用户摸个功能方法的数据范围权限，返回null或者size==0表示拥有所有权限
+     *
+     * @param sUserCode  sUserCode
+     * @param sOptid     sOptid
+     * @param sOptMethod sOptMethod
+     * @return 用户摸个功能方法的数据范围权限
+     */
+    @Override
+    public List<String> listUserDataFiltersByOptIdAndMethod(String sUserCode, String sOptid, String sOptMethod) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<String> value = evrnManger.listUserDataFiltersByOptIdAndMethod(sUserCode,sOptid,sOptMethod);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    /**
      * 获取用户所有菜单功能
      *
      * @param userCode userCode
@@ -303,6 +321,19 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IOptMethod> listAllOptMethod() {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IOptMethod> value = evrnManger.listAllOptMethod();
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    /**
+     * @return 所有的数据范围定义表达式
+     */
+    @Override
+    public List<? extends IOptDataScope> listAllOptDataScope() {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IOptDataScope> value = evrnManger.listAllOptDataScope();
             if(value!=null)
                 return value;
         }
