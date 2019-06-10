@@ -1,3 +1,5 @@
+drop table if exists F_OS_INFO cascade;
+drop table if exists F_DATABASE_INFO cascade;
 CREATE TABLE F_OS_INFO  (
    OS_ID                VARCHAR(20)                    NOT NULL,
    OS_NAME              VARCHAR(200)                   NOT NULL,

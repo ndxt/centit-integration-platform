@@ -1,3 +1,5 @@
+call p_drop_ifExists('F_OS_INFO');
+call p_drop_ifExists('F_DATABASE_INFO');
 CREATE TABLE F_OS_INFO  (
    OS_ID                VARCHAR2(20)                    NOT NULL,
    OS_NAME              VARCHAR2(200)                   NOT NULL,
@@ -36,5 +38,5 @@ insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOP
   values('sysadmin','1000101',sysdate,sysdate,null,'u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
   values('sysadmin','1000102',sysdate,sysdate,null,'u0000000','u0000000');
-
+call p_drop_ifExists('S_DATABASECODE','2');
 create sequence S_DATABASECODE;
