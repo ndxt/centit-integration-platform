@@ -68,7 +68,7 @@ drop table if exists F_UNITROLE cascade;
 /*==============================================================*/
 create table F_DATACATALOG
 (
-   CATALOG_CODE         varchar(16) not null,
+   CATALOG_CODE         varchar(32) not null,
    CATALOG_NAME         varchar(64) not null,
    CATALOG_STYLE        char(1) not null ,
    CATALOG_TYPE         char(1) not null  ,
@@ -90,8 +90,8 @@ alter table F_DATACATALOG add primary key (CATALOG_CODE);
 
 create table F_DATADICTIONARY
 (
-   CATALOG_CODE         varchar(16) not null,
-   DATA_CODE            varchar(16) not null,
+   CATALOG_CODE         varchar(32) not null,
+   DATA_CODE            varchar(32) not null,
    EXTRA_CODE           varchar(16)  ,
    EXTRA_CODE2          varchar(16) ,
    DATA_TAG             char(1) ,
@@ -111,7 +111,7 @@ alter table F_DATADICTIONARY add primary key (CATALOG_CODE, DATA_CODE);
 
 create table F_OPTDATASCOPE
 (
-   opt_Scope_Code       varchar(16) not null,
+   opt_Scope_Code       varchar(32) not null,
    Opt_ID               varchar(16),
    scope_Name           varchar(64),
    Filter_Condition     varchar(1024)  ,
@@ -394,7 +394,7 @@ alter table F_USER_QUERY_FILTER add primary key (FILTER_NO);
 
 create table M_InnerMsg
 (
-   Msg_Code             varchar(16) not null ,
+   Msg_Code             varchar(32) not null ,
    Sender               varchar(128),
    Send_Date            date,
    Msg_Title            varchar(128),
@@ -431,7 +431,7 @@ create table M_InnerMsg_Recipient
    Receive_Type         char(1)  ,
    Mail_Type            char(1)  ,
    msg_State            char(1)  ,
-   ID                   varchar(16) not null
+   ID                   varchar(32) not null
 );
 comment on column M_InnerMsg_Recipient.   Receive_Type     is   'P=个人为消息A=机构为公告M=邮件' ;
 comment on column M_InnerMsg_Recipient. Mail_Type       is  'T=收件人C=抄送B=密送'  ;
@@ -443,7 +443,7 @@ create table M_MsgAnnex
 (
    Msg_Code             varchar(16) not null,
    Info_Code            varchar(16) not null,
-   Msg_Annex_Id         varchar(16) not null
+   Msg_Annex_Id         varchar(32) not null
 );
 alter table M_MsgAnnex  add primary key (Msg_Annex_Id);
 
@@ -464,38 +464,38 @@ alter table F_UNITROLE add primary key (UNIT_CODE, ROLE_CODE);
 -- v_hi_unitinfo视图脚本
 
 CREATE OR REPLACE VIEW v_hi_unitinfo AS
-SELECT a.unit_code AS top_unit_code,  b.unit_code,b.unit_type, b.parent_unit, b.is_valid, b.unit_name,b.unit_desc,b.unit_short_name,b.unit_order,b.dep_no,
-       b.unit_word,b.unit_grade,
-       LENGTH(b.Unit_Path)- LENGTH(REPLACE(b.Unit_Path,'/','')) - LENGTH(a.Unit_Path) + LENGTH(REPLACE(a.Unit_Path,'/',''))+1  AS hi_level,
-       substr(b.Unit_Path ,  LENGTH(a.Unit_Path)+1) AS Unit_Path
-  FROM F_UNITINFO a , F_UNITINFO b
- WHERE b.Unit_Path LIKE CONCAT(a.Unit_Path,'%' );
+   SELECT a.unit_code AS top_unit_code,  b.unit_code,b.unit_type, b.parent_unit, b.is_valid, b.unit_name,b.unit_desc,b.unit_short_name,b.unit_order,b.dep_no,
+      b.unit_word,b.unit_grade,
+          LENGTH(b.Unit_Path)- LENGTH(REPLACE(b.Unit_Path,'/','')) - LENGTH(a.Unit_Path) + LENGTH(REPLACE(a.Unit_Path,'/',''))+1  AS hi_level,
+          substr(b.Unit_Path ,  LENGTH(a.Unit_Path)+1) AS Unit_Path
+   FROM F_UNITINFO a , F_UNITINFO b
+   WHERE b.Unit_Path LIKE CONCAT(a.Unit_Path,'%' );
 
 
- create or replace view F_V_Opt_Role_Map as
-select concat(c.opt_url,b.OPT_URL) as opt_url, b.opt_req, a.role_code, c.opt_id, b.opt_code
-  from F_ROLEPOWER a
-  join F_OPTDEF b
-    on (a.opt_code = b.opt_code)
-  join F_OptInfo c
-    on (b.opt_id = c.opt_id)
- where c.Opt_Type <> 'W'
-   and c.opt_url <> '...'
- order by c.opt_url, b.opt_req, a.role_code;
+create or replace view F_V_Opt_Role_Map as
+   select concat(c.opt_url,b.OPT_URL) as opt_url, b.opt_req, a.role_code, c.opt_id, b.opt_code
+   from F_ROLEPOWER a
+      join F_OPTDEF b
+         on (a.opt_code = b.opt_code)
+      join F_OptInfo c
+         on (b.opt_id = c.opt_id)
+   where c.Opt_Type <> 'W'
+         and c.opt_url <> '...'
+   order by c.opt_url, b.opt_req, a.role_code;
 /*==============================================================*/
 /* View: F_V_USERROLES                                          */
 /*==============================================================*/
 
 create or replace view F_V_USERROLES as
-select b.ROLE_CODE, b.ROLE_NAME, b.IS_VALID, 'D' as OBTAIN_TYPE, b.ROLE_TYPE, b.UNIT_CODE,
+   select b.ROLE_CODE, b.ROLE_NAME, b.IS_VALID, 'D' as OBTAIN_TYPE, b.ROLE_TYPE, b.UNIT_CODE,
       b.ROLE_DESC, b.CREATE_DATE, b.UPDATE_DATE ,a.USER_CODE, NULL as INHERITED_FROM
-    from F_USERROLE a join F_ROLEINFO b on (a.ROLE_CODE=b.ROLE_CODE)
-    where a.OBTAIN_DATE <=  now() and (a.SECEDE_DATE is null or a.SECEDE_DATE > now()) and b.IS_VALID='T'
-union
-  select b.ROLE_CODE, b.ROLE_NAME, b.IS_VALID, 'I' as OBTAIN_TYPE, b.ROLE_TYPE, b.UNIT_CODE,
-        b.ROLE_DESC, b.CREATE_DATE, b.UPDATE_DATE ,c.USER_CODE, a.UNIT_CODE as INHERITED_FROM
-    from F_UNITROLE a join F_ROLEINFO b on (a.ROLE_CODE = b.ROLE_CODE) JOIN F_USERUNIT c on( a.UNIT_CODE = c.UNIT_CODE)
-    where a.OBTAIN_DATE <=  now() and (a.SECEDE_DATE is null or a.SECEDE_DATE > now()) and b.IS_VALID='T';
+   from F_USERROLE a join F_ROLEINFO b on (a.ROLE_CODE=b.ROLE_CODE)
+   where a.OBTAIN_DATE <=  now() and (a.SECEDE_DATE is null or a.SECEDE_DATE > now()) and b.IS_VALID='T'
+   union
+   select b.ROLE_CODE, b.ROLE_NAME, b.IS_VALID, 'I' as OBTAIN_TYPE, b.ROLE_TYPE, b.UNIT_CODE,
+      b.ROLE_DESC, b.CREATE_DATE, b.UPDATE_DATE ,c.USER_CODE, a.UNIT_CODE as INHERITED_FROM
+   from F_UNITROLE a join F_ROLEINFO b on (a.ROLE_CODE = b.ROLE_CODE) JOIN F_USERUNIT c on( a.UNIT_CODE = c.UNIT_CODE)
+   where a.OBTAIN_DATE <=  now() and (a.SECEDE_DATE is null or a.SECEDE_DATE > now()) and b.IS_VALID='T';
 
 
 
@@ -503,39 +503,39 @@ union
 /* View: F_V_UserOptDataScopes                                  */
 /*==============================================================*/
 create or replace view F_V_UserOptDataScopes as
-select  distinct a.User_Code, c. OPT_ID ,  c.OPT_METHOD , b.opt_Scope_Codes
-from F_V_USERROLES a  join F_ROLEPOWER   b on (a.Role_Code=b.Role_Code)
-         join F_OPTDEF  c on(b.OPT_CODE=c.OPT_CODE);
+   select  distinct a.User_Code, c. OPT_ID ,  c.OPT_METHOD , b.opt_Scope_Codes
+   from F_V_USERROLES a  join F_ROLEPOWER   b on (a.Role_Code=b.Role_Code)
+      join F_OPTDEF  c on(b.OPT_CODE=c.OPT_CODE);
 /*==============================================================*/
 /* View: F_V_UserOptList                                        */
 /*==============================================================*/
 create or replace view F_V_UserOptList as
-select  distinct a.User_Code,  c.OPT_CODE,  c.OPT_NAME  ,  c. OPT_ID ,  c.OPT_METHOD
-from F_V_USERROLES a  join F_ROLEPOWER   b on (a.Role_Code=b.Role_Code)
-         join F_OPTDEF  c on(b.OPT_CODE=c.OPT_CODE);
+   select  distinct a.User_Code,  c.OPT_CODE,  c.OPT_NAME  ,  c. OPT_ID ,  c.OPT_METHOD
+   from F_V_USERROLES a  join F_ROLEPOWER   b on (a.Role_Code=b.Role_Code)
+      join F_OPTDEF  c on(b.OPT_CODE=c.OPT_CODE);
 
 /*==============================================================*/
 /* View: F_V_UserOptMoudleList                                  */
 /*==============================================================*/
 
 create or replace view f_v_useroptmoudlelist as
-select  distinct a.User_Code,d.Opt_ID, d.Opt_Name , d.Pre_Opt_ID  ,
-            d.Form_Code  , d.opt_url, d.opt_route, d.Msg_No , d.Msg_Prm, d.Is_In_ToolBar ,
-            d.Img_Index,d.Top_Opt_ID ,d.Order_Ind,d.Page_Type,d.opt_type
-from F_V_USERROLES a  join F_ROLEPOWER b on (a.Role_Code=b.Role_Code)
-         join F_OPTDEF  c on(b.OPT_CODE=c.OPT_CODE)
-        join F_OptInfo d on(c.OPT_ID=d.Opt_ID)
-where d.opt_url<>'...';
+   select  distinct a.User_Code,d.Opt_ID, d.Opt_Name , d.Pre_Opt_ID  ,
+      d.Form_Code  , d.opt_url, d.opt_route, d.Msg_No , d.Msg_Prm, d.Is_In_ToolBar ,
+      d.Img_Index,d.Top_Opt_ID ,d.Order_Ind,d.Page_Type,d.opt_type
+   from F_V_USERROLES a  join F_ROLEPOWER b on (a.Role_Code=b.Role_Code)
+      join F_OPTDEF  c on(b.OPT_CODE=c.OPT_CODE)
+      join F_OptInfo d on(c.OPT_ID=d.Opt_ID)
+   where d.opt_url<>'...';
 
 /*==============================================================*/
 /* View: f_v_optdef_url_map                                     */
 /*==============================================================*/
 create or replace view f_v_optdef_url_map as
-select concat(c.opt_url,b.OPT_URL) as opt_def_url, b.opt_req, b.opt_code
-from F_OPTDEF b join F_OptInfo c
-    on (b.opt_id = c.opt_id)
- where c.Opt_Type <> 'W'
-   and c.opt_url <> '...' and b.opt_req is not null;
+   select concat(c.opt_url,b.OPT_URL) as opt_def_url, b.opt_req, b.opt_code
+   from F_OPTDEF b join F_OptInfo c
+         on (b.opt_id = c.opt_id)
+   where c.Opt_Type <> 'W'
+         and c.opt_url <> '...' and b.opt_req is not null;
 
 /*==============================================================*/
 /* View: v_opt_tree                                             */
