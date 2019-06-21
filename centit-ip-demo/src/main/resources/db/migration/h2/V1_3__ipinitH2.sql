@@ -1,3 +1,5 @@
+drop table if exists F_OS_INFO cascade;
+drop table if exists F_DATABASE_INFO cascade;
 CREATE TABLE F_OS_INFO  (
    OS_ID                VARCHAR(20)                    NOT NULL,
    OS_NAME              VARCHAR(200)                   NOT NULL,
@@ -41,5 +43,5 @@ insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOP
     values('sysadmin','1000101',today(),today(),null,'u0000000','u0000000');
 insert into F_ROLEPOWER (ROLE_CODE, OPT_CODE, UPDATE_DATE, CREATE_DATE, OPT_SCOPE_CODES,CREATOR,UPDATOR)
     values('sysadmin','1000102',today(),today(),null,'u0000000','u0000000');
-
+drop sequence if exists S_DATABASECODE;
 create sequence S_DATABASECODE;
