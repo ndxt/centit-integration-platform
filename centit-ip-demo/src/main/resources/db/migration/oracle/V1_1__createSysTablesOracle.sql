@@ -98,7 +98,7 @@ create table F_DATACATALOG
    Field_Desc           varchar2(1024) ,
    update_Date          date,
    Create_Date          date,
-   opt_ID               varchar2(16) ,
+   opt_ID               varchar2(32) ,
    need_Cache           char(1) default '1',
    creator              varchar2(32),
    updator              varchar2(32)
@@ -134,7 +134,7 @@ alter table F_DATADICTIONARY add primary key (CATALOG_CODE, DATA_CODE);
 create table F_OPTDATASCOPE
 (
    opt_Scope_Code       varchar2(32) not null,
-   Opt_ID               varchar2(16),
+   Opt_ID               varchar2(32),
    scope_Name           varchar2(64),
    Filter_Condition     varchar2(1024)  ,
    scope_Memo           varchar2(1024)
@@ -174,7 +174,7 @@ create table F_OPT_LOG
    Opt_Content          varchar2(1000) not null  ,
    New_Value            clob ,
    Old_Value            clob ,
-   Opt_ID               varchar2(64) not null  ,
+   Opt_ID               varchar2(32) not null  ,
    OPT_Method           varchar2(64)  ,
    opt_Tag              varchar2(200)
 );
@@ -196,7 +196,7 @@ create table F_OptInfo
    Msg_Prm              varchar2(256),
    Is_In_ToolBar        char(1),
    Img_Index            number(10,0),
-   Top_Opt_ID           varchar2(8),
+   Top_Opt_ID           varchar2(32),
    Order_Ind            number(4,0) ,
    FLOW_CODE            varchar2(8) ,
    Page_Type            char(1)  default 'I' ,
@@ -280,7 +280,7 @@ create table F_SYS_NOTIFY
    Notify_Time          date,
    opt_Tag              varchar2(200)  ,
    OPT_Method           varchar2(64)  ,
-   Opt_ID               varchar2(64) not null
+   Opt_ID               varchar2(32) not null
 );
 comment on column F_SYS_NOTIFY.Notify_State is '0 成功， 1 失败 2 部分成功'  ;
 comment on column F_SYS_NOTIFY.opt_Tag is  '一般用于关联到业务主体' ;
@@ -368,7 +368,7 @@ create table F_USERSETTING
    USER_CODE            varchar2(32) not null ,
    Param_Code           varchar2(32) not null,
    Param_Value          varchar2(2048) not null,
-   opt_ID               varchar2(16) not null,
+   opt_ID               varchar2(32) not null,
    Param_Name           varchar2(200),
    Create_Date          date
 );
@@ -428,7 +428,7 @@ create table M_InnerMsg
    msg_State            char(1)  ,
    msg_Content          blob,
    Email_Id             varchar2(8)  ,
-   Opt_ID               varchar2(64) not null  ,
+   Opt_ID               varchar2(32) not null  ,
    OPT_Method           varchar2(64) ,
    opt_Tag              varchar2(200)
 );
