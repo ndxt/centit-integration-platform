@@ -1377,7 +1377,7 @@ is '接口ID（主键）';
 alter table WF_MODULE_INTERFACE
   add constraint ID primary key (INTERFACE_ID);
 
-call p_drop_ifExists('WF_MODULE_INTERFACE_PARAMETER');
+call p_drop_ifExists('WF_INTERFACE_PARAMETER');
 create table WF_INTERFACE_PARAMETER
 (
   parameter_code VARCHAR2(100) not null,
@@ -1506,7 +1506,7 @@ start with 1412
 increment by 1
 cache 20;
 
-call p_drop_ifExists('S_FLOWDEFNO','2');
+call p_drop_ifExists('S_FLOWINSTNO','2');
 create sequence S_FLOWINSTNO
 minvalue 1
 maxvalue 9999999999999999999999999999
