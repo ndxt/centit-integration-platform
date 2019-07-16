@@ -1,5 +1,9 @@
 delete from f_optinfo;
 delete from f_optdef
+delete from F_ROLEPOWER where role_code='sysadmin';
+
+insert into F_UNITROLE (UNIT_CODE, ROLE_CODE, OBTAIN_DATE, SECEDE_DATE, CHANGE_DESC, UPDATE_DATE, CREATE_DATE, CREATOR, UPDATOR) values ('U00001', 'deploy', CURDATE(), null, '', null, now(), '', '');
+insert into F_UNITROLE (UNIT_CODE, ROLE_CODE, OBTAIN_DATE, SECEDE_DATE, CHANGE_DESC, UPDATE_DATE, CREATE_DATE, CREATOR, UPDATOR) values ('U00001', 'sysadmin', CURDATE(), null, '', null, now(), '', '');
 -- 初始化业务菜单
 insert into f_optinfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE, CREATOR, UPDATOR) values ('PLATFORM', '集成平台', '0', '...', '...', '', 'O', null, '', 'Y', null, '', null, '', 'D', 'icon-ok', null, null, null, null, 'u0000000', 'u0000000');
 insert into f_optinfo (OPT_ID, OPT_NAME, PRE_OPT_ID, OPT_ROUTE, OPT_URL, FORM_CODE, OPT_TYPE, MSG_NO, MSG_PRM, IS_IN_TOOLBAR, IMG_INDEX, TOP_OPT_ID, ORDER_IND, FLOW_CODE, PAGE_TYPE, ICON, HEIGHT, WIDTH, UPDATE_DATE, CREATE_DATE, CREATOR, UPDATOR) values ('DEPTMAG', '部门管理', 'PLATFORM', '...', '...', '', 'O', null, '', 'Y', null, '', null, '', 'I', 'ios-people', null, null, null, null, 'u0000000', 'u0000000');
@@ -45,6 +49,9 @@ insert into f_optdef (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_URL, OPT_DESC,
 insert into f_optdef (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_URL, OPT_DESC, OPT_ORDER, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_REQ, CREATOR, UPDATOR) values ('1000081', 'LOGINCAS', '获取菜单', 'getMenu', '/menu', '', null, '', null, null, 'R', 'u0000000', 'u0000000');
 insert into f_optdef (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_URL, OPT_DESC, OPT_ORDER, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_REQ, CREATOR, UPDATOR) values ('1001210', 'menu', '查看', 'search', '/changeme', '查看（系统默认）', null, '', null, null, 'CRUD', '', '');
 insert into f_optdef (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_URL, OPT_DESC, OPT_ORDER, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_REQ, CREATOR, UPDATOR) values ('1001211', 'ROLE', '查看', 'search', '/changeme', '查看（系统默认）', null, '', null, null, 'CRUD', '', '');
+
+insert into F_ROLEPOWER(role_code,opt_code,update_Date,create_date,opt_scope_codes,CREATOR,UPDATOR)
+  select 'sysadmin',opt_code,sysdate,sysdate,'',CREATOR,UPDATOR from f_optdef ;
 
 commit;
 
