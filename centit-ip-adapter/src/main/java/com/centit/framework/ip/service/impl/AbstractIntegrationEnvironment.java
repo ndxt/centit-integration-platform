@@ -1,21 +1,14 @@
 package com.centit.framework.ip.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.components.CodeRepositoryCache;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.support.common.CachedObject;
-import com.centit.support.file.FileIOOpt;
-import com.centit.support.file.FileSystemOpt;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -33,6 +26,11 @@ public abstract class AbstractIntegrationEnvironment implements IntegrationEnvir
         osInfoCache = new CachedObject<>(this::reloadOsInfos, CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
         databaseInfoCache = new CachedObject<>(this::reloadDatabaseInfos, CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
         accessTokenCache = new CachedObject<>(this::reloadAccessTokens, CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
+
+        CodeRepositoryUtil.registeExtendedCodeRepo(
+            "osInfo", new OsInfoMap(osInfoCache));
+        CodeRepositoryUtil.registeExtendedCodeRepo(
+            "databaseInfo", new DatabaseInfoMap(databaseInfoCache));
     }
 
     public abstract List<OsInfo> reloadOsInfos();
@@ -95,7 +93,7 @@ public abstract class AbstractIntegrationEnvironment implements IntegrationEnvir
             return null;
         for(UserAccessToken at : accessTokens){
             if(StringUtils.equals(at.getTokenId(),tokenId)){
-                if( StringUtils.equals(at.getIsValid(),"T")
+                if(StringUtils.equals(at.getIsValid(),"T")
                         && StringUtils.equals(at.getSecretAccessKey(), accessKey) )
                     return at.getUserCode();
                 else

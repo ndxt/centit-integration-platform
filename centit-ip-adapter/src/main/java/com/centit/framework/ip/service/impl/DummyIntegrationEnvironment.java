@@ -2,7 +2,8 @@ package com.centit.framework.ip.service.impl;
 
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
-import com.centit.framework.ip.service.IntegrationEnvironment;
+import com.centit.framework.ip.po.UserAccessToken;
+import com.centit.support.algorithm.DatetimeOpt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,58 +11,46 @@ import java.util.List;
 /**
  * Created by codefan on 17-7-3.
  */
-public class DummyIntegrationEnvironment implements IntegrationEnvironment {
+public class DummyIntegrationEnvironment extends AbstractIntegrationEnvironment {
 
-
-    /**
-     * 刷新集成环境相关信息
-     * 包括：业务系统、数据库信息
-     *
-     * @return boolean 刷新集成环境相关信息
-     */
-    @Override
-    public boolean reloadIPEnvironmen() {
-        return true;
+    public DummyIntegrationEnvironment(){
+        super();
     }
 
     @Override
-    public OsInfo getOsInfo(String osId) {
-        OsInfo osInfo = new OsInfo();
-        osInfo.setOsId(osId);
-        osInfo.setOsName("dummy.app.key");
-        return osInfo;
-    }
-
-    @Override
-    public DatabaseInfo getDatabaseInfo(String databaseCode) {
-        DatabaseInfo databaseInfo = new DatabaseInfo();
-        databaseInfo.setOsId(databaseCode);
-        databaseInfo.setDatabaseCode(databaseCode);
-        databaseInfo.setDatabaseUrl("placeholder");
-        databaseInfo.setUsername("placeholder");
-        databaseInfo.setPassword("placeholder");
-        databaseInfo.setDatabaseDesc("placeholder");
-        return databaseInfo;
-    }
-
-    @Override
-    public List<OsInfo> listOsInfos() {
-
+    public List<OsInfo> reloadOsInfos() {
         List<OsInfo>  osInfos = new ArrayList<>(2);
-        osInfos.add(getOsInfo("dummy"));
+        OsInfo osInfo = new OsInfo();
+        osInfo.setOsId("dummy");
+        osInfo.setOsName("dummy.app.key");
+        osInfos.add(osInfo);
         return osInfos;
     }
 
     @Override
-    public List<DatabaseInfo> listDatabaseInfo() {
+    public List<DatabaseInfo> reloadDatabaseInfos() {
         List<DatabaseInfo>  databaseInfos = new ArrayList<>(2);
-        databaseInfos.add(getDatabaseInfo("dummy"));
+        DatabaseInfo databaseInfo = new DatabaseInfo();
+        databaseInfo.setOsId("dummy");
+        databaseInfo.setDatabaseCode("dummy");
+        databaseInfo.setDatabaseUrl("placeholder");
+        databaseInfo.setUsername("placeholder");
+        databaseInfo.setPassword("placeholder");
+        databaseInfo.setDatabaseDesc("placeholder");
+        databaseInfos.add(databaseInfo);
         return databaseInfos;
     }
 
     @Override
-    public String checkAccessToken(String tokenId, String accessKey) {
-        return tokenId;
+    public List<UserAccessToken> reloadAccessTokens() {
+        List<UserAccessToken> tokens = new ArrayList<>(2);
+        UserAccessToken token = new UserAccessToken();
+        token.setTokenId("dummy");
+        token.setSecretAccessKey("centit.1");
+        token.setUserCode("admin");
+        token.setCreateTime(DatetimeOpt.currentUtilDate());
+        token.setIsValid("T");
+        tokens.add(token);
+        return tokens;
     }
-
 }
