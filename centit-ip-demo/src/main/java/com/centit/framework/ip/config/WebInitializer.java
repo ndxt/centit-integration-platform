@@ -19,13 +19,14 @@ public class WebInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
         initializeSpringConfig(servletContext);
         initializeSpringMvcConfig(servletContext);
-        WebConfig.registerSpringSecurityFilter(servletContext);
+        String [] servletUrlPatterns = {"/system/*"};
+        WebConfig.registerSpringSecurityFilter(servletContext, servletUrlPatterns);
         WebConfig.registerRequestContextListener(servletContext);
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
         //WebConfig.registerResponseCorsFilter(servletContext);
-        WebConfig.registerCharacterEncodingFilter(servletContext);
-        WebConfig.registerHttpPutFormContentFilter(servletContext);
-        WebConfig.registerHiddenHttpMethodFilter(servletContext);
+        WebConfig.registerCharacterEncodingFilter(servletContext, servletUrlPatterns);
+        WebConfig.registerHttpPutFormContentFilter(servletContext, servletUrlPatterns);
+        WebConfig.registerHiddenHttpMethodFilter(servletContext, servletUrlPatterns);
         WebConfig.registerRequestThreadLocalFilter(servletContext);
         //Session
         WebConfig.registerHttpSessionEventPublisher(servletContext);
