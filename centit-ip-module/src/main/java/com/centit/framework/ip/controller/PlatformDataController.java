@@ -6,11 +6,14 @@ import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.ip.service.OsInfoManager;
 import com.centit.framework.ip.service.UserAccessTokenManager;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptInfo;
+import com.centit.framework.model.basedata.IUserRole;
+import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.OptInfo;
 import com.centit.framework.system.po.OptMethod;
@@ -27,12 +30,14 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.ConfigAttribute;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -441,6 +446,44 @@ public class PlatformDataController extends BaseController {
                 platformEnvironment.listUserRoles(userCode),response);
     }
 
+    /**
+     * 验证用户权限
+     * @param userCode 用户代码
+     * @param accessUrl 用户访问url
+     * @param request HttpServletRequest
+     * @return 用户是否有权限访问这个url
+     */
+    @ApiOperation(value="获取用户下的所有角色",notes="获取用户下的所有角色。")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "userCode", value="用户代码",
+            required = true, paramType = "path", dataType= "String"),
+        @ApiImplicitParam(
+            name = "accessUrl", value="用户访问Url",
+            required = true, paramType = "query", dataType= "String")}
+    )
+    @RequestMapping(value = "/checkuserpower/{userCode}",
+        method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public boolean checkUserAccessPower(@PathVariable String userCode,
+                              String accessUrl,
+                              HttpServletRequest request) {
+        List<? extends IUserRole> userRoles = platformEnvironment.listUserRoles(userCode);
+        Collection<ConfigAttribute> needRoles = CentitSecurityMetadata.matchUrlToRole(accessUrl, request);
+        if(userRoles==null || needRoles==null){
+            return false;
+        }
+        for(ConfigAttribute attr : needRoles){
+            for(IUserRole role : userRoles){
+                if(StringUtils.equals(
+                    CentitSecurityMetadata.ROLE_PREFIX + role.getRoleCode(),
+                    attr.getAttribute())){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     /**
      * 获取角色下的所有用户
      * @param roleCode 角色代码
