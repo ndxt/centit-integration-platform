@@ -218,7 +218,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 }
                 String regEmail = getAttributeString(attrs,"mail");
                 if(StringUtils.isNotBlank(regEmail)){
-                    if(regEmail.length() <60 && userInfoDao.getUserByRegEmail(regEmail)==null)
+                    if(regEmail.length() < 60 && userInfoDao.getUserByRegEmail(regEmail)==null)
                         userInfo.setRegEmail(regEmail);
                 }
                 String regCellPhone = getAttributeString(attrs,"mobilePhone");

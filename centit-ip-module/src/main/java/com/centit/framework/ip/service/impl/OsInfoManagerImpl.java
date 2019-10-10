@@ -84,7 +84,8 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
             try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
                 HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),osInfo.getOsUrl() + refreshUrl);
             }catch (IOException e){
-                e.printStackTrace();
+                logger.error(e.getLocalizedMessage());
+                //e.printStackTrace();
                 flag = false;
                 break;
             }
