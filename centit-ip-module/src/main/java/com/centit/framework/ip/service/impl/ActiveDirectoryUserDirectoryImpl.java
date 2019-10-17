@@ -178,7 +178,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     unitInfo.setUnitCode(unitInfoDao.getNextKey());
                     unitInfo.setUnitTag(distinguishedName);
                     unitInfo.setIsValid("T");
-                    unitInfo.setUnitType("L");
+                    unitInfo.setUnitType("A");
                     unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
                     unitInfo.setCreateDate(now);
                     //-----------------------------
