@@ -261,7 +261,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                         String groupName = StringBaseOpt.objectToString(member);
                         UnitInfo u = allUnits.get(groupName);
                         if(u!=null){
-                            if ((!StringUtils.isBlank(u.getUnitCode()))&&(StringUtils.isBlank(userInfo.getPrimaryUnit()))) {
+                            if ((StringUtils.isNotBlank(u.getUnitCode()))&&(StringUtils.isBlank(userInfo.getPrimaryUnit()))) {
                                 userInfo.setPrimaryUnit(u.getUnitCode());
                                 userInfoDao.updateUser(userInfo);
                             }
