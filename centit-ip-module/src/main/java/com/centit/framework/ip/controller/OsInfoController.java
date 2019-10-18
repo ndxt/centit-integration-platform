@@ -120,7 +120,7 @@ public class OsInfoController extends  BaseController {
         }
         osinfo.setCreated(WebOptUtils.getCurrentUserCode(request));
         osinfo.setCreateTime(new Date());
-        if(! passwordEncoder.isCorrectPasswordFormat(osinfo.getOauthPassword())){
+        if(osinfo.getOauthPassword()!=null && ! passwordEncoder.isCorrectPasswordFormat(osinfo.getOauthPassword())){
             osinfo.setOauthPassword(passwordEncoder.createPassword(
                 osinfo.getOauthPassword(), osinfo.getOsId()));
         }
