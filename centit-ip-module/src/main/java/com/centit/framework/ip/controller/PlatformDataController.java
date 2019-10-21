@@ -6,16 +6,20 @@ import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.ip.service.OsInfoManager;
 import com.centit.framework.ip.service.UserAccessTokenManager;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IOptInfo;
+import com.centit.framework.model.basedata.IUserRole;
+import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.OptInfo;
 import com.centit.framework.system.po.OptMethod;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
+import com.centit.framework.system.service.OptInfoManager;
 import com.centit.framework.system.service.SysRoleManager;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.UserSettingManager;
@@ -25,14 +29,15 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.ConfigAttribute;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -46,32 +51,28 @@ import java.util.Map;
 @Api(tags= "系统数据服务接口",value = "系统数据服务接口")
 public class PlatformDataController extends BaseController {
 
-    @Resource
-    @NotNull
+    @Autowired
     private UserSettingManager userSettingManager;
 
-    @Resource
-    @NotNull
+    @Autowired
     private SysRoleManager sysRoleManager;
 
-    @Resource(name="platformEnvironment")
-    @NotNull
+    @Autowired
     protected PlatformEnvironment platformEnvironment;
 
-    @Resource
-    @NotNull
+    @Autowired
     private SysUserManager sysUserManager;
 
-    @Resource
-    @NotNull
+    @Autowired
     protected OsInfoManager osInfoManager;
 
-    @Resource
-    @NotNull
+    @Autowired
+    protected OptInfoManager optInfoManager;
+
+    @Autowired
     protected DatabaseInfoManager oatabaseInfoManager;
 
-    @Resource
-    @NotNull
+    @Autowired
     protected UserAccessTokenManager userAccessTokenManager;
 
     @RequestMapping
@@ -446,6 +447,44 @@ public class PlatformDataController extends BaseController {
     }
 
     /**
+     * 验证用户权限
+     * @param userCode 用户代码
+     * @param accessUrl 用户访问url
+     * @param request HttpServletRequest
+     * @return 用户是否有权限访问这个url
+     */
+    @ApiOperation(value="获取用户下的所有角色",notes="获取用户下的所有角色。")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "userCode", value="用户代码",
+            required = true, paramType = "path", dataType= "String"),
+        @ApiImplicitParam(
+            name = "accessUrl", value="用户访问Url",
+            required = true, paramType = "query", dataType= "String")}
+    )
+    @RequestMapping(value = "/checkuserpower/{userCode}",
+        method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public boolean checkUserAccessPower(@PathVariable String userCode,
+                              String accessUrl,
+                              HttpServletRequest request) {
+        List<? extends IUserRole> userRoles = platformEnvironment.listUserRoles(userCode);
+        Collection<ConfigAttribute> needRoles = CentitSecurityMetadata.matchUrlToRole(accessUrl, request);
+        if(userRoles==null || needRoles==null){
+            return false;
+        }
+        for(ConfigAttribute attr : needRoles){
+            for(IUserRole role : userRoles){
+                if(StringUtils.equals(
+                    CentitSecurityMetadata.ROLE_PREFIX + role.getRoleCode(),
+                    attr.getAttribute())){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /**
      * 获取角色下的所有用户
      * @param roleCode 角色代码
      * @param response HttpServletResponse
@@ -626,6 +665,18 @@ public class PlatformDataController extends BaseController {
 				sysRoleManager.listAllOptMethods(),response);
     }
 
+
+    @ApiOperation(value="获取所有操作数据范围设定",notes="获取所有操作数据范围设定。")
+    @ApiImplicitParam(
+        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        required = true, paramType = "path", dataType= "String")
+    @RequestMapping(value = "/alloptdatascopes/{appName}",
+        method = RequestMethod.GET)
+    public void listAllOptDataScopes(@PathVariable String appName,
+                                 HttpServletResponse response) {
+        JsonResultUtils.writeSingleDataJson(
+            optInfoManager.listAllDataScope(),response);
+    }
     /**
      * 获取字典类型代码下的所有字典明细
      * @param appName 客户端名称

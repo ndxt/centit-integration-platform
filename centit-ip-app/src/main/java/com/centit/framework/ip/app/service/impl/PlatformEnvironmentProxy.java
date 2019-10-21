@@ -310,6 +310,19 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     /**
+     * @return 所有的数据范围定义表达式
+     */
+    @Override
+    public List<? extends IOptDataScope> listAllOptDataScope() {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IOptDataScope> value = evrnManger.listAllOptDataScope();
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    /**
      * 获取所有数据字典类别信息
      *
      * @return 所有数据字典类别信息

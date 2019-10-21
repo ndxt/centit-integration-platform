@@ -2,8 +2,9 @@ package com.centit.framework.ip.app.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.appclient.AppSession;
-import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.appclient.HttpReceiveJSON;
+import com.centit.framework.appclient.RestfulHttpRequest;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -13,9 +14,7 @@ import com.centit.support.algorithm.StringRegularOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 集成平台客户端业务配置新, 所有的访问需要添加一个cache策略
@@ -250,6 +249,16 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
                 OptMethod.class);
     }
 
+    /**
+     * @return 所有的数据范围定义表达式
+     */
+    @Override
+    public List<? extends IOptDataScope> listAllOptDataScope() {
+        return RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/platform/alloptdatascopes/"+topOptId,
+            OptDataScope.class);
+    }
 
     private CentitUserDetails loadUserDetails(String queryParam, String qtype) {
         HttpReceiveJSON resJson = RestfulHttpRequest.getResponseData(

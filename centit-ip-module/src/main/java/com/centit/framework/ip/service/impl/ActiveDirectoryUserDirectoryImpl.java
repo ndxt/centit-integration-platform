@@ -178,7 +178,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     unitInfo.setUnitCode(unitInfoDao.getNextKey());
                     unitInfo.setUnitTag(distinguishedName);
                     unitInfo.setIsValid("T");
-                    unitInfo.setUnitType("L");
+                    unitInfo.setUnitType("A");
                     unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
                     unitInfo.setCreateDate(now);
                     //-----------------------------
@@ -217,22 +217,22 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     createUser = true;
                 }
                 String regEmail = getAttributeString(attrs,"mail");
-                if(StringUtils.isNoneBlank(regEmail)){
-                    if(regEmail.length() <60 && userInfoDao.getUserByRegEmail(regEmail)==null)
+                if(StringUtils.isNotBlank(regEmail)){
+                    if(regEmail.length() < 60 && userInfoDao.getUserByRegEmail(regEmail)==null)
                         userInfo.setRegEmail(regEmail);
                 }
                 String regCellPhone = getAttributeString(attrs,"mobilePhone");
-                if(StringUtils.isNoneBlank(regCellPhone)){
+                if(StringUtils.isNotBlank(regCellPhone)){
                     if(regCellPhone.length() <15 && userInfoDao.getUserByRegCellPhone(regCellPhone)==null)
                         userInfo.setRegCellPhone(regCellPhone);
                 }
                 String idCardNo = getAttributeString(attrs,"idCard");
-                if(StringUtils.isNoneBlank(idCardNo)){
+                if(StringUtils.isNotBlank(idCardNo)){
                     if(idCardNo.length() <20 && userInfoDao.getUserByIdCardNo(idCardNo)==null)
                         userInfo.setIdCardNo(idCardNo);
                 }
                 String userWord = getAttributeString(attrs,"jobNo");
-                if(StringUtils.isNoneBlank(userWord)){
+                if(StringUtils.isNotBlank(userWord)){
                     if(userWord.length() <20 && userInfoDao.getUserByUserWord(userWord)==null)
                         userInfo.setUserWord(userWord);
                 }
@@ -261,6 +261,10 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                         String groupName = StringBaseOpt.objectToString(member);
                         UnitInfo u = allUnits.get(groupName);
                         if(u!=null){
+                            if ((StringUtils.isNotBlank(u.getUnitCode()))&&(StringUtils.isBlank(userInfo.getPrimaryUnit()))) {
+                                userInfo.setPrimaryUnit(u.getUnitCode());
+                                userInfoDao.updateUser(userInfo);
+                            }
                             List<UserUnit> uus = userUnitDao.listObjectByUserUnit(
                                     userInfo.getUserCode(),u.getUnitCode());
                             if(uus==null || uus.size()==0){

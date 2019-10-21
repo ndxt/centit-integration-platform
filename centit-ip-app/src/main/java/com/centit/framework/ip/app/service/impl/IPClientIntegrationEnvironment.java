@@ -16,8 +16,9 @@ import java.util.List;
 public class IPClientIntegrationEnvironment extends AbstractIntegrationEnvironment {
 
     public IPClientIntegrationEnvironment() {
-
+        super();
     }
+
     private AppSession appSession;
 
     public AppSession getPlatAppSession() {
