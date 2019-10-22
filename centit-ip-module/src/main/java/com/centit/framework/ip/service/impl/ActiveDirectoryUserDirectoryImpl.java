@@ -178,7 +178,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     unitInfo.setUnitCode(unitInfoDao.getNextKey());
                     unitInfo.setUnitTag(distinguishedName);
                     unitInfo.setIsValid("T");
-                    unitInfo.setUnitType("L");
+                    unitInfo.setUnitType("A");
                     unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
                     unitInfo.setCreateDate(now);
                     //-----------------------------
@@ -261,6 +261,10 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                         String groupName = StringBaseOpt.objectToString(member);
                         UnitInfo u = allUnits.get(groupName);
                         if(u!=null){
+                            if ((StringUtils.isNotBlank(u.getUnitCode()))&&(StringUtils.isBlank(userInfo.getPrimaryUnit()))) {
+                                userInfo.setPrimaryUnit(u.getUnitCode());
+                                userInfoDao.updateUser(userInfo);
+                            }
                             List<UserUnit> uus = userUnitDao.listObjectByUserUnit(
                                     userInfo.getUserCode(),u.getUnitCode());
                             if(uus==null || uus.size()==0){
