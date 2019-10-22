@@ -41,7 +41,7 @@ public class IPEnvironmentController extends BaseController {
     @RequestMapping(value ="/osinfos",method = RequestMethod.GET)
     public ResponseMapData listOsInfos() {
         ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData("objList", integrationEnvironment.listOsInfos());
+        resData.addResponseData(BaseController.OBJLIST, integrationEnvironment.listOsInfos());
         return resData;
     }
 
@@ -49,7 +49,7 @@ public class IPEnvironmentController extends BaseController {
     @WrapUpResponseBody
     public ResponseMapData listDatabaseInfos() {
         ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData("objList", integrationEnvironment.listDatabaseInfo());
+        resData.addResponseData(BaseController.OBJLIST, integrationEnvironment.listDatabaseInfo());
         return resData;
     }
 }
