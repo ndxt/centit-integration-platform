@@ -2,7 +2,6 @@ package com.centit.framework.ip.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
-import com.centit.framework.core.po.EntityWithTimestamp;
 import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorTime;

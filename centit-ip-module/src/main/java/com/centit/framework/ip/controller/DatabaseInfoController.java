@@ -2,10 +2,10 @@ package com.centit.framework.ip.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
@@ -50,19 +50,15 @@ public class DatabaseInfoController extends BaseController {
         name = "pageDesc", value="json格式，分页对象信息",
         paramType = "body", dataTypeClass = PageDesc.class)
     @RequestMapping(method = RequestMethod.GET)
-    public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> searchColumn = BaseController.convertSearchColumn(request);
+    @WrapUpResponseBody
+    public PageQueryResult<Object> list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> searchColumn = BaseController.collectRequestParameters(request);
 
 //        JSONArray listObjects = databaseInfoMag.queryDatabaseAsJson(
 //                StringBaseOpt.objectToString(searchColumn.get("databaseName")), pageDesc);
         JSONArray listObjects = databaseInfoMag.listObjectsAsJson(searchColumn, pageDesc);
 
-        PageQueryResult.createJSONArrayResult(listObjects,pageDesc,DatabaseInfo.class);
-        ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData(BaseController.OBJLIST, listObjects);
-        resData.addResponseData(BaseController.PAGE_DESC, pageDesc);
-
-        JsonResultUtils.writeResponseDataAsJson(resData, response);
+        return PageQueryResult.createJSONArrayResult(listObjects,pageDesc,DatabaseInfo.class);
     }
 
     /**

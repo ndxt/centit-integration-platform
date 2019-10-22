@@ -3,6 +3,7 @@ package com.centit.framework.ip.app.controller;
 import com.centit.framework.common.JsonResultUtils;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.ip.service.IntegrationEnvironment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,16 +39,17 @@ public class IPEnvironmentController extends BaseController {
 
 
     @RequestMapping(value ="/osinfos",method = RequestMethod.GET)
-    public void listOsInfos(HttpServletResponse response) {
+    public ResponseMapData listOsInfos() {
         ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData(OBJLIST, integrationEnvironment.listOsInfos());
-        JsonResultUtils.writeResponseDataAsJson(resData, response);
+        resData.addResponseData("objList", integrationEnvironment.listOsInfos());
+        return resData;
     }
 
     @RequestMapping(value ="/databaseinfos",method = RequestMethod.GET)
-    public void listDatabaseInfos(HttpServletResponse response) {
+    @WrapUpResponseBody
+    public ResponseMapData listDatabaseInfos() {
         ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData(OBJLIST, integrationEnvironment.listDatabaseInfo());
-        JsonResultUtils.writeResponseDataAsJson(resData, response);
+        resData.addResponseData("objList", integrationEnvironment.listDatabaseInfo());
+        return resData;
     }
 }

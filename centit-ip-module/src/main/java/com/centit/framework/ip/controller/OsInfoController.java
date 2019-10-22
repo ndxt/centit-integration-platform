@@ -2,10 +2,10 @@ package com.centit.framework.ip.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.JsonResultUtils;
-import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
+import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -83,23 +82,18 @@ public class OsInfoController extends  BaseController {
      * 查询所有的业务系统信息
      * @param pageDesc 分页对象
      * @param request HttpServletRequest
-     * @param response HttpServletResponse
      */
     @ApiOperation(value="查询所有的业务系统信息",notes="查询所有的业务系统信息。")
     @RequestMapping(method = RequestMethod.GET)
     @ApiImplicitParam(
         name = "pageDesc", value="json格式，分页对象信息",
         paramType = "body", dataTypeClass = PageDesc.class)
-    public void list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> searchColumn = convertSearchColumn(request);
+    @WrapUpResponseBody
+    public PageQueryResult<Object> list( PageDesc pageDesc, HttpServletRequest request) {
+        Map<String, Object> searchColumn = BaseController.collectRequestParameters(request);
 
         JSONArray listObjects = osInfoMag.listOsInfoAsJson(searchColumn, pageDesc);
-        PageQueryResult.createJSONArrayResult(listObjects,pageDesc, OsInfo.class);
-        ResponseMapData resData = new ResponseMapData();
-        resData.addResponseData(OBJLIST, listObjects);
-        resData.addResponseData(PAGE_DESC, pageDesc);
-
-        JsonResultUtils.writeResponseDataAsJson(resData, response);
+        return PageQueryResult.createJSONArrayResult(listObjects,pageDesc, OsInfo.class);
     }
 
     /**
