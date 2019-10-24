@@ -62,16 +62,19 @@ public class IPOrStaticAppSystemBeanConfig implements EnvironmentAware{
     public PlatformEnvironment platformEnvironment(
         @Autowired CentitPasswordEncoder passwordEncoder) {
 
-        Boolean ipEnable = env.getProperty("centit.ip.enable",Boolean.class);// = false
-        PlatformEnvironment staticPlatformEnvironment=null;
+        Boolean ipEnable = env.getProperty("centit.ip.system-enable", Boolean.class);// = false
+        if(ipEnable == null){
+            ipEnable = env.getProperty("centit.ip.enable", Boolean.class);// = false
+        }
 
+        PlatformEnvironment staticPlatformEnvironment=null;
         Boolean jdbcEnable = env.getProperty("centit.jdbcplatform.enable", Boolean.class);// = false
         if (jdbcEnable != null && jdbcEnable) {
             JdbcPlatformEnvironment jdbcPlatformEnvironment = new JdbcPlatformEnvironment();
             jdbcPlatformEnvironment.setDataBaseConnectInfo(
-                 env.getProperty("centit.jdbcplatform.url"),
-                    env.getProperty("centit.jdbcplatform.username"),
-                    env.getProperty("centit.jdbcplatform.password")
+                env.getProperty("centit.jdbcplatform.url"),
+                env.getProperty("centit.jdbcplatform.username"),
+                env.getProperty("centit.jdbcplatform.password")
             );
             jdbcPlatformEnvironment.setPasswordEncoder(passwordEncoder);
             if(ipEnable==null || !ipEnable) {
@@ -117,6 +120,10 @@ public class IPOrStaticAppSystemBeanConfig implements EnvironmentAware{
         IntegrationEnvironment staticIntegrationEnvironment=null;
 
         Boolean jdbcEnable = env.getProperty("centit.jdbcplatform.ip.enable", Boolean.class);// = false
+        if(jdbcEnable == null){
+            jdbcEnable = env.getProperty("centit.jdbcplatform.enable", Boolean.class);// = false
+        }
+
         if (jdbcEnable != null && jdbcEnable) {
             JdbcIntegrationEnvironment jdbcIntegrationEnvironment = new JdbcIntegrationEnvironment();
             jdbcIntegrationEnvironment.setDataBaseConnectInfo(

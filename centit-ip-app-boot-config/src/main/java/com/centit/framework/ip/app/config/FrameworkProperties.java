@@ -19,6 +19,7 @@ public class FrameworkProperties {
     @Data
     public static class IpConfig{
         private boolean enable;
+        private boolean systemEnable;
         private String home;
         private String topoptid;
         private boolean authEnable;

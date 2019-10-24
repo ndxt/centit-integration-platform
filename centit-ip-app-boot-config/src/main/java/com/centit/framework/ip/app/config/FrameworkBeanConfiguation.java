@@ -61,7 +61,7 @@ public class FrameworkBeanConfiguation {
     public PlatformEnvironment platformEnvironment(
             @Autowired CentitPasswordEncoder passwordEncoder) {
 
-        boolean ipEnable = frameworkProperties.getIp().isEnable();
+        boolean ipEnable = frameworkProperties.getIp().isSystemEnable();//.isEnable();
 
         JsonPlatformEnvironment jsonPlatformEnvironment = new JsonPlatformEnvironment();
         jsonPlatformEnvironment.setAppHome(frameworkProperties.getApp().getHome());
