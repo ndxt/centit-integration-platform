@@ -23,7 +23,7 @@ public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo,String> {
         if (filterField == null) {
             filterField = new HashMap<>();
             filterField.put("databaseName", CodeBook.LIKE_HQL_ID);
-            filterField.put("databaseNames", CodeBook.EQUAL_HQL_ID);
+            filterField.put("databaseCode", CodeBook.EQUAL_HQL_ID);
             filterField.put("databaseType", CodeBook.LIKE_HQL_ID);
             filterField.put("hostPort", CodeBook.LIKE_HQL_ID);
             filterField.put("databaseUrl", CodeBook.LIKE_HQL_ID);
