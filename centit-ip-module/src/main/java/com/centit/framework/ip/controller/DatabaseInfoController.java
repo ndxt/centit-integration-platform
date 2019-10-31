@@ -45,7 +45,7 @@ public class DatabaseInfoController extends BaseController {
      * @param request HttpServletRequest
      * @param response HttpServletResponse
      */
-    @ApiOperation(value="所有数据库列表信息",notes="所有数据库列表信息。")
+    @ApiOperation(value="所有数据库列表信息",notes="所有数据库列表信息。增加databaseCode")
     @ApiImplicitParam(
         name = "pageDesc", value="json格式，分页对象信息",
         paramType = "body", dataTypeClass = PageDesc.class)
