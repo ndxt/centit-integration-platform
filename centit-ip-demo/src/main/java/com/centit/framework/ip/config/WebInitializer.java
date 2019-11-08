@@ -17,42 +17,19 @@ public class WebInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
-        initializeSpringConfig(servletContext);
-        initializeSpringMvcConfig(servletContext);
         String [] servletUrlPatterns = {"/system/*"};
-        WebConfig.registerSpringSecurityFilter(servletContext, servletUrlPatterns);
+        WebConfig.registerSpringConfig(servletContext, ServiceConfig.class);
+        WebConfig.registerServletConfig(servletContext, "system",
+            "/system/*",
+            SystemSpringMvcConfig.class,SwaggerConfig.class);
         WebConfig.registerRequestContextListener(servletContext);
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
-        //WebConfig.registerResponseCorsFilter(servletContext);
+
         WebConfig.registerCharacterEncodingFilter(servletContext, servletUrlPatterns);
         WebConfig.registerHttpPutFormContentFilter(servletContext, servletUrlPatterns);
         WebConfig.registerHiddenHttpMethodFilter(servletContext, servletUrlPatterns);
         WebConfig.registerRequestThreadLocalFilter(servletContext);
-        //Session
-        WebConfig.registerHttpSessionEventPublisher(servletContext);
-    }
-
-    /**
-     * 加载Spring 配置
-     * @param servletContext ServletContext
-     */
-    private void initializeSpringConfig(ServletContext servletContext){
-        AnnotationConfigWebApplicationContext springContext = new AnnotationConfigWebApplicationContext();
-        springContext.register(ServiceConfig.class);
-        servletContext.addListener(new ContextLoaderListener(springContext));
-    }
-
-    /**
-     * 加载Servlet 配置
-     * @param servletContext ServletContext
-     */
-    private void initializeSpringMvcConfig(ServletContext servletContext) {
-        AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.register(SystemSpringMvcConfig.class, SwaggerConfig.class);
-        Dynamic system  = servletContext.addServlet("system", new DispatcherServlet(context));
-        system.addMapping("/system/*");
-        system.setLoadOnStartup(1);
-        system.setAsyncSupported(true);
+        WebConfig.registerSpringSecurityFilter(servletContext, servletUrlPatterns);
     }
 
 }
