@@ -35,7 +35,7 @@ public class DatabaseInfo implements IDatabaseInfo, Serializable {
 
     @Column(name = "OS_ID")
     @ApiModelProperty(value = "系统代码",name = "osId")
-    @DictionaryMap(value="osInfo",fieldName = "osName")
+    @DictionaryMap(value="osInfo",fieldName = "osName",isExpression = false)
     private String osId;
 
     @Column(name = "DATABASE_NAME")
