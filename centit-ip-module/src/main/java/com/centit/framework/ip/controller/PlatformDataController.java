@@ -24,6 +24,7 @@ import com.centit.framework.system.service.SysRoleManager;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.UserSettingManager;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -84,27 +85,23 @@ public class PlatformDataController extends BaseController {
     /**
      * 更新用户信息
      * @param userInfo 新的用户信息对象
-     * @param request HttpServletRequest
-     * @param response HttpServletResponse
      */
     @ApiOperation(value="更新用户信息",notes="更新用户信息。")
     @ApiImplicitParam(
         name = "userInfo", value="json格式，用户对象信息",required = true,
         paramType = "body", dataTypeClass= UserInfo.class)
     @RequestMapping(value = "/userinfo", method = RequestMethod.PUT)
-    public void updateUserInfo(@RequestBody UserInfo userInfo,
-                     HttpServletRequest request, HttpServletResponse response) {
-
+    @WrapUpResponseBody
+    public void updateUserInfo(@RequestBody UserInfo userInfo) {
         UserInfo dbUserInfo = sysUserManager.getObjectById(userInfo.getUserCode());
         if (null == dbUserInfo) {
-            JsonResultUtils.writeErrorMessageJson("当前用户不存在", response);
-            return;
+            throw new ObjectException(userInfo, ResponseData.ERROR_NOT_FOUND,
+                "当前用户不存在");
         }
         //这个接口不能修改用户的主机构，只能修改其他信息
         String  primaryUnit = dbUserInfo.getPrimaryUnit();
         userInfo.setPrimaryUnit(primaryUnit);
         sysUserManager.updateUserInfo(userInfo);
-        JsonResultUtils.writeSuccessJson(response);
     }
 
     /**
