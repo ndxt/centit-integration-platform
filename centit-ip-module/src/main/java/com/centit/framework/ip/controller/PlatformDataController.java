@@ -102,9 +102,8 @@ public class PlatformDataController extends BaseController {
         }
         //这个接口不能修改用户的主机构，只能修改其他信息
         String  primaryUnit = dbUserInfo.getPrimaryUnit();
-        dbUserInfo.copyNotNullProperty(userInfo);
-        dbUserInfo.setPrimaryUnit(primaryUnit);
-        sysUserManager.updateUserInfo(dbUserInfo);
+        userInfo.setPrimaryUnit(primaryUnit);
+        sysUserManager.updateUserInfo(userInfo);
         JsonResultUtils.writeSuccessJson(response);
     }
 
