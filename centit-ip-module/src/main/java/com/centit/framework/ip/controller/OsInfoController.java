@@ -112,6 +112,10 @@ public class OsInfoController extends  BaseController {
             JsonResultUtils.writeErrorMessageJson("对象不能为空", response);
             return;
         }
+        if(osInfoMag.getObjectById(osinfo.getOsId())!=null){
+            JsonResultUtils.writeErrorMessageJson("业务系统ID已存在", response);
+            return;
+        }
         osinfo.setCreated(WebOptUtils.getCurrentUserCode(request));
         osinfo.setCreateTime(new Date());
         if(osinfo.getOauthPassword()!=null && ! passwordEncoder.isCorrectPasswordFormat(osinfo.getOauthPassword())){
