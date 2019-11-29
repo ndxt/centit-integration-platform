@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap [
+        <!ELEMENT sqlMap (sql*)>
+        <!ELEMENT sql (#PCDATA)>
+        <!ATTLIST sql id  CDATA #REQUIRED>
+        <!ATTLIST sql dbtype  (Oracle|SqlServer|DB2|MySql) #IMPLIED>
+        ]>
+<sqlMap>
+    <!-- xml 中不判断id的唯一性，后面的语句会覆盖前面的，所以一般将通用的语句放在前面，数据库特有的语句放在后面。 -->
+
+    <sql id="LIST_ALL_OS">
+        <![CDATA[
+            select OS_ID, OS_NAME, OS_URL, OAUTH_PASSWORD
+            from F_OS_INFO
+        ]]>
+    </sql>
+
+    <sql id="LIST_ALL_DATABASE">
+        <![CDATA[
+            select DATABASE_CODE, OS_ID, DATABASE_NAME,
+                DATABASE_URL, USERNAME, PASSWORD, DATABASE_DESC
+            from F_DATABASE_INFO
+        ]]>
+    </sql>
+
+</sqlMap>
