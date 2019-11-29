@@ -60,7 +60,7 @@ public class FrameworkBeanConfiguation {
         JdbcPlatformEnvironment jdbcPlatformEnvironment = new JdbcPlatformEnvironment();
 
         jdbcPlatformEnvironment.setDataBaseConnectInfo(
-            frameworkProperties.getJdbcplatform().getUer(),
+            frameworkProperties.getJdbcplatform().getUrl(),
             frameworkProperties.getJdbcplatform().getUsername(),
             frameworkProperties.getJdbcplatform().getPassword());
         jdbcPlatformEnvironment.setPasswordEncoder(passwordEncoder);
@@ -73,7 +73,7 @@ public class FrameworkBeanConfiguation {
 
         JdbcIntegrationEnvironment jdbcIntegrationEnvironment = new JdbcIntegrationEnvironment();
         jdbcIntegrationEnvironment.setDataBaseConnectInfo(
-            frameworkProperties.getJdbcplatform().getUer(),
+            frameworkProperties.getJdbcplatform().getUrl(),
             frameworkProperties.getJdbcplatform().getUsername(),
             frameworkProperties.getJdbcplatform().getPassword());
         jdbcIntegrationEnvironment.reloadIPEnvironmen();

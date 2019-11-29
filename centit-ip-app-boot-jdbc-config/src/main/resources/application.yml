@@ -1,7 +1,0 @@
-framework:
-  app:
-    home: /D/Projects/RunData/webim_home
-  jdbcplatform:
-    url:
-    username:
-    password:

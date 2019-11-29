@@ -18,7 +18,7 @@ public class FrameworkProperties {
 
     @Data
     public static class JdbcPlatform{
-        private String uer;
+        private String url;
         private String username;
         private String password;
     }
