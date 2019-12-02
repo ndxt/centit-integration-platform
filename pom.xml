@@ -20,6 +20,7 @@
         <module>centit-ip-adapter-jdbc</module>
         <module>centit-ip-app-boot-config</module>
         <module>centit-ip-app-boot-jdbc-config</module>
+        <module>centit-ip-app-boot-json-config</module>
     </modules>
     <packaging>pom</packaging>
 

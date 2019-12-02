@@ -3,6 +3,7 @@ package com.centit.framework.ip.app.config;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.centit.framework.core.controller.MvcConfigUtil;
 import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
 import com.centit.framework.ip.app.service.impl.IntegrationEnvironmentProxy;
@@ -34,21 +35,7 @@ public class FrameworkBeanConfiguation {
 
     @Bean
     public FastJsonHttpMessageConverter fastJsonHttpMessageConverter(){
-        FastJsonHttpMessageConverter fastJsonHttpMessageConverter =
-                new FastJsonHttpMessageConverter();
-        List<MediaType> supportedMediaTypes = new ArrayList<>();
-        supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-        supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
-
-        fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-
-        FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setFeatures(Feature.AllowArbitraryCommas,Feature.AllowUnQuotedFieldNames,
-                Feature.DisableCircularReferenceDetect);
-        fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
-        return fastJsonHttpMessageConverter;
+        return MvcConfigUtil.fastJsonHttpMessageConverter();
     }
 
     @Bean({"passwordEncoder"})
