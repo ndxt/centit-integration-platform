@@ -2,15 +2,11 @@ package com.centit.framework.ip.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 import com.centit.framework.ip.po.UserAccessToken;
-import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.support.common.CachedObject;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;

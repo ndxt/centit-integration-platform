@@ -1,7 +1,5 @@
 package com.centit.framework.ip.app.config;
 
-import com.alibaba.fastjson.parser.Feature;
-import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.centit.framework.core.controller.MvcConfigUtil;
 import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
@@ -21,7 +19,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
 import java.util.List;

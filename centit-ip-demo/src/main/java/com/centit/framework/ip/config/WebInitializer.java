@@ -3,13 +3,9 @@ package com.centit.framework.ip.config;
 import com.centit.framework.config.SystemSpringMvcConfig;
 import com.centit.framework.config.WebConfig;
 import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration.Dynamic;
 /**
  * Created by zou_wy on 2017/3/29.
  */
