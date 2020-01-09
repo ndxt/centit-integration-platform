@@ -21,6 +21,7 @@
         <module>centit-ip-app-boot-config</module>
         <module>centit-ip-app-boot-jdbc-config</module>
         <module>centit-ip-app-boot-json-config</module>
+        <module>centit-ip-with-app</module>
     </modules>
     <packaging>pom</packaging>
 
