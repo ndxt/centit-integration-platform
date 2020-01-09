@@ -5,18 +5,18 @@ import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.ip.service.IntegrationEnvironment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/ipenvironment")
 public class IPEnvironmentController extends BaseController {
 
-    @Resource
+    @Autowired
     protected IntegrationEnvironment integrationEnvironment;
 
 

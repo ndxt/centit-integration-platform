@@ -16,14 +16,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
-import javax.annotation.Resource;
-
 @PropertySource("classpath:system.properties")
 public class IPAppSystemBeanConfig  implements EnvironmentAware{
 
     private Environment env;
 
-    @Resource
+    @Autowired
     @Override
     public void setEnvironment(final Environment environment) {
         if(environment!=null) {

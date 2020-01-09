@@ -10,10 +10,11 @@ import com.centit.support.database.utils.PageDesc;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,8 @@ public class OsInfoManagerImpl extends BaseEntityManagerImpl<OsInfo,String,OsInf
     private String refreshByNameUrl = "/system/environment/reload/refresh/%s";
 
     @Override
-    @Resource(name = "osInfoDao")
+    @Autowired
+    @Qualifier("osInfoDao")
     public void setBaseDao(OsInfoDao baseDao) {
         super.baseDao = baseDao;
     }

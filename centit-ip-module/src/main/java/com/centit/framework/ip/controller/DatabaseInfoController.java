@@ -18,12 +18,12 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -34,7 +34,7 @@ import java.util.Map;
 @Api(tags= "数据库维护接口",value = "数据库维护接口")
 public class DatabaseInfoController extends BaseController {
 
-    @Resource
+    @Autowired
     private DatabaseInfoManager databaseInfoMag;
 
     private String optId = "DATABASE";

@@ -6,10 +6,10 @@ import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.service.DatabaseInfoManager;
 import com.centit.framework.jdbc.service.BaseEntityManagerImpl;
 import com.centit.support.database.utils.PageDesc;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
     //private static final SysOptLog sysOptLog = SysOptLogFactoryImpl.getSysOptLog();
 
     @Override
-    @Resource(name = "databaseInfoDao")
+    @Autowired
     public void setBaseDao(DatabaseInfoDao baseDao) {
         super.baseDao = baseDao;
     }

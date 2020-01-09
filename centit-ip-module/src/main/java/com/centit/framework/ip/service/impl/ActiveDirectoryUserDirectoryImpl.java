@@ -11,11 +11,12 @@ import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -33,20 +34,20 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 
     private static Logger logger = LoggerFactory.getLogger(ActiveDirectoryUserDirectoryImpl.class);
 
-    @Resource
+    @Autowired
     @NotNull
     private UserUnitDao userUnitDao;
 
-    @Resource
+    @Autowired
     @NotNull
     private UnitInfoDao unitInfoDao;
 
-    @Resource
+    @Autowired
     @NotNull
     private UserRoleDao userRoleDao;
 
-    @Resource(name = "userInfoDao")
-    @NotNull
+    @Autowired
+    @Qualifier("userInfoDao")
     private UserInfoDao userInfoDao;
 
     @Value("${userdirectory.ldap.url:}")

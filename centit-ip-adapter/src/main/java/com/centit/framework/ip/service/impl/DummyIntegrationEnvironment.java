@@ -13,23 +13,18 @@ import java.util.List;
  */
 public class DummyIntegrationEnvironment extends AbstractIntegrationEnvironment {
 
+    private List<OsInfo> osInfos;
+    private List<DatabaseInfo> databaseInfos;
+
     public DummyIntegrationEnvironment(){
         super();
-    }
-
-    @Override
-    public List<OsInfo> reloadOsInfos() {
-        List<OsInfo>  osInfos = new ArrayList<>(2);
+        osInfos = new ArrayList<>(2);
         OsInfo osInfo = new OsInfo();
         osInfo.setOsId("dummy");
         osInfo.setOsName("dummy.app.key");
         osInfos.add(osInfo);
-        return osInfos;
-    }
 
-    @Override
-    public List<DatabaseInfo> reloadDatabaseInfos() {
-        List<DatabaseInfo>  databaseInfos = new ArrayList<>(2);
+        databaseInfos = new ArrayList<>(2);
         DatabaseInfo databaseInfo = new DatabaseInfo();
         databaseInfo.setOsId("dummy");
         databaseInfo.setDatabaseCode("dummy");
@@ -38,6 +33,25 @@ public class DummyIntegrationEnvironment extends AbstractIntegrationEnvironment 
         databaseInfo.setPassword("placeholder");
         databaseInfo.setDatabaseDesc("placeholder");
         databaseInfos.add(databaseInfo);
+    }
+
+    public DummyIntegrationEnvironment(OsInfo osInfo,
+                                       DatabaseInfo databaseInfo){
+        super();
+        osInfos = new ArrayList<>(2);
+        osInfos.add(osInfo);
+
+        databaseInfos = new ArrayList<>(2);
+        databaseInfos.add(databaseInfo);
+    }
+
+    @Override
+    public List<OsInfo> reloadOsInfos() {
+        return osInfos;
+    }
+
+    @Override
+    public List<DatabaseInfo> reloadDatabaseInfos() {
         return databaseInfos;
     }
 
