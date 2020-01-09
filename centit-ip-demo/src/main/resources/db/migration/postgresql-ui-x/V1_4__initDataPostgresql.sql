@@ -1,5 +1,5 @@
 delete from f_optinfo;
-delete from f_optdef
+delete from f_optdef;
 delete from F_ROLEPOWER where role_code='sysadmin';
 
 insert into F_UNITROLE (UNIT_CODE, ROLE_CODE, OBTAIN_DATE, SECEDE_DATE, CHANGE_DESC, UPDATE_DATE, CREATE_DATE, CREATOR, UPDATOR) values ('U00001', 'deploy', '2014-12-12', null, '', null, now(), '', '');
@@ -51,7 +51,7 @@ insert into f_optdef (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_URL, OPT_DESC,
 insert into f_optdef (OPT_CODE, OPT_ID, OPT_NAME, OPT_METHOD, OPT_URL, OPT_DESC, OPT_ORDER, IS_IN_WORKFLOW, UPDATE_DATE, CREATE_DATE, OPT_REQ, CREATOR, UPDATOR) values ('1001211', 'ROLE', '查看', 'search', '/changeme', '查看（系统默认）', null, '', null, null, 'CRUD', '', '');
 
 insert into F_ROLEPOWER(role_code,opt_code,update_Date,create_date,opt_scope_codes,CREATOR,UPDATOR)
-  select 'sysadmin',opt_code,sysdate,sysdate,'',CREATOR,UPDATOR from f_optdef ;
+  select 'sysadmin',opt_code,now(),now(),'',CREATOR,UPDATOR from f_optdef ;
 
 commit;
 
