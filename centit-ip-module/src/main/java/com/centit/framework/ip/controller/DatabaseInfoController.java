@@ -44,6 +44,7 @@ public class DatabaseInfoController extends BaseController {
      * @param pageDesc 分页对象信息
      * @param request HttpServletRequest
      * @param response HttpServletResponse
+     * @return PageQueryResult 分页查询结果
      */
     @ApiOperation(value="所有数据库列表信息",notes="所有数据库列表信息。增加databaseCode")
     @ApiImplicitParam(

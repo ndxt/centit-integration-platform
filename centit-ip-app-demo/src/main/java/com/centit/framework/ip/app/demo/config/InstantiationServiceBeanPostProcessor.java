@@ -2,7 +2,6 @@ package com.centit.framework.ip.app.demo.config;
 
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.OperationLogCenter;
-import com.centit.framework.model.adapter.MessageSender;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -22,9 +21,6 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Autowired
     private OperationLogWriter optLogManager;
 
-    @Autowired(required = false)
-    private MessageSender innerMessageManager;
-
     @Autowired
     private PlatformEnvironment platformEnvironment;
 
@@ -33,10 +29,6 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     {
         CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
 
-        if(innerMessageManager!=null) {
-            notificationCenter.registerMessageSender("innerMsg", innerMessageManager);
-            notificationCenter.appointDefaultSendType("innerMsg");
-        }
         if(optLogManager!=null) {
             OperationLogCenter.registerOperationLogWriter(optLogManager);
         }

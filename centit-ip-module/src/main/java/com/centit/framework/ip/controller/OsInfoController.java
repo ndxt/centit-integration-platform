@@ -82,6 +82,7 @@ public class OsInfoController extends  BaseController {
      * 查询所有的业务系统信息
      * @param pageDesc 分页对象
      * @param request HttpServletRequest
+     * @return PageQueryResult 分页查询结果
      */
     @ApiOperation(value="查询所有的业务系统信息",notes="查询所有的业务系统信息。")
     @RequestMapping(method = RequestMethod.GET)
@@ -189,6 +190,7 @@ public class OsInfoController extends  BaseController {
      * 根据ID删除单个业务系统信息
      * @param osId 业务系统ID
      * @param response HttpServletResponse
+     * @param request HttpServletRequest
      */
     @RequestMapping(value = "/{osId}", method = {RequestMethod.DELETE})
     @ApiOperation(value="根据ID删除单个业务系统信息",notes="根据ID删除单个业务系统信息。")

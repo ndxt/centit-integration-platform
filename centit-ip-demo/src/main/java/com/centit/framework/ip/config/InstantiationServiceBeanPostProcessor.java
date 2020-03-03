@@ -23,9 +23,6 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Autowired(required = false)
     private OperationLogWriter optLogManager;
 
-    @Autowired(required = false)
-    private MessageSender innerMessageManager;
-
     @Autowired
     private PlatformEnvironment platformEnvironment;
 
@@ -43,10 +40,6 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_KEEP_FRESH);
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
 
-        if(innerMessageManager!=null) {
-            notificationCenter.registerMessageSender("innerMsg", innerMessageManager);
-            notificationCenter.appointDefaultSendType("innerMsg");
-        }
         if(optLogManager!=null) {
             OperationLogCenter.registerOperationLogWriter(optLogManager);
         }
