@@ -1,7 +1,5 @@
 package com.centit.framework.ip.service;
 
-
-
 import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.framework.ip.po.OsInfo;
 

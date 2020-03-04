@@ -18,10 +18,6 @@
             <artifactId>centit-ip-module</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
     </dependencies>
 </project>
