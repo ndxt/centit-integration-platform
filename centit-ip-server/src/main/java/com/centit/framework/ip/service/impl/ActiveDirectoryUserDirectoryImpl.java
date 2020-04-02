@@ -274,7 +274,11 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                                 uu.setUnitCode(u.getUnitCode());
                                 uu.setUserCode(userInfo.getUserCode());
                                 uu.setCreateDate(now);
-                                uu.setIsPrimary("F");
+                                if (u.getUnitCode().equals(userInfo.getPrimaryUnit())) {
+                                    uu.setIsPrimary("T");
+                                }else{
+                                    uu.setIsPrimary("F");
+                                }
                                 uu.setUserRank(defaultRank);
                                 uu.setUserStation(defaultStation);
                                 userUnitDao.saveNewObject(uu);
