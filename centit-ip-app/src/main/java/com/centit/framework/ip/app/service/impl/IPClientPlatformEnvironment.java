@@ -9,6 +9,7 @@ import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.JsonCentitUserDetails;
 import com.centit.framework.staticsystem.po.*;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +140,6 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     @Override
     public boolean checkUserPassword(String userCode, String userPassword) {
-
         Map<String,String> userInfo = new HashMap<>();
         userInfo.put("userCode", userCode);
         userInfo.put("password", userPassword);
@@ -147,8 +147,9 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         String sret = RestfulHttpRequest.jsonPost(
             appSession,"/platform/checkpassword/"+userCode,
             userInfo, true);
-        return StringRegularOpt.isTrue(sret);
-
+        HttpReceiveJSON receiveJSON = HttpReceiveJSON.valueOfJson(sret);
+        return receiveJSON!=null &&
+            BooleanBaseOpt.castObjectToBoolean(receiveJSON.getData(), false);
     }
 
     @Override
