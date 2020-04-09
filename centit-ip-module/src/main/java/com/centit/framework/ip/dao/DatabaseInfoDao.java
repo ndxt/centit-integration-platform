@@ -20,19 +20,17 @@ import java.util.Map;
 public class DatabaseInfoDao extends BaseDaoImpl<DatabaseInfo,String> {
 
     public Map<String, String> getFilterField() {
-        if (filterField == null) {
-            filterField = new HashMap<>();
-            filterField.put("databaseName", CodeBook.LIKE_HQL_ID);
-            filterField.put("databaseCode", CodeBook.EQUAL_HQL_ID);
-            filterField.put("databaseType", CodeBook.LIKE_HQL_ID);
-            filterField.put("hostPort", CodeBook.LIKE_HQL_ID);
-            filterField.put("databaseUrl", CodeBook.LIKE_HQL_ID);
-            filterField.put("username", CodeBook.LIKE_HQL_ID);
-            filterField.put("password", CodeBook.LIKE_HQL_ID);
-            filterField.put("dataDesc", CodeBook.LIKE_HQL_ID);
-            filterField.put("createTime", CodeBook.LIKE_HQL_ID);
-            filterField.put("created", CodeBook.LIKE_HQL_ID);
-        }
+        Map<String, String> filterField = new HashMap<>();
+        filterField.put("databaseName", CodeBook.LIKE_HQL_ID);
+        filterField.put("databaseCode", CodeBook.EQUAL_HQL_ID);
+        filterField.put("databaseType", CodeBook.LIKE_HQL_ID);
+        filterField.put("hostPort", CodeBook.LIKE_HQL_ID);
+        filterField.put("databaseUrl", CodeBook.LIKE_HQL_ID);
+        filterField.put("username", CodeBook.LIKE_HQL_ID);
+        filterField.put("password", CodeBook.LIKE_HQL_ID);
+        filterField.put("dataDesc", CodeBook.LIKE_HQL_ID);
+        filterField.put("createTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("created", CodeBook.LIKE_HQL_ID);
         return filterField;
     }
 

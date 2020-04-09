@@ -12,12 +12,10 @@ import java.util.Map;
 public class UserAccessTokenDao extends BaseDaoImpl<UserAccessToken,String> {
 
     public Map<String, String> getFilterField() {
-        if (filterField == null) {
-            filterField = new HashMap<String, String>();
-            filterField.put("tokenId", CodeBook.EQUAL_HQL_ID);
-            filterField.put("userCode", CodeBook.EQUAL_HQL_ID);
-        }
+        Map<String, String> filterField = new HashMap<>();
+        filterField.put("tokenId", CodeBook.EQUAL_HQL_ID);
+        filterField.put("userCode", CodeBook.EQUAL_HQL_ID);
         return filterField;
     }
- 
+
 }

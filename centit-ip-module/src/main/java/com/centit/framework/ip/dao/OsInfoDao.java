@@ -12,25 +12,14 @@ import java.util.Map;
 public class OsInfoDao extends BaseDaoImpl<OsInfo,String> {
 
     public Map<String, String> getFilterField() {
-        if (filterField == null) {
-            filterField = new HashMap<String, String>();
-
-            filterField.put("osId", CodeBook.LIKE_HQL_ID);
-
-
-            filterField.put("osName", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("hasInterface", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("interfaceUrl", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("created", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("lastUpdateTime", CodeBook.LIKE_HQL_ID);
-
-            filterField.put("createTime", CodeBook.LIKE_HQL_ID);
-
-        }
+        Map<String, String> filterField = new HashMap<>();
+        filterField.put("osId", CodeBook.LIKE_HQL_ID);
+        filterField.put("osName", CodeBook.LIKE_HQL_ID);
+        filterField.put("hasInterface", CodeBook.LIKE_HQL_ID);
+        filterField.put("interfaceUrl", CodeBook.LIKE_HQL_ID);
+        filterField.put("created", CodeBook.LIKE_HQL_ID);
+        filterField.put("lastUpdateTime", CodeBook.LIKE_HQL_ID);
+        filterField.put("createTime", CodeBook.LIKE_HQL_ID);
         return filterField;
     }
 }
