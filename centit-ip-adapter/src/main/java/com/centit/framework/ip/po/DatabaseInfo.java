@@ -1,5 +1,6 @@
 package com.centit.framework.ip.po;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.framework.core.dao.DictionaryMap;
 import com.centit.support.database.metadata.IDatabaseInfo;
@@ -27,11 +28,10 @@ import java.util.Date;
 public class DatabaseInfo implements IDatabaseInfo, Serializable {
     private static final long serialVersionUID = 1L;
     public static final String DESKEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
+
     // 数据库名
     @Id
     @Column(name = "DATABASE_CODE")
-//    @GeneratedValue(generator = "assignedGenerator")
-//    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String databaseCode;
 
     @Column(name = "OS_ID")
@@ -75,8 +75,12 @@ public class DatabaseInfo implements IDatabaseInfo, Serializable {
     @Column(name = "CREATE_TIME")
     private Date createTime;
 
-    // Constructors
+    @ApiModelProperty(value = "扩展属性，json格式，clob字段")
+    //@Column(name = "EXT_PROPS")
+    //@Basic(fetch = FetchType.LAZY)
+    private JSONObject extProps;
 
+    // Constructors
     /**
      * default constructor
      */
@@ -89,70 +93,13 @@ public class DatabaseInfo implements IDatabaseInfo, Serializable {
     }
 
     public DatabaseInfo(String databaseCode, String databaseName, String databaseUrl,
-    		String username, String password,
-                        String dataDesc) {
+                 String username, String password, String dataDesc) {
         this.databaseCode = databaseCode;
         this.databaseName = databaseName;
         this.databaseUrl = databaseUrl;
         this.username = username;
         this.password = password;
         this.databaseDesc = dataDesc;
-    }
-
-    /*
-     * 替换子类对象数组，这个函数主要是考虑hibernate中的对象的状态，以避免对象状态不一致的问题
-     */
-
-    public void copy(DatabaseInfo other) {
-        this.databaseCode = other.getDatabaseCode();
-        this.setDatabaseName(other.getDatabaseName());
-        this.databaseUrl = other.getDatabaseUrl();
-        this.username = other.getUsername();
-        this.password = other.getPassword();
-        this.databaseDesc = other.getDatabaseDesc();
-        this.osId = other.getOsId();
-        this.created = other.getCreated();
-        this.createTime = other.getCreateTime();
-        this.lastModifyDate = other.getLastModifyDate();
-
-    }
-
-    public void copyNotNullProperty(DatabaseInfo other) {
-
-        if (other.getDatabaseName() != null)
-            this.setDatabaseName(other.getDatabaseName());
-        if (other.getDatabaseCode() != null)
-            this.databaseCode = other.getDatabaseCode();
-        if (other.getDatabaseUrl() != null)
-            this.databaseUrl = other.getDatabaseUrl();
-        if (other.getUsername() != null)
-            this.username = other.getUsername();
-        if (other.getPassword() != null)
-            this.password = other.getPassword();
-        if (other.getDatabaseDesc() != null)
-            this.databaseDesc = other.getDatabaseDesc();
-        if (other.getOsId() != null)
-            this.osId = other.getOsId();
-        if (other.getCreated() != null)
-            this.created = other.getCreated();
-        if (other.getCreateTime() != null)
-            this.createTime = other.getCreateTime();
-        if (other.getLastModifyDate() != null)
-            this.lastModifyDate = other.getLastModifyDate();
-    }
-
-    public void clearProperties() {
-
-        this.databaseCode = null;
-        this.databaseName = null;
-        this.databaseUrl = null;
-        this.lastModifyDate = null;
-        this.osId = null;
-        this.username = null;
-        this.password = null;
-        this.databaseDesc = null;
-        this.created = null;
-        this.createTime = null;
     }
 
     public void setPassword(String password) {
@@ -170,4 +117,5 @@ public class DatabaseInfo implements IDatabaseInfo, Serializable {
         return AESSecurityUtils.decryptBase64String(
             getPassword().substring(7),DatabaseInfo.DESKEY);
     }
+
 }

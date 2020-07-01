@@ -16,8 +16,6 @@ public class UserAccessToken implements java.io.Serializable {
 
     @Id
     @Column(name = "TOKEN_ID")
-//    @GeneratedValue(generator = "assignedGenerator")
-//    @GenericGenerator(name = "assignedGenerator", strategy = "assigned")
     private String tokenId;
 
     @Column(name = "USER_CODE")
@@ -31,10 +29,7 @@ public class UserAccessToken implements java.io.Serializable {
 
     @Column(name = "CREATE_TIME")
     private Date createTime;
-
-
     // Constructors
-
     /**
      * default constructor
      */
