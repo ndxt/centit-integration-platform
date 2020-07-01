@@ -32,6 +32,7 @@ public class DatabaseInfo implements IDatabaseInfo, Serializable {
     // 数据库名
     @Id
     @Column(name = "DATABASE_CODE")
+    @ValueGenerator(strategy = GeneratorType.UUID22)
     private String databaseCode;
 
     @Column(name = "OS_ID")
