@@ -108,6 +108,7 @@ public class PlatformDataController extends BaseController {
      * 获取用户某个业务相关的所以用户设置
      * @param optID 业务ID
      * @param userCode 用户代码
+     * @return json
      */
     @ApiOperation(value="获取用户某个业务相关的所以用户设置",notes="获取用户某个业务相关的所以用户设置。")
     @ApiImplicitParams({
@@ -130,6 +131,7 @@ public class PlatformDataController extends BaseController {
      * 获取用户设置
      * @param userCode 用户代码
      * @param paramCode 设置编码
+     * @return json
      */
     @ApiOperation(value="获取用户设置",notes="根据用户代码和参数代码获取用户设置。")
     @ApiImplicitParams({
@@ -175,6 +177,7 @@ public class PlatformDataController extends BaseController {
      * @param optid 业务菜单ID
      * @param userCode 用户代码
      * @param asAdmin 是否为管理员
+     * @return json
      */
     @ApiOperation(value="获取用户的业务菜单里的所有操作方法",notes="获取用户的业务菜单里的所有操作方法。")
     @ApiImplicitParams({
@@ -204,6 +207,7 @@ public class PlatformDataController extends BaseController {
      * 校验用户密码
      * @param userCode 用户代码
      * @param jsonData json字符串 里面的key必须有password
+     * @return boolean
      */
     @ApiOperation(value="校验用户密码",notes="校验用户密码。")
     @ApiImplicitParams({
@@ -252,6 +256,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的用户
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的用户",notes="获取所有的用户。")
     @ApiImplicitParam(
@@ -267,6 +272,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的机构
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的机构",notes="获取所有的机构。")
     @ApiImplicitParam(
@@ -282,6 +288,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的用户机构关系
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的用户机构关系",notes="获取所有的用户机构关系。")
     @ApiImplicitParam(
@@ -298,6 +305,7 @@ public class PlatformDataController extends BaseController {
      * 获取用户所以在的机构
      * @param appName 客户端名称
      * @param userCode 用户代码
+     * @return json
      */
     @ApiOperation(value="获取用户所以在的机构",notes="获取用户所以在的机构。")
     @ApiImplicitParams({
@@ -319,6 +327,7 @@ public class PlatformDataController extends BaseController {
      * 获取机构下的所有用户
      * @param appName 客户端名称
      * @param unitCode 机构代码
+     * @return json
      */
     @ApiOperation(value="获取机构下的所有用户",notes="获取机构下的所有用户。")
     @ApiImplicitParams({
@@ -340,6 +349,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的机构
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的机构",notes="获取所有的机构。")
     @ApiImplicitParam(
@@ -355,6 +365,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的用户
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的用户",notes="获取所有的用户。")
     @ApiImplicitParam(
@@ -370,6 +381,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的角色
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的角色",notes="获取所有的角色。")
     @ApiImplicitParam(
@@ -385,6 +397,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取用户下的所有角色
      * @param userCode 用户代码
+     * @return json
      */
     @ApiOperation(value="获取用户下的所有角色",notes="获取用户下的所有角色。")
     @ApiImplicitParam(
@@ -439,6 +452,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取角色下的所有用户
      * @param roleCode 角色代码
+     * @return json
      */
     @ApiOperation(value="获取角色下的所有用户",notes="获取角色下的所有用户。")
     @ApiImplicitParam(
@@ -454,6 +468,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 根据用户获取用户和角色的关联关系
      * @param userCode 用户代码
+     * @return json
      */
     @ApiOperation(value="根据用户获取用户和角色的关联关系",notes="根据用户获取用户和角色的关联关系。")
     @ApiImplicitParam(
@@ -469,6 +484,7 @@ public class PlatformDataController extends BaseController {
    /**
      * 获取机构下的所有角色
      * @param unitCode 机构代码
+    * @return json
      */
     @ApiOperation(value="获取机构下的所有角色",notes="获取机构下的所有角色。")
     @ApiImplicitParam(
@@ -484,6 +500,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取角色下的所有机构
      * @param roleCode 角色代码
+     * @return json
      */
     @ApiOperation(value="获取角色下的所有机构",notes="获取角色下的所有机构。")
     @ApiImplicitParam(
@@ -499,6 +516,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的业务菜单
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的业务菜单",notes="获取所有的业务菜单。")
     @ApiImplicitParam(
@@ -514,6 +532,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有的字典类型
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有的字典类型",notes="获取所有的字典类型。")
     @ApiImplicitParam(
@@ -530,6 +549,7 @@ public class PlatformDataController extends BaseController {
      * 获取字典类型代码下的所有字典明细
      * @param appName 客户端名称
      * @param catalogCode 字典类型代码
+     * @return json
      */
     @ApiOperation(value="获取字典类型代码下的所有字典明细",notes="获取字典类型代码下的所有字典明细。")
     @ApiImplicitParams({
@@ -551,6 +571,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有角色权限
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有角色权限",notes="获取所有角色权限。")
     @ApiImplicitParam(
@@ -566,6 +587,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取所有操作方法
      * @param appName 客户端名称
+     * @return json
      */
     @ApiOperation(value="获取所有操作方法",notes="获取所有操作方法。")
     @ApiImplicitParam(
@@ -594,6 +616,7 @@ public class PlatformDataController extends BaseController {
      * @param appName 客户端名称
      * @param queryParam 查询类型对应的值
      * @param qtype 查询类型:loginName、userCode、regEmail、regCellPhone 不传为:loginName
+     * @return json
      */
     @ApiOperation(value="获取字典类型代码下的所有字典明细",notes="获取字典类型代码下的所有字典明细。")
     @ApiImplicitParams({
@@ -665,6 +688,7 @@ public class PlatformDataController extends BaseController {
     /**
      * 获取认证的用户信息
      * @param tokenId tokenId
+     * @return json
      */
     @ApiOperation(value="获取认证的用户信息",notes="获取认证的用户信息。")
     @ApiImplicitParam(
@@ -679,6 +703,7 @@ public class PlatformDataController extends BaseController {
 
     /**
      * 获取所有的用户认证信息
+     * @return json
      */
     @ApiOperation(value="获取所有的用户认证信息",notes="获取所有的用户认证信息。")
     @RequestMapping(value = "/ipenvironment/allUserToken",
