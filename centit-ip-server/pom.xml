@@ -19,11 +19,11 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-module</artifactId>
-            <version>${centit.framework.version}</version>
-        </dependency>
+            <dependency>
+                <groupId>com.centit.framework</groupId>
+                <artifactId>framework-system-module</artifactId>
+                <version>${centit.framework.version}</version>
+            </dependency>
 
         <!-- test library -->
         <dependency>
