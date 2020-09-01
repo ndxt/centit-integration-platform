@@ -48,14 +48,14 @@ public class ServiceConfig {
         return notificationCenter;
     }
 
-    @Bean
+    /*@Bean
     @Lazy(value = false)
     public OperationLogWriter operationLogWriter() {
-        TextOperationLogWriterImpl  operationLog =  new TextOperationLogWriterImpl();
+        TextOperationLogWriterImpl operationLog =  new TextOperationLogWriterImpl();
         operationLog.init();
         return operationLog;
     }
-
+    */
     @Bean
     public InstantiationServiceBeanPostProcessor instantiationServiceBeanPostProcessor() {
         return new InstantiationServiceBeanPostProcessor();
