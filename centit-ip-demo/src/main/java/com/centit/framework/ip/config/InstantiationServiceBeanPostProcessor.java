@@ -33,12 +33,10 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event){
-
         CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
         CodeRepositoryCache.setEvictCacheExtOpt(osInfoManager);
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_KEEP_FRESH);
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
-
         if(optLogManager!=null) {
             OperationLogCenter.registerOperationLogWriter(optLogManager);
         }
