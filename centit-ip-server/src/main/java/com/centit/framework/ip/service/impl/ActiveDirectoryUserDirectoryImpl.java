@@ -8,6 +8,7 @@ import com.centit.framework.system.dao.UserUnitDao;
 import com.centit.framework.system.po.*;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.UuidOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +147,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
         return getAttributeString(attr.get(attrName));
     }
 
-    @Transactional
+    @Override
+    @Transactional(rollbackFor=Exception.class)
     public int synchroniseUserDirectory() {
         Properties env = new Properties();
         //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
@@ -176,11 +178,10 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 boolean createNew = unitInfo==null;
                 if(createNew){
                     unitInfo = new UnitInfo();
-                    unitInfo.setUnitCode(unitInfoDao.getNextKey());
+//                    unitInfo.setUnitCode(unitInfoDao.getNextKey());
                     unitInfo.setUnitTag(distinguishedName);
                     unitInfo.setIsValid("T");
                     unitInfo.setUnitType("A");
-                    unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
                     unitInfo.setCreateDate(now);
                     //-----------------------------
                   }
@@ -189,9 +190,12 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 unitInfo.setLastModifyDate(now);
                 if(createNew){
                     unitInfoDao.saveNewObject(unitInfo);
+                    unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
+                    unitInfoDao.updateUnit(unitInfo);
                 }else {
                     unitInfoDao.updateUnit(unitInfo);
                 }
+
                 allUnits.put(distinguishedName, unitInfo);
             }
 
@@ -211,7 +215,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 UserInfo userInfo = userInfoDao.getUserByLoginName(loginName);
                 if(userInfo==null) {
                     userInfo = new UserInfo();
-                    userInfo.setUserCode(userInfoDao.getNextKey());
+//                    userInfo.setUserCode(userInfoDao.getNextKey());
                     userInfo.setIsValid("T");
                     userInfo.setLoginName(loginName);
                     userInfo.setCreateDate(now);
@@ -270,7 +274,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                                     userInfo.getUserCode(),u.getUnitCode());
                             if(uus==null || uus.size()==0){
                                 UserUnit uu = new UserUnit();
-                                uu.setUserUnitId(userUnitDao.getNextKey());
+                                uu.setUserUnitId(UuidOpt.getUuidAsString());
                                 uu.setUnitCode(u.getUnitCode());
                                 uu.setUserCode(userInfo.getUserCode());
                                 uu.setCreateDate(now);
