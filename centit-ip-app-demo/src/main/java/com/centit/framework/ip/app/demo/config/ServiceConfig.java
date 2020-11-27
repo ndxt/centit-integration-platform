@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.session.security.SpringSessionBackedSessionRegistry;
         SpringSecurityDaoConfig.class})
 @ComponentScan(basePackages = {"com.centit","com.otherpackage"},
         excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
+@EnableSpringHttpSession
 public class ServiceConfig {
 
     @Value("${app.home:./}")
