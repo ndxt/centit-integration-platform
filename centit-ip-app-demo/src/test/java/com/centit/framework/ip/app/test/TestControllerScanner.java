@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class TestControllerScanner {
     }
 
     //@Test
-    public void testControllerMapping() {
+    public void testControllerMapping() throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException, InvocationTargetException {
         JSONArray optInfoList = RequestMappingUtils.mapControllerInfosByPackage("com.centit" );
         String excelFileName = "D:/Projects/RunData/demo_home/optInfos.xlsx";
         try (OutputStream newExcelFile = new FileOutputStream(new File(excelFileName))) {
@@ -50,7 +51,7 @@ public class TestControllerScanner {
             for(Object object : optInfoList){
                 JSONArray optMethods = (JSONArray)((JSONObject)object).get("optMethods");
                 if(optMethods!=null && optMethods.size()>0){
-                    ExcelExportUtil.appendDataToExcelSheet(excelFileName,"optMethod",optMethods,
+                    ExcelExportUtil.appendDataToExcelSheet(excelFileName,"optMethod", optMethods,
                             new String[]{"业务代码","操作名称","操作Url","操作方法","请求类型"},
                             new String[]{"optId","optName","optUrl","optName","optReq"});
                 }

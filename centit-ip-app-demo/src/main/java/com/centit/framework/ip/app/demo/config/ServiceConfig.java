@@ -9,8 +9,13 @@ import com.centit.framework.ip.app.config.IPAppSystemBeanConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.framework.session.SimpleMapSessionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 /**
  * Created by codefan on 17-7-18.
@@ -66,4 +71,14 @@ public class ServiceConfig {
         return new InstantiationServiceBeanPostProcessor();
     }
 
+    @Bean
+    public FindByIndexNameSessionRepository sessionRepository() {
+        return new SimpleMapSessionRepository();
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry(
+        @Autowired FindByIndexNameSessionRepository sessionRepository){
+        return new SpringSessionBackedSessionRegistry(sessionRepository);
+    }
 }
