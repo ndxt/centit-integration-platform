@@ -13,11 +13,12 @@ import com.centit.framework.model.basedata.OperationLog;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.json.JsonPropertyUtils;
+import com.centit.support.network.HtmlFormUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.text.StringEscapeUtils;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -79,7 +80,7 @@ public class DatabaseInfoController extends BaseController {
     public void saveDatabaseInfo(@Valid DatabaseInfo databaseinfo,
                                  HttpServletRequest request, HttpServletResponse response) {
 
-        databaseinfo.setDatabaseUrl(StringEscapeUtils.unescapeHtml4(databaseinfo.getDatabaseUrl()));
+        databaseinfo.setDatabaseUrl(HtmlFormUtils.htmlString(databaseinfo.getDatabaseUrl()));
         //加密
         databaseinfo.setPassword(databaseinfo.getPassword());
         databaseinfo.setCreated(WebOptUtils.getCurrentUserCode(request));
@@ -140,7 +141,7 @@ public class DatabaseInfoController extends BaseController {
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.PUT})
     public void updateDatabaseInfo(@PathVariable String databaseCode, @Valid DatabaseInfo databaseinfo,
                                    HttpServletRequest request, HttpServletResponse response) {
-        databaseinfo.setDatabaseUrl(StringEscapeUtils.unescapeHtml4(databaseinfo.getDatabaseUrl()));
+        databaseinfo.setDatabaseUrl(HtmlFormUtils.htmlString((databaseinfo.getDatabaseUrl())));
         DatabaseInfo temp = databaseInfoMag.getObjectById(databaseCode);
         if (!databaseinfo.getPassword().equals(temp.getPassword())) {
             databaseinfo.setPassword(databaseinfo.getPassword());

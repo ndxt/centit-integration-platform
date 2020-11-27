@@ -182,9 +182,8 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
-
         </plugins>
-        <resources>
+        <!--<resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
@@ -196,6 +195,6 @@
             <resource>
                 <directory>src/main/resources/${profiles.active}</directory>
             </resource>
-        </resources>
+        </resources>-->
     </build>
 </project>
