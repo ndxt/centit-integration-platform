@@ -17,6 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,7 +32,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/sys/database")
-@Api(tags= "数据库维护接口",value = "数据库维护接口")
+@Api(tags = "数据库维护接口", value = "数据库维护接口")
 public class DatabaseInfoController extends BaseController {
 
     @Autowired
@@ -41,46 +42,44 @@ public class DatabaseInfoController extends BaseController {
 
     /**
      * 数据库维护接口
+     *
      * @param pageDesc 分页对象信息
-     * @param request HttpServletRequest
+     * @param request  HttpServletRequest
      * @param response HttpServletResponse
      * @return PageQueryResult 分页查询结果
      */
-    @ApiOperation(value="所有数据库列表信息",notes="所有数据库列表信息。增加databaseCode")
+    @ApiOperation(value = "所有数据库列表信息", notes = "所有数据库列表信息。增加databaseCode")
     @ApiImplicitParam(
-        name = "pageDesc", value="json格式，分页对象信息",
+        name = "pageDesc", value = "json格式，分页对象信息",
         paramType = "body", dataTypeClass = PageDesc.class)
     @RequestMapping(method = RequestMethod.GET)
     @WrapUpResponseBody
-    public PageQueryResult<Object> list( PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
+    public PageQueryResult<Object> list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = BaseController.collectRequestParameters(request);
 
 //        JSONArray listObjects = databaseInfoMag.queryDatabaseAsJson(
 //                StringBaseOpt.objectToString(searchColumn.get("databaseName")), pageDesc);
         JSONArray listObjects = databaseInfoMag.listObjectsAsJson(searchColumn, pageDesc);
 
-        return PageQueryResult.createJSONArrayResult(listObjects,pageDesc,DatabaseInfo.class);
+        return PageQueryResult.createJSONArrayResult(listObjects, pageDesc, DatabaseInfo.class);
     }
 
     /**
      * 新增数据库信息
+     *
      * @param databaseinfo 数据库对象信息
-     * @param request HttpServletRequest
-     * @param response HttpServletResponse
+     * @param request      HttpServletRequest
+     * @param response     HttpServletResponse
      */
-    @ApiOperation(value="新增数据库信息",notes="新增数据库信息。")
+    @ApiOperation(value = "新增数据库信息", notes = "新增数据库信息。")
     @ApiImplicitParam(
-        name = "databaseinfo", value="json格式，数据库对象信息", required = true,
+        name = "databaseinfo", value = "json格式，数据库对象信息", required = true,
         paramType = "body", dataTypeClass = DatabaseInfo.class)
     @RequestMapping(method = {RequestMethod.POST})
     public void saveDatabaseInfo(@Valid DatabaseInfo databaseinfo,
                                  HttpServletRequest request, HttpServletResponse response) {
 
-        DatabaseInfo temp = databaseInfoMag.getObjectById(databaseInfoMag.getNextKey());
-        if (temp!=null){
-            JsonResultUtils.writeErrorMessageJson("该数据库标识已存在", response);
-            return;
-        }
+        databaseinfo.setDatabaseUrl(StringEscapeUtils.unescapeHtml4(databaseinfo.getDatabaseUrl()));
         //加密
         databaseinfo.setPassword(databaseinfo.getPassword());
         databaseinfo.setCreated(WebOptUtils.getCurrentUserCode(request));
@@ -90,30 +89,31 @@ public class DatabaseInfoController extends BaseController {
 
         /**********************log************************/
         OperationLogCenter.logNewObject(request, optId, databaseinfo.getDatabaseCode(), OperationLog.P_OPT_LOG_METHOD_C,
-                "新增数据库", databaseinfo);
+            "新增数据库", databaseinfo);
         /**********************log************************/
     }
 
     /**
      * 连接测试
+     *
      * @param databaseInfo 数据库信息
-     * @param response 返回
+     * @param response     返回
      */
-    @ApiOperation(value="数据库连接测试",notes="数据库连接测试。")
+    @ApiOperation(value = "数据库连接测试", notes = "数据库连接测试。")
     @ApiImplicitParam(
-        name = "databaseinfo", value="json格式，数据库对象信息", required = true,
+        name = "databaseinfo", value = "json格式，数据库对象信息", required = true,
         paramType = "body", dataTypeClass = DatabaseInfo.class)
     @RequestMapping(value = "/testConnect", method = {RequestMethod.POST})
     public void testConnect(@Valid DatabaseInfo databaseInfo, HttpServletResponse response) {
 
 
         boolean result = DataSourceDescription.testConntect(new DataSourceDescription(
-                databaseInfo.getDatabaseUrl(),
-                databaseInfo.getUsername(),
-                databaseInfo.getClearPassword()));
+            databaseInfo.getDatabaseUrl(),
+            databaseInfo.getUsername(),
+            databaseInfo.getClearPassword()));
 
         if (result) {
-            JsonResultUtils.writeSingleDataJson("连接测试成功",response);
+            JsonResultUtils.writeSingleDataJson("连接测试成功", response);
         } else {
             JsonResultUtils.writeErrorMessageJson("数据库连接测试失败！", response);
         }
@@ -122,25 +122,27 @@ public class DatabaseInfoController extends BaseController {
 
     /**
      * 修改数据库信息
+     *
      * @param databaseCode 数据库代码
      * @param databaseinfo 修改数据库信息
-     * @param request HttpServletRequest
-     * @param response HttpServletResponse
+     * @param request      HttpServletRequest
+     * @param response     HttpServletResponse
      */
-    @ApiOperation(value="修改数据库信息",notes="修改数据库信息。")
+    @ApiOperation(value = "修改数据库信息", notes = "修改数据库信息。")
     @ApiImplicitParams({
         @ApiImplicitParam(
-            name = "databaseCode", value="数据库代码",
-            required = true, paramType = "path", dataType= "String"),
+            name = "databaseCode", value = "数据库代码",
+            required = true, paramType = "path", dataType = "String"),
         @ApiImplicitParam(
-            name = "databaseinfo", value="json格式，数据库对象信息", required = true,
+            name = "databaseinfo", value = "json格式，数据库对象信息", required = true,
             paramType = "body", dataTypeClass = DatabaseInfo.class)
     })
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.PUT})
     public void updateDatabaseInfo(@PathVariable String databaseCode, @Valid DatabaseInfo databaseinfo,
                                    HttpServletRequest request, HttpServletResponse response) {
+        databaseinfo.setDatabaseUrl(StringEscapeUtils.unescapeHtml4(databaseinfo.getDatabaseUrl()));
         DatabaseInfo temp = databaseInfoMag.getObjectById(databaseCode);
-        if (!databaseinfo.getPassword().equals(temp.getPassword())){
+        if (!databaseinfo.getPassword().equals(temp.getPassword())) {
             databaseinfo.setPassword(databaseinfo.getPassword());
         }
 
@@ -152,37 +154,39 @@ public class DatabaseInfoController extends BaseController {
 
         /**********************log****************************/
         OperationLogCenter.logUpdateObject(request, optId, databaseCode, OperationLog.P_OPT_LOG_METHOD_U,
-                "更新数据库信息", databaseinfo, oldValue);
+            "更新数据库信息", databaseinfo, oldValue);
         /**********************log****************************/
     }
 
     /**
      * 获取单个数据库信息
+     *
      * @param databaseCode 数据库代码
-     * @param response HttpServletResponse
+     * @param response     HttpServletResponse
      */
-    @ApiOperation(value="获取单个数据库信息",notes="获取单个数据库信息。")
+    @ApiOperation(value = "获取单个数据库信息", notes = "获取单个数据库信息。")
     @ApiImplicitParam(
-        name = "databaseCode", value="数据库代码",
-        required = true, paramType = "path", dataType= "String")
+        name = "databaseCode", value = "数据库代码",
+        required = true, paramType = "path", dataType = "String")
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.GET})
     public void getDatabaseInhfo(@PathVariable String databaseCode, HttpServletResponse response) {
         DatabaseInfo databaseInfo = databaseInfoMag.getObjectById(databaseCode);
 
         JsonResultUtils.writeSingleDataJson(databaseInfo, response,
-                JsonPropertyUtils.getExcludePropPreFilter(DatabaseInfo.class, "databaseInfo"));
+            JsonPropertyUtils.getExcludePropPreFilter(DatabaseInfo.class, "databaseInfo"));
     }
 
     /**
      * 删除单个数据库信息
+     *
      * @param databaseCode 数据库代码
-     * @param request HttpServletRequest
-     * @param response HttpServletResponse
+     * @param request      HttpServletRequest
+     * @param response     HttpServletResponse
      */
-    @ApiOperation(value="删除单个数据库信息",notes="删除单个数据库信息。")
+    @ApiOperation(value = "删除单个数据库信息", notes = "删除单个数据库信息。")
     @ApiImplicitParam(
-        name = "databaseCode", value="数据库代码",
-        required = true, paramType = "path", dataType= "String")
+        name = "databaseCode", value = "数据库代码",
+        required = true, paramType = "path", dataType = "String")
     @RequestMapping(value = "/{databaseCode}", method = {RequestMethod.DELETE})
     public void deleteDatabase(@PathVariable String databaseCode,
                                HttpServletRequest request, HttpServletResponse response) {
@@ -193,7 +197,7 @@ public class DatabaseInfoController extends BaseController {
 
         /******************************log********************************/
         OperationLogCenter.logDeleteObject(request, optId, databaseCode, OperationLog.P_OPT_LOG_METHOD_D,
-                "删除数据库", databaseInfo);
+            "删除数据库", databaseInfo);
         /******************************log********************************/
     }
 

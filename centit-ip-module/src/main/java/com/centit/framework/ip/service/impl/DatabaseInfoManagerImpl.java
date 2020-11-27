@@ -26,10 +26,12 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
         super.baseDao = baseDao;
     }
 
+    @Override
     public boolean connectionTest(DatabaseInfo databaseInfo) {
         return baseDao.connectionTest(databaseInfo);
     }
 
+    @Override
     public List<DatabaseInfo> listDatabase() {
         List<DatabaseInfo> database = baseDao.listDatabase();
         return database;
@@ -37,8 +39,6 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
 
     @Override
     public void saveNewObject(DatabaseInfo databaseInfo) {
-        if(null==databaseInfo.getDatabaseCode())
-            databaseInfo.setDatabaseCode(baseDao.getNextKey());
         baseDao.saveNewObject(databaseInfo);
     }
 
@@ -47,9 +47,9 @@ public class DatabaseInfoManagerImpl extends BaseEntityManagerImpl<DatabaseInfo,
         return baseDao.getNextKey();
     }
 
+    @Override
     public void mergeObject(DatabaseInfo databaseInfo){
-        if(null==databaseInfo.getDatabaseCode())
-            databaseInfo.setDatabaseCode(getNextKey());
+
         baseDao.mergeObject(databaseInfo);
     }
 
