@@ -156,6 +156,15 @@
                 <profiles.active>prod</profiles.active>
             </properties>
         </profile>
+        <profile>
+			<id>dev</id>
+			<properties>
+				<profiles.active></profiles.active>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+	    </profile>
     </profiles>
     <build>
         <plugins>
@@ -183,7 +192,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <!--<resources>
+        <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
@@ -195,6 +204,6 @@
             <resource>
                 <directory>src/main/resources/${profiles.active}</directory>
             </resource>
-        </resources>-->
+        </resources>
     </build>
 </project>
