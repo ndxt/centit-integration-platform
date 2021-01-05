@@ -1,8 +1,6 @@
 package com.centit.framework.ip.app.config;
 
-import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
-import com.centit.framework.ip.service.IntegrationEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetailsService;
 import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
@@ -57,19 +55,6 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
             env.getProperty("centit.ip.auth.usercode"),
             env.getProperty("centit.ip.auth.password"));
         return ipPlatformEnvironment;
-    }
-
-    @Bean
-    @Lazy(value = false)
-    public IntegrationEnvironment integrationEnvironment() {
-        IPClientIntegrationEnvironment ipIntegrationEnvironment = new IPClientIntegrationEnvironment();
-        ipIntegrationEnvironment.createPlatAppSession(
-            env.getProperty("centit.ip.home"),
-            BooleanBaseOpt.castObjectToBoolean(env.getProperty("centit.ip.auth.enable"),false),
-            env.getProperty("centit.ip.auth.usercode"),
-            env.getProperty("centit.ip.auth.password"));
-        //ipPlatformEnvironment.init();
-        return ipIntegrationEnvironment;
     }
 
     @Bean

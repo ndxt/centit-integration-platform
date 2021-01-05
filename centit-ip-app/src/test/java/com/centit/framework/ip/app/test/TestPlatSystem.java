@@ -1,6 +1,5 @@
 package com.centit.framework.ip.app.test;
 
-import com.centit.framework.ip.po.DatabaseInfo;
 import com.centit.support.security.AESSecurityUtils;
 
 public class TestPlatSystem {
@@ -21,11 +20,11 @@ public class TestPlatSystem {
 
     public static String encodeDatabasePassword(String password) {
 		return AESSecurityUtils.encryptAndBase64(
-				password, DatabaseInfo.DESKEY);
+				password, AESSecurityUtils.AES_DEFAULT_KEY);
     }
 
     public static String decodeDatabasePassword(String password) {
 		return AESSecurityUtils.decryptBase64String(
-				password, DatabaseInfo.DESKEY);
+				password, AESSecurityUtils.AES_DEFAULT_KEY);
     }
 }

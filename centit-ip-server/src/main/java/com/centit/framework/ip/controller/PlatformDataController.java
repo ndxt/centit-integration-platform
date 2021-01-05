@@ -6,21 +6,12 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.framework.ip.po.DatabaseInfo;
-import com.centit.framework.ip.po.OsInfo;
-import com.centit.framework.ip.po.UserAccessToken;
-import com.centit.framework.ip.service.DatabaseInfoManager;
-import com.centit.framework.ip.service.OsInfoManager;
-import com.centit.framework.ip.service.UserAccessTokenManager;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.*;
-import com.centit.framework.system.service.OptInfoManager;
-import com.centit.framework.system.service.SysRoleManager;
-import com.centit.framework.system.service.SysUserManager;
-import com.centit.framework.system.service.UserSettingManager;
+import com.centit.framework.system.service.*;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
@@ -69,12 +60,6 @@ public class PlatformDataController extends BaseController {
 
     @Autowired
     protected OptInfoManager optInfoManager;
-
-    @Autowired
-    protected DatabaseInfoManager oatabaseInfoManager;
-
-    @Autowired
-    protected UserAccessTokenManager userAccessTokenManager;
 
     @RequestMapping
     @WrapUpResponseBody
@@ -669,13 +654,6 @@ public class PlatformDataController extends BaseController {
         return resData;
     }
 
-    @ApiOperation(value="所有的数据源信息",notes="获取所有的数据源信息。")
-    @RequestMapping(value = "/ipenvironment/databaseinfo",
-            method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public List<DatabaseInfo> listAllDatabase() {
-        return oatabaseInfoManager.listDatabase();
-    }
 
     @ApiOperation(value="所有的业务系统信息",notes="获取所有的业务系统信息。")
     @RequestMapping(value = "/ipenvironment/osinfo",
@@ -685,33 +663,6 @@ public class PlatformDataController extends BaseController {
         return osInfoManager.listObjects();
     }
 
-    /**
-     * 获取认证的用户信息
-     * @param tokenId tokenId
-     * @return json
-     */
-    @ApiOperation(value="获取认证的用户信息",notes="获取认证的用户信息。")
-    @ApiImplicitParam(
-        name = "tokenId", value="tokenId",
-        required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/ipenvironment/userToken/{tokenId}",
-            method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public UserAccessToken getUserToken(@PathVariable String tokenId) {
-        return userAccessTokenManager.getObjectById(tokenId);
-    }
-
-    /**
-     * 获取所有的用户认证信息
-     * @return json
-     */
-    @ApiOperation(value="获取所有的用户认证信息",notes="获取所有的用户认证信息。")
-    @RequestMapping(value = "/ipenvironment/allUserToken",
-        method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public List<UserAccessToken> listAllUserToken() {
-        return userAccessTokenManager.listObjects();
-    }
 
     /**
      * 新增菜单和操作

@@ -2,12 +2,8 @@ package com.centit.framework.ip.app.config;
 
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.centit.framework.core.controller.MvcConfigUtil;
-import com.centit.framework.ip.app.service.impl.IPClientIntegrationEnvironment;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
-import com.centit.framework.ip.app.service.impl.IntegrationEnvironmentProxy;
 import com.centit.framework.ip.app.service.impl.PlatformEnvironmentProxy;
-import com.centit.framework.ip.service.IntegrationEnvironment;
-import com.centit.framework.ip.service.impl.JsonIntegrationEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.security.model.CentitUserDetailsService;
@@ -70,39 +66,6 @@ public class FrameworkBeanConfiguation {
         platformEnvironment.setEvrnMangers(evrnMangers);
 
         return platformEnvironment;
-    }
-
-    @Bean
-    @Lazy(value = false)
-    public IntegrationEnvironment integrationEnvironment() {
-
-        boolean ipEnable = frameworkProperties.getIp().isEnable();
-
-        JsonIntegrationEnvironment staticIntegrationEnvironment = new JsonIntegrationEnvironment();
-        staticIntegrationEnvironment.setAppHome(frameworkProperties.getApp().getHome());
-
-        staticIntegrationEnvironment.reloadIPEnvironmen();
-        if(!ipEnable) {
-            return staticIntegrationEnvironment;
-        }
-
-
-        IPClientIntegrationEnvironment ipIntegrationEnvironment = new IPClientIntegrationEnvironment();
-        ipIntegrationEnvironment.createPlatAppSession(
-                frameworkProperties.getIp().getHome(),
-                frameworkProperties.getIp().isAuthEnable(),
-                frameworkProperties.getIp().getUsercode(),
-                frameworkProperties.getIp().getPassword());
-        //ipPlatformEnvironment.init();
-
-        List<IntegrationEnvironment> evrnMangers = new ArrayList<>();
-        evrnMangers.add(ipIntegrationEnvironment);
-        evrnMangers.add(staticIntegrationEnvironment);
-
-        IntegrationEnvironmentProxy integrationEnvironment = new IntegrationEnvironmentProxy();
-        integrationEnvironment.setEvrnMangers(evrnMangers);
-
-        return integrationEnvironment;
     }
 
     @Bean

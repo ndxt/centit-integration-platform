@@ -317,4 +317,12 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         param.put("optMethods", optMethods);
         RestfulHttpRequest.jsonPost(appSession,"/platform/insertopt", param);
     }
+
+    @Override
+    public List<? extends IOsInfo> listOsInfos() {
+        return  RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/platform/ipenvironment/osinfo",
+            OsInfo.class);
+    }
 }

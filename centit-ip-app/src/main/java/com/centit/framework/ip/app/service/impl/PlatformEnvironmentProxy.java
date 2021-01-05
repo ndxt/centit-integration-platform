@@ -62,6 +62,16 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         }
     }
 
+    @Override
+    public List<? extends IOsInfo> listOsInfos() {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IOsInfo> osInfos = evrnManger.listOsInfos();
+            if(osInfos!=null)
+                return osInfos;
+        }
+        return null;
+    }
+
     /**
      * 获取用户所有菜单功能
      *

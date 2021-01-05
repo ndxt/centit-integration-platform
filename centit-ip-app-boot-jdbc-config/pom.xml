@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-integration-platform</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>2.1-SNAPSHOT</version>
+        <version>5.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-ip-app-boot-jdbc-config</artifactId>
@@ -34,12 +34,6 @@
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-static-jdbc</artifactId>
             <version>${centit.framework.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-adapter-jdbc</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
