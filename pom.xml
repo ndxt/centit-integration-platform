@@ -17,6 +17,7 @@
         <module>centit-ip-app-config</module>
         <module>centit-ip-app-boot-config</module>
         <module>centit-ip-server</module>
+        <module>centit-ip-users</module>
     </modules>
     <packaging>pom</packaging>
 
