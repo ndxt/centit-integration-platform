@@ -55,36 +55,19 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         }
     }
 
-    @Override
+    /*@Override
     public void insertOrUpdateMenu(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             evrnManger.insertOrUpdateMenu(optInfos, optMethods);
         }
     }
-
+*/
     @Override
-    public List<? extends IOsInfo> listOsInfos() {
+    public List<? extends IOsInfo> listOsInfos(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IOsInfo> osInfos = evrnManger.listOsInfos();
+            List<? extends IOsInfo> osInfos = evrnManger.listOsInfos(topUnit);
             if(osInfos!=null)
                 return osInfos;
-        }
-        return null;
-    }
-
-    /**
-     * 获取用户所有菜单功能
-     *
-     * @param userCode userCode
-     * @param asAdmin  是否是作为管理员
-     * @return 用户所有菜单功能
-     */
-    @Override
-    public List<? extends IOptInfo> listUserMenuOptInfos(String userCode, boolean asAdmin) {
-        for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IOptInfo> value = evrnManger.listUserMenuOptInfos(userCode,asAdmin);
-            if(value!=null)
-                return value;
         }
         return null;
     }
@@ -110,10 +93,10 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     @Override
-    public List<? extends IUserRole> listUserRoles(String userCode) {
+    public List<? extends IUserRole> listUserRoles(String topUnit, String userCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserRole> value =
-                    evrnManger.listUserRoles(userCode);
+                    evrnManger.listUserRoles(topUnit, userCode);
             if(value!=null)
                 return value;
         }
@@ -121,10 +104,10 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     }
 
     @Override
-    public List<? extends IUserRole> listRoleUsers(String roleCode) {
+    public List<? extends IUserRole> listRoleUsers(String topUnit, String roleCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserRole> value =
-                    evrnManger.listRoleUsers(roleCode);
+                    evrnManger.listRoleUsers(topUnit, roleCode);
             if(value!=null)
                 return value;
         }
@@ -188,9 +171,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return 所有用户，
      */
     @Override
-    public List<? extends IUserInfo> listAllUsers() {
+    public List<? extends IUserInfo> listAllUsers(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IUserInfo> value = evrnManger.listAllUsers();
+            List<? extends IUserInfo> value = evrnManger.listAllUsers(topUnit);
             if(value!=null)
                 return value;
         }
@@ -203,9 +186,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return 所有机构
      */
     @Override
-    public List<? extends IUnitInfo> listAllUnits() {
+    public List<? extends IUnitInfo> listAllUnits(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IUnitInfo> value = evrnManger.listAllUnits();
+            List<? extends IUnitInfo> value = evrnManger.listAllUnits(topUnit);
             if(value!=null)
                 return value;
         }
@@ -218,9 +201,25 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return 所有用户和机构关联关系
      */
     @Override
-    public List<? extends IUserUnit> listAllUserUnits() {
+    public List<? extends IUserUnit> listAllUserUnits(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IUserUnit> value = evrnManger.listAllUserUnits();
+            List<? extends IUserUnit> value = evrnManger.listAllUserUnits(topUnit);
+            if(value!=null)
+                return value;
+        }
+        return null;
+    }
+
+    /**
+     * 根据用户代码获得 用户的所有租户，顶级机构
+     *
+     * @param userCode userCode
+     * @return List 用户所有的机构信息
+     */
+    @Override
+    public List<? extends IUnitInfo> listUserTopUnits(String userCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IUnitInfo> value = evrnManger.listUserTopUnits(userCode);
             if(value!=null)
                 return value;
         }
@@ -234,9 +233,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return 用户所有的机构信息
      */
     @Override
-    public List<? extends IUserUnit> listUserUnits(String userCode) {
+    public List<? extends IUserUnit> listUserUnits(String topUnit, String userCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IUserUnit> value = evrnManger.listUserUnits(userCode);
+            List<? extends IUserUnit> value = evrnManger.listUserUnits(topUnit, userCode);
             if(value!=null)
                 return value;
         }
@@ -265,9 +264,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return List 操作方法信息
      */
     @Override
-    public List<? extends IRoleInfo> listAllRoleInfo() {
+    public List<? extends IRoleInfo> listAllRoleInfo(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IRoleInfo> value = evrnManger.listAllRoleInfo();
+            List<? extends IRoleInfo> value = evrnManger.listAllRoleInfo(topUnit);
             if(value!=null)
                 return value;
         }
@@ -280,9 +279,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return List 操作方法信息
      */
     @Override
-    public List<? extends IRolePower> listAllRolePower() {
+    public List<? extends IRolePower> listAllRolePower(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IRolePower> value = evrnManger.listAllRolePower();
+            List<? extends IRolePower> value = evrnManger.listAllRolePower(topUnit);
             if(value!=null)
                 return value;
         }
@@ -295,9 +294,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return List 业务信息
      */
     @Override
-    public List<? extends IOptInfo> listAllOptInfo() {
+    public List<? extends IOptInfo> listAllOptInfo(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IOptInfo> value = evrnManger.listAllOptInfo();
+            List<? extends IOptInfo> value = evrnManger.listAllOptInfo(topUnit);
             if(value!=null)
                 return value;
         }
@@ -310,9 +309,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return List 操作方法信息
      */
     @Override
-    public List<? extends IOptMethod> listAllOptMethod() {
+    public List<? extends IOptMethod> listAllOptMethod(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IOptMethod> value = evrnManger.listAllOptMethod();
+            List<? extends IOptMethod> value = evrnManger.listAllOptMethod(topUnit);
             if(value!=null)
                 return value;
         }
@@ -323,9 +322,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return 所有的数据范围定义表达式
      */
     @Override
-    public List<? extends IOptDataScope> listAllOptDataScope() {
+    public List<? extends IOptDataScope> listAllOptDataScope(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IOptDataScope> value = evrnManger.listAllOptDataScope();
+            List<? extends IOptDataScope> value = evrnManger.listAllOptDataScope(topUnit);
             if(value!=null)
                 return value;
         }
@@ -338,9 +337,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
      * @return 所有数据字典类别信息
      */
     @Override
-    public List<? extends IDataCatalog> listAllDataCatalogs() {
+    public List<? extends IDataCatalog> listAllDataCatalogs(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            List<? extends IDataCatalog> value = evrnManger.listAllDataCatalogs();
+            List<? extends IDataCatalog> value = evrnManger.listAllDataCatalogs(topUnit);
             if(value!=null)
                 return value;
         }
