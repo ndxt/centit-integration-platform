@@ -181,11 +181,7 @@ public class PlatformDataController extends BaseController {
     @WrapUpResponseBody
     public List<? extends IOptInfo> listUserMenuOptInfos(@PathVariable String optid,
                                      @PathVariable String userCode, boolean asAdmin) {
-        if(StringUtils.isBlank(optid) || "null".equals(optid)){
-            return platformEnvironment.listUserMenuOptInfos(userCode ,asAdmin);
-        }else {
-            return platformEnvironment.listUserMenuOptInfosUnderSuperOptId(userCode, optid, asAdmin);
-        }
+        return platformEnvironment.listUserMenuOptInfosUnderSuperOptId(userCode, optid, asAdmin);
     }
 
     /**
@@ -240,72 +236,88 @@ public class PlatformDataController extends BaseController {
 
     /**
      * 获取所有的用户
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的用户",notes="获取所有的用户。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/allusers/{appName}",
+    @RequestMapping(value = "/allusers/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserInfo> listAllUsers(@PathVariable String appName) {
-        return platformEnvironment.listAllUsers();
+    public List<? extends IUserInfo> listAllUsers(@PathVariable String topUnit) {
+        return platformEnvironment.listAllUsers(topUnit);
     }
 
     /**
      * 获取所有的机构
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的机构",notes="获取所有的机构。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/allunits/{appName}",
+    @RequestMapping(value = "/allunits/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUnitInfo> listAllUnits(@PathVariable String appName) {
-        return platformEnvironment.listAllUnits();
+    public List<? extends IUnitInfo> listAllUnits(@PathVariable String topUnit) {
+        return platformEnvironment.listAllUnits(topUnit);
     }
 
     /**
      * 获取所有的用户机构关系
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的用户机构关系",notes="获取所有的用户机构关系。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/alluserunits/{appName}",
+    @RequestMapping(value = "/alluserunits/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserUnit> listAllUserUnits(@PathVariable String appName) {
-        return platformEnvironment.listAllUserUnits();
+    public List<? extends IUserUnit> listAllUserUnits(@PathVariable String topUnit) {
+        return platformEnvironment.listAllUserUnits(topUnit);
+    }
+
+    /**
+     * 获取用户所有的租户
+     * @param userCode 用户代码
+     * @return json
+     */
+    @ApiOperation(value="获取用户所有的租户",notes="获取用户所有的租户。")
+    @ApiImplicitParam(
+        name = "userCode", value="用户代码",
+        required = true, paramType = "path", dataType= "String")
+    @RequestMapping(value = "/usertopunits/{userCode}",
+        method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public List<? extends IUnitInfo> listUserTopUnits(@PathVariable String userCode) {
+        return platformEnvironment.listUserTopUnits(userCode);
     }
 
     /**
      * 获取用户所以在的机构
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @param userCode 用户代码
      * @return json
      */
     @ApiOperation(value="获取用户所以在的机构",notes="获取用户所以在的机构。")
     @ApiImplicitParams({
         @ApiImplicitParam(
-            name = "appName", value="客户端名称（暂时未用到可随意传值）",
+            name = "topUnit", value="租户代码",
             required = true, paramType = "path", dataType= "String"),
         @ApiImplicitParam(
             name = "userCode", value="用户代码",
             required = true, paramType = "path", dataType= "String")
     })
-    @RequestMapping(value = "/userunits/{appName}/{userCode}",
+    @RequestMapping(value = "/userunits/{topUnit}/{userCode}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserUnit> listUserUnits(@PathVariable String appName, @PathVariable String userCode){
-        return platformEnvironment.listUserUnits(userCode);
+    public List<? extends IUserUnit> listUserUnits(@PathVariable String topUnit, @PathVariable String userCode){
+        return platformEnvironment.listUserUnits(topUnit, userCode);
     }
 
     /**
@@ -333,54 +345,55 @@ public class PlatformDataController extends BaseController {
 
     /**
      * 获取所有的机构
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的机构",notes="获取所有的机构。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/unitrepo/{appName}",
+    @RequestMapping(value = "/unitrepo/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUnitInfo> getUnitRepo(@PathVariable String appName) {
-        return platformEnvironment.listAllUnits();
+    public List<? extends IUnitInfo> getUnitRepo(@PathVariable String topUnit) {
+        return platformEnvironment.listAllUnits(topUnit);
     }
 
     /**
      * 获取所有的用户
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的用户",notes="获取所有的用户。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/userrepo/{appName}",
+    @RequestMapping(value = "/userrepo/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserInfo> getUserRepo(@PathVariable String appName) {
-        return platformEnvironment.listAllUsers();
+    public List<? extends IUserInfo> getUserRepo(@PathVariable String topUnit) {
+        return platformEnvironment.listAllUsers(topUnit);
     }
 
     /**
      * 获取所有的角色
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的角色",notes="获取所有的角色。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/rolerepo/{appName}",
+    @RequestMapping(value = "/rolerepo/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IRoleInfo> getRoleRepo(@PathVariable String appName) {
-        return platformEnvironment.listAllRoleInfo();
+    public List<? extends IRoleInfo> getRoleRepo(@PathVariable String topUnit) {
+        return platformEnvironment.listAllRoleInfo(topUnit);
     }
 
     /**
      * 获取用户下的所有角色
+     * @param topUnit 租户代码
      * @param userCode 用户代码
      * @return json
      */
@@ -388,11 +401,11 @@ public class PlatformDataController extends BaseController {
     @ApiImplicitParam(
         name = "userCode", value="用户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/userroles/{userCode}",
+    @RequestMapping(value = "/userroles/{topUnit}/{userCode}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserRole> listUserRoles(@PathVariable String userCode) {
-        return platformEnvironment.listUserRoles(userCode);
+    public List<? extends IUserRole> listUserRoles(@PathVariable String topUnit, @PathVariable String userCode) {
+        return platformEnvironment.listUserRoles(topUnit, userCode);
     }
 
     /**
@@ -405,21 +418,25 @@ public class PlatformDataController extends BaseController {
     @ApiOperation(value="获取用户下的所有角色",notes="获取用户下的所有角色。")
     @ApiImplicitParams({
         @ApiImplicitParam(
+            name = "topUnit", value="租户代码",
+            required = true, paramType = "path", dataType= "String"),
+        @ApiImplicitParam(
             name = "userCode", value="用户代码",
             required = true, paramType = "path", dataType= "String"),
         @ApiImplicitParam(
             name = "accessUrl", value="用户访问Url",
             required = true, paramType = "query", dataType= "String")}
     )
-    @RequestMapping(value = "/checkuserpower/{userCode}",
+    @RequestMapping(value = "/checkuserpower/{topUnit}/{userCode}",
         method = RequestMethod.GET)
     @WrapUpResponseBody
-    public boolean checkUserAccessPower(@PathVariable String userCode,
+    public boolean checkUserAccessPower(@PathVariable String topUnit, @PathVariable String userCode,
                               String accessUrl,
                               HttpServletRequest request) {
-        List<? extends IUserRole> userRoles = platformEnvironment.listUserRoles(userCode);
-        Collection<ConfigAttribute> needRoles =
-            CentitSecurityMetadata.matchUrlToRole(accessUrl, request);
+        List<? extends IUserRole> userRoles = platformEnvironment.listUserRoles(topUnit, userCode);
+        Collection<ConfigAttribute> needRoles = null;
+            //CentitSecurityMetadata.matchUrlToRole(accessUrl, request);
+            //TODO 待处理
         if(userRoles==null || needRoles==null){
             return false;
         }
@@ -436,6 +453,7 @@ public class PlatformDataController extends BaseController {
     }
     /**
      * 获取角色下的所有用户
+     * @param topUnit 租户代码
      * @param roleCode 角色代码
      * @return json
      */
@@ -443,15 +461,16 @@ public class PlatformDataController extends BaseController {
     @ApiImplicitParam(
         name = "roleCode", value="角色代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/roleusers/{roleCode}",
+    @RequestMapping(value = "/roleusers/{topUnit}/{roleCode}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserRole> listRoleUsers(@PathVariable String roleCode) {
-        return platformEnvironment.listRoleUsers(roleCode);
+    public List<? extends IUserRole> listRoleUsers(@PathVariable String topUnit, @PathVariable String roleCode) {
+        return platformEnvironment.listRoleUsers(topUnit, roleCode);
     }
 
     /**
      * 根据用户获取用户和角色的关联关系
+     * @param topUnit 租户代码
      * @param userCode 用户代码
      * @return json
      */
@@ -459,11 +478,11 @@ public class PlatformDataController extends BaseController {
     @ApiImplicitParam(
         name = "userCode", value="用户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/userroleinfos/{userCode}",
+    @RequestMapping(value = "/userroleinfos/{topUnit}/{userCode}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserRole> listUserRoleInfos(@PathVariable String userCode) {
-        return platformEnvironment.listUserRoles(userCode);
+    public List<? extends IUserRole> listUserRoleInfos(@PathVariable String topUnit, @PathVariable String userCode) {
+        return platformEnvironment.listUserRoles(topUnit, userCode);
     }
 
    /**
@@ -500,34 +519,34 @@ public class PlatformDataController extends BaseController {
 
     /**
      * 获取所有的业务菜单
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的业务菜单",notes="获取所有的业务菜单。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/optinforepo/{appName}",
+    @RequestMapping(value = "/optinforepo/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IOptInfo> getOptInfoRepo(@PathVariable String appName) {
-        return platformEnvironment.listAllOptInfo();
+    public List<? extends IOptInfo> getOptInfoRepo(@PathVariable String topUnit) {
+        return platformEnvironment.listAllOptInfo(topUnit);
     }
 
     /**
      * 获取所有的字典类型
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有的字典类型",notes="获取所有的字典类型。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/catalogs/{appName}",
+    @RequestMapping(value = "/catalogs/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IDataCatalog> listAllDataCatalogs(@PathVariable String appName) {
-        return platformEnvironment.listAllDataCatalogs();
+    public List<? extends IDataCatalog> listAllDataCatalogs(@PathVariable String topUnit) {
+        return platformEnvironment.listAllDataCatalogs(topUnit);
     }
 
     /**
@@ -555,47 +574,48 @@ public class PlatformDataController extends BaseController {
 
     /**
      * 获取所有角色权限
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有角色权限",notes="获取所有角色权限。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/allrolepowers/{appName}",
+    @RequestMapping(value = "/allrolepowers/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<RolePower> listAllRolePower(@PathVariable String appName) {
-        return sysRoleManager.listAllRolePowers();
+    public List<? extends IRolePower> listAllRolePower(@PathVariable String topUnit) {
+        return platformEnvironment.listAllRolePower(topUnit);
     }
 
     /**
      * 获取所有操作方法
-     * @param appName 客户端名称
+     * @param topUnit 租户代码
      * @return json
      */
     @ApiOperation(value="获取所有操作方法",notes="获取所有操作方法。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/alloptmethods/{appName}",
+    @RequestMapping(value = "/alloptmethods/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<OptMethod> listAllOptMethod(@PathVariable String appName) {
-        return sysRoleManager.listAllOptMethods();
+    public List<? extends IOptMethod> listAllOptMethod(@PathVariable String topUnit) {
+        return platformEnvironment.listAllOptMethod(topUnit);
     }
 
 
     @ApiOperation(value="获取所有操作数据范围设定",notes="获取所有操作数据范围设定。")
     @ApiImplicitParam(
-        name = "appName", value="客户端名称（暂时未用到可随意传值）",
+        name = "topUnit", value="租户代码",
         required = true, paramType = "path", dataType= "String")
-    @RequestMapping(value = "/alloptdatascopes/{appName}",
+    @RequestMapping(value = "/alloptdatascopes/{topUnit}",
         method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<OptDataScope> listAllOptDataScopes(@PathVariable String appName) {
-        return optInfoManager.listAllDataScope();
+    public List<? extends IOptDataScope> listAllOptDataScopes(@PathVariable String topUnit) {
+        return platformEnvironment.listAllOptDataScope(topUnit);
     }
+
     /**
      * 获取字典类型代码下的所有字典明细
      * @param appName 客户端名称
@@ -656,11 +676,11 @@ public class PlatformDataController extends BaseController {
 
 
     @ApiOperation(value="所有的业务系统信息",notes="获取所有的业务系统信息。")
-    @RequestMapping(value = "/ipenvironment/osinfo",
+    @RequestMapping(value = "/ipenvironment/osinfo/{topUnit}",
             method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<OsInfo> listAllOS() {
-        return osInfoManager.listObjects();
+    public List<? extends IOsInfo> listAllOS(@PathVariable String topUnit) {
+        return platformEnvironment.listOsInfos(topUnit);
     }
 
 
@@ -668,7 +688,7 @@ public class PlatformDataController extends BaseController {
      * 新增菜单和操作
      * @param request HttpServletRequest
      * @throws IOException 异常
-     */
+     *//*
     @ApiOperation(value="新增菜单和操作",notes="新增菜单和操作。")
     @RequestMapping(value = "/insertopt", method = RequestMethod.POST)
     @WrapUpResponseBody
@@ -677,5 +697,5 @@ public class PlatformDataController extends BaseController {
         List<OptInfo> optInfos = JSON.parseArray(param.get("optInfos").toString(),OptInfo.class);
         List<OptMethod> optMethods = JSON.parseArray(param.get("optMethods").toString(),OptMethod.class);
         platformEnvironment.insertOrUpdateMenu(optInfos, optMethods);
-    }
+    }*/
 }
