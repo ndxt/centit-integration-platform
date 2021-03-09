@@ -410,9 +410,11 @@ public class PlatformDataController extends BaseController {
 
     /**
      * 验证用户权限
-     * @param userCode 用户代码
+     *
+     * @param topUnit   租户代码
+     * @param userCode  用户代码
      * @param accessUrl 用户访问url
-     * @param request HttpServletRequest
+     * @param request   HttpServletRequest
      * @return 用户是否有权限访问这个url
      */
     @ApiOperation(value="获取用户下的所有角色",notes="获取用户下的所有角色。")

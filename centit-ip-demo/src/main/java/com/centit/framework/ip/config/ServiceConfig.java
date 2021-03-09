@@ -6,8 +6,12 @@ import com.centit.framework.config.SpringSecurityCasConfig;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
+import com.centit.framework.system.service.impl.DBPlatformEnvironment;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 
 /**
@@ -21,6 +25,9 @@ import org.springframework.context.annotation.*;
         SpringSecurityDaoConfig.class,
         JdbcConfig.class})
 public class ServiceConfig {
+
+    @Value("${app.support.tenant:false}")
+    protected String supportTenant;
 
     @Bean
     @Lazy(value = false)
@@ -66,4 +73,11 @@ public class ServiceConfig {
         return new InstantiationServiceBeanPostProcessor();
     }
 
+    @Bean
+    public PlatformEnvironment platformEnvironment(){
+        boolean tenant = BooleanBaseOpt.castObjectToBoolean(supportTenant, false);
+        DBPlatformEnvironment platformEnvironment = new DBPlatformEnvironment();
+        platformEnvironment.setSupportTenant(tenant);
+        return platformEnvironment;
+    }
 }

@@ -315,8 +315,8 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     /**
      * 新增菜单和操作
      *
-     * @param optInfos   菜单对象集合
-     * @param optMethods 操作对象集合
+     * param optInfos   菜单对象集合
+     * param optMethods 操作对象集合
      *//*
     @Override
     public void insertOrUpdateMenu(List<? extends IOptInfo> optInfos, List<? extends IOptMethod> optMethods) {
@@ -325,6 +325,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         param.put("optMethods", optMethods);
         RestfulHttpRequest.jsonPost(appSession, "/platform/insertopt", param);
     }*/
+
     @Override
     public List<? extends IOsInfo> listOsInfos(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
