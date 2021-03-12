@@ -147,6 +147,12 @@
             </properties>
         </profile>
         <profile>
+            <id>demo</id>
+            <properties>
+                <profiles.active>demo</profiles.active>
+            </properties>
+        </profile>
+        <profile>
 			<id>dev</id>
 			<properties>
 				<profiles.active></profiles.active>
@@ -189,6 +195,7 @@
                     <exclude>test/*</exclude>
                     <exclude>prod/*</exclude>
                     <exclude>system.properties</exclude>
+                    <exclude>demo/*</exclude>
                 </excludes>
             </resource>
             <resource>
