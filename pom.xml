@@ -6,7 +6,7 @@
     <parent>
         <artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>1.3.2101</version>
+        <version>5.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.framework</groupId>
@@ -26,6 +26,7 @@
         <centit.framework.version>5.1-SNAPSHOT</centit.framework.version>
         <centit.persistence.version>5.1-SNAPSHOT</centit.persistence.version>
         <centit.commons.version>2.3-SNAPSHOT</centit.commons.version>
+        <jdk.version>1.8</jdk.version>
     </properties>
 
     <name>com.centit.framework:centit-integration-platform</name>
