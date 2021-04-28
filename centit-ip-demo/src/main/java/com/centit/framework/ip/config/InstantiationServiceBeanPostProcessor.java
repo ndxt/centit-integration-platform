@@ -35,7 +35,7 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     public void onApplicationEvent(ContextRefreshedEvent event){
         CodeRepositoryCache.setPlatformEnvironment(platformEnvironment);
         CodeRepositoryCache.setEvictCacheExtOpt(osInfoManager);
-        CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_KEEP_FRESH);
+        CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
         if(optLogManager!=null) {
             OperationLogCenter.registerOperationLogWriter(optLogManager);
