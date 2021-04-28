@@ -693,7 +693,7 @@ public class PlatformDataController extends BaseController {
         resData.addResponseData("userDetails", userDetails);
         //resData.addResponseData("userRoles", userDetails.getUserRoles());
         //resData.addResponseData("userSettings", userDetails.getUserSettings());
-        resData.addResponseData("userUnits", userDetails.getUserUnits());
+        //resData.addResponseData("userUnits", userDetails.getUserUnits());
         return resData;
     }
 

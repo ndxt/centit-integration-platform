@@ -279,8 +279,8 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         JsonCentitUserDetails userDetails =
             resJson.getDataAsObject("userDetails", JsonCentitUserDetails.class);
         //userDetails.getUserInfo().put("userPin", resJson.getDataAsString("userPin"));
-        userDetails.setUserUnits(
-            (JSONArray) resJson.getData("userUnits"));//, UserUnit.class));
+        //userDetails.setUserUnits(
+            //(JSONArray) resJson.getData("userUnits"));//, UserUnit.class));
         userDetails.setAuthoritiesByRoles(userDetails.getUserRoles());
         return userDetails;
     }
