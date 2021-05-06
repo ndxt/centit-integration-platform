@@ -11,8 +11,12 @@ import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.TopUnitSecurityMetadata;
-import com.centit.framework.system.po.*;
-import com.centit.framework.system.service.*;
+import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.system.po.UserSetting;
+import com.centit.framework.system.service.OptInfoManager;
+import com.centit.framework.system.service.OsInfoManager;
+import com.centit.framework.system.service.SysUserManager;
+import com.centit.framework.system.service.UserSettingManager;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
@@ -32,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author codefan
@@ -45,8 +48,8 @@ public class PlatformDataController extends BaseController {
     @Autowired
     private UserSettingManager userSettingManager;
 
-    @Autowired
-    private SysRoleManager sysRoleManager;
+    /*@Autowired
+    private SysRoleManager sysRoleManager;*/
 
     @Autowired
     protected PlatformEnvironment platformEnvironment;
@@ -411,6 +414,18 @@ public class PlatformDataController extends BaseController {
     @WrapUpResponseBody
     public List<? extends IUserRole> listUserRoles(@PathVariable String topUnit, @PathVariable String userCode) {
         return platformEnvironment.listUserRoles(topUnit, userCode);
+    }
+
+    @RequestMapping(value = "/userpowers/{topUnit}/{userCode}", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public List<? extends IOptMethod> listUserPowers(@PathVariable String topUnit, @PathVariable String userCode) {
+        return sysUserManager(userCode);
+    }
+
+    @RequestMapping(value = "/userinfo/{userCode}", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public UserInfo getUserInfo(@PathVariable String userCode) {
+        return sysUserManager.getObjectById(userCode);
     }
 
     /**
