@@ -416,12 +416,34 @@ public class PlatformDataController extends BaseController {
         return platformEnvironment.listUserRoles(topUnit, userCode);
     }
 
+    /**
+     * @param topUnit  租户代码
+     * @param userCode 用户代码
+     * @return
+     */
+    @ApiOperation(value = "获取用户权限操作方法信息", notes = "获取用户权限操作方法信息。")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "topUnit", value = "租户代码",
+            required = true, paramType = "path", dataType = "String"),
+        @ApiImplicitParam(
+            name = "userCode", value = "用户代码",
+            required = true, paramType = "path", dataType = "String")}
+    )
     @RequestMapping(value = "/userpowers/{topUnit}/{userCode}", method = RequestMethod.GET)
     @WrapUpResponseBody
     public List<? extends IOptMethod> listUserPowers(@PathVariable String topUnit, @PathVariable String userCode) {
-        return sysUserManager(userCode);
+        return sysUserManager.listUserPowers(topUnit, userCode);
     }
 
+    /**
+     * @param userCode 用户代码
+     * @return
+     */
+    @ApiOperation(value = "获取用户信息", notes = "获取用户信息。")
+    @ApiImplicitParam(
+        name = "userCode", value = "用户代码",
+        required = true, paramType = "path", dataType = "String")
     @RequestMapping(value = "/userinfo/{userCode}", method = RequestMethod.GET)
     @WrapUpResponseBody
     public UserInfo getUserInfo(@PathVariable String userCode) {
