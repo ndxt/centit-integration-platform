@@ -417,6 +417,27 @@ public class PlatformDataController extends BaseController {
     }
 
     /**
+     * 获取租户下所有的业务菜单
+     *
+     * @param topUnit 租户代码
+     * @return json
+     */
+    @ApiOperation(value = "获取用户权限的业务菜单", notes = "获取用户权限的业务菜单。")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "topUnit", value = "租户代码",
+            required = true, paramType = "path", dataType = "String"),
+        @ApiImplicitParam(
+            name = "userCode", value = "用户代码",
+            required = true, paramType = "path", dataType = "String")}
+    )
+    @RequestMapping(value = "/useroptinfs/{topUnit}/{userCode}", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public List<? extends IOptInfo> listUserOptinfos(@PathVariable String topUnit, @PathVariable String userCode) {
+        return optInfoManager.listUserOptinfos(topUnit, userCode);
+    }
+
+    /**
      * @param topUnit  租户代码
      * @param userCode 用户代码
      * @return
