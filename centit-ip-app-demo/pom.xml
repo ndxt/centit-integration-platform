@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.centit.framework</groupId>
         <artifactId>framework-snapshot-dependencies</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>5.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>1.0-SNAPSHOT</version>
+    <version>5.1-SNAPSHOT</version>
     <artifactId>centit-ip-app-demo</artifactId>
     <name>com.centit.framework:centit-ip-app-demo</name>
     <packaging>war</packaging>
@@ -71,14 +71,14 @@
         </dependency>
 
         <!-- server runtime library -->
-        <dependency>
+        <!--<dependency>
             <groupId>com.sun</groupId>
             <artifactId>tools</artifactId>
             <version>${jdk.version}</version>
-            <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
             <scope>system</scope>
         </dependency>
-
+        -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>

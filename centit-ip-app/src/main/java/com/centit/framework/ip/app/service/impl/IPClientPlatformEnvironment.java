@@ -10,7 +10,6 @@ import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.JsonCentitUserDetails;
 import com.centit.framework.staticsystem.po.*;
 import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
