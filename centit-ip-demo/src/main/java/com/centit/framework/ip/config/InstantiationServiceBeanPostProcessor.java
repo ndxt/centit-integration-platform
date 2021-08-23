@@ -28,6 +28,9 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Value("${http.exception.notAsHttpError:false}")
     protected boolean httpExceptionNotAsHttpError;
 
+    @Value("${app.support.tenant:false}")
+    protected boolean supportTenant;
+
     @Autowired
     protected CodeRepositoryCache.EvictCacheExtOpt osInfoManager;
 
@@ -37,6 +40,7 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
         CodeRepositoryCache.setEvictCacheExtOpt(osInfoManager);
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
+        WebOptUtils.setIsTenant(supportTenant);
         if(optLogManager!=null) {
             OperationLogCenter.registerOperationLogWriter(optLogManager);
         }
