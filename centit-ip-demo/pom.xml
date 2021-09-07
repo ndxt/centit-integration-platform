@@ -131,6 +131,18 @@
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!--<dependency>
+            <groupId>com.shentong</groupId>
+            <artifactId>shentongjdbc</artifactId>
+            <version>4.0</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-users-register</artifactId>
+            <version>5.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <profiles>

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -11,6 +12,7 @@ import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.TopUnitSecurityMetadata;
+import com.centit.framework.system.po.DataDictionary;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
 import com.centit.framework.system.service.OptInfoManager;
@@ -645,8 +647,14 @@ public class PlatformDataController extends BaseController {
     @RequestMapping(value = "/dictionary/{appName}/{catalogCode}", method = RequestMethod.GET)
     @WrapUpResponseBody
     public List<? extends IDataDictionary> listDataDictionaries(@PathVariable String appName,
-                                                                @PathVariable String catalogCode) {
-        return platformEnvironment.listDataDictionaries(catalogCode);
+                                                                @PathVariable String catalogCode,
+                                                                HttpServletRequest request) {
+        List<DataDictionary> dictionaries = (List<DataDictionary>) platformEnvironment.listDataDictionaries(catalogCode);
+        String lang = WebOptUtils.getCurrentLang(request);
+        dictionaries.forEach(dict -> {
+            dict.setDataValue(dict.getLocalDataValue(lang));
+        });
+        return dictionaries;
     }
 
     /**

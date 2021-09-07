@@ -36,5 +36,41 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+
+        <!--<dependency>
+            <groupId>com.dingtalk</groupId>
+            <artifactId>dingtalk-api-sdk</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/taobao-sdk-java-auto_1479188381469-20210528.jar</systemPath>
+        </dependency>-->
+
+        <dependency>
+            <groupId>com.dingtalk.open</groupId>
+            <artifactId>taobao-sdk-java-auto-source</artifactId>
+            <version>1479188381469-20210528</version>
+        </dependency>
     </dependencies>
+
+    <build>
+        <!--<resources>
+            <resource>
+                <directory>${project.basedir}/lib</directory>
+                <targetPath>WEB-INF/lib</targetPath>
+                <includes>
+                    <include>**/*.jar</include>
+                </includes>
+            </resource>
+        </resources>-->
+        <!--<resources>
+            <resource>
+                &lt;!&ndash;把lib/目录下第三方jar包打进程序中，如上面的systemPath目录下的jar&ndash;&gt;
+                <directory>lib/</directory>
+                <includes>
+                    <include>**/*.jar</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>-->
+    </build>
 </project>
