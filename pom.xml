@@ -11,20 +11,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.framework</groupId>
     <artifactId>centit-integration-platform</artifactId>
-    <version>5.1-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
     <modules>
         <module>centit-ip-app</module>
         <module>centit-ip-app-config</module>
         <module>centit-ip-app-boot-config</module>
         <module>centit-ip-server</module>
-        <module>centit-ip-users-register</module>
+<!--        <module>centit-ip-users-register</module>-->
     </modules>
     <packaging>pom</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.framework.version>5.1-SNAPSHOT</centit.framework.version>
-        <centit.persistence.version>5.1-SNAPSHOT</centit.persistence.version>
+        <centit.framework.version>5.2-SNAPSHOT</centit.framework.version>
         <centit.commons.version>2.3-SNAPSHOT</centit.commons.version>
         <jdk.version>1.8</jdk.version>
     </properties>
