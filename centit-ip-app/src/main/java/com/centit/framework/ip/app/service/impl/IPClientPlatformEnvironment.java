@@ -1,6 +1,7 @@
 package com.centit.framework.ip.app.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.appclient.AppSession;
 import com.centit.framework.appclient.HttpReceiveJSON;
 import com.centit.framework.appclient.RestfulHttpRequest;
@@ -8,7 +9,6 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.JsonCentitUserDetails;
-import com.centit.framework.staticsystem.po.*;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,14 +47,15 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
-    public UserSetting getUserSetting(String userCode, String paramCode) {
+    public IUserSetting getUserSetting(String userCode, String paramCode) {
         HttpReceiveJSON resJson = RestfulHttpRequest.getResponseData(
             appSession,
             "/platform/usersetting/" + userCode + "/" + paramCode);
 
-        if (resJson == null)
+        if (resJson == null) {
             return null;
-        return resJson.getDataAsObject(UserSetting.class);
+        }
+        return resJson.getDataAsObject(IUserSetting.class);
     }
 
     /**
@@ -68,7 +69,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/usersettings/" + userCode + "/" + topOptId,
-            UserSetting.class);
+            IUserSetting.class);
     }
 
     @Override
@@ -84,29 +85,29 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }*/
 
     @Override
-    public List<OptInfo> listUserMenuOptInfosUnderSuperOptId(String userCode, String superOptId,
-                                                             boolean asAdmin) {
+    public List<IOptInfo> listUserMenuOptInfosUnderSuperOptId(String userCode, String superOptId,
+                                                              boolean asAdmin) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/usermenu/" + superOptId + "/" + userCode + "?asAdmin=" + asAdmin,
-            OptInfo.class);
+            IOptInfo.class);
 
     }
 
     @Override
-    public List<UserRole> listUserRoles(String topUnit, String userCode) {
+    public List<IUserRole> listUserRoles(String topUnit, String userCode) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/userroles/" + topUnit + "/" + userCode,
-            UserRole.class);
+            IUserRole.class);
     }
 
     @Override
-    public List<UserRole> listRoleUsers(String topUnit, String roleCode) {
+    public List<IUserRole> listRoleUsers(String topUnit, String roleCode) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/roleusers/" + topUnit + "/" + roleCode,
-            UserRole.class);
+            IUserRole.class);
     }
 
     @Override
@@ -152,27 +153,27 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
-    public List<UserInfo> listAllUsers(String topUnit) {
+    public List<IUserInfo> listAllUsers(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/allusers/" + topUnit,
-            UserInfo.class);
+            IUserInfo.class);
     }
 
     @Override
-    public List<UnitInfo> listAllUnits(String topUnit) {
+    public List<IUnitInfo> listAllUnits(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/allunits/" + topUnit,
-            UnitInfo.class);
+            IUnitInfo.class);
     }
 
     @Override
-    public List<UserUnit> listAllUserUnits(String topUnit) {
+    public List<IUserUnit> listAllUserUnits(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/alluserunits/" + topUnit,
-            UserUnit.class);
+            IUserUnit.class);
     }
 
     @Override
@@ -180,23 +181,23 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/usertopunits/" + userCode,
-            UnitInfo.class);
+            IUnitInfo.class);
     }
 
     @Override
-    public List<UserUnit> listUserUnits(String topUnit, String userCode) {
+    public List<IUserUnit> listUserUnits(String topUnit, String userCode) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/userunits/" + topUnit + "/" + userCode,
-            UserUnit.class);
+            IUserUnit.class);
     }
 
     @Override
-    public List<UserUnit> listUnitUsers(String unitCode) {
+    public List<IUserUnit> listUnitUsers(String unitCode) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/unitusers/" + topOptId + "/" + unitCode,
-            UserUnit.class);
+            IUserUnit.class);
     }
 
     /**
@@ -209,23 +210,23 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/rolerepo/" + topUnit,
-            RoleInfo.class);
+            IRoleInfo.class);
     }
 
     @Override
-    public List<DataCatalog> listAllDataCatalogs(String topUnit) {
+    public List<IDataCatalog> listAllDataCatalogs(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/catalogs/" + topUnit,
-            DataCatalog.class);
+            IDataCatalog.class);
     }
 
     @Override
-    public List<DataDictionary> listDataDictionaries(String catalogCode) {
+    public List<IDataDictionary> listDataDictionaries(String catalogCode) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/dictionary/" + topOptId + "/" + catalogCode,
-            DataDictionary.class);
+            IDataDictionary.class);
     }
 
     @Override
@@ -233,7 +234,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/allrolepowers/" + topUnit,
-            RolePower.class);
+            IRolePower.class);
     }
 
     /**
@@ -246,7 +247,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/optinforepo/" + topUnit,
-            OptInfo.class);
+            IOptInfo.class);
     }
 
     @Override
@@ -254,7 +255,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/alloptmethods/" + topUnit,
-            OptMethod.class);
+            IOptMethod.class);
     }
 
     /**
@@ -265,7 +266,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/alloptdatascopes/" + topUnit,
-            OptDataScope.class);
+            IOptDataScope.class);
     }
 
     private CentitUserDetails loadUserDetails(String queryParam, String qtype) {
@@ -279,7 +280,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
             resJson.getDataAsObject("userDetails", JsonCentitUserDetails.class);
         //userDetails.getUserInfo().put("userPin", resJson.getDataAsString("userPin"));
         //userDetails.setUserUnits(
-            //(JSONArray) resJson.getData("userUnits"));//, UserUnit.class));
+        //(JSONArray) resJson.getData("userUnits"));//, UserUnit.class));
         userDetails.setAuthoritiesByRoles(userDetails.getUserRoles());
         return userDetails;
     }
@@ -313,7 +314,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     /**
      * 新增菜单和操作
-     *
+     * <p>
      * param optInfos   菜单对象集合
      * param optMethods 操作对象集合
      *//*
@@ -324,12 +325,38 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
         param.put("optMethods", optMethods);
         RestfulHttpRequest.jsonPost(appSession, "/platform/insertopt", param);
     }*/
-
     @Override
     public List<? extends IOsInfo> listOsInfos(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/ipenvironment/osinfo/" + topUnit,
-            OsInfo.class);
+            IOsInfo.class);
+    }
+
+    @Override
+    public IOsInfo getOsInfo(String osId){
+        return RestfulHttpRequest.getResponseObject(appSession,
+            "/platform/osinfo/"+osId,
+            IOsInfo.class);
+    }
+    @Override
+    public IOsInfo deleteOsInfo(String osId){
+         String result=RestfulHttpRequest.doDelete(appSession,
+            "/platform/osinfo/"+osId);
+         return JSON.toJavaObject(JSONObject.parseObject(result).getJSONObject("data"),IOsInfo.class);
+    }
+    @Override
+    public IOsInfo updateOsInfo(JSONObject osInfo){
+         String result=RestfulHttpRequest.jsonPut(appSession,
+            "/platform/osinfo",
+            osInfo);
+         return JSON.toJavaObject(JSONObject.parseObject(result).getJSONObject("data"),IOsInfo.class);
+    }
+    @Override
+    public IOsInfo addOsInfo(JSONObject osInfo){
+       String result=RestfulHttpRequest.jsonPost(appSession,
+            "/platform/osinfo",
+            osInfo);
+        return JSON.toJavaObject(JSONObject.parseObject(result).getJSONObject("data"),IOsInfo.class);
     }
 }

@@ -16,11 +16,7 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-static</artifactId>
-            <version>${centit.framework.version}</version>
-        </dependency>
+
 
 
         <!-- server runtime library -->
@@ -42,6 +38,10 @@
             <artifactId>centit-persistence-extend</artifactId>
             <version>1.1.1812</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-core</artifactId>
         </dependency>
 
     </dependencies>

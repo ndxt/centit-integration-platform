@@ -13,6 +13,7 @@ import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.TopUnitSecurityMetadata;
 import com.centit.framework.system.po.DataDictionary;
+import com.centit.framework.system.po.OsInfo;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
 import com.centit.framework.system.service.OptInfoManager;
@@ -778,6 +779,37 @@ public class PlatformDataController extends BaseController {
     public List<? extends IOsInfo> listAllOS(@PathVariable String topUnit) {
         return platformEnvironment.listOsInfos(topUnit);
     }
+    @ApiOperation(value = "获取单个业务系统信息", notes = "获取单个业务系统信息。")
+    @ApiImplicitParam(
+        name = "osId", value = "系统ID",
+        required = true, paramType = "path", dataType = "String")
+    @RequestMapping(value = "/osinfo/{osId}", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public IOsInfo getOsInfo(@PathVariable String osId) {
+        return platformEnvironment.getOsInfo(osId);
+    }
+    @ApiOperation(value = "创建单个业务系统信息", notes = "创建单个业务系统信息。")
+    @RequestMapping(value = "/osinfo", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public IOsInfo addOsInfo(@RequestBody JSONObject osInfo) {
+        return platformEnvironment.addOsInfo(osInfo);
+    }
+    @ApiOperation(value = "删除单个业务系统信息", notes = "删除单个业务系统信息。")
+    @ApiImplicitParam(
+        name = "osId", value = "系统ID",
+        required = true, paramType = "path", dataType = "String")
+    @RequestMapping(value = "/osinfo/{osId}", method = RequestMethod.DELETE)
+    @WrapUpResponseBody
+    public IOsInfo deleteOsInfo(@PathVariable String osId) {
+        return platformEnvironment.deleteOsInfo(osId);
+    }
+    @ApiOperation(value = "更新单个业务系统信息", notes = "更新单个业务系统信息。")
+    @RequestMapping(value = "/osinfo", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public IOsInfo updateOsInfo(@RequestBody JSONObject osInfo) {
+        return platformEnvironment.updateOsInfo(osInfo);
+    }
+
 
     /**
      * 新增菜单和操作

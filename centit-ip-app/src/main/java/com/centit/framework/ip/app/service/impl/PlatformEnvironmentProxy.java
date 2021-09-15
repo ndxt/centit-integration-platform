@@ -1,5 +1,6 @@
 package com.centit.framework.ip.app.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -31,8 +32,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public IUserSetting getUserSetting(String userCode, String paramCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             IUserSetting svalue = evrnManger.getUserSetting(userCode,paramCode);
-            if(svalue!=null)
+            if(svalue!=null) {
                 return svalue;
+            }
         }
         return null;
     }
@@ -66,8 +68,49 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IOsInfo> listOsInfos(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IOsInfo> osInfos = evrnManger.listOsInfos(topUnit);
-            if(osInfos!=null)
+            if(osInfos!=null) {
                 return osInfos;
+            }
+        }
+        return null;
+    }
+    @Override
+    public IOsInfo getOsInfo(String osId){
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOsInfo osInfo = evrnManger.getOsInfo(osId);
+            if(osInfo!=null) {
+                return osInfo;
+            }
+        }
+        return null;
+    }
+    @Override
+    public IOsInfo deleteOsInfo(String osId){
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOsInfo osInfo = evrnManger.deleteOsInfo(osId);
+            if(osInfo!=null) {
+                return osInfo;
+            }
+        }
+        return null;
+    }
+    @Override
+    public IOsInfo updateOsInfo(JSONObject osInfo){
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOsInfo iOsInfo = evrnManger.updateOsInfo(osInfo);
+            if(iOsInfo!=null) {
+                return iOsInfo;
+            }
+        }
+        return null;
+    }
+    @Override
+    public IOsInfo addOsInfo(JSONObject osInfo){
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOsInfo iOsInfo = evrnManger.addOsInfo(osInfo);
+            if(iOsInfo!=null) {
+                return iOsInfo;
+            }
         }
         return null;
     }
@@ -86,8 +129,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IOptInfo> value =
                     evrnManger.listUserMenuOptInfosUnderSuperOptId(userCode,superOptId,asAdmin);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -97,8 +141,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserRole> value =
                     evrnManger.listUserRoles(topUnit, userCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -108,8 +153,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserRole> value =
                     evrnManger.listRoleUsers(topUnit, roleCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -119,8 +165,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUnitRole> value =
                     evrnManger.listUnitRoles(unitCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -130,8 +177,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUnitRole> value =
                     evrnManger.listRoleUnits(roleCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -159,8 +207,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     @Override
     public boolean checkUserPassword(String userCode, String userPassword) {
         for(PlatformEnvironment evrnManger:evrnMangers){
-            if(evrnManger.checkUserPassword(userCode,userPassword))
+            if(evrnManger.checkUserPassword(userCode,userPassword)) {
                 return true;
+            }
         }
         return false;
     }
@@ -174,8 +223,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IUserInfo> listAllUsers(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserInfo> value = evrnManger.listAllUsers(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -189,8 +239,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IUnitInfo> listAllUnits(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUnitInfo> value = evrnManger.listAllUnits(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -204,8 +255,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IUserUnit> listAllUserUnits(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserUnit> value = evrnManger.listAllUserUnits(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -220,8 +272,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IUnitInfo> listUserTopUnits(String userCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUnitInfo> value = evrnManger.listUserTopUnits(userCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -236,8 +289,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IUserUnit> listUserUnits(String topUnit, String userCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserUnit> value = evrnManger.listUserUnits(topUnit, userCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -252,8 +306,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IUserUnit> listUnitUsers(String unitCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IUserUnit> value = evrnManger.listUnitUsers(unitCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -267,8 +322,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IRoleInfo> listAllRoleInfo(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IRoleInfo> value = evrnManger.listAllRoleInfo(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -282,8 +338,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IRolePower> listAllRolePower(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IRolePower> value = evrnManger.listAllRolePower(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -297,8 +354,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IOptInfo> listAllOptInfo(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IOptInfo> value = evrnManger.listAllOptInfo(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -312,8 +370,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IOptMethod> listAllOptMethod(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IOptMethod> value = evrnManger.listAllOptMethod(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -325,8 +384,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IOptDataScope> listAllOptDataScope(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IOptDataScope> value = evrnManger.listAllOptDataScope(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -340,8 +400,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IDataCatalog> listAllDataCatalogs(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IDataCatalog> value = evrnManger.listAllDataCatalogs(topUnit);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -356,8 +417,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IDataDictionary> listDataDictionaries(String catalogCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IDataDictionary> value = evrnManger.listDataDictionaries(catalogCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -372,8 +434,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public CentitUserDetails loadUserDetailsByLoginName(String loginName) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             CentitUserDetails value = evrnManger.loadUserDetailsByLoginName(loginName);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -388,8 +451,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public CentitUserDetails loadUserDetailsByUserCode(String userCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             CentitUserDetails value = evrnManger.loadUserDetailsByUserCode(userCode);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -404,8 +468,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public CentitUserDetails loadUserDetailsByRegEmail(String regEmail) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             CentitUserDetails value = evrnManger.loadUserDetailsByRegEmail(regEmail);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
@@ -420,8 +485,9 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public CentitUserDetails loadUserDetailsByRegCellPhone(String regCellPhone) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             CentitUserDetails value = evrnManger.loadUserDetailsByRegCellPhone(regCellPhone);
-            if(value!=null)
+            if(value!=null) {
                 return value;
+            }
         }
         return null;
     }
