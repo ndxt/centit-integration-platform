@@ -339,24 +339,26 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
             "/platform/osinfo/"+osId,
             IOsInfo.class);
     }
+
     @Override
     public IOsInfo deleteOsInfo(String osId){
          String result=RestfulHttpRequest.doDelete(appSession,
             "/platform/osinfo/"+osId);
-         return JSON.toJavaObject(JSONObject.parseObject(result).getJSONObject("data"),IOsInfo.class);
+         return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOsInfo.class);
     }
+
     @Override
     public IOsInfo updateOsInfo(JSONObject osInfo){
          String result=RestfulHttpRequest.jsonPut(appSession,
             "/platform/osinfo",
             osInfo);
-         return JSON.toJavaObject(JSONObject.parseObject(result).getJSONObject("data"),IOsInfo.class);
+         return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOsInfo.class);
     }
     @Override
     public IOsInfo addOsInfo(JSONObject osInfo){
        String result=RestfulHttpRequest.jsonPost(appSession,
             "/platform/osinfo",
             osInfo);
-        return JSON.toJavaObject(JSONObject.parseObject(result).getJSONObject("data"),IOsInfo.class);
+       return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOsInfo.class);
     }
 }

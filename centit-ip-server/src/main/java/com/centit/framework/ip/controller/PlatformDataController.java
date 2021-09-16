@@ -779,6 +779,7 @@ public class PlatformDataController extends BaseController {
     public List<? extends IOsInfo> listAllOS(@PathVariable String topUnit) {
         return platformEnvironment.listOsInfos(topUnit);
     }
+
     @ApiOperation(value = "获取单个业务系统信息", notes = "获取单个业务系统信息。")
     @ApiImplicitParam(
         name = "osId", value = "系统ID",
@@ -788,12 +789,14 @@ public class PlatformDataController extends BaseController {
     public IOsInfo getOsInfo(@PathVariable String osId) {
         return platformEnvironment.getOsInfo(osId);
     }
+
     @ApiOperation(value = "创建单个业务系统信息", notes = "创建单个业务系统信息。")
     @RequestMapping(value = "/osinfo", method = RequestMethod.POST)
     @WrapUpResponseBody
     public IOsInfo addOsInfo(@RequestBody JSONObject osInfo) {
         return platformEnvironment.addOsInfo(osInfo);
     }
+
     @ApiOperation(value = "删除单个业务系统信息", notes = "删除单个业务系统信息。")
     @ApiImplicitParam(
         name = "osId", value = "系统ID",
@@ -803,6 +806,7 @@ public class PlatformDataController extends BaseController {
     public IOsInfo deleteOsInfo(@PathVariable String osId) {
         return platformEnvironment.deleteOsInfo(osId);
     }
+
     @ApiOperation(value = "更新单个业务系统信息", notes = "更新单个业务系统信息。")
     @RequestMapping(value = "/osinfo", method = RequestMethod.PUT)
     @WrapUpResponseBody
