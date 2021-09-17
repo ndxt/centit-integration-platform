@@ -190,6 +190,20 @@ public class PlatformDataController extends BaseController {
         return platformEnvironment.listUserMenuOptInfosUnderSuperOptId(userCode, optid, asAdmin);
     }
 
+    @ApiOperation(value = "获取应用菜单里的所有模块", notes = "获取应用菜单里的所有模块")
+    @RequestMapping(value = "/osmenu/{osId}", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public List<? extends IOptInfo> listOsMenuOptInfos(@PathVariable String osId){
+        return platformEnvironment.listMenuOptInfosUnderOsId(osId);
+    }
+
+    @ApiOperation(value = "创建单个模块信息", notes = "创建单个模块信息。")
+    @RequestMapping(value = "/optinfo", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public IOptInfo addOptInfo(@RequestBody JSONObject optInfo) {
+        return platformEnvironment.addOptInfo(optInfo);
+    }
+
     /**
      * 校验用户密码
      *

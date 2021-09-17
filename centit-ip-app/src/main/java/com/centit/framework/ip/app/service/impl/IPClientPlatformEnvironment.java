@@ -93,6 +93,21 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
             IOptInfo.class);
 
     }
+    @Override
+    public List<IOptInfo> listMenuOptInfosUnderOsId(String osId) {
+        return RestfulHttpRequest.getResponseObjectList(
+            appSession,
+            "/platform/osmenu/" + osId,
+            IOptInfo.class);
+
+    }
+    @Override
+    public IOptInfo addOptInfo(JSONObject optInfo){
+        String result=RestfulHttpRequest.jsonPost(appSession,
+            "/platform/optinfo",
+            optInfo);
+        return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOptInfo.class);
+    }
 
     @Override
     public List<IUserRole> listUserRoles(String topUnit, String userCode) {

@@ -135,6 +135,27 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         }
         return null;
     }
+    @Override
+    public List<? extends IOptInfo> listMenuOptInfosUnderOsId(String osId) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IOptInfo> value =
+                evrnManger.listMenuOptInfosUnderOsId(osId);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+    @Override
+    public IOptInfo addOptInfo(JSONObject optInfo){
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOptInfo iOptInfo = evrnManger.addOptInfo(optInfo);
+            if(iOptInfo!=null) {
+                return iOptInfo;
+            }
+        }
+        return null;
+    }
 
     @Override
     public List<? extends IUserRole> listUserRoles(String topUnit, String userCode) {
