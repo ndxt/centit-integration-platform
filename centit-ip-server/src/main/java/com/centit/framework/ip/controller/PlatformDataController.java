@@ -807,7 +807,7 @@ public class PlatformDataController extends BaseController {
     @ApiOperation(value = "创建单个业务系统信息", notes = "创建单个业务系统信息。")
     @RequestMapping(value = "/osinfo", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public IOsInfo addOsInfo(@RequestBody JSONObject osInfo) {
+    public IOsInfo addOsInfo(@RequestBody IOsInfo osInfo) {
         return platformEnvironment.addOsInfo(osInfo);
     }
 
@@ -824,7 +824,7 @@ public class PlatformDataController extends BaseController {
     @ApiOperation(value = "更新单个业务系统信息", notes = "更新单个业务系统信息。")
     @RequestMapping(value = "/osinfo", method = RequestMethod.PUT)
     @WrapUpResponseBody
-    public IOsInfo updateOsInfo(@RequestBody JSONObject osInfo) {
+    public IOsInfo updateOsInfo(@RequestBody IOsInfo osInfo) {
         return platformEnvironment.updateOsInfo(osInfo);
     }
 

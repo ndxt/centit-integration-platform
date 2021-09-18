@@ -363,14 +363,14 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
-    public IOsInfo updateOsInfo(JSONObject osInfo){
+    public IOsInfo updateOsInfo(IOsInfo osInfo){
          String result=RestfulHttpRequest.jsonPut(appSession,
             "/platform/osinfo",
             osInfo);
          return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOsInfo.class);
     }
     @Override
-    public IOsInfo addOsInfo(JSONObject osInfo){
+    public IOsInfo addOsInfo(IOsInfo osInfo){
        String result=RestfulHttpRequest.jsonPost(appSession,
             "/platform/osinfo",
             osInfo);

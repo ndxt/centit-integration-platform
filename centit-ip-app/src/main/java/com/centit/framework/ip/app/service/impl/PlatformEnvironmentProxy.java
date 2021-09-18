@@ -95,7 +95,7 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return null;
     }
     @Override
-    public IOsInfo updateOsInfo(JSONObject osInfo){
+    public IOsInfo updateOsInfo(IOsInfo osInfo){
         for(PlatformEnvironment evrnManger:evrnMangers){
             IOsInfo iOsInfo = evrnManger.updateOsInfo(osInfo);
             if(iOsInfo!=null) {
@@ -105,7 +105,7 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return null;
     }
     @Override
-    public IOsInfo addOsInfo(JSONObject osInfo){
+    public IOsInfo addOsInfo(IOsInfo osInfo){
         for(PlatformEnvironment evrnManger:evrnMangers){
             IOsInfo iOsInfo = evrnManger.addOsInfo(osInfo);
             if(iOsInfo!=null) {
