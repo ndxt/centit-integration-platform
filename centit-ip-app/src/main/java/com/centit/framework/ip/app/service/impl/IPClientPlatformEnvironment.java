@@ -108,6 +108,13 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
             optInfo);
         return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOptInfo.class);
     }
+    @Override
+    public IOptMethod addOptMethod(JSONObject optMethod){
+        String result=RestfulHttpRequest.jsonPost(appSession,
+            "/platform/optmethod",
+            optMethod);
+        return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOptMethod.class);
+    }
 
     @Override
     public List<IUserRole> listUserRoles(String topUnit, String userCode) {

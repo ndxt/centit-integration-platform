@@ -156,6 +156,16 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         }
         return null;
     }
+    @Override
+    public IOptMethod addOptMethod(JSONObject optMethod){
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOptMethod iOptMethod = evrnManger.addOptMethod(optMethod);
+            if(iOptMethod!=null) {
+                return iOptMethod;
+            }
+        }
+        return null;
+    }
 
     @Override
     public List<? extends IUserRole> listUserRoles(String topUnit, String userCode) {

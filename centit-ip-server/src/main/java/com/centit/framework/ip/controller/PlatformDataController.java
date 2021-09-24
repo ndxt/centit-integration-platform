@@ -203,6 +203,12 @@ public class PlatformDataController extends BaseController {
     public IOptInfo addOptInfo(@RequestBody JSONObject optInfo) {
         return platformEnvironment.addOptInfo(optInfo);
     }
+    @ApiOperation(value = "创建单个方法信息", notes = "创建单个方法信息。")
+    @RequestMapping(value = "/optmethod", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public IOptMethod addOptMethod(@RequestBody JSONObject optMethod) {
+        return platformEnvironment.addOptMethod(optMethod);
+    }
 
     /**
      * 校验用户密码
