@@ -1,19 +1,22 @@
 package com.centit.framework.tenan.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
+import com.centit.framework.system.dao.OsInfoDao;
 import com.centit.framework.system.dao.UnitInfoDao;
 import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.framework.system.dao.UserUnitDao;
+import com.centit.framework.system.po.OsInfo;
 import com.centit.framework.system.po.UnitInfo;
 import com.centit.framework.system.po.UserUnit;
 import com.centit.framework.tenan.dao.*;
 import com.centit.framework.tenan.po.*;
 import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.tenan.service.TenantPowerManage;
 import com.centit.framework.tenan.service.TenantService;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.framework.tenan.vo.TenantMemberApplyVo;
@@ -22,19 +25,22 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
+import com.centit.support.database.utils.QueryAndNamedParams;
+import com.centit.support.database.utils.QueryUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.centit.framework.tenan.util.UserUtils.getUserCodeFromSecurityContext;
 
 @Service
 @Slf4j
@@ -66,6 +72,9 @@ public class TenantServiceImpl implements TenantService {
 
     @Autowired
     private TenantMemberDao tenantMemberDao;
+
+    @Autowired
+    private OsInfoDao osInfoDao;
 
     @Override
     @Transactional
@@ -131,7 +140,7 @@ public class TenantServiceImpl implements TenantService {
         }
 
         List<TenantMemberApply> tenantMemberApplies = listApplyInfoByCondition(pageDesc, code, codeType, approveType);
-        if (null == tenantMemberApplies || tenantMemberApplies.size() == 0) {
+        if (CollectionUtils.sizeIsEmpty(tenantMemberApplies)) {
             return PageQueryResult.createResult(Collections.emptyList(), pageDesc);
         }
 
@@ -307,7 +316,7 @@ public class TenantServiceImpl implements TenantService {
         String topUnit = tenantMemberQo.getTopUnit();
         String currentUserCode = getUserCodeFromSecurityContext();
         boolean userHasPower = null != currentUserCode
-            && (tenantInfoDao.userIsOwner(topUnit, currentUserCode) || workGroupDao.userIsAdmin(topUnit, currentUserCode));
+            && (tenantInfoDao.userIsOwner(topUnit, currentUserCode) || workGroupDao.userIsTenantAdmin(topUnit, currentUserCode));
         if (!userHasPower) {
             return ResponseData.makeErrorMessage("当前人员没有操作权限!");
         }
@@ -324,10 +333,147 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("userCode 不能为空");
         }
         List<TenantInfo> tenantInfos = userTenantsByUserCode(userCode);
-        if (null == tenantInfos || tenantInfos.size() == 0) {
+        if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
             return ResponseData.makeResponseData(Collections.emptyMap());
         }
         return ResponseData.makeResponseData(formatTenants(userCode, tenantInfos));
+    }
+
+    @Override
+    @Transactional
+    public ResponseData createApplication(OsInfo osInfo) {
+        String topUnit = osInfo.getTopUnit();
+        String osName = osInfo.getOsName();
+        String created = osInfo.getCreated();
+        if (StringUtils.isAnyBlank(topUnit, osName, created)) {
+            return ResponseData.makeErrorMessage("topUnit,osName,created不能为空");
+        }
+        List<WorkGroup> workGroups = workGroupDao.listWorkGroupByUserCodeAndTopUnit(created, topUnit);
+        if (CollectionUtils.sizeIsEmpty(workGroups) || !workGroupDao.userIsTenantAdmin(topUnit, created)) {
+            return ResponseData.makeErrorMessage("该用户没有创建应用的权限,请使用管理员账号创建应用");
+        }
+        osInfo.setOsType("P");
+        osInfo.setCreateTime(nowDate());
+        saveWorkGroupByOSInfo(osInfo);
+        return ResponseData.makeSuccessResponse("应用创建成功!");
+    }
+
+    @Override
+    public ResponseData listTenantApplication(String topUnit) {
+        return ResponseData.makeResponseData(osInfoDao.listOsInfoByUnit(topUnit));
+    }
+
+    @Override
+    public ResponseData listWorkGroupByProperties(Map<String, Object> paramMap) {
+        return ResponseData.makeResponseData(workGroupDao.listObjectsByProperties(paramMap));
+    }
+
+    @Override
+    public ResponseData userInWorkGroup(WorkGroup workGroup) {
+        String groupId = workGroup.getGroupId();
+        String userCode = workGroup.getUserCode();
+        if (StringUtils.isAnyBlank(groupId, userCode)) {
+            return ResponseData.makeErrorMessage("参数groupId,userCode不能为空");
+        }
+        return ResponseData.makeResponseData(workGroupDao.userIsMember(groupId, userCode));
+    }
+
+    @Override
+    public PageQueryResult<TenantInfo> pageListTenants(String unitName, PageDesc pageDesc) {
+        HashMap<String, Object> filterMap = new HashMap<>();
+        filterMap.put("unitName_lk", StringUtils.join("%", unitName, "%"));
+        filterMap.put("isAvailable", "T");
+        List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(filterMap, pageDesc);
+        if (null == tenantInfos || tenantInfos.isEmpty()) {
+            return PageQueryResult.createResult(tenantInfos, pageDesc);
+        }
+        //去除敏感信息
+        tenantInfos.forEach(tenantInfo -> {
+            tenantInfo.setOwnUser(null);
+            tenantInfo.setSourceUrl(null);
+            tenantInfo.setMemo(null);
+            tenantInfo.setUseLimittime(null);
+        });
+        return PageQueryResult.createResult(tenantInfos, pageDesc);
+    }
+
+    @Override
+    public ResponseData findUsers(Map<String, Object> paramMap) {
+        //todo:查看用户是否在该机构内
+
+        String unitCode = MapUtils.getString(paramMap, "unitCode");
+        String userName = MapUtils.getString(paramMap, "userName");
+        String regCellPhone = MapUtils.getString(paramMap, "regCellPhone");
+        String userCode = MapUtils.getString(paramMap, "userCode");
+        if (StringUtils.isAllBlank(userName,regCellPhone,userCode)){
+            return ResponseData.makeErrorMessage("userName,regCellPhone,userCode不能全为空");
+        }
+        if (StringUtils.isBlank(unitCode)) {
+            return ResponseData.makeErrorMessage("unitCode不能为空");
+        }
+        List<UserInfo> userInfos = getUserInfosByExactUserName(paramMap);
+        if (CollectionUtils.sizeIsEmpty(userInfos)) {
+            return ResponseData.makeResponseData(CollectionUtils.emptyCollection());
+        }
+        List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("topUnit", unitCode));
+        Iterator<UserInfo> iterator = userInfos.iterator();
+        while (iterator.hasNext()){
+            UserUnit userUnitByUserCode = getUserUnitByUserCode(userUnits, iterator.next().getUserCode());
+            if (null != userUnitByUserCode){
+                iterator.remove();
+            }
+        }
+        return ResponseData.makeResponseData(userInfos);
+    }
+
+    /**
+     * 通过userCode userName regCellPhone精确查找用户
+     * @param paramMap
+     * @return
+     */
+    private List<UserInfo> getUserInfosByExactUserName(Map<String, Object> paramMap) {
+        Map<String, Object> filterMap = filterMapAbsentKey(new String[]{"userCode", "userName", "regCellPhone"}, paramMap);
+        String querySql = "select  USER_CODE, USER_PIN, IS_VALID, USER_TYPE, LOGIN_NAME, USER_NAME, ENGLISH_NAME, USER_DESC, LOGIN_TIMES, ACTIVE_TIME, PWD_EXPIRED_TIME, REG_EMAIL, USER_PWD, REG_CELL_PHONE, ID_CARD_NO, USER_WORD, USER_TAG, USER_ORDER, TOP_UNIT, PRIMARY_UNIT, CREATE_DATE, CREATOR, UPDATOR, UPDATE_DATE from F_USERINFO where 1=1  [  userName| and USER_NAME = :userName ] [ userCode| AND USER_CODE = :userCode ]  [ regCellPhone | AND REG_CELL_PHONE = :regCellPhone ]";
+        QueryAndNamedParams qapSql = QueryUtils.translateQuery(querySql, filterMap);
+        return userInfoDao.listObjectsBySql(qapSql.getQuery(), paramMap);
+    }
+
+
+    /**
+     * 筛选出map中指定key对应的数据
+     *
+     * @param keys 需要筛选出的key
+     * @param map  需要呗筛选的map
+     * @return 筛选后的结果 如果map中不存在keys中指定的key，结果中也不会存在
+     */
+    private Map<String, Object> filterMapAbsentKey(String[] keys, Map<String, Object> map) {
+        if (CollectionUtils.sizeIsEmpty(map)) {
+            return new HashMap<>();
+        }
+        ArrayList<String> keyList = new ArrayList<>(map.keySet());
+        HashMap<String, Object> resultMap = new HashMap<>();
+        for (String key : keys) {
+            if (keyList.contains(key)) {
+                resultMap.put(key, map.get(key));
+            }
+        }
+        return resultMap;
+    }
+
+    /**
+     * 通过osInfo 信息保存workGroup
+     *
+     * @param osInfo 应用基本信息
+     */
+    private void saveWorkGroupByOSInfo(OsInfo osInfo) {
+        osInfoDao.saveNewObject(osInfo);
+        WorkGroup workGroup = new WorkGroup();
+        workGroup.setGroupId(osInfo.getOsId());
+        workGroup.setUserCode(osInfo.getCreated());
+        workGroup.setRoleCode("OSZZ");
+        workGroup.setCreator(osInfo.getCreated());
+        workGroup.setIsValid("T");
+        workGroupDao.saveNewObject(workGroup);
     }
 
     /**
@@ -338,42 +484,92 @@ public class TenantServiceImpl implements TenantService {
      * @return
      */
     private List<Map> formatTenants(String userCode, List<TenantInfo> tenantInfos) {
-        //补充管理成员角色
         Set<String> topUnitCodes = tenantInfos.stream().map(TenantInfo::getTopUnit).collect(Collectors.toSet());
         List<WorkGroup> workGroups = workGroupDao.listWorkGroupByUserCodeAndTopUnit(userCode, CollectionsOpt.listToArray(topUnitCodes));
+        String primaryUnit = userInfoDao.getUserByCode(userCode).getPrimaryUnit();
         List<Map> tenantJsonArrays = JSONArray.parseArray(JSONArray.toJSONString(tenantInfos), Map.class);
         for (Map tenantJson : tenantJsonArrays) {
-            if (MapUtils.getString(tenantJson, "ownUser").equals(userCode)) {
-                tenantJson.put("isOwner", "T");
-            } else {
-                tenantJson.put("isOwner", "F");
-            }
-
-            String topUnit = MapUtils.getString(tenantJson, "topUnit");
-            WorkGroup workGroup = getWorkGroupByUserCodeAndTopUnit(userCode, topUnit, workGroups);
-            if (null !=workGroup){
-                tenantJson.put("roleCode",workGroup.getRoleCode());
-            }else {
-                tenantJson.put("roleCode","");
-            }
-            //todo:添加职务部门相关信息
+            extendTenantsAttribute(userCode, workGroups, primaryUnit, tenantJson);
         }
         return tenantJsonArrays;
     }
 
     /**
+     * 补充Tenant中的字段信息
+     *
+     * @param userCode    用户code
+     * @param workGroups  成员角色
+     * @param primaryUnit 用户主机构
+     * @param tenantJson  Tenant
+     */
+    private void extendTenantsAttribute(String userCode, List<WorkGroup> workGroups, String primaryUnit, Map tenantJson) {
+        if (MapUtils.getString(tenantJson, "ownUser").equals(userCode)) {
+            tenantJson.put("isOwner", "T");
+        } else {
+            tenantJson.put("isOwner", "F");
+        }
+
+        String topUnit = MapUtils.getString(tenantJson, "topUnit");
+        WorkGroup workGroup = getWorkGroupByUserCodeAndTopUnit(userCode, topUnit, workGroups);
+        if (null != workGroup) {
+            tenantJson.put("roleCode", workGroup.getRoleCode());
+        } else {
+            tenantJson.put("roleCode", "");
+        }
+
+        if (MapUtils.getString(tenantJson, "topUnit").equals(primaryUnit)) {
+            tenantJson.put("primaryUnit", "T");
+        } else {
+            tenantJson.put("primaryUnit", "F");
+        }
+        List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("userCode", userCode, "topUnit", topUnit));
+        extendTenantsUserRanks(tenantJson, userUnits);
+
+    }
+
+    /**
+     * 补充Tenant中UserRank字段及其翻译
+     *
+     * @param tenantJson Tenant集合
+     * @param userUnits  userUnits集合
+     */
+    private void extendTenantsUserRanks(Map tenantJson, List<UserUnit> userUnits) {
+        if (CollectionUtils.sizeIsEmpty(userUnits)) {
+            tenantJson.put("userRank", new ArrayList<>());
+            tenantJson.put("userRankText", new ArrayList<>());
+            return;
+        }
+        List<String> userRanks = userUnits.stream().filter(userUnit -> StringUtils.isNotBlank(userUnit.getUserRank()))
+            .map(UserUnit::getUserRank).collect(Collectors.toList());
+        tenantJson.put("userRank", Optional.ofNullable(userRanks).orElse(new ArrayList<>()));
+        if (CollectionUtils.sizeIsEmpty(userRanks)) {
+            tenantJson.put("userRankText", new ArrayList<>());
+            return;
+        }
+        ArrayList<String> userRankTexts = new ArrayList<>();
+        for (String userRank : userRanks) {
+            IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userRank);
+            if (null != rankType) {
+                userRankTexts.add(rankType.getDataValue());
+            }
+        }
+        tenantJson.put("userRankText", userRankTexts);
+    }
+
+    /**
      * 通过userCode 和topUnit 获取WorkGroup
+     *
      * @param userCode
      * @param topUnit
      * @param workGroups
      * @return
      */
     private WorkGroup getWorkGroupByUserCodeAndTopUnit(String userCode, String topUnit, List<WorkGroup> workGroups) {
-        if (null == workGroups || workGroups.size() == 0 ){
+        if (CollectionUtils.sizeIsEmpty(workGroups)) {
             return null;
         }
         for (WorkGroup workGroup : workGroups) {
-            if (userCode.equals(workGroup.getUserCode()) && topUnit.equals(workGroup.getGroupId())){
+            if (userCode.equals(workGroup.getUserCode()) && topUnit.equals(workGroup.getGroupId())) {
                 return workGroup;
             }
         }
@@ -619,6 +815,21 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
+     * 根据userCode获取UserUnit详情
+     *
+     * @param userUnits UserUnit集合
+     * @param userCode 用户code
+     * @return 第一个符合条件的UserUnit
+     */
+    private UserUnit getUserUnitByUserCode(List<UserUnit> userUnits, String userCode) {
+        for (UserUnit userUnit : userUnits) {
+            if (userCode.equals(userUnit.getUserCode())) {
+                return userUnit;
+            }
+        }
+        return null;
+    }
+    /**
      * 根据userCode获取user详情
      *
      * @param userInfos
@@ -691,33 +902,7 @@ public class TenantServiceImpl implements TenantService {
         }
     }
 
-    /**
-     * 从SecurityContext中获取当前登录人的userCode
-     *
-     * @return
-     */
-    private String getUserCodeFromSecurityContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CentitUserDetails) {
-            return ((CentitUserDetails) principal).getUserCode();
-        }
-        return null;
-    }
 
-    /**
-     * 从SecurityContext中获取当前登录人的用户信息
-     *
-     * @return
-     */
-    private JSONObject getUserInfoFromSecurityContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CentitUserDetails) {
-            return ((CentitUserDetails) principal).getUserInfo();
-        }
-        return null;
-    }
 
     /**
      * 用户是否已经归属与租户
@@ -727,13 +912,13 @@ public class TenantServiceImpl implements TenantService {
      */
     private boolean userInTenant(String userCode) {
         List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("userCode", userCode));
-        if (null == userUnits || userUnits.size() == 0) {
+        if (CollectionUtils.sizeIsEmpty(userUnits)) {
             return false;
         }
         Set<String> topUnits = userUnits.stream().map(UserUnit::getTopUnit).collect(Collectors.toSet());
         List<TenantInfo> tenantInfos = tenantInfoDao.listObjects(CollectionsOpt.createHashMap("topUnit_in",
             CollectionsOpt.listToArray(topUnits)));
-        if (null == tenantInfos || tenantInfos.size() == 0) {
+        if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
             return false;
         }
         return true;
@@ -747,7 +932,7 @@ public class TenantServiceImpl implements TenantService {
      */
     private List<TenantInfo> userTenantsByUserCode(String userCode) {
         List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("userCode", userCode));
-        if (null == userUnits || userUnits.size() == 0) {
+        if (CollectionUtils.sizeIsEmpty(userUnits)) {
             return null;
         }
         Set<String> topUnits = userUnits.stream().map(UserUnit::getTopUnit).collect(Collectors.toSet());

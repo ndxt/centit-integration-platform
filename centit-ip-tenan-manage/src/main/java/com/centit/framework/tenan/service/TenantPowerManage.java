@@ -1,0 +1,133 @@
+package com.centit.framework.tenan.service;
+
+import com.centit.framework.common.ResponseData;
+import com.centit.support.common.ObjectException;
+
+/**
+ * 判断用户在租户中具有的权限与角色
+ * 如果用户登录后，且判断的是当前人员不需要传入参数userCode
+ */
+public interface TenantPowerManage {
+
+    /**
+     * 判断用户是否为租户所有者
+     *
+     * @param userCode 用户code
+     * @param topUnit  租户id
+     * @return true:是所有者
+     */
+    boolean userIsTenantOwner(String userCode, String topUnit);
+
+
+    /**
+     * 判断当前用户是否为租户所有者
+     *
+     * @param topUnit topUnit 租户id
+     * @return true:是所有者
+     * @throws ObjectException 如果当前用户未登录抛出异常
+     */
+    boolean userIsTenantOwner(String topUnit) throws ObjectException;
+
+    /**
+     * 判断用户是否为租户管理员
+     *
+     * @param userCode 用户code
+     * @param topUnit  租户id
+     * @return true:是管理员
+     */
+    boolean userIsTenantAdmin(String userCode, String topUnit);
+
+    /**
+     * 判断当前用户是否为租户管理员
+     *
+     * @param topUnit topUnit 租户id
+     * @return true:是管理员
+     * @throws ObjectException 如果当前用户未登录抛出异常
+     */
+    boolean userIsTenantAdmin(String topUnit) throws ObjectException;
+
+    /**
+     * 判断用户是否为租户成员
+     *
+     * @param userCode 用户code
+     * @param topUnit  租户id
+     * @return true:是管理员
+     */
+    boolean userIsTenantMember(String userCode, String topUnit);
+
+    /**
+     * 判断当前用户是否为租户成员
+     *
+     * @param topUnit 租户id
+     * @return true:是成员
+     * @throws ObjectException 如果当前用户未登录抛出异常
+     */
+    boolean userIsTenantMember(String topUnit) throws ObjectException;
+
+    /**
+     * 判断用户是否为应用管理员
+     *
+     * @param userCode 用户code
+     * @param osId     应用id
+     * @return true:是管理员
+     */
+    boolean userIsApplicationAdmin(String userCode, String osId);
+
+    /**
+     * 判断当前用户是否为应用管理员
+     *
+     * @param osId 应用id
+     * @return true:是管理员
+     * @throws ObjectException 如果当前用户未登录抛出异常
+     */
+    boolean userIsApplicationAdmin(String osId) throws ObjectException;
+
+    /**
+     * 判断用户是否为应用成员
+     *
+     * @param userCode 用户code
+     * @param osId     应用id
+     * @return true:是成员
+     * @throws ObjectException 如果当前用户未登录抛出异常
+     */
+    boolean userIsApplicationMember(String userCode, String osId) throws ObjectException;
+
+    /**
+     * 判断当前用户是否为应用成员
+     *
+     * @param osId 应用id
+     * @return true:是成员
+     * @throws ObjectException 如果当前用户未登录抛出异常
+     */
+    boolean userIsApplicationMember(String osId) throws ObjectException;
+
+    /**
+     * 获取租户资源上限
+     * @param topUnit 租户id
+     * @return
+     */
+    ResponseData tenantResourceLimit(String topUnit);
+
+    /**
+     * 租户已用资源
+     * @param topUnit
+     * @return
+     */
+    ResponseData tenantResourceUsed(String topUnit);
+
+    /**
+     * 租户剩余可用资源
+     * @param topUnit
+     * @return
+     */
+    boolean teanatResourceUseable(String topUnit);
+
+
+    /**
+     * 租户指定资源是否剩余
+     * @param topUnit 租户id
+     * @param resourceType 租户类型
+     * @return
+     */
+    boolean specialResourceUseable(String topUnit,String resourceType);
+}

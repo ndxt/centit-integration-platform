@@ -29,7 +29,7 @@ public class WorkGroup implements Serializable {
     @Id
     @Column(name = "role_code")
     @Length(max = 32)
-    @ApiModelProperty(value = "角色", name = "roleCode")
+    @ApiModelProperty(value = "角色", name = "roleCode")//在os中role对应 组长：OSZZ 组员：OSZY
     private String roleCode;
 
     @Id

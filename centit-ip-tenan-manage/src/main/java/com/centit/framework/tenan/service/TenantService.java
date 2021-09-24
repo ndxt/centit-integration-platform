@@ -2,11 +2,9 @@ package com.centit.framework.tenan.service;
 
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.framework.tenan.po.TenantBusinessLog;
-import com.centit.framework.tenan.po.TenantInfo;
+import com.centit.framework.system.po.OsInfo;
+import com.centit.framework.tenan.po.*;
 import com.centit.framework.system.po.UserInfo;
-import com.centit.framework.tenan.po.TenantMember;
-import com.centit.framework.tenan.po.TenantMemberApply;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.framework.tenan.vo.TenantMemberApplyVo;
 import com.centit.framework.tenan.vo.TenantMemberQo;
@@ -134,8 +132,53 @@ public interface TenantService {
 
     /**
      * 用户所在租户
-     * @param userCode
+     * @param userCode 用户code
      * @return
      */
     ResponseData userTenants(String userCode);
+
+    /**
+     * 租户管理员创建应用
+     * @param osInfo 应用详情
+     * @return
+     */
+    ResponseData createApplication(OsInfo osInfo);
+
+    /**
+     * 获取租户下的应用列表
+     * @param topUnit 租户id
+     * @return
+     */
+    ResponseData listTenantApplication(String topUnit);
+
+    /**
+     * 根据属性获取组信息
+     * @param paramMap 过滤参数
+     * @return
+     */
+    ResponseData listWorkGroupByProperties(Map<String,Object> paramMap);
+
+    /**
+     * 判断当前用户是否为组成员
+     * @param workGroup
+     * @return
+     */
+    ResponseData userInWorkGroup(WorkGroup workGroup);
+
+    /**
+     * 根据unitName 模糊查询租户信息
+     * @param unitName
+     * @param pageDesc
+     * @return
+     */
+    PageQueryResult<TenantInfo> pageListTenants(String unitName , PageDesc pageDesc);
+
+    /**
+     * 精确查找用户
+     * @param paramMap 用户信息
+     *                 只能根据userCode，userName，regCellPhone精确查找
+     *                 unitCode:必要 当前用户所在租户code
+     * @return 查找userinfo结果
+     */
+    ResponseData findUsers(Map<String,Object> paramMap);
 }

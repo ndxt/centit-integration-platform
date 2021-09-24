@@ -5,16 +5,15 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.system.po.OsInfo;
 import com.centit.framework.system.po.UserInfo;
-import com.centit.framework.tenan.po.TenantBusinessLog;
-import com.centit.framework.tenan.po.TenantInfo;
-import com.centit.framework.tenan.po.TenantMember;
-import com.centit.framework.tenan.po.TenantMemberApply;
+import com.centit.framework.tenan.po.*;
 import com.centit.framework.tenan.service.TenantService;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.framework.tenan.vo.TenantMemberApplyVo;
 import com.centit.framework.tenan.vo.TenantMemberQo;
 import com.centit.support.common.ObjectException;
+import com.centit.support.common.ParamName;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -263,11 +262,109 @@ public class TenanController extends BaseController {
 
         try {
             return tenantService.userTenants(userCode);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("获取用户所在租户出错，错误原因:{},入参:{}", e, userCode);
         }
         return ResponseData.makeErrorMessage("获取用户所在租户出错");
+
+    }
+
+    @ApiOperation(
+        value = "租户管理员创建应用",
+        notes = "租户管理员创建应用"
+    )
+    @RequestMapping(value = "/createApplication", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData createApplication(@RequestBody OsInfo osInfo) {
+
+        try {
+            return tenantService.createApplication(osInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("租户管理员创建应用出错，错误原因:{},入参:{}", e, osInfo.toString());
+        }
+        return ResponseData.makeErrorMessage("租户管理员创建应用失败!");
+
+    }
+
+    @ApiOperation(
+        value = "获取租户下的应用列表",
+        notes = "获取租户下的应用列表"
+    )
+    @RequestMapping(value = "/listTenantApplication", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public ResponseData listTenantApplication(@RequestParam("topUnit") String topUnit) {
+
+        try {
+            return tenantService.listTenantApplication(topUnit);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("获取租户下的应用列表出错，错误原因:{},入参:{}", e, topUnit);
+        }
+        return ResponseData.makeErrorMessage("获取租户下的应用列表失败!");
+
+    }
+
+    @ApiOperation(
+        value = "根据属性获取组信息",
+        notes = "根据属性获取组信息"
+    )
+    @RequestMapping(value = "/listWorkGroups", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public ResponseData listWorkGroupByProperties(HttpServletRequest request) {
+
+        Map<String, Object> parameters = collectRequestParameters(request);
+        try {
+            return tenantService.listWorkGroupByProperties(parameters);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("根据属性获取组信息列表出错，错误原因:{},入参:{}", e, parameters.toString());
+        }
+        return ResponseData.makeErrorMessage("根据属性获取组信息列表!");
+    }
+
+    @ApiOperation(
+        value = "判断人员是否在班组内",
+        notes = "判断人员是否在班组内"
+    )
+    @RequestMapping(value = "/userIsMember", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public ResponseData userInWorkGroup(WorkGroup workGroup) {
+
+        try {
+            return tenantService.userInWorkGroup(workGroup);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("判断人员是否在班组内出错，错误原因:{},入参:{}", e, workGroup.toString());
+        }
+        return ResponseData.makeErrorMessage("判断人员是否在班组内出错!");
+    }
+
+    @ApiOperation(
+        value = "查询租户信息",
+        notes = "根据unitName模糊查询租户信息"
+    )
+    @RequestMapping(value = "/pageListTenants", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public PageQueryResult<TenantInfo> pageListTenants(@ParamName("unitName") String unitName, PageDesc pageDesc) {
+        if (StringUtils.isBlank(unitName)){
+            throw new ObjectException("unitName不能为空");
+        }
+        return tenantService.pageListTenants(unitName, pageDesc);
+
+    }
+
+    @ApiOperation(
+        value = "查询用户信息",
+        notes = "查询租户信息，只能根据userCode，userName，regCellPhone精确查找，unitCode:必传 当前用户所在租户topUnit"
+    )
+    @RequestMapping(value = "/findUsers", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public ResponseData findUsers(HttpServletRequest request) {
+        Map<String, Object> paramMap = collectRequestParameters(request);
+
+        return tenantService.findUsers(paramMap);
 
     }
 }

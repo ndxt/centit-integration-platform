@@ -17,18 +17,31 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static com.centit.framework.tenan.constant.TenantConstant.TENANT_ADMIN_ROLE_CODE;
+
 @Repository
 public class WorkGroupDao extends BaseDaoImpl<WorkGroup, String> {
     /**
      * 校验用户是否为租户管理员
      *
-     * @param topUnit
-     * @param userCode
+     * @param topUnit 租户d
+     * @param userCode 用户code
      * @return
      */
-    public boolean userIsAdmin(String topUnit, String userCode) {
+    public boolean userIsTenantAdmin(String topUnit, String userCode) {
 
-        Map<String, Object> filterMap = CollectionsOpt.createHashMap("groupId", topUnit, "userCode", userCode, "roleCode", "ZHGLY");
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("groupId", topUnit, "userCode", userCode, "roleCode", TENANT_ADMIN_ROLE_CODE);
+        return super.listObjectsByProperties(filterMap).size() > 0;
+    }
+
+    /**
+     * 校验用户是否为应用开发组成员
+     * @param topUnit 应用id
+     * @param userCode 用户id
+     * @return
+     */
+    public boolean userIsMember(String topUnit, String userCode) {
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("groupId", topUnit, "userCode", userCode);
         return super.listObjectsByProperties(filterMap).size() > 0;
     }
 
