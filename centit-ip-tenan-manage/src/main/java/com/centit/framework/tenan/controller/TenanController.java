@@ -16,7 +16,6 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.common.ParamName;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.*;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/tenant")
-@Slf4j
 @Api(
     tags = {"租户管理接口"},
     value = "租户管理接口"
@@ -54,7 +52,7 @@ public class TenanController extends BaseController {
             return tenantService.registerUserAccount(userInfo);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("用户注册失败,错误原因{},用户名数据：{}", e, userInfo.toString());
+            logger.error("用户注册失败,错误原因{},用户名数据：{}", e, userInfo.toString());
             return ResponseData.makeErrorMessage("用户注册失败!");
         }
     }
@@ -71,7 +69,7 @@ public class TenanController extends BaseController {
             return tenantService.applyAddTenant(tenantInfo);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("用户申请新建租户失败,错误原因{},用户名数据：{}", e, tenantInfo.toString());
+            logger.error("用户申请新建租户失败,错误原因{},用户名数据：{}", e, tenantInfo.toString());
             return ResponseData.makeErrorMessage("用户申请新建租户失败!");
         }
     }
@@ -88,7 +86,7 @@ public class TenanController extends BaseController {
             return tenantService.applyJoinTenant(tenantMemberApply);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("成员申请失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
+            logger.error("成员申请失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
             return ResponseData.makeErrorMessage("成员申请失败!");
         }
     }
@@ -162,7 +160,7 @@ public class TenanController extends BaseController {
             return tenantService.updateUserInfo(userInfo);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("更新人员信息失败。失败原因：{},入参：{}", e, userInfo.toString());
+            logger.error("更新人员信息失败。失败原因：{},入参：{}", e, userInfo.toString());
         }
         return ResponseData.errorResponse;
     }
@@ -184,7 +182,7 @@ public class TenanController extends BaseController {
             return tenantService.quitTenant(topUnit, userCode);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("退出租户失败。失败原因：{},入参：userCode={},topUnit={}", e, userCode, topUnit);
+            logger.error("退出租户失败。失败原因：{},入参：userCode={},topUnit={}", e, userCode, topUnit);
         }
         return ResponseData.errorResponse;
     }
@@ -201,7 +199,7 @@ public class TenanController extends BaseController {
             return tenantService.businessTenant(tenantBusinessLog);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("租户转让申请失败。失败原因：{},入参：tenantBusinessLog={}", e, tenantBusinessLog.toString());
+            logger.error("租户转让申请失败。失败原因：{},入参：tenantBusinessLog={}", e, tenantBusinessLog.toString());
         }
         return ResponseData.makeErrorMessage("租户转让申请失败");
     }
@@ -245,7 +243,7 @@ public class TenanController extends BaseController {
             return ResponseData.makeErrorMessage(obe.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("设置租户成员角色出错，错误原因:{},入参:{}", e, tenantMemberQo.toString());
+            logger.error("设置租户成员角色出错，错误原因:{},入参:{}", e, tenantMemberQo.toString());
         }
         return ResponseData.makeErrorMessage("设置租户成员角色出错");
 
@@ -264,7 +262,7 @@ public class TenanController extends BaseController {
             return tenantService.userTenants(userCode);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("获取用户所在租户出错，错误原因:{},入参:{}", e, userCode);
+            logger.error("获取用户所在租户出错，错误原因:{},入参:{}", e, userCode);
         }
         return ResponseData.makeErrorMessage("获取用户所在租户出错");
 
@@ -282,7 +280,7 @@ public class TenanController extends BaseController {
             return tenantService.createApplication(osInfo);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("租户管理员创建应用出错，错误原因:{},入参:{}", e, osInfo.toString());
+            logger.error("租户管理员创建应用出错，错误原因:{},入参:{}", e, osInfo.toString());
         }
         return ResponseData.makeErrorMessage("租户管理员创建应用失败!");
 
@@ -300,7 +298,7 @@ public class TenanController extends BaseController {
             return tenantService.listTenantApplication(topUnit);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("获取租户下的应用列表出错，错误原因:{},入参:{}", e, topUnit);
+            logger.error("获取租户下的应用列表出错，错误原因:{},入参:{}", e, topUnit);
         }
         return ResponseData.makeErrorMessage("获取租户下的应用列表失败!");
 
@@ -319,7 +317,7 @@ public class TenanController extends BaseController {
             return tenantService.listWorkGroupByProperties(parameters);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("根据属性获取组信息列表出错，错误原因:{},入参:{}", e, parameters.toString());
+            logger.error("根据属性获取组信息列表出错，错误原因:{},入参:{}", e, parameters.toString());
         }
         return ResponseData.makeErrorMessage("根据属性获取组信息列表!");
     }
@@ -336,7 +334,7 @@ public class TenanController extends BaseController {
             return tenantService.userInWorkGroup(workGroup);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("判断人员是否在班组内出错，错误原因:{},入参:{}", e, workGroup.toString());
+            logger.error("判断人员是否在班组内出错，错误原因:{},入参:{}", e, workGroup.toString());
         }
         return ResponseData.makeErrorMessage("判断人员是否在班组内出错!");
     }

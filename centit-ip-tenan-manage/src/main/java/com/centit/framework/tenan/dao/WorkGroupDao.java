@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static com.centit.framework.tenan.constant.TenantConstant.APPLICATION_ADMIN_ROLE_CODE;
 import static com.centit.framework.tenan.constant.TenantConstant.TENANT_ADMIN_ROLE_CODE;
 
 @Repository
@@ -34,6 +35,17 @@ public class WorkGroupDao extends BaseDaoImpl<WorkGroup, String> {
         return super.listObjectsByProperties(filterMap).size() > 0;
     }
 
+    /**
+     *校验用户是否为应用开发组长（管理员）
+     * @param osId 应用id
+     * @param userCode 用户code
+     * @return
+     */
+    public boolean userIsApplicationAdmin(String osId, String userCode) {
+
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("groupId", osId, "userCode", userCode, "roleCode", APPLICATION_ADMIN_ROLE_CODE);
+        return super.listObjectsByProperties(filterMap).size() > 0;
+    }
     /**
      * 校验用户是否为应用开发组成员
      * @param topUnit 应用id

@@ -1,7 +1,12 @@
 package com.centit.framework.tenan.service;
 
-import com.centit.framework.common.ResponseData;
+import com.centit.framework.tenan.po.TenantInfo;
 import com.centit.support.common.ObjectException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 判断用户在租户中具有的权限与角色
@@ -104,30 +109,42 @@ public interface TenantPowerManage {
     /**
      * 获取租户资源上限
      * @param topUnit 租户id
-     * @return
+     * @return 租户详情
      */
-    ResponseData tenantResourceLimit(String topUnit);
+    TenantInfo tenantResourceLimit(String topUnit);
 
     /**
      * 租户已用资源
-     * @param topUnit
-     * @return
+     * @param topUnit 租户id
+     * @return map中对应的key：
+     *       SOURCE_TYPE：资源code
+     *      SOURCE_TYPE_COUNT：已用个数
      */
-    ResponseData tenantResourceUsed(String topUnit);
+    List<Map<String, Object>> tenantResourceUsed(String topUnit);
 
     /**
-     * 租户剩余可用资源
-     * @param topUnit
-     * @return
+     * 租户资源详情
+     * @param topUnit 租户id
+     * @return map中对应的key：
+     *      sourceType 资源类型
+     *      limit 资源限制个数
+     *      usedSource 已用资源个数
+     *      useAble可用资源个数
+     *      isLimit 是否达到上限 true:达到上限 false：未达到上限
      */
-    boolean teanatResourceUseable(String topUnit);
+    ArrayList<HashMap<String, Object>> tenantResourceDetails(String topUnit);
 
 
     /**
-     * 租户指定资源是否剩余
+     * 租户指定资源详情
      * @param topUnit 租户id
      * @param resourceType 租户类型
-     * @return
+     * @return map中对应的key：
+     *      sourceType 资源类型
+     *      limit 资源限制个数
+     *      usedSource 已用资源个数
+     *      useAble可用资源个数
+     *      isLimit 是否达到上限 true:达到上限 false：未达到上限
      */
-    boolean specialResourceUseable(String topUnit,String resourceType);
+    HashMap<String, Object> specialResourceDetails(String topUnit, String resourceType);
 }

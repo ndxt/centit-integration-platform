@@ -89,6 +89,22 @@ public class TenantInfo implements Serializable {
     @ApiModelProperty(value = "更新时间", name = "updateTime")
     private Date updateTime;
 
+    @Column(name = "database_number_limit")
+    @ApiModelProperty(value = "数据库个数上限 ,数据类型：D", name = "databaseNumberLimit")
+    private int databaseNumberLimit;
+
+    @Column(name = "os_number_limit")
+    @ApiModelProperty(value = "应用个数上限 数据类型：O", name = "osNumberLimit")
+    private int osNumberLimit;
+
+    @Column(name = "file_space_limit")
+    @ApiModelProperty(value = "文件服务空间上限 数据类型：F", name = "fileSpaceLimit")
+    private int fileSpaceLimit;
+
+    @Column(name = "data_space_limit")
+    @ApiModelProperty(value = "数据空间上限 数据类型：C", name = "dataSpaceLimit")
+    private int dataSpaceLimit;
+
     public String getTopUnit() {
         return topUnit;
     }
@@ -209,6 +225,38 @@ public class TenantInfo implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public int getDatabaseNumberLimit() {
+        return databaseNumberLimit;
+    }
+
+    public void setDatabaseNumberLimit(int databaseNumberLimit) {
+        this.databaseNumberLimit = databaseNumberLimit;
+    }
+
+    public int getOsNumberLimit() {
+        return osNumberLimit;
+    }
+
+    public void setOsNumberLimit(int osNumberLimit) {
+        this.osNumberLimit = osNumberLimit;
+    }
+
+    public int getFileSpaceLimit() {
+        return fileSpaceLimit;
+    }
+
+    public void setFileSpaceLimit(int fileSpaceLimit) {
+        this.fileSpaceLimit = fileSpaceLimit;
+    }
+
+    public int getDataSpaceLimit() {
+        return dataSpaceLimit;
+    }
+
+    public void setDataSpaceLimit(int dataSpaceLimit) {
+        this.dataSpaceLimit = dataSpaceLimit;
+    }
+
     @Override
     public String toString() {
         return "TenantInfo{" +
@@ -227,6 +275,10 @@ public class TenantInfo implements Serializable {
             ", createTime=" + createTime +
             ", updator='" + updator + '\'' +
             ", updateTime=" + updateTime +
+            ", databaseNumberLimit=" + databaseNumberLimit +
+            ", osNumberLimit=" + osNumberLimit +
+            ", fileSpaceLimit=" + fileSpaceLimit +
+            ", dataSpaceLimit=" + dataSpaceLimit +
             '}';
     }
 }

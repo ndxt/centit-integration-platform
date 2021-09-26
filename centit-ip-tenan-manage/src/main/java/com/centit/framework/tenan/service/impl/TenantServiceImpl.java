@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.centit.framework.tenan.constant.TenantConstant.APPLICATION_ADMIN_ROLE_CODE;
 import static com.centit.framework.tenan.util.UserUtils.getUserCodeFromSecurityContext;
 
 @Service
@@ -470,7 +471,7 @@ public class TenantServiceImpl implements TenantService {
         WorkGroup workGroup = new WorkGroup();
         workGroup.setGroupId(osInfo.getOsId());
         workGroup.setUserCode(osInfo.getCreated());
-        workGroup.setRoleCode("OSZZ");
+        workGroup.setRoleCode(APPLICATION_ADMIN_ROLE_CODE);
         workGroup.setCreator(osInfo.getCreated());
         workGroup.setIsValid("T");
         workGroupDao.saveNewObject(workGroup);
