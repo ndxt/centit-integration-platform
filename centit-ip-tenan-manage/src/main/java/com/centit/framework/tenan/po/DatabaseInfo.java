@@ -72,11 +72,133 @@ public class DatabaseInfo implements Serializable {
 
     @Column(name = "SOURCE_TYPE")
     @Length(max = 1)
-    @ApiModelProperty(value = "资源类型", name = "sourceType")
+    @ApiModelProperty(value = "资源类型 数据库资源类型：D,应用资源类型:O,文件空间资源类型:F,数据空间资源类型:C", name = "sourceType")
     private String sourceType;
 
     @Column(name = "EXT_PROPS")
     @ApiModelProperty(value = "扩展属性", name = "extProps")
     private String extProps;
 
+    public String getDatabaseCode() {
+        return DatabaseCode;
+    }
+
+    public void setDatabaseCode(String databaseCode) {
+        DatabaseCode = databaseCode;
+    }
+
+    public String getTopUnit() {
+        return topUnit;
+    }
+
+    public void setTopUnit(String topUnit) {
+        this.topUnit = topUnit;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public String getDatabaseUrl() {
+        return databaseUrl;
+    }
+
+    public void setDatabaseUrl(String databaseUrl) {
+        this.databaseUrl = databaseUrl;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getDatabaseDesc() {
+        return databaseDesc;
+    }
+
+    public void setDatabaseDesc(String databaseDesc) {
+        this.databaseDesc = databaseDesc;
+    }
+
+    public Date getLastModifyDate() {
+        return lastModifyDate;
+    }
+
+    public void setLastModifyDate(Date lastModifyDate) {
+        this.lastModifyDate = lastModifyDate;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
+    }
+
+    public String getUpdator() {
+        return updator;
+    }
+
+    public void setUpdator(String updator) {
+        this.updator = updator;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getExtProps() {
+        return extProps;
+    }
+
+    public void setExtProps(String extProps) {
+        this.extProps = extProps;
+    }
+
+    @Override
+    public String toString() {
+        return "DatabaseInfo{" +
+            "DatabaseCode='" + DatabaseCode + '\'' +
+            ", topUnit='" + topUnit + '\'' +
+            ", databaseName='" + databaseName + '\'' +
+            ", databaseUrl='" + databaseUrl + '\'' +
+            ", username='" + username + '\'' +
+            ", password='" + password + '\'' +
+            ", databaseDesc='" + databaseDesc + '\'' +
+            ", lastModifyDate=" + lastModifyDate +
+            ", createTime=" + createTime +
+            ", created='" + created + '\'' +
+            ", updator='" + updator + '\'' +
+            ", sourceType='" + sourceType + '\'' +
+            ", extProps='" + extProps + '\'' +
+            '}';
+    }
 }

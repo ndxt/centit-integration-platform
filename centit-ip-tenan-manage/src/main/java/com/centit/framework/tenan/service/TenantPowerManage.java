@@ -147,4 +147,30 @@ public interface TenantPowerManage {
      *      isLimit 是否达到上限 true:达到上限 false：未达到上限
      */
     HashMap<String, Object> specialResourceDetails(String topUnit, String resourceType);
+
+    /**
+     * 校验用户是否为system租户成员
+     * @param userCode 用户code
+     * @return true：是 false：否
+     */
+    boolean userIsSystemMember(String userCode);
+
+    /**
+     * 校验当前用户是否为system租户成员
+     * @return true：是 false：否
+     */
+    boolean userIsSystemMember();
+
+    /**
+     * 校验当前用户是否为system租户管理员
+     * @param userCode 用户code
+     * @return true：是 false：否
+     */
+    boolean userIsSystemAdmin(String userCode);
+
+    /**
+     * 校验当前用户是否为system租户管理员
+     * @return true：是 false：否
+     */
+    boolean userIsSystemAdmin();
 }

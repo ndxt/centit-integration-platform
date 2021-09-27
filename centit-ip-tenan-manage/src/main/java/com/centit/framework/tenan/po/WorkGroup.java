@@ -32,53 +32,44 @@ public class WorkGroup implements Serializable {
     @ApiModelProperty(value = "角色", name = "roleCode")//在os中role对应 组长：OSZZ 组员：OSZY
     private String roleCode;
 
-    @Id
     @Column(name = "is_valid")
     @Length(max = 32)
     @ApiModelProperty(value = "是否生效", name = "isValid")
     private String isValid;
 
-    @Id
     @Column(name = "AUTH_TIME")
     @Length(max = 32)
     @ApiModelProperty(value = "创建时间", name = "authTime")
     private Date authTime;
 
-    @Id
     @Column(name = "creator")
     @Length(max = 32)
     @ApiModelProperty(value = "创建人", name = "creator")
     private String creator;
 
-    @Id
     @Column(name = "updator")
     @Length(max = 32)
     @ApiModelProperty(value = "更新人", name = "updator")
     private String updator;
 
-    @Id
     @Column(name = "UPDATE_DATE")
     @Length(max = 32)
     @ApiModelProperty(value = "更新时间", name = "updateDate")
     private Date updateDate;
 
-    @Id
     @Column(name = "USER_ORDER")
-    @Length(max = 32)
     @ApiModelProperty(value = "排序号", name = "userOrder")
-    private Date userOrder;
+    private int userOrder;
 
-    @Id
     @Column(name = "RUN_TOKEN")
     @Length(max = 32)
     @ApiModelProperty(value = "运行令牌", name = "runToken")
-    private Date runToken;
+    private String runToken;
 
-    @Id
     @Column(name = "AUTH_DESC")
-    @Length(max = 32)
+    @Length(max = 255)
     @ApiModelProperty(value = "授权说明", name = "authDesc")
-    private Date authDesc;
+    private String authDesc;
 
     public String getGroupId() {
         return groupId;
@@ -144,27 +135,27 @@ public class WorkGroup implements Serializable {
         this.updateDate = updateDate;
     }
 
-    public Date getUserOrder() {
+    public int getUserOrder() {
         return userOrder;
     }
 
-    public void setUserOrder(Date userOrder) {
+    public void setUserOrder(int userOrder) {
         this.userOrder = userOrder;
     }
 
-    public Date getRunToken() {
+    public String getRunToken() {
         return runToken;
     }
 
-    public void setRunToken(Date runToken) {
+    public void setRunToken(String runToken) {
         this.runToken = runToken;
     }
 
-    public Date getAuthDesc() {
+    public String getAuthDesc() {
         return authDesc;
     }
 
-    public void setAuthDesc(Date authDesc) {
+    public void setAuthDesc(String authDesc) {
         this.authDesc = authDesc;
     }
 
@@ -180,8 +171,8 @@ public class WorkGroup implements Serializable {
             ", updator='" + updator + '\'' +
             ", updateDate=" + updateDate +
             ", userOrder=" + userOrder +
-            ", runToken=" + runToken +
-            ", authDesc=" + authDesc +
+            ", runToken='" + runToken + '\'' +
+            ", authDesc='" + authDesc + '\'' +
             '}';
     }
 }

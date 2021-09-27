@@ -9,6 +9,7 @@ import com.centit.framework.system.po.OsInfo;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.po.*;
 import com.centit.framework.tenan.service.TenantService;
+import com.centit.framework.tenan.util.UserUtils;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.framework.tenan.vo.TenantMemberApplyVo;
 import com.centit.framework.tenan.vo.TenantMemberQo;
@@ -167,22 +168,46 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "退出租户",
-        notes = "退出租户，请求示例：{\"userCode\":\"U6n6uge0\",\"topUnit\":\"f0c0368da826434bbb158ed2ef0b1726\"}"
+        notes = "退出租户，请求示例：{\"topUnit\":\"f0c0368da826434bbb158ed2ef0b1726\"}"
     )
     @RequestMapping(value = "/quitTenant", method = RequestMethod.PUT)
     @WrapUpResponseBody
     public ResponseData quitTenant(@RequestBody Map<String, Object> paraMaps) {
         String topUnit = MapUtils.getString(paraMaps, "topUnit");
-        String userCode = MapUtils.getString(paraMaps, "userCode");
-        if (StringUtils.isAnyBlank(topUnit, userCode)) {
-            return ResponseData.makeErrorMessage("参数topUnit,userCode不能为空");
+        if (StringUtils.isBlank(topUnit)) {
+            return ResponseData.makeErrorMessage("参数topUnit不能为空");
         }
-
+        String userCode = UserUtils.getUserCodeFromSecurityContext();
+        if (StringUtils.isBlank(userCode)){
+            return ResponseData.makeErrorMessage("当前用户未登录");
+        }
         try {
             return tenantService.quitTenant(topUnit, userCode);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("退出租户失败。失败原因：{},入参：userCode={},topUnit={}", e, userCode, topUnit);
+        }
+        return ResponseData.errorResponse;
+    }
+
+
+    @ApiOperation(
+        value = "把成员移除租户",
+        notes = "把成员移除租户，请求示例：{\"userCode\":\"U6n6uge0\",\"topUnit\":\"f0c0368da826434bbb158ed2ef0b1726\"}"
+    )
+    @RequestMapping(value = "/removeTenantMember", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData removeTenantMember(@RequestBody Map<String, Object> paraMaps) {
+        String topUnit = MapUtils.getString(paraMaps, "topUnit");
+        String userCode = MapUtils.getString(paraMaps, "userCode");
+        if (StringUtils.isAnyBlank(topUnit,userCode)) {
+            return ResponseData.makeErrorMessage("参数topUnit,userCode不能为空");
+        }
+        try {
+            return tenantService.removeTenantMember(topUnit, userCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("移除租户失败。失败原因：{},入参：userCode={},topUnit={}", e, userCode, topUnit);
         }
         return ResponseData.errorResponse;
     }
@@ -233,12 +258,12 @@ public class TenanController extends BaseController {
         value = "设置租户成员角色",
         notes = "设置租户成员角色"
     )
-    @RequestMapping(value = "/adminAssignRole", method = RequestMethod.POST)
+    @RequestMapping(value = "/assignTenantRole", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData adminAssignRole(@RequestBody TenantMemberQo tenantMemberQo) {
+    public ResponseData assignTenantRole(@RequestBody TenantMemberQo tenantMemberQo) {
 
         try {
-            return tenantService.adminAssignRole(tenantMemberQo);
+            return tenantService.assignTenantRole(tenantMemberQo);
         } catch (ObjectException obe) {
             return ResponseData.makeErrorMessage(obe.getMessage());
         } catch (Exception e) {
@@ -251,13 +276,75 @@ public class TenanController extends BaseController {
 
 
     @ApiOperation(
+        value = "设置应用组员角色",
+        notes = "设置应用组员角色，把租户成员加入到开发组中"
+    )
+    @RequestMapping(value = "/assignApplicationRole", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData assignApplicationRole(@RequestBody WorkGroup workGroup) {
+
+        try {
+            return tenantService.assignApplicationRole(workGroup);
+        } catch (ObjectException obe) {
+            return ResponseData.makeErrorMessage(obe.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("设置应用组员角色出错，错误原因:{},入参:{}", e, workGroup.toString());
+        }
+        return ResponseData.makeErrorMessage("设置应用组员角色出错");
+
+    }
+
+
+    @ApiOperation(
+        value = "移除开发中的成员",
+        notes = "移除开发中的成员 请求示例：{\"userCode\":\"U6n6uge0\",\"groupId\":\"f0c0368da826434bbb158ed2ef0b1726\"}"
+    )
+    @RequestMapping(value = "/removeApplicationMember", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData removeApplicationMember(@RequestBody Map<String, Object> paraMaps) {
+        String groupId = MapUtils.getString(paraMaps, "groupId");
+        String userCode = MapUtils.getString(paraMaps, "userCode");
+        if (StringUtils.isAnyBlank(groupId,userCode)){
+            return ResponseData.makeErrorMessage("groupId,userCode不能为空");
+        }
+        try {
+            return tenantService.removeApplicationMember(groupId,userCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("设置应用组员角色出错，错误原因:{},入参:groupId={},userCode={}", e, groupId,userCode);
+        }
+        return ResponseData.makeErrorMessage("移除开发中的成员出错");
+    }
+
+
+
+    @ApiOperation(
+        value = "获取组员列表信息",
+        notes = "获取组员列表信息 "
+    )
+    @RequestMapping(value = "/listApplicationMember", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public ResponseData listApplicationMember(@RequestParam("groupId") String groupId) {
+
+        try {
+            return tenantService.listApplicationMember(groupId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取组员列表信息出错，错误原因:{},入参:groupId={", e, groupId);
+        }
+        return ResponseData.makeErrorMessage("获取组员列表信息出错");
+    }
+
+    @ApiOperation(
         value = "获取用户所在租户",
         notes = "获取用户所在租户"
     )
     @RequestMapping(value = "/userTenants", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public ResponseData userTenants(@RequestParam("userCode") String userCode) {
+    public ResponseData userTenants(HttpServletRequest request) {
 
+        String userCode = UserUtils.getUserCodeFromSecurityContext();
         try {
             return tenantService.userTenants(userCode);
         } catch (Exception e) {
@@ -324,7 +411,7 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "判断人员是否在班组内",
-        notes = "判断人员是否在班组内"
+        notes = "判断人员是否在班组内,与/tenantPower/userIsApplicationMember功能相同，这个功能尽量不用"
     )
     @RequestMapping(value = "/userIsMember", method = RequestMethod.GET)
     @WrapUpResponseBody
@@ -364,5 +451,28 @@ public class TenanController extends BaseController {
 
         return tenantService.findUsers(paramMap);
 
+    }
+
+    @ApiOperation(
+        value = "用户申请资源",
+        notes = "用户申请资源"
+    )
+    @RequestMapping(value = "/applyResource", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData applyResource(@RequestBody @Validated DatabaseInfo databaseInfo) {
+
+        return tenantService.applyResource(databaseInfo);
+
+    }
+
+    @ApiOperation(
+        value = "根据条件列出租户下的资源",
+        notes = "根据条件列出租户下的资源 topUnit：租户id 必填，sourceType：资源类型，选填 "
+    )
+    @RequestMapping(value = "/listResource", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public ResponseData listResource(DatabaseInfo databaseInfo) {
+
+        return tenantService.listResource(databaseInfo);
     }
 }

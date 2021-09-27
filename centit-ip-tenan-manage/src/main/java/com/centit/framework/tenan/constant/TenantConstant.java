@@ -12,9 +12,18 @@ public class TenantConstant {
     public static final String TENANT_ADMIN_ROLE_CODE = "ZHGLY";
 
     /**
+     *租户组员角色代码
+     */
+    public static final String TENANT_NORMAL_MEMBER_ROLE_CODE = "ZHZY";
+
+    /**
      * 应用中的开发组长
      */
     public static final String APPLICATION_ADMIN_ROLE_CODE = "OSZZ";
+    /**
+     * 应用中的开发组员
+     */
+    public static final String APPLICATION_NORMAL_MEMBER_ROLE_CODE = "OSZY";
     /**
      * 数据库资源类型
      */
@@ -31,5 +40,10 @@ public class TenantConstant {
      * 数据空间资源类型
      */
     public static final String DATA_SPACE_SOURCE_TYPE = "C";
+
+    /**
+     * 系统租户topUnitCode
+     */
+    public static final String SYSTEM_TENANT_TOP_UNIT_CODE = "system";
 
 }

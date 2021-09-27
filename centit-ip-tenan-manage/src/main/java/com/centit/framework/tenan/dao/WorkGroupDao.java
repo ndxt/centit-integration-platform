@@ -39,7 +39,7 @@ public class WorkGroupDao extends BaseDaoImpl<WorkGroup, String> {
      *校验用户是否为应用开发组长（管理员）
      * @param osId 应用id
      * @param userCode 用户code
-     * @return
+     * @return true：是 false：否
      */
     public boolean userIsApplicationAdmin(String osId, String userCode) {
 
@@ -80,7 +80,7 @@ public class WorkGroupDao extends BaseDaoImpl<WorkGroup, String> {
      * updator  require
      * groupId  require
      * userCode  require
-     * @return
+     * @return 更新个数
      */
     @Transactional
     public int updateByProperties(Map<String, Object> filterMap) {

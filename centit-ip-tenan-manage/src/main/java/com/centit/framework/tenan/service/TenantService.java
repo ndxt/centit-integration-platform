@@ -85,6 +85,14 @@ public interface TenantService {
     ResponseData quitTenant(String topUnit,String userCode);
 
     /**
+     * 移除租户内的成员
+     * @param topUnit
+     * @param userCode
+     * @return
+     */
+    ResponseData removeTenantMember(String topUnit,String userCode);
+
+    /**
      * 转让租户
      * @param tenantBusinessLog
      * @return
@@ -127,7 +135,30 @@ public interface TenantService {
      * @param tenantMemberQo
      * @return
      */
-    ResponseData adminAssignRole(TenantMemberQo tenantMemberQo);
+    ResponseData assignTenantRole(TenantMemberQo tenantMemberQo);
+
+
+    /**
+     * 应用组长设置组员角色
+     * @param workGroup
+     * @return
+     */
+    ResponseData assignApplicationRole(WorkGroup workGroup);
+
+    /**
+     *移除开发中的成员
+     * @param groupId
+     * @param userCode
+     * @return
+     */
+    ResponseData removeApplicationMember(String groupId,String userCode);
+
+    /**
+     * 获取组员列表信息
+     * @param groupId 组id
+     * @return 应用中成员信息
+     */
+    ResponseData listApplicationMember(String groupId);
 
 
     /**
@@ -181,4 +212,18 @@ public interface TenantService {
      * @return 查找userinfo结果
      */
     ResponseData findUsers(Map<String,Object> paramMap);
+
+    /**
+     * 用户申请资源
+     * @param databaseInfo
+     * @return
+     */
+    ResponseData applyResource(DatabaseInfo databaseInfo);
+
+    /**
+     * 根据条件列出租户下的资源
+     * @param databaseInfo
+     * @return
+     */
+    ResponseData listResource(DatabaseInfo databaseInfo);
 }

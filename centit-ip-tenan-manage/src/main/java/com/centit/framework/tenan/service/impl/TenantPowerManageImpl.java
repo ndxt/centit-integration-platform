@@ -1,6 +1,5 @@
 package com.centit.framework.tenan.service.impl;
 
-import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.system.dao.UserUnitDao;
 import com.centit.framework.tenan.dao.DatabaseInfoDao;
 import com.centit.framework.tenan.dao.TenantInfoDao;
@@ -9,7 +8,6 @@ import com.centit.framework.tenan.po.TenantInfo;
 import com.centit.framework.tenan.service.TenantPowerManage;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
-import com.google.common.base.CaseFormat;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,10 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.centit.framework.tenan.constant.TenantConstant.DATABASE_SOURCE_TYPE;
-import static com.centit.framework.tenan.constant.TenantConstant.DATA_SPACE_SOURCE_TYPE;
-import static com.centit.framework.tenan.constant.TenantConstant.FILE_SPACE_SOURCE_TYPE;
-import static com.centit.framework.tenan.constant.TenantConstant.OS_SOURCE_TYPE;
+import static com.centit.framework.tenan.constant.TenantConstant.*;
 import static com.centit.framework.tenan.util.UserUtils.getUserCodeFromSecurityContext;
 
 @Service
@@ -161,6 +156,26 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         maps.add(map);
         return getSourceUseDetails(maps, getResourceLimit(tenantInfo, resourceType), resourceType);
+    }
+
+    @Override
+    public boolean userIsSystemMember(String userCode) {
+        return this.userIsTenantMember(userCode,SYSTEM_TENANT_TOP_UNIT_CODE);
+    }
+
+    @Override
+    public boolean userIsSystemMember() {
+        return userIsTenantMember(SYSTEM_TENANT_TOP_UNIT_CODE);
+    }
+
+    @Override
+    public boolean userIsSystemAdmin(String userCode) {
+        return userIsTenantAdmin(userCode,SYSTEM_TENANT_TOP_UNIT_CODE);
+    }
+
+    @Override
+    public boolean userIsSystemAdmin() {
+        return userIsTenantAdmin(SYSTEM_TENANT_TOP_UNIT_CODE);
     }
 
     /**
