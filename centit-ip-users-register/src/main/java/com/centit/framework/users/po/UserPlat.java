@@ -24,12 +24,12 @@ public class UserPlat implements java.io.Serializable {
     @Column(name = "USER_PLAT_ID")
     //@GeneratedValue(generator = "assignedGenerator")
     @ValueGenerator(strategy = GeneratorType.UUID22)
-    @Length(max = 64)
+    @Length(max = 32)
     @ApiModelProperty(value = "用户平台ID", name = "userPlatId")
     private String userPlatId;
 
     @Column(name = "PLAT_ID")
-    @Length(max = 64)
+    @Length(max = 32)
     @ApiModelProperty(value = "平台ID", name = "platId")
     private String platId;
 

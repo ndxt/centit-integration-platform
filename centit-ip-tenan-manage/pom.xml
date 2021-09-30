@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-integration-platform</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>5.1-SNAPSHOT</version>
+        <version>5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -42,13 +42,13 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-adapter</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${centit.framework.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-core</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${centit.framework.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-jdbc</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${centit.persistence.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -79,19 +79,19 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-entity</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${centit.framework.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-module</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${centit.framework.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-static</artifactId>
-            <version>5.1-SNAPSHOT</version>
+            <version>${centit.framework.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

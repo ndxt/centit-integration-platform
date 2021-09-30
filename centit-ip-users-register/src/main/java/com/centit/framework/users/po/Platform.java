@@ -23,7 +23,7 @@ public class Platform implements java.io.Serializable {
     @Id
     @Column(name = "PLAT_ID")
     @ValueGenerator(strategy = GeneratorType.UUID22)
-    @Length(max = 64)
+    @Length(max = 32)
     @ApiModelProperty(value = "平台ID", name = "platId")
     private String platId;
 
