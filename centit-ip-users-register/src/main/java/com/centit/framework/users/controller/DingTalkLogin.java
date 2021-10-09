@@ -121,16 +121,15 @@ public class DingTalkLogin extends BaseController {
      * @throws ApiException
      */
     @RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
-    @ResponseBody
-    public ServiceResult<Map<String, Object>> getUserInfo(@RequestParam("code") String code,
-                                                           @RequestParam("state") String state,
-                                                           HttpServletRequest request) throws ApiException {
+    @WrapUpResponseBody
+    public ResponseData getUserInfo(@RequestParam("code") String code, @RequestParam("state") String state,
+                                    HttpServletRequest request) throws ApiException {
         // 获取access_token，注意正式代码要有异常流处理
         String accessToken = "";
         ServiceResult<String> accessTokenSr = tokenService.getAccessToken();
         //ServiceResult<String> accessTokenSr = tokenService.getCorpAccessToken();
         if (!accessTokenSr.isSuccess()) {
-            return ServiceResult.failure(accessTokenSr.getCode(), accessTokenSr.getMessage());
+            return ResponseData.makeErrorMessage(Integer.valueOf(accessTokenSr.getCode()), accessTokenSr.getMessage());
         }
         accessToken = accessTokenSr.getResult();
 
@@ -144,9 +143,9 @@ public class DingTalkLogin extends BaseController {
         return dingTalkLoginService.getUser(accessToken, userIdSr.getResult());*/
 
         if (StringUtils.isBlank(accessToken)) {
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             map.put("accessToken", "");
-            return ServiceResult.success(map);
+            return ResponseData.makeResponseData(map);
         }
         // 通过临时授权码获取授权用户的个人信息
         DefaultDingTalkClient client2 = new DefaultDingTalkClient("https://oapi.dingtalk.com/sns/getuserinfo_bycode");
@@ -181,14 +180,14 @@ public class DingTalkLogin extends BaseController {
         paramsMap.put("corpId", appConfig.getCorpId());
         paramsMap.put("appKey", appConfig.getAppKey());
         paramsMap.put("appSecret", appConfig.getAppSecret());
-        UserPlat userPlat = userPlatService.getUserPlatByProperty(paramsMap);
+        UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
         if (null != userPlat) {
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
             SecurityContextHolder.getContext().setAuthentication(ud);
             map.put("userCode", userPlat.getUserCode());
             map.put("accessToken", request.getSession().getId());
         }
-        return ServiceResult.success(map);
+        return ResponseData.makeResponseData(map);
     }
 
 }

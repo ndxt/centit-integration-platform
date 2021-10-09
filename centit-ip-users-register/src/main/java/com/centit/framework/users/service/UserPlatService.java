@@ -11,7 +11,7 @@ public interface UserPlatService {
 
     UserPlat getObjectById(String userPlatId);
 
-    UserPlat getUserPlatByProperty(Map<String,Object> paramsMap);
+    UserPlat getUserPlatByProperties(Map<String,Object> paramsMap);
 
     void mergeObject(UserPlat userPlat);
 

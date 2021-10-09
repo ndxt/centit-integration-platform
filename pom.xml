@@ -17,7 +17,12 @@
         <module>centit-ip-app-config</module>
         <module>centit-ip-app-boot-config</module>
         <module>centit-ip-server</module>
-<!--        <module>centit-ip-users-register</module>-->
+        <module>centit-ip-users-register</module>
+        <module>centit-ip-tenan-manage</module>
+        <module>centit-ip-demo</module>
+        <module>centit-ip-dubbo-server-config</module>
+        <module>centit-ip-dubbo-client-config</module>
+        <module>centit-ip-app-dubbo-config</module>
     </modules>
     <packaging>pom</packaging>
 

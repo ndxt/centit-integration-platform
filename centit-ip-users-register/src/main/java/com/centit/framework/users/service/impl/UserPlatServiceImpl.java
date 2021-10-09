@@ -33,7 +33,7 @@ public class UserPlatServiceImpl implements UserPlatService {
     }
 
     @Override
-    public UserPlat getUserPlatByProperty(Map<String, Object> paramsMap) {
+    public UserPlat getUserPlatByProperties(Map<String, Object> paramsMap) {
         return userPlatDao.getObjectByProperties(paramsMap);
     }
 
