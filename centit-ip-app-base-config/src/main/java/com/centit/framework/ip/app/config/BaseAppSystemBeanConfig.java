@@ -1,28 +1,27 @@
 package com.centit.framework.ip.app.config;
 
-import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetailsService;
 import com.centit.framework.staticsystem.service.impl.UserDetailsServiceImpl;
-import com.centit.support.algorithm.BooleanBaseOpt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
+@Configuration
 @PropertySource("classpath:system.properties")
-public class IPAppSystemBeanConfig  implements EnvironmentAware{
+public class BaseAppSystemBeanConfig implements EnvironmentAware {
 
     private Environment env;
 
     @Autowired
     @Override
     public void setEnvironment(final Environment environment) {
-        if(environment!=null) {
+        if (environment != null) {
             this.env = environment;
         }
     }
@@ -55,6 +54,5 @@ public class IPAppSystemBeanConfig  implements EnvironmentAware{
     public HttpSessionCsrfTokenRepository csrfTokenRepository() {
         return new HttpSessionCsrfTokenRepository();
     }
-
 
 }

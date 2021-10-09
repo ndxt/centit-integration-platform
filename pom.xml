@@ -22,7 +22,7 @@
         <module>centit-ip-demo</module>
         <module>centit-ip-dubbo-server-config</module>
         <module>centit-ip-dubbo-client-config</module>
-        <module>centit-ip-app-dubbo-config</module>
+        <module>centit-ip-app-base-config</module>
     </modules>
     <packaging>pom</packaging>
 

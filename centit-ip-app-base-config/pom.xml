@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>centit-ip-app-dubbo-config</artifactId>
-    <name>com.centit.framework:centit-ip-app-dubbo-config</name>
+    <artifactId>centit-ip-app-base-config</artifactId>
+    <name>com.centit.framework:centit-ip-app-base-config</name>
     <packaging>jar</packaging>
     <description>先腾集成平台应用，配置类</description>
 

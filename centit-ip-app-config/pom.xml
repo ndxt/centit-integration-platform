@@ -28,6 +28,12 @@
             <version>${centit.framework.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-app-base-config</artifactId>
+            <version>${centit.framework.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>
