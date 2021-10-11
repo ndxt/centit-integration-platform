@@ -147,7 +147,7 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return null;
     }
     @Override
-    public IOptInfo addOptInfo(JSONObject optInfo){
+    public IOptInfo addOptInfo(IOptInfo optInfo){
         for(PlatformEnvironment evrnManger:evrnMangers){
             IOptInfo iOptInfo = evrnManger.addOptInfo(optInfo);
             if(iOptInfo!=null) {

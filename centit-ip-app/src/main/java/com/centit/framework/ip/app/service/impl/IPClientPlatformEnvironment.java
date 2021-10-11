@@ -102,7 +102,7 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
 
     }
     @Override
-    public IOptInfo addOptInfo(JSONObject optInfo){
+    public IOptInfo addOptInfo(IOptInfo optInfo){
         String result=RestfulHttpRequest.jsonPost(appSession,
             "/platform/optinfo",
             optInfo);
