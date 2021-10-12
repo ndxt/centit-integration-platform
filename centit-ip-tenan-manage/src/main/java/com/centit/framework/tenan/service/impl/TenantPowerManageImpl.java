@@ -1,9 +1,8 @@
 package com.centit.framework.tenan.service.impl;
 
 import com.centit.framework.system.dao.UserUnitDao;
-import com.centit.framework.tenan.dao.DatabaseInfoDao;
 import com.centit.framework.tenan.dao.TenantInfoDao;
-import com.centit.framework.tenan.dao.WorkGroupDao;
+import com.centit.product.dao.WorkGroupDao;
 import com.centit.framework.tenan.po.TenantInfo;
 import com.centit.framework.tenan.service.TenantPowerManage;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -37,8 +36,6 @@ public class TenantPowerManageImpl implements TenantPowerManage {
     @Autowired
     private UserUnitDao userUnitDao;
 
-    @Autowired
-    private DatabaseInfoDao databaseInfoDao;
 
     @Override
     public boolean userIsTenantOwner(String userCode, String topUnit) {
@@ -56,7 +53,9 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsTenantAdmin(String userCode, String topUnit) {
-        return workGroupDao.userIsTenantAdmin(userCode, topUnit);
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("groupId", topUnit, "userCode", userCode,
+            "roleCode", TENANT_ADMIN_ROLE_CODE);
+        return workGroupDao.listObjectsByProperties(filterMap).size() > 0;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         if (StringUtils.isBlank(userCode)) {
             throw new ObjectException("用户未登录!");
         }
-        return workGroupDao.userIsTenantAdmin(topUnit, userCode);
+        return userIsTenantAdmin(userCode, topUnit);
     }
 
     @Override
@@ -85,7 +84,9 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsApplicationAdmin(String userCode, String osId) {
-        return workGroupDao.userIsApplicationAdmin(osId, userCode);
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("groupId", osId, "userCode", userCode, "roleCode",
+            APPLICATION_ADMIN_ROLE_CODE);
+        return workGroupDao.listObjectsByProperties(filterMap).size() > 0;
     }
 
     @Override
@@ -99,7 +100,8 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsApplicationMember(String userCode, String osId) throws ObjectException {
-        return workGroupDao.userIsMember(osId, userCode);
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("groupId", osId, "userCode", userCode);
+        return workGroupDao.listObjectsByProperties(filterMap).size() > 0;
     }
 
     @Override
@@ -115,7 +117,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
     public TenantInfo tenantResourceLimit(String topUnit) {
         Map<String, Object> filterMap = CollectionsOpt.createHashMap("topUnit", topUnit, "isAvailable", "T");
         List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(filterMap);
-        if (CollectionUtils.sizeIsEmpty(tenantInfos)){
+        if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
             return null;
         }
         return tenantInfos.get(0);
@@ -123,13 +125,15 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public List<Map<String, Object>> tenantResourceUsed(String topUnit) {
-        return databaseInfoDao.listHashUsedDatabaseByGroup(topUnit);
+        //屏蔽用户资源功能，查询逻辑待定
+        return null;
+        // return databaseInfoDao.listHashUsedDatabaseByGroup(topUnit);
     }
 
     @Override
     public ArrayList<HashMap<String, Object>> tenantResourceDetails(String topUnit) {
         TenantInfo tenantInfo = tenantResourceLimit(topUnit);
-        if (null == tenantInfo){
+        if (null == tenantInfo) {
             return new ArrayList<>();
         }
         List<Map<String, Object>> sourceTypeCount = tenantResourceUsed(topUnit);
@@ -149,7 +153,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
     @Override
     public HashMap<String, Object> specialResourceDetails(String topUnit, String resourceType) {
         TenantInfo tenantInfo = tenantResourceLimit(topUnit);
-        if (null ==tenantInfo){
+        if (null == tenantInfo) {
             return new HashMap<>();
         }
         Map<String, Object> map = tenantResourceUsed(topUnit, resourceType);
@@ -160,7 +164,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsSystemMember(String userCode) {
-        return this.userIsTenantMember(userCode,SYSTEM_TENANT_TOP_UNIT_CODE);
+        return this.userIsTenantMember(userCode, SYSTEM_TENANT_TOP_UNIT_CODE);
     }
 
     @Override
@@ -170,7 +174,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsSystemAdmin(String userCode) {
-        return userIsTenantAdmin(userCode,SYSTEM_TENANT_TOP_UNIT_CODE);
+        return userIsTenantAdmin(userCode, SYSTEM_TENANT_TOP_UNIT_CODE);
     }
 
     @Override
@@ -223,7 +227,9 @@ public class TenantPowerManageImpl implements TenantPowerManage {
      * @return
      */
     public Map<String, Object> tenantResourceUsed(String topUnit, String sourceType) {
-        return databaseInfoDao.listHashUsedDatabaseBySourceType(topUnit, sourceType);
+        //屏蔽资源查询公告，查询逻辑待定
+        return null;
+        //return databaseInfoDao.listHashUsedDatabaseBySourceType(topUnit, sourceType);
     }
 
     /**

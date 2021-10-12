@@ -73,7 +73,6 @@ public class TenantInfo implements Serializable {
     @Column(name = "creator")
     @Length(max = 32)
     @ApiModelProperty(value = "申请人", name = "creator")
-    @NotEmpty
     private String creator;
 
     @Column(name = "create_time")

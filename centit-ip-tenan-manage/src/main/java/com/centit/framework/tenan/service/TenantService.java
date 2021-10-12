@@ -138,12 +138,7 @@ public interface TenantService {
     ResponseData assignTenantRole(TenantMemberQo tenantMemberQo);
 
 
-    /**
-     * 应用组长设置组员角色
-     * @param workGroup
-     * @return
-     */
-    ResponseData assignApplicationRole(WorkGroup workGroup);
+
 
     /**
      *移除开发中的成员
@@ -168,12 +163,6 @@ public interface TenantService {
      */
     ResponseData userTenants(String userCode);
 
-    /**
-     * 租户管理员创建应用
-     * @param osInfo 应用详情
-     * @return
-     */
-    ResponseData createApplication(OsInfo osInfo);
 
     /**
      * 获取租户下的应用列表
@@ -189,12 +178,6 @@ public interface TenantService {
      */
     ResponseData listWorkGroupByProperties(Map<String,Object> paramMap);
 
-    /**
-     * 判断当前用户是否为组成员
-     * @param workGroup
-     * @return
-     */
-    ResponseData userInWorkGroup(WorkGroup workGroup);
 
     /**
      * 根据unitName 模糊查询租户信息
@@ -213,17 +196,5 @@ public interface TenantService {
      */
     ResponseData findUsers(Map<String,Object> paramMap);
 
-    /**
-     * 用户申请资源
-     * @param databaseInfo
-     * @return
-     */
-    ResponseData applyResource(DatabaseInfo databaseInfo);
 
-    /**
-     * 根据条件列出租户下的资源
-     * @param databaseInfo
-     * @return
-     */
-    ResponseData listResource(DatabaseInfo databaseInfo);
 }

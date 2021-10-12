@@ -5,7 +5,6 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.system.po.OsInfo;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.po.*;
 import com.centit.framework.tenan.service.TenantService;
@@ -275,66 +274,9 @@ public class TenanController extends BaseController {
     }
 
 
-    @ApiOperation(
-        value = "设置应用组员角色",
-        notes = "设置应用组员角色，把租户成员加入到开发组中"
-    )
-    @RequestMapping(value = "/assignApplicationRole", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public ResponseData assignApplicationRole(@RequestBody WorkGroup workGroup) {
-
-        try {
-            return tenantService.assignApplicationRole(workGroup);
-        } catch (ObjectException obe) {
-            return ResponseData.makeErrorMessage(obe.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("设置应用组员角色出错，错误原因:{},入参:{}", e, workGroup.toString());
-        }
-        return ResponseData.makeErrorMessage("设置应用组员角色出错");
-
-    }
-
-
-    @ApiOperation(
-        value = "移除开发中的成员",
-        notes = "移除开发中的成员 请求示例：{\"userCode\":\"U6n6uge0\",\"groupId\":\"f0c0368da826434bbb158ed2ef0b1726\"}"
-    )
-    @RequestMapping(value = "/removeApplicationMember", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public ResponseData removeApplicationMember(@RequestBody Map<String, Object> paraMaps) {
-        String groupId = MapUtils.getString(paraMaps, "groupId");
-        String userCode = MapUtils.getString(paraMaps, "userCode");
-        if (StringUtils.isAnyBlank(groupId,userCode)){
-            return ResponseData.makeErrorMessage("groupId,userCode不能为空");
-        }
-        try {
-            return tenantService.removeApplicationMember(groupId,userCode);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("设置应用组员角色出错，错误原因:{},入参:groupId={},userCode={}", e, groupId,userCode);
-        }
-        return ResponseData.makeErrorMessage("移除开发中的成员出错");
-    }
 
 
 
-    @ApiOperation(
-        value = "获取组员列表信息",
-        notes = "获取组员列表信息 "
-    )
-    @RequestMapping(value = "/listApplicationMember", method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public ResponseData listApplicationMember(@RequestParam("groupId") String groupId) {
-
-        try {
-            return tenantService.listApplicationMember(groupId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("获取组员列表信息出错，错误原因:{},入参:groupId={", e, groupId);
-        }
-        return ResponseData.makeErrorMessage("获取组员列表信息出错");
-    }
 
     @ApiOperation(
         value = "获取用户所在租户",
@@ -355,23 +297,6 @@ public class TenanController extends BaseController {
 
     }
 
-    @ApiOperation(
-        value = "租户管理员创建应用",
-        notes = "租户管理员创建应用"
-    )
-    @RequestMapping(value = "/createApplication", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public ResponseData createApplication(@RequestBody OsInfo osInfo) {
-
-        try {
-            return tenantService.createApplication(osInfo);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("租户管理员创建应用出错，错误原因:{},入参:{}", e, osInfo.toString());
-        }
-        return ResponseData.makeErrorMessage("租户管理员创建应用失败!");
-
-    }
 
     @ApiOperation(
         value = "获取租户下的应用列表",
@@ -391,40 +316,7 @@ public class TenanController extends BaseController {
 
     }
 
-    @ApiOperation(
-        value = "根据属性获取组信息",
-        notes = "根据属性获取组信息"
-    )
-    @RequestMapping(value = "/listWorkGroups", method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public ResponseData listWorkGroupByProperties(HttpServletRequest request) {
 
-        Map<String, Object> parameters = collectRequestParameters(request);
-        try {
-            return tenantService.listWorkGroupByProperties(parameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("根据属性获取组信息列表出错，错误原因:{},入参:{}", e, parameters.toString());
-        }
-        return ResponseData.makeErrorMessage("根据属性获取组信息列表!");
-    }
-
-    @ApiOperation(
-        value = "判断人员是否在班组内",
-        notes = "判断人员是否在班组内,与/tenantPower/userIsApplicationMember功能相同，这个功能尽量不用"
-    )
-    @RequestMapping(value = "/userIsMember", method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public ResponseData userInWorkGroup(WorkGroup workGroup) {
-
-        try {
-            return tenantService.userInWorkGroup(workGroup);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("判断人员是否在班组内出错，错误原因:{},入参:{}", e, workGroup.toString());
-        }
-        return ResponseData.makeErrorMessage("判断人员是否在班组内出错!");
-    }
 
     @ApiOperation(
         value = "查询租户信息",
@@ -453,26 +345,4 @@ public class TenanController extends BaseController {
 
     }
 
-    @ApiOperation(
-        value = "用户申请资源",
-        notes = "用户申请资源"
-    )
-    @RequestMapping(value = "/applyResource", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public ResponseData applyResource(@RequestBody @Validated DatabaseInfo databaseInfo) {
-
-        return tenantService.applyResource(databaseInfo);
-
-    }
-
-    @ApiOperation(
-        value = "根据条件列出租户下的资源",
-        notes = "根据条件列出租户下的资源 topUnit：租户id 必填，sourceType：资源类型，选填 "
-    )
-    @RequestMapping(value = "/listResource", method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public ResponseData listResource(DatabaseInfo databaseInfo) {
-
-        return tenantService.listResource(databaseInfo);
-    }
 }
