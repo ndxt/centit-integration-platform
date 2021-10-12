@@ -17,6 +17,12 @@
             <artifactId>framework-dubbo-server-config</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-adapter</artifactId>
+            <version>${centit.framework.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
