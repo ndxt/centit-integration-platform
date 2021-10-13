@@ -49,6 +49,10 @@
             <version>1.18.2</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>framework-system-static</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
