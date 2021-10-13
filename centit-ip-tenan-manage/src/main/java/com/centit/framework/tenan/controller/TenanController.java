@@ -1,6 +1,7 @@
 package com.centit.framework.tenan.controller;
 
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
@@ -8,7 +9,6 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.po.*;
 import com.centit.framework.tenan.service.TenantService;
-import com.centit.framework.tenan.util.UserUtils;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.framework.tenan.vo.TenantMemberApplyVo;
 import com.centit.framework.tenan.vo.TenantMemberQo;
@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -176,8 +178,9 @@ public class TenanController extends BaseController {
         if (StringUtils.isBlank(topUnit)) {
             return ResponseData.makeErrorMessage("参数topUnit不能为空");
         }
-        String userCode = UserUtils.getUserCodeFromSecurityContext();
-        if (StringUtils.isBlank(userCode)){
+        String userCode = WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        if (StringUtils.isBlank(userCode)) {
             return ResponseData.makeErrorMessage("当前用户未登录");
         }
         try {
@@ -199,7 +202,7 @@ public class TenanController extends BaseController {
     public ResponseData removeTenantMember(@RequestBody Map<String, Object> paraMaps) {
         String topUnit = MapUtils.getString(paraMaps, "topUnit");
         String userCode = MapUtils.getString(paraMaps, "userCode");
-        if (StringUtils.isAnyBlank(topUnit,userCode)) {
+        if (StringUtils.isAnyBlank(topUnit, userCode)) {
             return ResponseData.makeErrorMessage("参数topUnit,userCode不能为空");
         }
         try {
@@ -274,10 +277,6 @@ public class TenanController extends BaseController {
     }
 
 
-
-
-
-
     @ApiOperation(
         value = "获取用户所在租户",
         notes = "获取用户所在租户"
@@ -286,7 +285,7 @@ public class TenanController extends BaseController {
     @WrapUpResponseBody
     public ResponseData userTenants(HttpServletRequest request) {
 
-        String userCode = UserUtils.getUserCodeFromSecurityContext();
+        String userCode =WebOptUtils.getCurrentUserCode(request);
         try {
             return tenantService.userTenants(userCode);
         } catch (Exception e) {
@@ -317,7 +316,6 @@ public class TenanController extends BaseController {
     }
 
 
-
     @ApiOperation(
         value = "查询租户信息",
         notes = "根据unitName模糊查询租户信息"
@@ -325,7 +323,7 @@ public class TenanController extends BaseController {
     @RequestMapping(value = "/pageListTenants", method = RequestMethod.GET)
     @WrapUpResponseBody
     public PageQueryResult<TenantInfo> pageListTenants(@ParamName("unitName") String unitName, PageDesc pageDesc) {
-        if (StringUtils.isBlank(unitName)){
+        if (StringUtils.isBlank(unitName)) {
             throw new ObjectException("unitName不能为空");
         }
         return tenantService.pageListTenants(unitName, pageDesc);

@@ -2,6 +2,7 @@ package com.centit.framework.tenan.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -21,7 +22,6 @@ import com.centit.framework.tenan.po.*;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.service.TenantPowerManage;
 import com.centit.framework.tenan.service.TenantService;
-import com.centit.framework.tenan.util.UserUtils;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.framework.tenan.vo.TenantMemberApplyVo;
 import com.centit.framework.tenan.vo.TenantMemberQo;
@@ -45,12 +45,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.centit.framework.tenan.constant.TenantConstant.*;
-import static com.centit.framework.tenan.util.UserUtils.getUserCodeFromSecurityContext;
 
 @Service
 public class TenantServiceImpl implements TenantService {
@@ -146,7 +147,8 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ResponseData applyAddTenant(TenantInfo tenantInfo) {
-        String userCode = getUserCodeFromSecurityContext();
+        String userCode = WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
             return ResponseData.makeErrorMessage("用户未登录,请重新登录!");
         }
@@ -216,7 +218,8 @@ public class TenantServiceImpl implements TenantService {
         oldTenantInfo.setMemo(tenantInfo.getMemo());
         oldTenantInfo.setIsAvailable(tenantInfo.getIsAvailable());
         oldTenantInfo.setUpdateTime(nowDate());
-        tenantInfo.setUpdator(getUserCodeFromSecurityContext());
+        tenantInfo.setUpdator(WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         if ("F".equals(tenantInfo.getIsAvailable())) {
             oldTenantInfo.setPassTime(null);
         } else {
@@ -272,7 +275,8 @@ public class TenantServiceImpl implements TenantService {
         if (StringUtils.isBlank(userinfo.getUserCode())) {
             return ResponseData.makeErrorMessage("userCode不能为空");
         }
-        if (!userinfo.getUserCode().equals(getUserCodeFromSecurityContext())) {
+        if (!userinfo.getUserCode().equals(WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))) {
             return ResponseData.makeErrorMessage("无权限修改其他人的用户信息");
         }
         UserInfo oldUserByCode = userInfoDao.getUserByCode(userinfo.getUserCode());
@@ -389,7 +393,8 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeSuccessResponse("无权转让该租户!");
         }
 
-        tenantBusinessLog.setAssignorUserCode(getUserCodeFromSecurityContext());
+        tenantBusinessLog.setAssignorUserCode(WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         String assignorUserCode = tenantBusinessLog.getAssignorUserCode();
         String assigneeUserCode = tenantBusinessLog.getAssigneeUserCode();
         List<String> userCodes = CollectionsOpt.createList(assignorUserCode, assigneeUserCode);
@@ -472,7 +477,7 @@ public class TenantServiceImpl implements TenantService {
         if (tenantPowerManage.userIsApplicationAdmin(userCode, groupId)) {
             return ResponseData.makeErrorMessage("组长不允许被移除");
         }
-        List<WorkGroup> workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, new String[]{groupId});
+        List<WorkGroup> workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, groupId);
         if (!CollectionUtils.isEmpty(workGroups) && workGroups.size() == 1) {
             workGroupDao.deleteObjectForceById(workGroups.get(0));
         } else {
@@ -525,7 +530,8 @@ public class TenantServiceImpl implements TenantService {
         if (null == osInfoDao.getObjectById(workGroupParameter.getGroupId())) {
             return "groupId不存在!";
         }
-        workGroup.setCreator(UserUtils.getUserCodeFromSecurityContext());
+        workGroup.setCreator(WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         workGroup.setIsValid("T");
         return null;
     }
@@ -538,7 +544,7 @@ public class TenantServiceImpl implements TenantService {
         }
         List<TenantInfo> tenantInfos = userTenantsByUserCode(userCode);
         if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
-            return ResponseData.makeResponseData(Collections.emptyMap());
+            return ResponseData.makeResponseData(Collections.emptyList());
         }
         return ResponseData.makeResponseData(formatTenants(userCode, tenantInfos));
     }
@@ -798,7 +804,8 @@ public class TenantServiceImpl implements TenantService {
         workGroupParameter.setUserCode(tenantMemberQo.getMemberUserCode());
         workGroupParameter.setRoleCode(tenantMemberQo.getRoleCode());
         workGroup.setUpdateDate(nowDate());
-        workGroup.setUpdator(getUserCodeFromSecurityContext());
+        workGroup.setUpdator(WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         updateWorkGroupRole(workGroup);
     }
 
@@ -821,7 +828,8 @@ public class TenantServiceImpl implements TenantService {
             workGroupManager.updateWorkGroup(workGroup);
         }
         if (workGroups.size() == 0) {
-            workGroup.setCreator(UserUtils.getUserCodeFromSecurityContext());
+            workGroup.setCreator(WebOptUtils.getCurrentUserCode(
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
             workGroup.setAuthTime(nowDate());
             workGroupDao.saveNewObject(workGroup);
         }
@@ -1187,7 +1195,8 @@ public class TenantServiceImpl implements TenantService {
         workGroupParameter.setGroupId(tenantInfo.getTopUnit());
         workGroupParameter.setUserCode(tenantInfo.getOwnUser());
         workGroup.setWorkGroupParameter(workGroupParameter);
-        workGroup.setCreator(getUserCodeFromSecurityContext());
+        workGroup.setCreator(WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         workGroup.setIsValid("T");
         workGroupManager.createWorkGroup(workGroup);
     }
