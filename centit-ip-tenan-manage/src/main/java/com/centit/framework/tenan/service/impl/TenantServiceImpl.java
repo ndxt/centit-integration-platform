@@ -126,8 +126,10 @@ public class TenantServiceImpl implements TenantService {
     public ResponseData registerUserAccount(UserInfo userInfo) throws IllegalAccessException {
 
         String userPwd = userInfo.getUserPwd();
-        if (StringUtils.isBlank(userPwd)) {
-            return ResponseData.makeErrorMessage("用户密码不能为空");
+        String regCellPhone = userInfo.getRegCellPhone();
+        String loginName = userInfo.getLoginName();
+        if (StringUtils.isAnyBlank(userPwd,regCellPhone,loginName)) {
+            return ResponseData.makeErrorMessage("用户,密码,手机号不能为空!");
         }
 
         if (checkUserAccountHasExist(userInfo)) {
