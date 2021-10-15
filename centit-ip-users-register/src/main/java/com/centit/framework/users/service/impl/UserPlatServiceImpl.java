@@ -3,9 +3,11 @@ package com.centit.framework.users.service.impl;
 import com.centit.framework.users.dao.UserPlatDao;
 import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.UserPlatService;
+import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +40,16 @@ public class UserPlatServiceImpl implements UserPlatService {
     }
 
     @Override
+    public List<UserPlat> listPlatUsersByPlatId(String platId) {
+        return userPlatDao.listPlatUsersByPlatId(platId);
+    }
+
+    @Override
+    public List<UserPlat> listObjects(Map<String, Object> filterMap, PageDesc pageDesc) {
+        return userPlatDao.listObjects(filterMap, pageDesc);
+    }
+
+    @Override
     public void saveUserPlat(UserPlat userPlat) {
         userPlatDao.saveNewObject(userPlat);
     }
@@ -45,5 +57,10 @@ public class UserPlatServiceImpl implements UserPlatService {
     @Override
     public void updateUserPlat(UserPlat userPlat) {
         userPlatDao.updateObject(userPlat);
+    }
+
+    @Override
+    public void deleteObject(UserPlat userPlat) {
+        userPlatDao.deleteObject(userPlat);
     }
 }

@@ -4,8 +4,10 @@ import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.users.po.UserPlat;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,5 +27,10 @@ public class UserPlatDao extends BaseDaoImpl<UserPlat, String> {
         filterField.put("userId", CodeBook.EQUAL_HQL_ID);
 
         return filterField;
+    }
+
+    @Transactional
+    public List<UserPlat> listPlatUsersByPlatId(String platId) {
+        return listObjectsByProperty("platId", platId);
     }
 }

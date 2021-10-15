@@ -1,10 +1,12 @@
 package com.centit.framework.users.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.users.common.ServiceResult;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.po.AccessToken;
+import com.centit.framework.users.po.DingTalkSuite;
 import com.centit.framework.users.utils.FileUtil;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.dingtalk.api.DefaultDingTalkClient;
@@ -75,7 +77,10 @@ public class TokenService {
         String suiteTicket = "94t717KmkkijItbs3fgik2UWYwHcBcO1pafJtgAkNQeqRuD4r8rxaNS6odLvA0nl6SMzQ2j7b6vpPRnRKCBKcF";
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("suiteid", "1");
-        suiteTicket = dingTalkSuiteService.getDingTalkSuiteByProperty(paramsMap).getSuitTicket();
+        DingTalkSuite dingTalkSuite = dingTalkSuiteService.getDingTalkSuiteByProperty(paramsMap);
+        if (null != dingTalkSuite) {
+            suiteTicket = dingTalkSuite.getSuitTicket();
+        }
         try {
             //response = client.execute(request);
             response = client.execute(request, appConfig.getAppKey(), appConfig.getAppSecret(), suiteTicket, appConfig.getCorpId());
@@ -90,12 +95,12 @@ public class TokenService {
         return ServiceResult.success(accessToken);
     }
 
-    public ServiceResult<String> getAccessToken() {
+    public ResponseData getAccessToken() {
         // 从持久化存储中读取
         //String accessToken = getFromCache("accessToken", "access_token");
         String accessToken = getFromDb();
         if (accessToken != null) {
-            return ServiceResult.success(accessToken);
+            return ResponseData.makeResponseData(accessToken);
         }
 
         DefaultDingTalkClient client = new DefaultDingTalkClient(UrlConstant.URL_GET_TOKEN);
@@ -110,13 +115,13 @@ public class TokenService {
             response = client.execute(request);
         } catch (ApiException e) {
             log.error("getAccessToken failed", e);
-            return ServiceResult.failure(e.getErrCode(), e.getErrMsg());
+            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), e.getErrMsg());
         }
 
         accessToken = response.getAccessToken();
         //putToCache("accessToken", "access_token", accessToken);
         saveTokenTodb(accessToken, response.getExpiresIn());
-        return ServiceResult.success(accessToken);
+        return ResponseData.makeResponseData(accessToken);
     }
 
     /**
@@ -162,7 +167,7 @@ public class TokenService {
         accessToken.setAccessToken(value);
         accessToken.setExpireIn(expiresIn);
         accessToken.setExpireTime(DatetimeOpt.convertDatetimeToString(
-            new Date((System.currentTimeMillis()+expiresIn*1000))));
+            new Date((System.currentTimeMillis() + expiresIn * 1000))));
         accessTokenService.saveAccessToke(accessToken);
     }
 }

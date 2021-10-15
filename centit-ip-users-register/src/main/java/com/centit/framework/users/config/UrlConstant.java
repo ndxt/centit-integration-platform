@@ -27,6 +27,12 @@ public class UrlConstant {
      */
     public static final String URL_GET_USER_INFO = HOST + "/user/getuserinfo";
 
+    public static final String URL_GET_USER_BYCODE = HOST + "/sns/getuserinfo_bycode";
+
+    public static final String URL_GET_USER_BYUNIONID = HOST + "/topapi/user/getbyunionid";
+
+    public static final String URL_GET_USER = HOST + "/topapi/v2/user/get";
+
     /**
      * 根据用户id获取用户详情 url
      */
@@ -42,4 +48,13 @@ public class UrlConstant {
      */
     public static final String URL_USER_SIMPLELIST = HOST + "/user/simplelist";
 
+    /**
+     * 创建用户
+     */
+    public static final String USER_CREATE = HOST + "/topapi/v2/user/create?access_token=ACCESS_TOKEN";
+
+    /**
+     * 创建部门  接口调用请求地址（请求方式：post）
+     **/
+    public static final String DEPARTMENT_CREATE = HOST + "/topapi/v2/department/create?access_token=ACCESS_TOKEN";
 }

@@ -33,7 +33,7 @@ public class CallBackController extends BaseController {
     @Autowired
     private AppConfig appConfig;
 
-    @RequestMapping(value = "/dingCallback", method = RequestMethod.POST)
+    @PostMapping(value = "/dingCallback")
     @ResponseBody
     public Object dingCallback(@RequestParam(value = "suitetbId") String suitetbId,
                                @RequestParam(value = "signature") String signature,
@@ -86,14 +86,14 @@ public class CallBackController extends BaseController {
         }
     }
 
-    private void suiteTicket(JSONObject decodeEncrypt_json, String suitetbId) {
+    private void suiteTicket(JSONObject decodeEncryptJson, String suitetbId) {
         try {
             Map<String, Object> paramsMap = new HashMap<>();
             paramsMap.put("suiteid", suitetbId);
             //查询钉钉套件suite信息
             DingTalkSuite suite = dingTalkSuiteService.getDingTalkSuiteByProperty(paramsMap);
             if (null != suite) {
-                String suiteTicket = decodeEncrypt_json.getString("SuiteTicket");
+                String suiteTicket = decodeEncryptJson.getString("SuiteTicket");
                 //通过suiteTicket获取之后需要换取suiteToken
                 //JSONObject suiteToken = DingTalkUtil.getSuiteAccessToken(suite.getSuiteKey(), suite.getSuiteSecret(), suiteTicket);
                 suite.setSuitTicket(suiteTicket);
@@ -163,13 +163,13 @@ public class CallBackController extends BaseController {
             paramsMap.put("suiteid", suitetbId);
             //查询钉钉套件suite信息
             DingTalkSuite suite = dingTalkSuiteService.getDingTalkSuiteByProperty(paramsMap);
-            String suite_key = "";
+            String suiteKey = "";
             if (null != suite) {
                 //套件注册成功后生成的suite_key
-                suite_key = suite.getSuiteKey();
+                suiteKey = suite.getSuiteKey();
             }
-            if (!"".equals(suite_key) && suite_key != null) { //当suite_key存在时，即套件创建成功
-                dingTalkEncryptor = new DingTalkEncryptor(suite.getToken(), suite.getEncodingAesKey(), suite_key);  //创建加解密类
+            if (!"".equals(suiteKey) && suiteKey != null) { //当suite_key存在时，即套件创建成功
+                dingTalkEncryptor = new DingTalkEncryptor(suite.getToken(), suite.getEncodingAesKey(), suiteKey);  //创建加解密类
             } else {  //当suite_key不存在时，第一次创建套件
                 dingTalkEncryptor = new DingTalkEncryptor(suite.getToken(), suite.getEncodingAesKey(),
                     appConfig.getAppKey());  //创建加解密类
@@ -180,16 +180,15 @@ public class CallBackController extends BaseController {
         return dingTalkEncryptor;
     }
 
-    private String createSuiteCheck(JSONObject decodeEncrypt_json) {
+    private String createSuiteCheck(JSONObject decodeEncryptJson) {
         //此事件需要返回的"Random"字段，
-        String res = decodeEncrypt_json.getString("Random");
-        String testSuiteKey = decodeEncrypt_json.getString("TestSuiteKey");
+        String res = decodeEncryptJson.getString("Random");
+        String testSuiteKey = decodeEncryptJson.getString("TestSuiteKey");
         return res;
     }
 
-    private String updateSuiteCheck(JSONObject decodeEncrypt_json) {
+    private String updateSuiteCheck(JSONObject decodeEncryptJson) {
         //此事件需要返回的"Random"字段，
-        String res = decodeEncrypt_json.getString("Random");
-        return res;
+        return decodeEncryptJson.getString("Random");
     }
 }

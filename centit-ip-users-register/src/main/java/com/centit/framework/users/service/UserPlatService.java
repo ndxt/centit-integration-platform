@@ -1,7 +1,9 @@
 package com.centit.framework.users.service;
 
 import com.centit.framework.users.po.UserPlat;
+import com.centit.support.database.utils.PageDesc;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +15,10 @@ public interface UserPlatService {
 
     UserPlat getUserPlatByProperties(Map<String,Object> paramsMap);
 
+    List<UserPlat> listPlatUsersByPlatId(String platId);
+
+    List<UserPlat> listObjects(Map<String, Object> filterMap, PageDesc pageDesc);
+
     void mergeObject(UserPlat userPlat);
 
     void deleteObjectById(String userPlatId);
@@ -20,4 +26,6 @@ public interface UserPlatService {
     void saveUserPlat(UserPlat userPlat);
 
     void updateUserPlat(UserPlat userPlat);
+
+    void deleteObject(UserPlat userPlat);
 }
