@@ -2,7 +2,6 @@ package com.centit.framework.users.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.users.common.ServiceResult;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.po.AccessToken;
@@ -10,11 +9,8 @@ import com.centit.framework.users.po.DingTalkSuite;
 import com.centit.framework.users.utils.FileUtil;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.dingtalk.api.DefaultDingTalkClient;
-import com.dingtalk.api.DingTalkClient;
-import com.dingtalk.api.request.OapiGetJsapiTicketRequest;
 import com.dingtalk.api.request.OapiGettokenRequest;
 import com.dingtalk.api.request.OapiServiceGetCorpTokenRequest;
-import com.dingtalk.api.response.OapiGetJsapiTicketResponse;
 import com.dingtalk.api.response.OapiGettokenResponse;
 import com.dingtalk.api.response.OapiServiceGetCorpTokenResponse;
 import com.taobao.api.ApiException;
@@ -34,9 +30,9 @@ import java.util.Map;
 public class TokenService {
     private static final Logger log = LoggerFactory.getLogger(TokenService.class);
     /**
-     * 缓存时间：一小时50分钟
+     * 缓存时间：7200秒（2小时）
      */
-    private static final long CACHE_TTL = 60 * 55 * 2 * 1000;
+    private static final long CACHE_TTL = 60 * 60 * 2 * 1000;
 
     private AppConfig appConfig;
 
@@ -62,14 +58,14 @@ public class TokenService {
      *
      * @return accessToken 或错误信息
      */
-    public ServiceResult<String> getCorpAccessToken() {
+    public ResponseData getCorpAccessToken() {
         // 从持久化存储中读取
         String accessToken = getFromCache("accessToken", "access_token");
         if (accessToken != null) {
-            return ServiceResult.success(accessToken);
+            return ResponseData.makeResponseData(accessToken);
         }
 
-        DefaultDingTalkClient client = new DefaultDingTalkClient(UrlConstant.URL_GET_TOKEN_NEW);
+        DefaultDingTalkClient client = new DefaultDingTalkClient(UrlConstant.URL_GET_CORP_TOKEN);
         OapiServiceGetCorpTokenRequest request = new OapiServiceGetCorpTokenRequest();
         OapiServiceGetCorpTokenResponse response;
         request.setAuthCorpid(appConfig.getCorpId());
@@ -86,15 +82,20 @@ public class TokenService {
             response = client.execute(request, appConfig.getAppKey(), appConfig.getAppSecret(), suiteTicket, appConfig.getCorpId());
         } catch (ApiException e) {
             log.error("getAccessToken failed", e);
-            return ServiceResult.failure(e.getErrCode(), e.getErrMsg());
+            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), e.getErrMsg());
         }
 
         accessToken = response.getAccessToken();
         //putToCache("accessToken", "access_token", accessToken);
         saveTokenTodb(accessToken, response.getExpiresIn());
-        return ServiceResult.success(accessToken);
+        return ResponseData.makeResponseData(accessToken);
     }
 
+    /**
+     * access_token的有效期为7200秒（2小时），有效期内重复获取会返回相同结果并自动续期，过期后获取会返回新的access_token。
+     *
+     * @return
+     */
     public ResponseData getAccessToken() {
         // 从持久化存储中读取
         //String accessToken = getFromCache("accessToken", "access_token");
