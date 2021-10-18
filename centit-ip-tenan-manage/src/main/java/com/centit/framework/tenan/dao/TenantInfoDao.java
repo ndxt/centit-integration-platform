@@ -19,7 +19,7 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
     public List<TenantInfo> listObjectsByProperties(PageListTenantInfoQo pageListTenantInfoQo, PageDesc pageDesc) {
 
         HashMap<String, Object> filterMap = getQoFilterMap(pageListTenantInfoQo);
-        return super.listObjects(filterMap,pageDesc);
+        return super.listObjectsByProperties(filterMap,pageDesc);
     }
 
     /**

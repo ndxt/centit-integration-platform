@@ -19,7 +19,7 @@ import java.util.Date;
 public class TenantInfo implements Serializable {
     @Id
     @Column(name = "top_unit")
-    @ValueGenerator(strategy = GeneratorType.UUID22)
+    @ValueGenerator(strategy = GeneratorType.RANDOM_ID, value = "7:T")
     @Length(max = 32)
     @ApiModelProperty(value = "机构id", name = "topUnit")
     private String topUnit;

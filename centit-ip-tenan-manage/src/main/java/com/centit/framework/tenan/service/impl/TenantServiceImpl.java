@@ -7,19 +7,13 @@ import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IDataDictionary;
+import com.centit.framework.system.dao.*;
+import com.centit.framework.system.po.*;
 import com.centit.product.dao.WorkGroupDao;
 import com.centit.product.po.WorkGroup;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
-import com.centit.framework.system.dao.OsInfoDao;
-import com.centit.framework.system.dao.UnitInfoDao;
-import com.centit.framework.system.dao.UserInfoDao;
-import com.centit.framework.system.dao.UserUnitDao;
-import com.centit.framework.system.po.OsInfo;
-import com.centit.framework.system.po.UnitInfo;
-import com.centit.framework.system.po.UserUnit;
 import com.centit.framework.tenan.dao.*;
 import com.centit.framework.tenan.po.*;
-import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.service.TenantPowerManage;
 import com.centit.framework.tenan.service.TenantService;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
@@ -42,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +46,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.centit.framework.common.GlobalConstValue.*;
 import static com.centit.framework.tenan.constant.TenantConstant.*;
 
 @Service
@@ -121,6 +117,15 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private PlatformEnvironment platformEnvironment;
 
+    @Autowired
+    private UserRoleDao userRoleDao;
+
+    @Autowired
+    private DataCatalogDao dataCatalogDao;
+
+    @Autowired
+    private DataDictionaryDao dataDictionaryDao;
+
     @Override
     @Transactional
     public ResponseData registerUserAccount(UserInfo userInfo) throws IllegalAccessException {
@@ -128,7 +133,7 @@ public class TenantServiceImpl implements TenantService {
         String userPwd = userInfo.getUserPwd();
         String regCellPhone = userInfo.getRegCellPhone();
         String loginName = userInfo.getLoginName();
-        if (StringUtils.isAnyBlank(userPwd,regCellPhone,loginName)) {
+        if (StringUtils.isAnyBlank(userPwd, regCellPhone, loginName)) {
             return ResponseData.makeErrorMessage("用户,密码,手机号不能为空!");
         }
 
@@ -217,6 +222,9 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("isAvailable字段属性有误");
         }
         TenantInfo oldTenantInfo = tenantInfoDao.getObjectById(tenantInfo.getTopUnit());
+        if (null== oldTenantInfo){
+            return ResponseData.makeErrorMessage("租户不存在!");
+        }
         oldTenantInfo.setMemo(tenantInfo.getMemo());
         oldTenantInfo.setIsAvailable(tenantInfo.getIsAvailable());
         oldTenantInfo.setUpdateTime(nowDate());
@@ -225,32 +233,17 @@ public class TenantServiceImpl implements TenantService {
         if ("F".equals(tenantInfo.getIsAvailable())) {
             oldTenantInfo.setPassTime(null);
         } else {
-            if (tenantInfo.getDatabaseNumberLimit() == 0) {
-                oldTenantInfo.setDatabaseNumberLimit(databaseNumberLimit);
-            }
-            if (tenantInfo.getOsNumberLimit() == 0) {
-                oldTenantInfo.setOsNumberLimit(osNumberLimit);
-            }
-            if (tenantInfo.getDataSpaceLimit() == 0) {
-                oldTenantInfo.setDataSpaceLimit(dataSpaceLimit);
-            }
-            if (tenantInfo.getFileSpaceLimit() == 0) {
-                oldTenantInfo.setFileSpaceLimit(fileSpaceLimit);
-            }
-            oldTenantInfo.setPassTime(nowDate());
+            saveTenantDefaultResourcesAttribute(tenantInfo, oldTenantInfo);
         }
 
         tenantInfoDao.updateObject(oldTenantInfo);
         if ("T".equals(tenantInfo.getIsAvailable())) {
-            //根据租户信息创建机构信息的和租户与机构的关系
-            //根据当前用户是否为租户所有者判断是否具有资源申请，租户转让的能力
-            //设置租户所有者为租户管理员
-            UnitInfo unitInfo = saveUnitInfoByTenantInfo(oldTenantInfo);
-            saveUserUnitByTenantAndUnit(oldTenantInfo, unitInfo);
-            saveTenantOwnerToWorkGroup(oldTenantInfo);
+            saveTenantRelationData(oldTenantInfo);
         }
         return ResponseData.makeSuccessResponse();
     }
+
+
 
 
     @Override
@@ -306,7 +299,7 @@ public class TenantServiceImpl implements TenantService {
         if (tenantInfoDao.userIsOwner(topUnit, userCode)) {
             return ResponseData.makeErrorMessage("租户所有者不允许退出租户");
         }
-        removeTenantMemberRelation(topUnit,userCode);
+        removeTenantMemberRelation(topUnit, userCode);
         return ResponseData.makeSuccessResponse("已退出该机构!");
     }
 
@@ -321,7 +314,7 @@ public class TenantServiceImpl implements TenantService {
         if (isTenantManger(userCode, topUnit)) {
             return ResponseData.makeErrorMessage("管理员或租户所有者不允许被移除租户!");
         }
-        removeTenantMemberRelation(topUnit,userCode);
+        removeTenantMemberRelation(topUnit, userCode);
         return ResponseData.makeSuccessResponse("移除成功!");
     }
 
@@ -367,7 +360,8 @@ public class TenantServiceImpl implements TenantService {
 
     /**
      * 根据groupId和userCode删除数据
-     * @param groupId 组id
+     *
+     * @param groupId  组id
      * @param userCode 用户code
      */
     private void removeWorkGroup(String groupId, String userCode) {
@@ -379,12 +373,13 @@ public class TenantServiceImpl implements TenantService {
 
     /**
      * 删除租户成员与租户之间的管理关系
+     *
      * @param unitCode 租户id
      * @param userCode 用户id
      */
     private void removeTenantMemberRelation(String unitCode, String userCode) {
-        removeUserUnit(unitCode,userCode);
-        removeWorkGroup(unitCode,userCode);
+        removeUserUnit(unitCode, userCode);
+        removeWorkGroup(unitCode, userCode);
     }
 
     @Override
@@ -690,6 +685,7 @@ public class TenantServiceImpl implements TenantService {
      * @param primaryUnit 用户主机构
      * @param tenantJson  Tenant
      */
+    @SuppressWarnings("unchecked")
     private void extendTenantsAttribute(String userCode, List<WorkGroup> workGroups, String primaryUnit, Map tenantJson) {
         if (MapUtils.getString(tenantJson, "ownUser").equals(userCode)) {
             tenantJson.put("isOwner", "T");
@@ -707,6 +703,11 @@ public class TenantServiceImpl implements TenantService {
             tenantJson.put("roleCode", "");
         }
         tenantJson.put("roleName", translateTenantRole(roleCode));
+
+        //判断当前用户是否为租户所有者或管理员
+        boolean isAdmin = MapUtils.getString(tenantJson, "roleCode", "").equals(TENANT_ADMIN_ROLE_CODE)
+            || MapUtils.getString(tenantJson, "isOwner").equals("T");
+        tenantJson.put("isAdmin", isAdmin);
 
         if (MapUtils.getString(tenantJson, "topUnit").equals(primaryUnit)) {
             tenantJson.put("isPrimaryUnit", "T");
@@ -920,7 +921,7 @@ public class TenantServiceImpl implements TenantService {
         tenantInfo.setIsAvailable(null);
         tenantInfo.setApplyTime(currentDate);
         tenantInfo.setCreateTime(currentDate);
-        tenantInfo.setTopUnit(UuidOpt.getUuidAsString32());
+        tenantInfo.setTopUnit(null);
         tenantInfo.setDataSpaceLimit(0);
         tenantInfo.setFileSpaceLimit(0);
         tenantInfo.setDatabaseNumberLimit(0);
@@ -1164,7 +1165,7 @@ public class TenantServiceImpl implements TenantService {
         if (CollectionUtils.sizeIsEmpty(topUnits)) {
             return null;
         }
-        return tenantInfoDao.listObjects(CollectionsOpt.createHashMap("topUnit_in",
+        return tenantInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap("topUnit_in",
             CollectionsOpt.listToArray(topUnits)));
 
     }
@@ -1201,5 +1202,159 @@ public class TenantServiceImpl implements TenantService {
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         workGroup.setIsValid("T");
         workGroupManager.createWorkGroup(workGroup);
+    }
+
+    /**
+     * 根据租户信息创建机构信息的和租户与机构的关系
+     * 根据当前用户是否为租户所有者判断是否具有资源申请，租户转让的能力
+     * 设置租户所有者为租户管理员
+     * 设置租户所有者为机构管理员
+     * 初始化字典值
+     *
+     * @param oldTenantInfo
+     */
+    private void saveTenantRelationData(TenantInfo oldTenantInfo) {
+        UnitInfo unitInfo = saveUnitInfoByTenantInfo(oldTenantInfo);
+        saveUserUnitByTenantAndUnit(oldTenantInfo, unitInfo);
+        saveTenantOwnerToWorkGroup(oldTenantInfo);
+        saveUserRole(oldTenantInfo.getOwnUser(), SYSTEM_ADMIN_ROLE_CODE);
+        initTenantDictionary(oldTenantInfo.getTopUnit(),oldTenantInfo.getOwnUser());
+    }
+
+    /**
+     * 保存用户角色
+     *
+     * @param userCode 租户code
+     * @param roleCode 角色code
+     */
+    private void saveUserRole(String userCode, String roleCode) {
+        List<UserRole> userRoles = userRoleDao.listObjectsByProperties(
+            CollectionsOpt.createHashMap("userCode", userCode, "roleCode", roleCode));
+        if (CollectionUtils.sizeIsEmpty(userRoles)) {
+            return;
+        }
+        UserRole userRole = new UserRole();
+        UserRoleId userRoleId = new UserRoleId();
+        userRoleId.setRoleCode(roleCode);
+        userRoleId.setUserCode(userCode);
+        userRole.setId(userRoleId);
+        userRole.setCreator(WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+        userRoleDao.saveNewObject(userRole);
+    }
+
+    /**
+     * 初始化租户的字典值
+     *
+     * @param topUnitCode 租户code
+     * @param userCode 创建人用户code
+     */
+    private void initTenantDictionary(String topUnitCode, String userCode) {
+
+        //用户类型数据字典userType
+        DataCatalog userTypeDataCatalog = defaultDataCatalog(userCode, topUnitCode,
+            DATA_CATALOG_UESR_TYPE_SUFFIX, "用户类型");
+        dataCatalogDao.saveNewObject(userTypeDataCatalog);
+        String[][] userTypeElements = {{userTypeDataCatalog.getCatalogCode(),"A","普通用户"}};
+        batchSaveDataDictionary(userTypeElements);
+
+        //机构类型数据字典unitType
+        DataCatalog unitTypeDataCatalog = defaultDataCatalog(userCode, topUnitCode,
+            DATA_CATALOG_UNIT_TYPE_SUFFIX, "机构类别");
+        dataCatalogDao.saveNewObject(unitTypeDataCatalog);
+        String unitTypeCatalogCode = unitTypeDataCatalog.getCatalogCode();
+        String[][] unitTypeElements = {{unitTypeCatalogCode,"A","一般机构"},{unitTypeCatalogCode,"I","项目组"},{unitTypeCatalogCode,"O","业务机构"}};
+        batchSaveDataDictionary(unitTypeElements);
+
+        //用户职务类型字典 RankType
+        DataCatalog rankTypeDataCatalog = defaultDataCatalog(userCode, topUnitCode,
+            DATA_CATALOG_RANK_SUFFIX, "职位");
+        dataCatalogDao.saveNewObject(rankTypeDataCatalog);
+        String rankTypeCatalogCode = rankTypeDataCatalog.getCatalogCode();
+        String[][] rankTypeElements = {{rankTypeCatalogCode,"CM","董事长"},{rankTypeCatalogCode,"DM","部门经理"},{rankTypeCatalogCode,"FG","分管高层"},
+            {rankTypeCatalogCode,"GM","总经理"},{rankTypeCatalogCode,"PM","副总经理"},{rankTypeCatalogCode,"YG","普通员工"}};
+        batchSaveDataDictionary(rankTypeElements);
+
+        //用户岗位类型字典 stationType
+        DataCatalog stationTypeDataCatalog = defaultDataCatalog(userCode, topUnitCode,
+            DATA_CATALOG_STATION_SUFFIX, "用户岗位");
+        dataCatalogDao.saveNewObject(stationTypeDataCatalog);
+        String[][] stationTypeElements = {{stationTypeDataCatalog.getCatalogCode(),"PT","普通岗位"},{stationTypeDataCatalog.getCatalogCode(),"LD","领导岗位"}};
+        batchSaveDataDictionary(stationTypeElements);
+    }
+
+    /**
+     * 获取一个默认的DataCatalog对象
+     *
+     * @param createUser        创建人
+     * @param topUnitCode       单位code
+     * @param catalogCodeSuffix catalog后缀
+     * @param catalogName       字典名称
+     * @return 默认的DataCatalog对象
+     */
+    private DataCatalog defaultDataCatalog(String createUser, String topUnitCode,
+                                           String catalogCodeSuffix, String catalogName) {
+        DataCatalog dataCatalog = new DataCatalog();
+        dataCatalog.setCreator(createUser);
+        dataCatalog.setCatalogName(catalogName);
+        dataCatalog.setTopUnit(topUnitCode);
+        dataCatalog.setCatalogCode(topUnitCode + catalogCodeSuffix);
+        return dataCatalog;
+    }
+
+    /**
+     * 批量保存字典数据
+     * @param elements 字典数据中的元素值
+     */
+    private void batchSaveDataDictionary(String[]... elements) {
+        if (null == elements || elements.length == 0) {
+            return;
+        }
+        for (String[] element : elements) {
+            if (element.length < 3) {
+                throw new ObjectException("保存字段数据出错，期待参数个数为3，实际为" + element.length);
+            }
+            dataDictionaryDao.saveNewObject(defaultDataDictionary(element[0], element[1], element[2]));
+        }
+
+    }
+
+    /**
+     * 生成一个默认的DataDictionary对象
+     * @param catalogCode 字典大类code
+     * @param dataCode 字典code
+     * @param dataValue 字典值
+     * @return 新的DataDictionary对象
+     */
+    private DataDictionary defaultDataDictionary(String catalogCode,  String dataCode, String dataValue) {
+        DataDictionary dataDictionary = new DataDictionary();
+        DataDictionaryId dataDictionaryId = new DataDictionaryId();
+        dataDictionaryId.setCatalogCode(catalogCode);
+        dataDictionaryId.setDataCode(dataCode);
+        dataDictionary.setId(dataDictionaryId);
+        dataDictionary.setDataValue(dataValue);
+        return dataDictionary;
+    }
+
+    /**
+     * 给租户设置默认的资源数量
+     *
+     * @param tenantInfo    租户基本信息
+     * @param oldTenantInfo 需要被持久化的租户基本信息
+     */
+    private void saveTenantDefaultResourcesAttribute(TenantInfo tenantInfo, TenantInfo oldTenantInfo) {
+        if (tenantInfo.getDatabaseNumberLimit() == 0) {
+            oldTenantInfo.setDatabaseNumberLimit(databaseNumberLimit);
+        }
+        if (tenantInfo.getOsNumberLimit() == 0) {
+            oldTenantInfo.setOsNumberLimit(osNumberLimit);
+        }
+        if (tenantInfo.getDataSpaceLimit() == 0) {
+            oldTenantInfo.setDataSpaceLimit(dataSpaceLimit);
+        }
+        if (tenantInfo.getFileSpaceLimit() == 0) {
+            oldTenantInfo.setFileSpaceLimit(fileSpaceLimit);
+        }
+        oldTenantInfo.setPassTime(nowDate());
     }
 }

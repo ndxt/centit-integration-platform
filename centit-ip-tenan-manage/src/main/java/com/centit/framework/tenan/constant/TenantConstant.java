@@ -46,4 +46,9 @@ public class TenantConstant {
      */
     public static final String SYSTEM_TENANT_TOP_UNIT_CODE = "system";
 
+    /**
+     * 系统管理员角色code
+     */
+    public static final String SYSTEM_ADMIN_ROLE_CODE = "sysadmin";
+
 }
