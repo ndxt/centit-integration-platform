@@ -9,8 +9,10 @@ import com.centit.framework.users.po.DingTalkSuite;
 import com.centit.framework.users.utils.FileUtil;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.request.OapiGetJsapiTicketRequest;
 import com.dingtalk.api.request.OapiGettokenRequest;
 import com.dingtalk.api.request.OapiServiceGetCorpTokenRequest;
+import com.dingtalk.api.response.OapiGetJsapiTicketResponse;
 import com.dingtalk.api.response.OapiGettokenResponse;
 import com.dingtalk.api.response.OapiServiceGetCorpTokenResponse;
 import com.taobao.api.ApiException;
@@ -87,7 +89,7 @@ public class TokenService {
 
         accessToken = response.getAccessToken();
         //putToCache("accessToken", "access_token", accessToken);
-        saveTokenTodb(accessToken, response.getExpiresIn());
+        saveTokenTodb(appConfig.getAppKey(), accessToken, response.getExpiresIn());
         return ResponseData.makeResponseData(accessToken);
     }
 
@@ -99,7 +101,7 @@ public class TokenService {
     public ResponseData getAccessToken() {
         // 从持久化存储中读取
         //String accessToken = getFromCache("accessToken", "access_token");
-        String accessToken = getFromDb();
+        String accessToken = getFromDb(appConfig.getAppKey());
         if (accessToken != null) {
             return ResponseData.makeResponseData(accessToken);
         }
@@ -121,7 +123,7 @@ public class TokenService {
 
         accessToken = response.getAccessToken();
         //putToCache("accessToken", "access_token", accessToken);
-        saveTokenTodb(accessToken, response.getExpiresIn());
+        saveTokenTodb(appConfig.getAppKey(), accessToken, response.getExpiresIn());
         return ResponseData.makeResponseData(accessToken);
     }
 
@@ -150,8 +152,8 @@ public class TokenService {
         FileUtil.write2File(wrapperObj, section);
     }
 
-    public String getFromDb() {
-        AccessToken accessToken = accessTokenService.getObjectById(appConfig.getAppKey());
+    public String getFromDb(String section) {
+        AccessToken accessToken = accessTokenService.getObjectById(section);
         if (null != accessToken) {
             long createTime = DatetimeOpt.convertStringToDate(accessToken.getCreateTime(),
                 DatetimeOpt.getDateTimePattern()).getTime();
@@ -162,13 +164,54 @@ public class TokenService {
         return null;
     }
 
-    private void saveTokenTodb(String value, Long expiresIn) {
+    private void saveTokenTodb(String section, String value, Long expiresIn) {
         AccessToken accessToken = new AccessToken();
-        accessToken.setAppId(appConfig.getAppKey());
+        accessToken.setAppId(section);
         accessToken.setAccessToken(value);
         accessToken.setExpireIn(expiresIn);
         accessToken.setExpireTime(DatetimeOpt.convertDatetimeToString(
             new Date((System.currentTimeMillis() + expiresIn * 1000))));
         accessTokenService.saveAccessToke(accessToken);
     }
+
+    /**
+     * 获取JSTicket, 用于js的签名计算
+     * 正常的情况下，jsapi_ticket的有效期为7200秒，所以开发者需要在某个地方设计一个定时器，定期去更新jsapi_ticket
+     *
+     * @return jsTicket或错误信息
+     */
+    public ResponseData getJsTicket() {
+        // 从持久化存储中读取
+        //String ticket = getFromCache("jsticket", "ticket");
+        String ticket = getFromDb("jsticket");
+        if (ticket != null) {
+            return ResponseData.makeResponseData(ticket);
+        }
+
+        String accessToken;
+        ResponseData tokenSr = getAccessToken();
+        if (tokenSr.getCode() != 0) {
+            return ResponseData.makeErrorMessage(tokenSr.getCode(), tokenSr.getMessage());
+        }
+        accessToken = tokenSr.getData().toString();
+
+        DefaultDingTalkClient client = new DefaultDingTalkClient(UrlConstant.URL_GET_JSTICKET);
+        OapiGetJsapiTicketRequest request = new OapiGetJsapiTicketRequest();
+        OapiGetJsapiTicketResponse response;
+        request.setHttpMethod("GET");
+        try {
+            response = client.execute(request, accessToken);
+        } catch (ApiException e) {
+            log.error("getAccessToken failed", e);
+            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), e.getErrMsg());
+        }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
+        ticket = response.getTicket();
+        //putToCache("jsticket", "ticket", ticket);
+        saveTokenTodb("jsticket", ticket, response.getExpiresIn());
+        return ResponseData.makeResponseData(ticket);
+    }
+
 }

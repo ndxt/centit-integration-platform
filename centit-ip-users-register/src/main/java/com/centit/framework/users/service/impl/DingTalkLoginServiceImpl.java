@@ -132,8 +132,13 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         DingTalkClient client = new DefaultDingTalkClient(UrlConstant.DEPARTMENT_CREATE);
         OapiV2DepartmentCreateRequest request = new OapiV2DepartmentCreateRequest();
         request.setName(unitInfo.getUnitName());
-        //需查询获取钉钉上级部门详情的id
-        request.setParentId(1L);
+        //需查询获取钉钉上级部门详情的parentId
+        OapiV2DepartmentGetResponse department = getDingUnitinfo(accessToken, unitInfo.getUnitCode());
+        if (null != department) {
+            request.setParentId(department.getResult().getParentId());
+        } else {
+            request.setParentId(1L);
+        }
         OapiV2DepartmentCreateResponse response;
         try {
             response = client.execute(request, accessToken);
@@ -145,20 +150,33 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         return ResponseData.makeResponseData(response.getBody());
     }
 
+    /**
+     * 访问/topapi/v2/department/get 获取部门详情
+     *
+     * @param accessToken
+     * @param deptId
+     * @return
+     */
     @Override
     public ResponseData getUnitInfo(String accessToken, String deptId) {
+        OapiV2DepartmentGetResponse response = getDingUnitinfo(accessToken, deptId);
+        if (response == null) {
+            ResponseData.makeErrorMessage("Failed to getDingUnitinfo");
+        }
+        return ResponseData.makeResponseData(response.getBody());
+    }
+
+    private OapiV2DepartmentGetResponse getDingUnitinfo(String accessToken, String deptId) {
         DingTalkClient client = new DefaultDingTalkClient(UrlConstant.URL_DEPARTMENT_GET);
         OapiV2DepartmentGetRequest request = new OapiV2DepartmentGetRequest();
         request.setDeptId(Long.valueOf(deptId));
         request.setLanguage("zh_CN");
-        OapiV2DepartmentGetResponse response;
+        OapiV2DepartmentGetResponse response = null;
         try {
             response = client.execute(request, accessToken);
         } catch (ApiException e) {
             logger.error("Failed to {}", UrlConstant.URL_DEPARTMENT_GET, e);
-            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to getUnitInfo: " + e.getErrMsg());
         }
-        //response.getResult().getParentId();
-        return ResponseData.makeResponseData(response.getBody());
+        return response;
     }
 }

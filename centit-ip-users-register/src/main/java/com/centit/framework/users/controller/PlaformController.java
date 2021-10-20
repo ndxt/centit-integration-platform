@@ -173,32 +173,8 @@ public class PlaformController extends BaseController {
     @GetMapping(value = "/getCacheToken")
     @WrapUpResponseBody
     public ResponseData test(HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = tokenService.getFromDb();
+        String accessToken = tokenService.getFromDb(appConfig.getAppKey());
         return ResponseData.makeResponseData(accessToken);
-    }
-
-    /**
-     * 这个方法是个内部通讯的客户端程序使用的，客户端程序通过用户代码（注意不是用户名）和密码登录，这个密码建议随机生成
-     *
-     * @param request request
-     * @return ResponseData
-     */
-    @ApiOperation(value = "内部通讯的客户端程序使用接口", notes = "这个方法是个内部通讯的客户端程序使用的，客户端程序通过用户代码（注意不是用户名）和密码登录，这个密码建议随机生成")
-    @GetMapping(value = "/loginasclient")
-    @WrapUpResponseBody
-    public ResponseData loginAsClient(HttpServletRequest request) {
-        Map<String, Object> formValue = BaseController.collectRequestParameters(request);
-
-        String userCode = StringBaseOpt.objectToString(formValue.get("userCode"));
-        String userPwd = StringBaseOpt.objectToString(formValue.get("password"));
-        boolean bo = platformEnvironment.checkUserPassword(userCode, userPwd);
-        if (!bo) {
-            return ResponseData.makeErrorMessage("用户名和密码不匹配。");
-        }
-        CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userCode);
-        SecurityContextHolder.getContext().setAuthentication(ud);
-        return ResponseData.makeResponseData(
-            SecurityContextUtils.SecurityContextTokenName, request.getSession().getId());
     }
 
 }

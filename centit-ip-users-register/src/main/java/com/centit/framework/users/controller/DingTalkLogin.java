@@ -1,10 +1,13 @@
 package com.centit.framework.users.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.system.po.UnitInfo;
+import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.po.UserPlat;
@@ -18,9 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -105,6 +106,19 @@ public class DingTalkLogin extends BaseController {
         }
         String userId = userIdData.getData().toString();
 
+        //根据userId获取用户详情
+        ResponseData userInfoData = dingTalkLoginService.getUserInfo(accessToken, userId);
+        if (userInfoData.getCode() != 0) {
+            return ResponseData.makeErrorMessage(userIdData.getCode(), userIdData.getMessage());
+        }
+        JSONObject jsonObject = JSONObject.parseObject(userInfoData.getData().toString());
+        String regPhone = "";
+        if (null != jsonObject) {
+            JSONObject userObject = JSONObject.parseObject(jsonObject.getString("result"));
+            if (null != userObject) {
+                regPhone = userObject.getString("mobile");
+            }
+        }
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("userId", userId);
@@ -120,8 +134,65 @@ public class DingTalkLogin extends BaseController {
             resultMap.put("userInfo", ud);
             resultMap.put("userCode", userPlat.getUserCode());
             resultMap.put("accessToken", request.getSession().getId());
+        } else if (userPlat == null && StringUtils.isNotBlank(regPhone)) {
+            //通过手机号获取用户信息,保存至userPlat表，下次登录直接查询userPlat
+            CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByRegCellPhone(regPhone);
+            if (null != userDetails) {
+                SecurityContextHolder.getContext().setAuthentication(userDetails);
+                UserPlat newUser = new UserPlat();
+                newUser.setUserCode(userDetails.getUserCode());
+                newUser.setCorpId(appConfig.getCorpId());
+                newUser.setAppKey(appConfig.getAppKey());
+                newUser.setAppSecret(appConfig.getAppSecret());
+                newUser.setUnionId(unionid);
+                newUser.setUserId(userId);
+                userPlatService.saveUserPlat(newUser);
+                resultMap.put("userInfo", userDetails);
+                resultMap.put("userCode", userDetails.getUserCode());
+                resultMap.put("accessToken", request.getSession().getId());
+            }
         }
         return ResponseData.makeResponseData(resultMap);
+    }
+
+    private String getAccessToken() {
+        String accessToken = "";
+        ResponseData accessTokenData = tokenService.getAccessToken();
+        if (accessTokenData.getCode() != 0) {
+            return "";
+        }
+        accessToken = accessTokenData.getData().toString();
+        return accessToken;
+    }
+
+    @ApiOperation(value = "同步钉钉创建用户", notes = "同步钉钉创建用户。")
+    @PostMapping(value = "/usercreate")
+    public ResponseData userCreate(UserInfo userInfo, HttpServletRequest request) {
+        String accessToken = getAccessToken();
+        if (StringUtils.isBlank(accessToken)) {
+            return ResponseData.makeErrorMessage("获取钉钉access_token失败");
+        }
+        return dingTalkLoginService.userCreate(accessToken, userInfo);
+    }
+
+    @ApiOperation(value = "同步钉钉创建机构部门", notes = "同步钉钉创建机构部门。")
+    @PostMapping(value = "/unitcreate")
+    public ResponseData unitCreate(UnitInfo unitInfo, HttpServletRequest request) {
+        String accessToken = getAccessToken();
+        if (StringUtils.isBlank(accessToken)) {
+            return ResponseData.makeErrorMessage("获取钉钉access_token失败");
+        }
+        return dingTalkLoginService.unitCreate(accessToken, unitInfo);
+    }
+
+    @ApiOperation(value = "根据部门deptId获取钉钉部门详情", notes = "根据部门deptId获取钉钉部门详情。")
+    @GetMapping(value = "/{deptId}")
+    public ResponseData getUnitInfo(@PathVariable String deptId, HttpServletResponse response) {
+        String accessToken = getAccessToken();
+        if (StringUtils.isBlank(accessToken)) {
+            return ResponseData.makeErrorMessage("获取钉钉access_token失败");
+        }
+        return dingTalkLoginService.getUnitInfo(accessToken, deptId);
     }
 
 }
