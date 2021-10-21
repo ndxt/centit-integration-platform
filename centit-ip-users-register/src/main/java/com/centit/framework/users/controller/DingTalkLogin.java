@@ -167,6 +167,7 @@ public class DingTalkLogin extends BaseController {
 
     @ApiOperation(value = "同步钉钉创建用户", notes = "同步钉钉创建用户。")
     @PostMapping(value = "/usercreate")
+    @WrapUpResponseBody
     public ResponseData userCreate(UserInfo userInfo, HttpServletRequest request) {
         String accessToken = getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
@@ -177,6 +178,7 @@ public class DingTalkLogin extends BaseController {
 
     @ApiOperation(value = "同步钉钉创建机构部门", notes = "同步钉钉创建机构部门。")
     @PostMapping(value = "/unitcreate")
+    @WrapUpResponseBody
     public ResponseData unitCreate(UnitInfo unitInfo, HttpServletRequest request) {
         String accessToken = getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
@@ -187,6 +189,7 @@ public class DingTalkLogin extends BaseController {
 
     @ApiOperation(value = "根据部门deptId获取钉钉部门详情", notes = "根据部门deptId获取钉钉部门详情。")
     @GetMapping(value = "/{deptId}")
+    @WrapUpResponseBody
     public ResponseData getUnitInfo(@PathVariable String deptId, HttpServletResponse response) {
         String accessToken = getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
