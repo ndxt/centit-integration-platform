@@ -19,7 +19,7 @@ public interface TenantService {
      * @param userinfo
      * @return
      */
-    ResponseData registerUserAccount(UserInfo userinfo) throws IllegalAccessException;
+    ResponseData registerUserAccount(UserInfo userinfo) ;
 
     /**
      * 用户新建租户

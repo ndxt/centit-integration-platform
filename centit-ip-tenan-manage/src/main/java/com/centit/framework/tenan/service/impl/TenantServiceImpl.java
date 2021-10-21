@@ -127,13 +127,14 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     @Transactional
-    public ResponseData registerUserAccount(UserInfo userInfo) throws IllegalAccessException {
+    public ResponseData registerUserAccount(UserInfo userInfo)  {
 
         String userPwd = userInfo.getUserPwd();
         String regCellPhone = userInfo.getRegCellPhone();
         String loginName = userInfo.getLoginName();
-        if (StringUtils.isAnyBlank(userPwd, regCellPhone, loginName)) {
-            return ResponseData.makeErrorMessage("用户,密码,手机号不能为空!");
+        String userName = userInfo.getUserName();
+        if (StringUtils.isAnyBlank(userPwd, regCellPhone, loginName,userName)) {
+            return ResponseData.makeErrorMessage("登录名,密码,手机号，用户名不能为空!");
         }
 
         if (checkUserAccountHasExist(userInfo)) {
@@ -247,7 +248,7 @@ public class TenantServiceImpl implements TenantService {
     @Transactional
     public ResponseData agreeJoin(TenantMemberApplyVo tenantMemberApplyVo) {
         String applyState = tenantMemberApplyVo.getApplyState();
-        if (equalsAny(applyState, "3", "4")) {
+        if (!equalsAny(applyState, "3", "4")) {
             return ResponseData.makeErrorMessage("applyState属性值有误");
         }
 
