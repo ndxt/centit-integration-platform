@@ -37,6 +37,11 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
+    public Platform getPlatformByProperties(Map<String, Object> paramsMap) {
+        return platformDao.getObjectByProperties(paramsMap);
+    }
+
+    @Override
     public boolean hasSamePlat(Platform platform) {
         return platformDao.isUniquePlat(platform.getPlatSourceCode(), platform.getPlatId());
     }

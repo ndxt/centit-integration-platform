@@ -10,8 +10,10 @@ import com.centit.framework.system.po.UnitInfo;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
+import com.centit.framework.users.po.Platform;
 import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.DingTalkLoginService;
+import com.centit.framework.users.service.PlatformService;
 import com.centit.framework.users.service.TokenService;
 import com.centit.framework.users.service.UserPlatService;
 import com.taobao.api.ApiException;
@@ -50,7 +52,10 @@ public class DingTalkLogin extends BaseController {
     private UserPlatService userPlatService;
 
     @Autowired
-    protected PlatformEnvironment platformEnvironment;
+    private PlatformEnvironment platformEnvironment;
+
+    @Autowired
+    private PlatformService platformService;
 
     @ApiOperation(value = "钉钉二维码登录", notes = "钉钉二维码登录。")
     @GetMapping(value = "/qrconnect")
@@ -141,6 +146,12 @@ public class DingTalkLogin extends BaseController {
                 SecurityContextHolder.getContext().setAuthentication(userDetails);
                 UserPlat newUser = new UserPlat();
                 newUser.setUserCode(userDetails.getUserCode());
+                Map<String, Object> platMap = new HashMap<>();
+                platMap.put("corpId", appConfig.getCorpId());
+                Platform platform = platformService.getPlatformByProperties(platMap);
+                if (null != platform) {
+                    newUser.setPlatId(platform.getPlatId());
+                }
                 newUser.setCorpId(appConfig.getCorpId());
                 newUser.setAppKey(appConfig.getAppKey());
                 newUser.setAppSecret(appConfig.getAppSecret());

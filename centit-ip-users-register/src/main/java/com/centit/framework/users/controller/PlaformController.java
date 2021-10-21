@@ -173,8 +173,7 @@ public class PlaformController extends BaseController {
     @GetMapping(value = "/getCacheToken")
     @WrapUpResponseBody
     public ResponseData test(HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = tokenService.getFromDb(appConfig.getAppKey());
-        return ResponseData.makeResponseData(accessToken);
+        return tokenService.getAccessToken();
     }
 
 }

@@ -10,7 +10,7 @@ public interface SocialDeptAuthService {
 
     SocialDeptAuth getObjectById(String unitCode);
 
-    SocialDeptAuth getSocialDeptAuthByProperties(Map<String,Object> paramsMap);
+    SocialDeptAuth getSocialDeptAuthByProperties(Map<String, Object> paramsMap);
 
     List<SocialDeptAuth> listObjects(Map<String, Object> filterMap, PageDesc pageDesc);
 

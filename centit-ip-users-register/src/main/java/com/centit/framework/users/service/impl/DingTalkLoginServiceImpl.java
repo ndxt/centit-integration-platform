@@ -113,10 +113,10 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         request.setName(userInfo.getUserName());
         request.setMobile(userInfo.getRegCellPhone());
         SocialDeptAuth socialDeptAuth = socialDeptAuthDao.getObjectById(userInfo.getPrimaryUnit());
-        if(null != socialDeptAuth){
+        if (null != socialDeptAuth) {
             //需查询获取钉钉部门详情的id
-            request.setDeptIdList(socialDeptAuth.getDeptId().toString());//Long --> String
-        }else{
+            request.setDeptIdList(socialDeptAuth.getDeptId());
+        } else {
             logger.error("Failed to {}", UrlConstant.USER_CREATE, "部门未同步到平台应用");
             return ResponseData.makeErrorMessage(500, "Failed to userCreate: 部门未同步到平台应用");
         }
@@ -143,25 +143,18 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         DingTalkClient client = new DefaultDingTalkClient(UrlConstant.DEPARTMENT_CREATE);
         OapiV2DepartmentCreateRequest request = new OapiV2DepartmentCreateRequest();
         request.setName(unitInfo.getUnitName());
-        if("".equals(unitInfo.getParentUnit())){
+        if ("".equals(unitInfo.getParentUnit())) {
             request.setParentId(1L);
-        }else {
+        } else {
             //获取部门和平台部门的关联数据
             SocialDeptAuth socialDeptAuth = socialDeptAuthDao.getObjectById(unitInfo.getParentUnit());
             if (null != socialDeptAuth) {
-                request.setParentId(socialDeptAuth.getDeptId());
+                request.setParentId(Long.valueOf(socialDeptAuth.getDeptId()));
             } else {
                 logger.error("Failed to {}", UrlConstant.DEPARTMENT_CREATE, "未查询到父节点机构");
                 return ResponseData.makeErrorMessage(500, "Failed to unitCreate: 未查询到父节点机构");
             }
         }
-        //需查询获取钉钉上级部门详情的parentId
-//        OapiV2DepartmentGetResponse department = getDingUnitinfo(accessToken, unitInfo.getUnitCode());
-//        if (null != department) {
-//            request.setParentId(department.getResult().getParentId());
-//        } else {
-//            request.setParentId(1L);
-//        }
         OapiV2DepartmentCreateResponse response;
         try {
             response = client.execute(request, accessToken);
@@ -172,7 +165,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         //response.getResult().getDeptId();
         SocialDeptAuth socialDeptAuth = new SocialDeptAuth();
         socialDeptAuth.setUnitCode(unitInfo.getUnitCode());
-        socialDeptAuth.setDeptId(response.getResult().getDeptId());
+        socialDeptAuth.setDeptId(response.getResult().getDeptId().toString());
         socialDeptAuthDao.saveNewObject(socialDeptAuth);
         return ResponseData.makeResponseData(response.getBody());
     }

@@ -19,14 +19,14 @@ public class SocialDeptAuth implements java.io.Serializable {
 
     @Id
     @Column(name = "UNIT_CODE")
-    @ApiModelProperty(value = "机构代码",name = "unitCode")
+    @ApiModelProperty(value = "机构代码", name = "unitCode")
     private String unitCode;
 
 
     @Column(name = "DEPT_ID")
     @Length(max = 64, message = "字段长度不能大于{max}")
     @ApiModelProperty(value = "平台部门", name = "appKey")
-    private Long deptId;
+    private String deptId;
 
     @Column(name = "CREATE_DATE", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,6 +40,7 @@ public class SocialDeptAuth implements java.io.Serializable {
     @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE,
         condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date updateDate;
+
     /**
      * default constructor
      */
@@ -54,11 +55,11 @@ public class SocialDeptAuth implements java.io.Serializable {
         this.unitCode = unitCode;
     }
 
-    public Long getDeptId() {
+    public String getDeptId() {
         return deptId;
     }
 
-    public void setDeptId(Long deptId) {
+    public void setDeptId(String deptId) {
         this.deptId = deptId;
     }
 

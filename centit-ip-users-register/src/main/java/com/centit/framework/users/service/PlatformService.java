@@ -17,6 +17,8 @@ public interface PlatformService {
 
     Platform getObjectById(String platId);
 
+    Platform getPlatformByProperties(Map<String,Object> paramsMap);
+
     boolean hasSamePlat(Platform platform);
 
     void savePlatform(Platform platform);
