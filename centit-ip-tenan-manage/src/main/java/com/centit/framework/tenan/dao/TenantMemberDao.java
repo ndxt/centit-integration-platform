@@ -41,8 +41,7 @@ public class TenantMemberDao extends BaseDaoImpl<TenantMember, String> {
         if (StringUtils.isNotBlank(tenantMemberQo.getRoleCode())) {
             filterMap.put("roleCode", tenantMemberQo.getRoleCode());
         }
-        filterMap.put("offset", pageDesc.getRowStart());
-        filterMap.put("size", pageDesc.getPageSize());
+
         QueryAndNamedParams qapSql = QueryUtils.translateQuery(querySql, filterMap);
         qapSql.addAllParams(filterMap);
 

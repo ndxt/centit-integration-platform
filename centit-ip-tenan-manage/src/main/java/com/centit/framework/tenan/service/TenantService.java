@@ -2,7 +2,6 @@ package com.centit.framework.tenan.service;
 
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.framework.system.po.OsInfo;
 import com.centit.framework.tenan.po.*;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
@@ -119,16 +118,14 @@ public interface TenantService {
      */
     PageQueryResult<TenantInfo> pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc);
 
+
     /**
      * 展示该机构下的人员
-     * @param tenantMemberQo 机构id
-     * @param pageDesc
+     * @param params 请求参数
+     * @param pageDesc 分页参数
      * @return
-     * 姓名
-     * 租户id
-     * 职位
      */
-    PageQueryResult<TenantMember> pageListTenantMember(TenantMemberQo tenantMemberQo, PageDesc pageDesc);
+    PageQueryResult pageListTenantMember(Map<String,Object> params, PageDesc pageDesc);
 
     /**
      * 租户所有者或平台管理员分配管理员权限
@@ -136,8 +133,6 @@ public interface TenantService {
      * @return
      */
     ResponseData assignTenantRole(TenantMemberQo tenantMemberQo);
-
-
 
 
     /**

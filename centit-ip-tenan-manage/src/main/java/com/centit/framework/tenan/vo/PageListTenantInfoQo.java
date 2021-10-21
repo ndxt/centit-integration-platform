@@ -41,6 +41,9 @@ public class PageListTenantInfoQo {
     @ApiModelProperty(value = "是否可以；示例：T：可用，F：不可用", name = "isAvailable")
     private String isAvailable;
 
+    @ApiModelProperty(value = "租户所有者;", name = "ownUser")
+    private String ownUser;
+
 
     public String getUnitName() {
         return unitName;
@@ -114,6 +117,14 @@ public class PageListTenantInfoQo {
         this.isAvailable = isAvailable;
     }
 
+    public String getOwnUser() {
+        return ownUser;
+    }
+
+    public void setOwnUser(String ownUser) {
+        this.ownUser = ownUser;
+    }
+
     @Override
     public String toString() {
         return "PageListTenantInfoQo{" +
@@ -126,6 +137,7 @@ public class PageListTenantInfoQo {
             ", startPassTime=" + startPassTime +
             ", endPassTime=" + endPassTime +
             ", isAvailable='" + isAvailable + '\'' +
+            ", ownUser='" + ownUser + '\'' +
             '}';
     }
 }

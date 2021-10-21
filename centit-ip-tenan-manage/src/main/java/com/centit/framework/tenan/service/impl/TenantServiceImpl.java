@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -222,7 +221,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("isAvailable字段属性有误");
         }
         TenantInfo oldTenantInfo = tenantInfoDao.getObjectById(tenantInfo.getTopUnit());
-        if (null== oldTenantInfo){
+        if (null == oldTenantInfo) {
             return ResponseData.makeErrorMessage("租户不存在!");
         }
         oldTenantInfo.setMemo(tenantInfo.getMemo());
@@ -244,8 +243,6 @@ public class TenantServiceImpl implements TenantService {
     }
 
 
-
-
     @Override
     @Transactional
     public ResponseData agreeJoin(TenantMemberApplyVo tenantMemberApplyVo) {
@@ -258,8 +255,10 @@ public class TenantServiceImpl implements TenantService {
         BeanUtils.copyProperties(tenantMemberApplyVo, tenantMemberApply);
         tenantMemberApplyDao.updateObject(tenantMemberApply);
 
-        //如果当前操作人是租户管理员，且同意了用户的申请，则给用户分给机构
-        saveTenantUserUnit(tenantMemberApply);
+        //同意申请，给用户分配机构
+        if (tenantMemberApply.getApplyState().equals("3")) {
+            saveTenantUserUnit(tenantMemberApply);
+        }
         return ResponseData.makeSuccessResponse();
     }
 
@@ -428,18 +427,33 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public PageQueryResult<TenantInfo> pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc) {
-
+        if (tenantPowerManage.userIsSystemMember()) {
+            //如果当前用户是平台管理员，则可以查看所有人的申请信息
+            tenantInfo.setOwnUser(null);
+        } else {
+            tenantInfo.setOwnUser(WebOptUtils.getCurrentUserCode(
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+        }
         List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(tenantInfo, pageDesc);
         return PageQueryResult.createResult(tenantInfos, pageDesc);
     }
 
     @Override
-    public PageQueryResult<TenantMember> pageListTenantMember(TenantMemberQo tenantMemberQo, PageDesc pageDesc) {
-        if (StringUtils.isBlank(tenantMemberQo.getTopUnit())) {
+    public PageQueryResult pageListTenantMember(Map<String,Object> params, PageDesc pageDesc) {
+        String topUnit = MapUtils.getString(params, "topUnit");
+        if (StringUtils.isBlank(topUnit)){
             throw new ObjectException("topUnit 不能为空");
         }
-        return PageQueryResult.createResult(tenantMemberDao.pageListTenantMember(tenantMemberQo, pageDesc), pageDesc);
+        JSONArray userInfoJsonArray = userInfoDao.listObjectsByUnit(params, pageDesc);
+        if (userInfoJsonArray.size()==0){
+            return PageQueryResult.createJSONArrayResult(userInfoJsonArray,pageDesc);
+        }
+
+        List<Map> userInfoMap = extendUserRoleByWorkGroup(topUnit, userInfoJsonArray);
+        return PageQueryResult.createResult(userInfoMap,pageDesc);
     }
+
+
 
     @Override
     @Transactional
@@ -858,7 +872,9 @@ public class TenantServiceImpl implements TenantService {
         HashMap<String, Object> map = new HashMap<>();
         map.put("g0_loginName", userInfo.getLoginName());
         map.put("g1_userName", userInfo.getUserName());
-        map.put("g2_regEmail", userInfo.getRegEmail());
+        if (StringUtils.isNotBlank(userInfo.getRegEmail())) {
+            map.put("g2_regEmail", userInfo.getRegEmail());
+        }
         if (StringUtils.isNotBlank(userInfo.getRegCellPhone())) {
             map.put("g3_regCellPhone", userInfo.getRegCellPhone());
         }
@@ -937,14 +953,11 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantMemberApply 申请信息
      */
     private void saveTenantUserUnit(TenantMemberApply tenantMemberApply) {
-        TenantMemberApply oldTenantMemberApply = new TenantMemberApply();
-        if (tenantMemberApply.getApplyState().equals("3")) {
-            UserInfo userInfo = new UserInfo();
-            userInfo.setUserCode(tenantMemberApply.getUserCode());
-            userInfo.setIsValid("T");
-            userInfoDao.updateObject(userInfo);
-            oldTenantMemberApply = tenantMemberApplyDao.getObjectById(tenantMemberApply);
-        }
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserCode(tenantMemberApply.getUserCode());
+        userInfo.setIsValid("T");
+        userInfoDao.updateObject(userInfo);
+        TenantMemberApply oldTenantMemberApply = tenantMemberApplyDao.getObjectById(tenantMemberApply);
         if (StringUtils.isBlank(oldTenantMemberApply.getUnitCode())) {
             //如果没有指定分配到哪个部门，则默认分配到顶级部门
             oldTenantMemberApply.setUnitCode(oldTenantMemberApply.getTopUnit());
@@ -1218,7 +1231,7 @@ public class TenantServiceImpl implements TenantService {
         saveUserUnitByTenantAndUnit(oldTenantInfo, unitInfo);
         saveTenantOwnerToWorkGroup(oldTenantInfo);
         saveUserRole(oldTenantInfo.getOwnUser(), SYSTEM_ADMIN_ROLE_CODE);
-        initTenantDictionary(oldTenantInfo.getTopUnit(),oldTenantInfo.getOwnUser());
+        initTenantDictionary(oldTenantInfo.getTopUnit(), oldTenantInfo.getOwnUser());
     }
 
     /**
@@ -1247,7 +1260,7 @@ public class TenantServiceImpl implements TenantService {
      * 初始化租户的字典值
      *
      * @param topUnitCode 租户code
-     * @param userCode 创建人用户code
+     * @param userCode    创建人用户code
      */
     private void initTenantDictionary(String topUnitCode, String userCode) {
 
@@ -1255,7 +1268,7 @@ public class TenantServiceImpl implements TenantService {
         DataCatalog userTypeDataCatalog = defaultDataCatalog(userCode, topUnitCode,
             DATA_CATALOG_UESR_TYPE_SUFFIX, "用户类型");
         dataCatalogDao.saveNewObject(userTypeDataCatalog);
-        String[][] userTypeElements = {{userTypeDataCatalog.getCatalogCode(),"A","普通用户"}};
+        String[][] userTypeElements = {{userTypeDataCatalog.getCatalogCode(), "A", "普通用户"}};
         batchSaveDataDictionary(userTypeElements);
 
         //机构类型数据字典unitType
@@ -1263,7 +1276,7 @@ public class TenantServiceImpl implements TenantService {
             DATA_CATALOG_UNIT_TYPE_SUFFIX, "机构类别");
         dataCatalogDao.saveNewObject(unitTypeDataCatalog);
         String unitTypeCatalogCode = unitTypeDataCatalog.getCatalogCode();
-        String[][] unitTypeElements = {{unitTypeCatalogCode,"A","一般机构"},{unitTypeCatalogCode,"I","项目组"},{unitTypeCatalogCode,"O","业务机构"}};
+        String[][] unitTypeElements = {{unitTypeCatalogCode, "A", "一般机构"}, {unitTypeCatalogCode, "I", "项目组"}, {unitTypeCatalogCode, "O", "业务机构"}};
         batchSaveDataDictionary(unitTypeElements);
 
         //用户职务类型字典 RankType
@@ -1271,15 +1284,15 @@ public class TenantServiceImpl implements TenantService {
             DATA_CATALOG_RANK_SUFFIX, "职位");
         dataCatalogDao.saveNewObject(rankTypeDataCatalog);
         String rankTypeCatalogCode = rankTypeDataCatalog.getCatalogCode();
-        String[][] rankTypeElements = {{rankTypeCatalogCode,"CM","董事长"},{rankTypeCatalogCode,"DM","部门经理"},{rankTypeCatalogCode,"FG","分管高层"},
-            {rankTypeCatalogCode,"GM","总经理"},{rankTypeCatalogCode,"PM","副总经理"},{rankTypeCatalogCode,"YG","普通员工"}};
+        String[][] rankTypeElements = {{rankTypeCatalogCode, "CM", "董事长"}, {rankTypeCatalogCode, "DM", "部门经理"}, {rankTypeCatalogCode, "FG", "分管高层"},
+            {rankTypeCatalogCode, "GM", "总经理"}, {rankTypeCatalogCode, "PM", "副总经理"}, {rankTypeCatalogCode, "YG", "普通员工"}};
         batchSaveDataDictionary(rankTypeElements);
 
         //用户岗位类型字典 stationType
         DataCatalog stationTypeDataCatalog = defaultDataCatalog(userCode, topUnitCode,
             DATA_CATALOG_STATION_SUFFIX, "用户岗位");
         dataCatalogDao.saveNewObject(stationTypeDataCatalog);
-        String[][] stationTypeElements = {{stationTypeDataCatalog.getCatalogCode(),"PT","普通岗位"},{stationTypeDataCatalog.getCatalogCode(),"LD","领导岗位"}};
+        String[][] stationTypeElements = {{stationTypeDataCatalog.getCatalogCode(), "PT", "普通岗位"}, {stationTypeDataCatalog.getCatalogCode(), "LD", "领导岗位"}};
         batchSaveDataDictionary(stationTypeElements);
     }
 
@@ -1304,6 +1317,7 @@ public class TenantServiceImpl implements TenantService {
 
     /**
      * 批量保存字典数据
+     *
      * @param elements 字典数据中的元素值
      */
     private void batchSaveDataDictionary(String[]... elements) {
@@ -1321,12 +1335,13 @@ public class TenantServiceImpl implements TenantService {
 
     /**
      * 生成一个默认的DataDictionary对象
+     *
      * @param catalogCode 字典大类code
-     * @param dataCode 字典code
-     * @param dataValue 字典值
+     * @param dataCode    字典code
+     * @param dataValue   字典值
      * @return 新的DataDictionary对象
      */
-    private DataDictionary defaultDataDictionary(String catalogCode,  String dataCode, String dataValue) {
+    private DataDictionary defaultDataDictionary(String catalogCode, String dataCode, String dataValue) {
         DataDictionary dataDictionary = new DataDictionary();
         DataDictionaryId dataDictionaryId = new DataDictionaryId();
         dataDictionaryId.setCatalogCode(catalogCode);
@@ -1356,5 +1371,32 @@ public class TenantServiceImpl implements TenantService {
             oldTenantInfo.setFileSpaceLimit(fileSpaceLimit);
         }
         oldTenantInfo.setPassTime(nowDate());
+    }
+
+    /**
+     * 补充userinfo中的角色信息
+     * @param topUnit 单位code
+     * @param userInfoJsonArray 用户信息集合
+     * @return
+     */
+    private List<Map> extendUserRoleByWorkGroup(String topUnit, JSONArray userInfoJsonArray) {
+        List<Map> userInfoMap = userInfoJsonArray.toJavaList(Map.class);
+        List<String> userCodes = (List<String>) userInfoMap.stream().map(map -> MapUtils.getString(map, "userCode")).collect(Collectors.toList());
+        Map<String, Object> hashMap = CollectionsOpt.createHashMap("groupId", topUnit);
+        hashMap.put("userCode_in",CollectionsOpt.listToArray(userCodes));
+        List<WorkGroup> workGroups = workGroupDao.listObjectsByProperties(hashMap);
+
+        for (Map map : userInfoMap) {
+            WorkGroup workGroup = getWorkGroupByUserCodeAndTopUnit(MapUtils.getString(map, "userCode"),topUnit, workGroups);
+            if (null == workGroup || StringUtils.isBlank(workGroup.getRoleCode())
+                || workGroup.getRoleCode().equals(TENANT_NORMAL_MEMBER_ROLE_CODE)){
+                map.put("roleCode",TENANT_NORMAL_MEMBER_ROLE_CODE);
+                map.put("roleName","组员");
+            }else {
+                map.put("roleCode",workGroup.getRoleCode());
+                map.put("roleName","管理员");
+            }
+        }
+        return userInfoMap;
     }
 }

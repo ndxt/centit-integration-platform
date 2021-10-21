@@ -67,6 +67,10 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
         if (StringUtils.isNotBlank(pageListTenantInfoQo.getIsAvailable())){
             filterMap.put("isAvailable",pageListTenantInfoQo.getIsAvailable());
         }
+
+        if (StringUtils.isNotBlank(pageListTenantInfoQo.getOwnUser())){
+            filterMap.put("ownUser",pageListTenantInfoQo.getOwnUser());
+        }
         return filterMap;
     }
 

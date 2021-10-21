@@ -250,9 +250,9 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/pageListTenantMember", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public PageQueryResult<TenantMember> pageListTenantMember(TenantMemberQo tenantMemberQo, PageDesc pageDesc) {
-
-        return tenantService.pageListTenantMember(tenantMemberQo, pageDesc);
+    public PageQueryResult<Object> pageListTenantMember(HttpServletRequest request, PageDesc pageDesc) {
+        Map<String, Object> parameters = collectRequestParameters(request);
+        return tenantService.pageListTenantMember(parameters, pageDesc);
 
     }
 
