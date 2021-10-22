@@ -1,8 +1,8 @@
 package com.centit.framework.users.service;
 
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.system.po.UnitInfo;
-import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.users.dto.DingUnitDTO;
+import com.centit.framework.users.dto.DingUserDTO;
 
 /**
  * @author zfg
@@ -15,9 +15,9 @@ public interface DingTalkLoginService {
 
     ResponseData getUserInfo(String accessToken, String userId);
 
-    ResponseData userCreate(String accessToken, UserInfo userInfo);
+    ResponseData userCreate(String accessToken, DingUserDTO userInfo);
 
-    ResponseData unitCreate(String accessToken, UnitInfo unitInfo);
+    ResponseData unitCreate(String accessToken, DingUnitDTO unitInfo);
 
     ResponseData getUnitInfo(String accessToken, String deptId);
 }

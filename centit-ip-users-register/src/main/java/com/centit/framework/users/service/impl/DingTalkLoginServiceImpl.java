@@ -1,11 +1,11 @@
 package com.centit.framework.users.service.impl;
 
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.system.po.UnitInfo;
-import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.dao.SocialDeptAuthDao;
+import com.centit.framework.users.dto.DingUnitDTO;
+import com.centit.framework.users.dto.DingUserDTO;
 import com.centit.framework.users.po.SocialDeptAuth;
 import com.centit.framework.users.service.DingTalkLoginService;
 import com.dingtalk.api.DefaultDingTalkClient;
@@ -50,6 +50,9 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             logger.error("Failed to {}", UrlConstant.URL_GET_USER_BYCODE, e);
             return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to getUserByCode: " + e.getErrMsg());
         }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
         return ResponseData.makeResponseData(response.getUserInfo().getUnionid());
     }
 
@@ -71,6 +74,9 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         } catch (ApiException e) {
             logger.error("Failed to {}", UrlConstant.URL_USER_GET, e);
             return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to getUserByUnionId: " + e.getErrMsg());
+        }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
         }
         return ResponseData.makeResponseData(response.getResult().getUserid());
     }
@@ -95,6 +101,9 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             logger.error("Failed to {}", UrlConstant.URL_GET_USER, e);
             return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to getUserInfo: " + e.getErrMsg());
         }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
         return ResponseData.makeResponseData(response.getBody());
     }
 
@@ -106,10 +115,9 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
      * @return
      */
     @Override
-    public ResponseData userCreate(String accessToken, UserInfo userInfo) {
+    public ResponseData userCreate(String accessToken, DingUserDTO userInfo) {
         DingTalkClient client = new DefaultDingTalkClient(UrlConstant.USER_CREATE);
         OapiV2UserCreateRequest request = new OapiV2UserCreateRequest();
-        request.setUserid(userInfo.getUserCode());
         request.setName(userInfo.getUserName());
         request.setMobile(userInfo.getRegCellPhone());
         SocialDeptAuth socialDeptAuth = socialDeptAuthDao.getObjectById(userInfo.getPrimaryUnit());
@@ -127,6 +135,9 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             logger.error("Failed to {}", UrlConstant.USER_CREATE, e);
             return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to userCreate: " + e.getErrMsg());
         }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
         //response.getResult().getUserid();
         return ResponseData.makeResponseData(response.getBody());
     }
@@ -139,7 +150,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
      * @return
      */
     @Override
-    public ResponseData unitCreate(String accessToken, UnitInfo unitInfo) {
+    public ResponseData unitCreate(String accessToken, DingUnitDTO unitInfo) {
         DingTalkClient client = new DefaultDingTalkClient(UrlConstant.DEPARTMENT_CREATE);
         OapiV2DepartmentCreateRequest request = new OapiV2DepartmentCreateRequest();
         request.setName(unitInfo.getUnitName());
@@ -162,6 +173,9 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             logger.error("Failed to {}", UrlConstant.DEPARTMENT_CREATE, e);
             return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to unitCreate: " + e.getErrMsg());
         }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
         //response.getResult().getDeptId();
         SocialDeptAuth socialDeptAuth = new SocialDeptAuth();
         socialDeptAuth.setUnitCode(unitInfo.getUnitCode());
@@ -183,6 +197,9 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         if (response == null) {
             ResponseData.makeErrorMessage("Failed to getDingUnitinfo");
         }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
         return ResponseData.makeResponseData(response.getBody());
     }
 
@@ -199,4 +216,5 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         }
         return response;
     }
+
 }

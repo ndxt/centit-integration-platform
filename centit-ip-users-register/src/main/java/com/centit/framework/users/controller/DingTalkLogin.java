@@ -6,10 +6,10 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.system.po.UnitInfo;
-import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
+import com.centit.framework.users.dto.DingUnitDTO;
+import com.centit.framework.users.dto.DingUserDTO;
 import com.centit.framework.users.po.Platform;
 import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.DingTalkLoginService;
@@ -179,7 +179,7 @@ public class DingTalkLogin extends BaseController {
     @ApiOperation(value = "同步钉钉创建用户", notes = "同步钉钉创建用户。")
     @PostMapping(value = "/usercreate")
     @WrapUpResponseBody
-    public ResponseData userCreate(UserInfo userInfo, HttpServletRequest request) {
+    public ResponseData userCreate(DingUserDTO userInfo, HttpServletRequest request) {
         String accessToken = getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
             return ResponseData.makeErrorMessage("获取钉钉access_token失败");
@@ -190,7 +190,7 @@ public class DingTalkLogin extends BaseController {
     @ApiOperation(value = "同步钉钉创建机构部门", notes = "同步钉钉创建机构部门。")
     @PostMapping(value = "/unitcreate")
     @WrapUpResponseBody
-    public ResponseData unitCreate(UnitInfo unitInfo, HttpServletRequest request) {
+    public ResponseData unitCreate(DingUnitDTO unitInfo, HttpServletRequest request) {
         String accessToken = getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
             return ResponseData.makeErrorMessage("获取钉钉access_token失败");

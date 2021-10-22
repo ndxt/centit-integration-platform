@@ -120,7 +120,9 @@ public class TokenService {
             log.error("getAccessToken failed", e);
             return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), e.getErrMsg());
         }
-
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
         accessToken = response.getAccessToken();
         //putToCache("accessToken", "access_token", accessToken);
         saveTokenTodb(appConfig.getAppKey(), accessToken, response.getExpiresIn());
