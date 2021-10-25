@@ -183,7 +183,7 @@
         <profile>
 			<id>dev</id>
 			<properties>
-				<profiles.active>dev</profiles.active>
+				<profiles.active></profiles.active>
 			</properties>
 			<activation>
 				<activeByDefault>true</activeByDefault>
