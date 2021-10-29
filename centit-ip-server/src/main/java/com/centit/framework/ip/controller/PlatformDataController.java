@@ -197,18 +197,6 @@ public class PlatformDataController extends BaseController {
         return platformEnvironment.listMenuOptInfosUnderOsId(osId);
     }
 
-    @ApiOperation(value = "创建单个模块信息", notes = "创建单个模块信息。")
-    @RequestMapping(value = "/optinfo", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public IOptInfo addOptInfo(@RequestBody IOptInfo optInfo) {
-        return platformEnvironment.addOptInfo(optInfo);
-    }
-    @ApiOperation(value = "创建单个方法信息", notes = "创建单个方法信息。")
-    @RequestMapping(value = "/optmethod", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public IOptMethod addOptMethod(@RequestBody JSONObject optMethod) {
-        return platformEnvironment.addOptMethod(optMethod);
-    }
 
     /**
      * 校验用户密码

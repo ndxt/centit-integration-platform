@@ -10,6 +10,7 @@
 
     <!-- 生成远程服务代理，可以和本地bean一样使用; init默认false，即懒加载，可改为ture(饥饿加载)-->
     <dubbo:reference id="platformEnvironment" interface="com.centit.framework.model.adapter.PlatformEnvironment" init="false"/>
+<!--                     url="dubbo://192.168.137.242:20880"/>-->
 
     <!--<dubbo:reference id="userService" interface="com.kami.service.UserService" >
         <dubbo:method name="findOne" cache="lru" />
