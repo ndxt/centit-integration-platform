@@ -189,6 +189,12 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 	    </profile>
+        <profile>
+            <id>pressure-test</id>
+            <properties>
+                <profiles.active>pressure-test</profiles.active>
+            </properties>
+        </profile>
     </profiles>
     <build>
         <finalName>${finalName}</finalName>
@@ -225,6 +231,7 @@
                     <exclude>prod/*</exclude>
                     <exclude>system.properties</exclude>
                     <exclude>demo/*</exclude>
+                    <exclude>pressure-test/*</exclude>
                 </excludes>
             </resource>
             <resource>
