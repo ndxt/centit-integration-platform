@@ -4,6 +4,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
 @Configuration
-@ImportResource({"classpath:dubbo-ip-client.xml"})
-public class IpServerDubboConfig {
+@ImportResource({"classpath:dubbo-ip-server.xml"})
+public class IpServerDubboServerConfig {
 }
