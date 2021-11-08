@@ -3,6 +3,7 @@ package com.centit.framework.tenan.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 
 import static com.centit.framework.common.GlobalConstValue.*;
 import static com.centit.framework.tenan.constant.TenantConstant.*;
+import static com.centit.framework.tenan.dao.TenantMemberApplyDao.NOT_APPROVE_ARRAY;
 
 @Service
 public class TenantServiceImpl implements TenantService {
@@ -162,7 +164,8 @@ public class TenantServiceImpl implements TenantService {
         tenantInfo.setCreator(userCode);
         tenantInfo.setOwnUser(userCode);
         saveTenantInfo(tenantInfo);
-        return ResponseData.makeSuccessResponse("租户申请成功,等待平台管理员审核!");
+        initTenant(new TenantInfo(),tenantInfo);
+        return ResponseData.makeSuccessResponse("租户申请成功!");
     }
 
 
@@ -190,14 +193,17 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public PageQueryResult listApplyInfo(Map<String, Object> parameters, PageDesc pageDesc) {
-        String code = MapUtils.getString(parameters, "code");
-        String codeType = MapUtils.getString(parameters, "codeType");
-        String approveType = MapUtils.getString(parameters, "approveType");
-        if (StringUtils.isAnyBlank(code, codeType, approveType)) {
-            throw new ObjectException("缺少参数code,codeType,approveType;");
-        }
 
-        List<TenantMemberApply> tenantMemberApplies = listApplyInfoByCondition(pageDesc, code, codeType, approveType);
+        if (null == parameters.get("applyState") && null == parameters.get("applyState_in")){
+            throw new ObjectException("缺少参数applyState;");
+        }
+        if (null == parameters.get("userCode") && null== parameters.get("topUnit")){
+            throw new ObjectException("缺少参数userCode或topUnit;");
+        }
+        if (null != parameters.get("applyState_in")){
+            parameters.put("applyState_in",MapUtils.getString(parameters, "applyState_in").split(","));
+        }
+        List<TenantMemberApply> tenantMemberApplies = tenantMemberApplyDao.listObjectsByProperties(parameters);
         if (CollectionUtils.sizeIsEmpty(tenantMemberApplies)) {
             return PageQueryResult.createResult(Collections.emptyList(), pageDesc);
         }
@@ -232,13 +238,11 @@ public class TenantServiceImpl implements TenantService {
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         if ("F".equals(tenantInfo.getIsAvailable())) {
             oldTenantInfo.setPassTime(null);
-        } else {
-            saveTenantDefaultResourcesAttribute(tenantInfo, oldTenantInfo);
+            tenantInfoDao.updateObject(oldTenantInfo);
         }
 
-        tenantInfoDao.updateObject(oldTenantInfo);
         if ("T".equals(tenantInfo.getIsAvailable())) {
-            saveTenantRelationData(oldTenantInfo);
+            initTenant(tenantInfo,oldTenantInfo);
         }
         return ResponseData.makeSuccessResponse();
     }
@@ -290,6 +294,8 @@ public class TenantServiceImpl implements TenantService {
         //刷新缓存中的人员信息
         SecurityContextHolder.getContext()
             .setAuthentication(platformEnvironment.loadUserDetailsByUserCode(userinfo.getUserCode()));
+        //人员新增更新成功后刷新缓存
+        CodeRepositoryCache.evictCache("UserInfo");
         return ResponseData.makeSuccessResponse();
     }
 
@@ -609,15 +615,39 @@ public class TenantServiceImpl implements TenantService {
         if (CollectionUtils.sizeIsEmpty(userInfos)) {
             return ResponseData.makeResponseData(CollectionUtils.emptyCollection());
         }
+        //排除已经被邀请的用户且没有蛇和,或者属于本单位的人员
+        Set<String> userInfoUserCodes = userInfos.stream().map(UserInfo::getUserCode).collect(Collectors.toSet());
+        List<TenantMemberApply> alreadyApply = tenantMemberApplyDao.listObjectsByProperties(
+            CollectionsOpt.createHashMap("userCode_in", CollectionsOpt.listToArray(userInfoUserCodes),
+                "topUnit", unitCode,"applyState_in",NOT_APPROVE_ARRAY ));
+        List<String> applyUserCodes = alreadyApply.stream().map(TenantMemberApply::getUserCode).collect(Collectors.toList());
         List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("topUnit", unitCode));
-        Iterator<UserInfo> iterator = userInfos.iterator();
-        while (iterator.hasNext()) {
-            UserUnit userUnitByUserCode = getUserUnitByUserCode(userUnits, iterator.next().getUserCode());
-            if (null != userUnitByUserCode) {
-                iterator.remove();
-            }
-        }
+        userInfos = userInfos.stream().filter(userInfo ->
+            null == getUserUnitByUserCode(userUnits, userInfo.getUserCode())&& !applyUserCodes.contains(userInfo.getUserCode())).collect(Collectors.toList());
         return ResponseData.makeResponseData(userInfos);
+    }
+
+    @Override
+    public ResponseData cancelApply(Map<String, Object> parameters) {
+        TenantMemberApply tenantMemberApply = tenantMemberApplyDao.getObjectByProperties(parameters);
+        if (null !=tenantMemberApply && StringUtils.equalsAny(tenantMemberApply.getApplyState(),"1","2")){
+            tenantMemberApplyDao.deleteObject(tenantMemberApply);
+        }
+        return ResponseData.makeSuccessResponse();
+    }
+
+    @Override
+    public ResponseData deleteTenant(Map<String, Object> parameters) {
+
+        if(!tenantPowerManage.userIsTenantOwner(MapUtils.getString(parameters,"topUnit"))){
+            return ResponseData.makeErrorMessage("只有租户所有者才能注销租户");
+        }
+        TenantInfo tenantInfo = new TenantInfo();
+        tenantInfo.setTopUnit(MapUtils.getString(parameters,"topUnit"));
+        tenantInfo.setIsAvailable("F");
+        tenantInfoDao.updateObject(tenantInfo);
+        return ResponseData.makeSuccessResponse();
+
     }
 
 
@@ -786,6 +816,40 @@ public class TenantServiceImpl implements TenantService {
         //部门信息
         tenantJson.put("deptCodes", unitCodes);
         tenantJson.put("deptNames", unitInfos.stream().map(UnitInfo::getUnitName).collect(Collectors.toSet()));
+
+        tenantJson.put("deptList", transformDeptList(userUnits, unitInfos));
+    }
+
+    /**
+     * 整合单位结构数据
+     * @param userUnits 用户单位关联信息
+     * @param unitInfos 机构信息
+     * @return
+     */
+    private ArrayList<HashMap<String, Object>> transformDeptList(List<UserUnit> userUnits, List<UnitInfo> unitInfos) {
+        Map<String, List<UserUnit>> groupByUnitCode = userUnits.stream().collect(Collectors.groupingBy(UserUnit::getUnitCode));
+        ArrayList<HashMap<String, Object>> deptList = new ArrayList<>();
+        for (String key : groupByUnitCode.keySet()) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("deptCode",key);
+            String unitName = unitInfos.stream().filter(unitInfo -> unitInfo.getUnitCode().equals(key)).findAny().map(UnitInfo::getUnitName).orElseGet(() -> "");
+            map.put("deptName",unitName);
+            //获取岗位集合
+            List<HashMap<String, Object>> userRankList = groupByUnitCode.get(key).stream().map(userUnit -> {
+                HashMap<String, Object> map1 = new HashMap<>();
+                map1.put("userRank", userUnit.getUserRank());
+                IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userUnit.getUserRank());
+                if (null != rankType){
+                    map1.put("userRankText",rankType.getDataValue());
+                }else {
+                    map1.put("userRankText","");
+                }
+                return map1;
+            }).collect(Collectors.toList());
+            map.put("userRankList",userRankList);
+            deptList.add(map);
+        }
+        return deptList;
     }
 
     /**
@@ -1085,38 +1149,6 @@ public class TenantServiceImpl implements TenantService {
         return null;
     }
 
-    /**
-     * 根据条件分页查询申请列表数据
-     *
-     * @param pageDesc
-     * @param code
-     * @param codeType
-     * @param approveType
-     * @return
-     */
-    private List<TenantMemberApply> listApplyInfoByCondition(PageDesc pageDesc, String code, String codeType, String approveType) {
-        if (codeType.equals("1") && approveType.equals("1")) {
-            //租户邀请用户，用户待审批数据
-            Map<String, Object> maps = CollectionsOpt.createHashMap("userCode", code);
-            return tenantMemberApplyDao.pageListNotApproveApplyByUserCode(maps, pageDesc);
-        }
-        if (codeType.equals("1") && approveType.equals("2")) {
-            //租户邀请用户，用户已经审批数据
-            Map<String, Object> maps = CollectionsOpt.createHashMap("userCode", code);
-            return tenantMemberApplyDao.pageListHasApproveApplyByUserCode(maps, pageDesc);
-        }
-        if (codeType.equals("2") && approveType.equals("1")) {
-            //用户申请加入租户，租户待审批数据
-            Map<String, Object> maps = CollectionsOpt.createHashMap("topUnit", code);
-            return tenantMemberApplyDao.pageListNotApproveApplyByUnitCode(maps, pageDesc);
-        }
-        if (codeType.equals("2") && approveType.equals("2")) {
-            //用户申请加入租户，租户已经审批数据
-            Map<String, Object> maps = CollectionsOpt.createHashMap("topUnit", code);
-            return tenantMemberApplyDao.pageListHasApproveApplyByUnitCode(maps, pageDesc);
-        }
-        return null;
-    }
 
 
     /**
@@ -1180,7 +1212,7 @@ public class TenantServiceImpl implements TenantService {
             return null;
         }
         return tenantInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap("topUnit_in",
-            CollectionsOpt.listToArray(topUnits)));
+            CollectionsOpt.listToArray(topUnits),"isAvailable","T"));
 
     }
 
@@ -1244,7 +1276,7 @@ public class TenantServiceImpl implements TenantService {
     private void saveUserRole(String userCode, String roleCode) {
         List<UserRole> userRoles = userRoleDao.listObjectsByProperties(
             CollectionsOpt.createHashMap("userCode", userCode, "roleCode", roleCode));
-        if (CollectionUtils.sizeIsEmpty(userRoles)) {
+        if (!CollectionUtils.sizeIsEmpty(userRoles)) {
             return;
         }
         UserRole userRole = new UserRole();
@@ -1252,6 +1284,7 @@ public class TenantServiceImpl implements TenantService {
         userRoleId.setRoleCode(roleCode);
         userRoleId.setUserCode(userCode);
         userRole.setId(userRoleId);
+        userRole.setObtainDate(new Date(System.currentTimeMillis()));
         userRole.setCreator(WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         userRoleDao.saveNewObject(userRole);
@@ -1399,5 +1432,15 @@ public class TenantServiceImpl implements TenantService {
             }
         }
         return userInfoMap;
+    }
+    /**
+     * 初始化租户信息
+     * @param newTenantInfo 租户详情
+     * @param oldTenantInfo 租户详情
+     */
+    private void initTenant(TenantInfo newTenantInfo,TenantInfo oldTenantInfo){
+        saveTenantDefaultResourcesAttribute(newTenantInfo, oldTenantInfo);
+        tenantInfoDao.updateObject(oldTenantInfo);
+        saveTenantRelationData(oldTenantInfo);
     }
 }

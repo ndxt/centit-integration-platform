@@ -2,68 +2,42 @@ package com.centit.framework.tenan.dao;
 
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.tenan.po.TenantMemberApply;
-import com.centit.support.database.utils.PageDesc;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
 
 @Repository
 public class TenantMemberApplyDao extends BaseDaoImpl<TenantMemberApply,String> {
 
 
     /**
-     * 分页查询租户邀请用户的邀请且用户没有处理的信息
-     * @param filterMap filterMap中必须存在key  userCode
-     * @param pageDesc
-     * @return
+     * 还未审批条件
      */
-    @Transactional
-    public List<TenantMemberApply> pageListNotApproveApplyByUserCode(Map<String, Object> filterMap, PageDesc pageDesc) {
-        filterMap.put("applyType","2");
-        filterMap.put("applyState_in",new  String[]{"1","2"});
-        return super.listObjects(filterMap, pageDesc);
-    }
+    public static final String[] NOT_APPROVE_ARRAY = {"1","2"};
+    /**
+     * 已经审批列表条件
+     */
+    public static final String[] HAS_APPROVE_ARRAY= {"3","4"};
 
     /**
-     * 分页查询用户申请加入租户且租户没有处理的申请信息
-     * @param filterMap filterMap中必须存在key  topUnit
-     * @param pageDesc
-     * @return
+     * 同意条件
      */
-    @Transactional
-    public List<TenantMemberApply> pageListNotApproveApplyByUnitCode(Map<String, Object> filterMap, PageDesc pageDesc) {
-        filterMap.put("applyType","1");
-        filterMap.put("applyState_in",new  String[]{"1","2"});
-        return super.listObjects(filterMap, pageDesc);
-    }
+    public static final String[] HAS_AGREE = {"3"};
+    /**
+     * 不同意条件
+     */
+    public static final String[] NOT_AGREE = {"4"};
 
     /**
-     * 分页查询租户邀请用户的邀请且租户已经处理的信息
-     * @param filterMap filterMap中必须存在key  userCode
-     * @param pageDesc
-     * @return
+     * 用户主动申请
      */
-    @Transactional
-    public List<TenantMemberApply> pageListHasApproveApplyByUserCode(Map<String, Object> filterMap, PageDesc pageDesc) {
-        filterMap.put("applyType","2");
-        filterMap.put("applyState_in",new  String[]{"3","4"});
-        return super.listObjects(filterMap, pageDesc);
-    }
+    public static final String APPLYTYPE_APPLY = "1";
 
     /**
-     * 分页查询用户申请加入租户且租户已经处理的申请信息
-     * @param filterMap filterMap中必须存在key  topUnit
-     * @param pageDesc
-     * @return
+     * 租户邀请
      */
-    @Transactional
-    public List<TenantMemberApply> pageListHasApproveApplyByUnitCode(Map<String, Object> filterMap, PageDesc pageDesc) {
-        filterMap.put("applyType","1");
-        filterMap.put("applyState_in",new  String[]{"3","4"});
-        return super.listObjects(filterMap, pageDesc);
-    }
+    public static  final String APPLYTYPE_INVITED = "2";
+
 
     /**
      * 保存数据前查看数据是否存在，如果存在把applyState修改为重新申请

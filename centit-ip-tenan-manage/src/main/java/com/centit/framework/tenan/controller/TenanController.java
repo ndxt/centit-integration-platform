@@ -60,7 +60,7 @@ public class TenanController extends BaseController {
     }
 
     @ApiOperation(
-        value = "用户申请新建租户",
+        value = "用户申请新建租户,目前租户申请后不需要管理员再次审核",
         notes = "用户申请新建租户,请求体(租户基本信息)"
     )
     @RequestMapping(value = "/applyAddTenant", method = RequestMethod.POST)
@@ -96,21 +96,22 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "列出申请信息",
-        notes = "可以是管理员邀请的信息，也可以是用户主动申请的信息"
+        notes = "可以是管理员邀请的信息，也可以是用户主动申请的信息。" +
+            "租户主动邀请用户加入，租户查看未审批的用户列表 applyType:2,topUnit= topUnit,applyState_in=[1,2]"
     )
     @ApiImplicitParams({@ApiImplicitParam(
-        name = "code",
-        value = "用户代码或机构代码",
+        name = "applyType",
+        value = "1:用户主动申请2:租户主动邀请",
         paramType = "String",
         dataTypeClass = String.class),
         @ApiImplicitParam(
-            name = "codeType",
-            value = "代码类型，1：用户代码2：机构代码",
+            name = "userCode/topUnit",
+            value = "用户代码或机构代码[userCode=][topUnit=]",
             paramType = "String",
             dataTypeClass = String.class),
         @ApiImplicitParam(
-            name = "approveType",
-            value = "审批类型， 1待审批 2已审批",
+            name = "applyState",
+            value = "审批类型 未审批：applyState_in=1,2,已审批：applyState_in=3,4,审批通过：applyState=3,不同意：applyState=4",
             paramType = "String",
             dataTypeClass = String.class),
         @ApiImplicitParam(
@@ -127,6 +128,46 @@ public class TenanController extends BaseController {
         return tenantService.listApplyInfo(collectRequestParameters(httpServletRequest), pageDesc);
     }
 
+    @ApiOperation(
+        value = "撤销申请",
+        notes = "用户或者租户撤销申请或邀请"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+        name = "topUnit",
+        value = "租户id",
+        paramType = "String",
+        dataTypeClass = String.class),
+        @ApiImplicitParam(
+            name = "userCode",
+            value = "用户code",
+            paramType = "String",
+            dataTypeClass = String.class)
+    }
+    )
+    @RequestMapping(value = "/cancelApply", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData cancelApply(HttpServletRequest request) {
+        Map<String, Object> parameters = collectRequestParameters(request);
+        if (StringUtils.isAnyBlank(MapUtils.getString(parameters,"topUnit"),
+            MapUtils.getString(parameters,"userCode"))){
+            return ResponseData.makeErrorMessage("topUnit或userCode不能为空");
+        }
+        return tenantService.cancelApply(parameters);
+    }
+
+    @ApiOperation(
+        value = "注销租户",
+        notes = "注销租户，只有租户所有者才可以操作"
+    )
+    @RequestMapping(value = "/deleteTenant", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData deleteTenant(HttpServletRequest request) {
+        Map<String, Object> parameters = collectRequestParameters(request);
+        if (StringUtils.isBlank(MapUtils.getString(parameters,"topUnit"))){
+            return ResponseData.makeErrorMessage("topUnit不能为空");
+        }
+        return tenantService.deleteTenant(parameters);
+    }
 
     @ApiOperation(
         value = "同意加入租户",

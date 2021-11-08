@@ -192,4 +192,18 @@ public interface TenantService {
     ResponseData findUsers(Map<String,Object> paramMap);
 
 
+    /**
+     *取消加入租户申请
+     * @param parameters userCode topUnit 必传
+     * @return
+     */
+    ResponseData cancelApply(Map<String, Object> parameters);
+
+    /**
+     * 注销租户申请
+     * @param parameters topUnit必传
+     * @return
+     */
+    ResponseData deleteTenant(Map<String, Object> parameters);
+
 }
