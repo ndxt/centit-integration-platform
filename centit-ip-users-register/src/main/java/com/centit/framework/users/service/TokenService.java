@@ -34,7 +34,7 @@ public class TokenService {
     /**
      * 缓存时间：7200秒（2小时）
      */
-    private static final long CACHE_TTL = 60 * 60 * 2 * 1000;
+    private static final long CACHE_TTL = 60 * 60 * 2 * 1000L;
 
     private AppConfig appConfig;
 

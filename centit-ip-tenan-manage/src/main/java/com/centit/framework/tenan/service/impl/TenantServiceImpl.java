@@ -407,7 +407,10 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeSuccessResponse("受让人信息有误!");
         }
         tenantBusinessLog.setAssigneeUserName(assigneeUserInfo.getUserName());
-        tenantBusinessLog.setAssignorUserName(getUserInfoByUserCode(userInfos, assignorUserCode).getUserName());
+        UserInfo user = getUserInfoByUserCode(userInfos, assignorUserCode);
+        if (null != user) {
+            tenantBusinessLog.setAssignorUserName(user.getUserName());
+        }
         tenantBusinessLog.setApplyBusinessTime(nowDate());
         tenantBusinessLog.setSuccessBusinessTime(nowDate());
         tenantBusinessLog.setBusinessState("T");
@@ -712,12 +715,24 @@ public class TenantServiceImpl implements TenantService {
      * @return
      */
     private List<Map> formatTenants(String userCode, List<TenantInfo> tenantInfos) {
-        Set<String> topUnitCodes = tenantInfos.stream().map(TenantInfo::getTopUnit).collect(Collectors.toSet());
-        List<WorkGroup> workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, CollectionsOpt.listToArray(topUnitCodes));
-        String primaryUnit = userInfoDao.getUserByCode(userCode).getPrimaryUnit();
+        Set<String> topUnitCodes = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(tenantInfos)) {
+            topUnitCodes = tenantInfos.stream().map(TenantInfo::getTopUnit).collect(Collectors.toSet());
+        }
+        List<WorkGroup> workGroups = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(topUnitCodes)) {
+            workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, CollectionsOpt.listToArray(topUnitCodes));
+        }
+        UserInfo userInfo = userInfoDao.getUserByCode(userCode);
+        String primaryUnit = "";
+        if (null != userInfo) {
+            primaryUnit = userInfo.getPrimaryUnit();
+        }
         List<Map> tenantJsonArrays = JSONArray.parseArray(JSONArray.toJSONString(tenantInfos), Map.class);
-        for (Map tenantJson : tenantJsonArrays) {
-            extendTenantsAttribute(userCode, workGroups, primaryUnit, tenantJson);
+        if (CollectionUtils.isNotEmpty(tenantJsonArrays)) {
+            for (Map tenantJson : tenantJsonArrays) {
+                extendTenantsAttribute(userCode, workGroups, primaryUnit, tenantJson);
+            }
         }
         return tenantJsonArrays;
     }
@@ -1225,7 +1240,7 @@ public class TenantServiceImpl implements TenantService {
      */
     private List<WorkGroup> listWorkGroupByUserCodeAndTopUnit(String userCode, String... topUnits) {
         HashMap<String, Object> map = new HashMap<>();
-        if (topUnits.length > 0) {
+        if (null != topUnits && topUnits.length > 0) {
             map.put("groupId_in", topUnits);
         }
         map.put("userCode", userCode);

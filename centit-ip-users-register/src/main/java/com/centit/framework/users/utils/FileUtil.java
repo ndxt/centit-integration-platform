@@ -3,6 +3,8 @@ package com.centit.framework.users.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.util.TextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
@@ -17,7 +19,10 @@ import java.util.Set;
  * @date 2020/2/4
  */
 public class FileUtil {
+
     private static final String FILEPATH = "Permanent_Data";
+
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
     /**
      * 将json写入文件
@@ -26,7 +31,6 @@ public class FileUtil {
      * @param fileName 文件名称
      */
     public synchronized static void write2File(Object json, String fileName) {
-        BufferedWriter writer = null;
         File filePath = new File(FILEPATH);
         JSONObject eJson = null;
 
@@ -35,21 +39,18 @@ public class FileUtil {
         }
 
         File file = new File(FILEPATH + File.separator + fileName + ".xml");
-        System.out.println("path:" + file.getPath() + " abs path:" + file.getAbsolutePath());
+        logger.info("path：{}, abs path {}", file.getPath(), file.getAbsolutePath());
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (Exception e) {
-                System.out.println("createNewFile，出现异常:");
-                e.printStackTrace();
+                logger.error("createNewFile异常", e);
             }
         } else {
             eJson = read2JSON(fileName);
         }
 
-        try {
-            writer = new BufferedWriter(new FileWriter(file));
-
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))){
             if (eJson == null) {
                 writer.write(json.toString());
             } else {
@@ -62,17 +63,8 @@ public class FileUtil {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            logger.error("write2File异常", e);
         }
-
     }
 
     /**
@@ -87,20 +79,17 @@ public class FileUtil {
             return null;
         }
 
-        BufferedReader reader = null;
-        String laststr = "";
-        try {
-            reader = new BufferedReader(new FileReader(file));
+        StringBuilder lastStr = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
             String tempString = null;
             while ((tempString = reader.readLine()) != null) {
-                laststr += tempString;
+                lastStr.append(tempString);
             }
-            reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("read2JSON异常", e);
         }
 
-        return (JSONObject) JSON.parse(laststr);
+        return (JSONObject) JSON.parse(lastStr.toString());
     }
 
     /**
@@ -122,11 +111,11 @@ public class FileUtil {
         }
     }
 
-    public static HashMap<Long, Long> toHashMap(JSONObject js) {
+    public static Map<Long, Long> toHashMap(JSONObject js) {
         if (js == null) {
             return null;
         }
-        HashMap<Long, Long> data = new HashMap<Long, Long>();
+        HashMap<Long, Long> data = new HashMap<>();
         // 将json字符串转换成jsonObject
         Set<String> set = js.keySet();
         // 遍历jsonObject数据，添加到Map对象
