@@ -73,11 +73,4 @@ public class ServiceConfig {
         return new InstantiationServiceBeanPostProcessor();
     }
 
-    @Bean
-    public PlatformEnvironment platformEnvironment(){
-        boolean tenant = BooleanBaseOpt.castObjectToBoolean(supportTenant, false);
-        DBPlatformEnvironment platformEnvironment = new DBPlatformEnvironment();
-        platformEnvironment.setSupportTenant(tenant);
-        return platformEnvironment;
-    }
 }
