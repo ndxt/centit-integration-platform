@@ -195,7 +195,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
     public ResponseData getUnitInfo(String accessToken, String deptId) {
         OapiV2DepartmentGetResponse response = getDingUnitinfo(accessToken, deptId);
         if (response == null) {
-            ResponseData.makeErrorMessage("Failed to getDingUnitinfo");
+            return ResponseData.makeErrorMessage("Failed to getDingUnitinfo");
         }
         if (!response.isSuccess()) {
             return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
