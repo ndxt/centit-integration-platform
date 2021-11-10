@@ -23,11 +23,11 @@ public class PKCS7Padding {
             amountToPad = BLOCK_SIZE;
         }
         char padChr = chr(amountToPad);
-        String tmp = new String();
+        StringBuilder tmp = new StringBuilder();
         for (int index = 0; index < amountToPad; index++) {
-            tmp += padChr;
+            tmp.append(padChr);
         }
-        return tmp.getBytes(CHARSET);
+        return tmp.toString().getBytes(CHARSET);
     }
 
     /**

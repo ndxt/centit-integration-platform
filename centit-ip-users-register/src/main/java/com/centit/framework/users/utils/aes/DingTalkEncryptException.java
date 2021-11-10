@@ -14,45 +14,45 @@ public class DingTalkEncryptException extends Exception {
     /**
      * 加密明文文本非法
      **/
-    public final static int ENCRYPTION_PLAINTEXT_ILLEGAL = 900001;
+    public static final int ENCRYPTION_PLAINTEXT_ILLEGAL = 900001;
     /**
      * 加密时间戳参数非法
      **/
-    public final static int ENCRYPTION_TIMESTAMP_ILLEGAL = 900002;
+    public static final int ENCRYPTION_TIMESTAMP_ILLEGAL = 900002;
     /**
      * 加密随机字符串参数非法
      **/
-    public final static int ENCRYPTION_NONCE_ILLEGAL = 900003;
+    public static final int ENCRYPTION_NONCE_ILLEGAL = 900003;
     /**
      * 不合法的aeskey
      **/
-    public final static int AES_KEY_ILLEGAL = 900004;
+    public static final int AES_KEY_ILLEGAL = 900004;
     /**
      * 签名不匹配
      **/
-    public final static int SIGNATURE_NOT_MATCH = 900005;
+    public static final int SIGNATURE_NOT_MATCH = 900005;
     /**
      * 计算签名错误
      **/
-    public final static int COMPUTE_SIGNATURE_ERROR = 900006;
+    public static final int COMPUTE_SIGNATURE_ERROR = 900006;
     /**
      * 计算加密文字错误
      **/
-    public final static int COMPUTE_ENCRYPT_TEXT_ERROR = 900007;
+    public static final int COMPUTE_ENCRYPT_TEXT_ERROR = 900007;
     /**
      * 计算解密文字错误
      **/
-    public final static int COMPUTE_DECRYPT_TEXT_ERROR = 900008;
+    public static final int COMPUTE_DECRYPT_TEXT_ERROR = 900008;
     /**
      * 计算解密文字长度不匹配
      **/
-    public final static int COMPUTE_DECRYPT_TEXT_LENGTH_ERROR = 900009;
+    public static final int COMPUTE_DECRYPT_TEXT_LENGTH_ERROR = 900009;
     /**
      * 计算解密文字suiteKey(ISV)或者corpid(普通企业)不匹配
      **/
-    public final static int COMPUTE_DECRYPT_TEXT_CORPID_ERROR = 900010;
+    public static final int COMPUTE_DECRYPT_TEXT_CORPID_ERROR = 900010;
 
-    private static Map<Integer, String> msgMap = new HashMap<Integer, String>();
+    private static Map<Integer, String> msgMap = new HashMap<>();
 
     static {
         msgMap.put(SUCCESS, "成功");

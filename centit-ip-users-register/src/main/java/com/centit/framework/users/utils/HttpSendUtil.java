@@ -1,8 +1,7 @@
 package com.centit.framework.users.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
@@ -20,6 +19,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -31,22 +32,20 @@ import java.security.cert.X509Certificate;
 
 /**
  * <p>HTTP 请求工具类<p>
- * @version 1.0
- * @author li_hao
- * @date 2018年11月7日
  */
 public class HttpSendUtil {
-	private static final Log log = LogFactory.getLog(HttpSendUtil.class);
-	
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpSendUtil.class);
+
     private static PoolingHttpClientConnectionManager connMgr;
     private static RequestConfig requestConfig;
     private static final int MAX_TIMEOUT = 600000;
 
     static {
         Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("http", PlainConnectionSocketFactory.INSTANCE)
-                .register("https", createSSLConnSocketFactory())
-                .build();
+            .register("http", PlainConnectionSocketFactory.INSTANCE)
+            .register("https", createSSLConnSocketFactory())
+            .build();
         // 设置连接池
         connMgr = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
         // 设置连接池大小
@@ -80,14 +79,14 @@ public class HttpSendUtil {
             response = httpclient.execute(httpGet);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) { //请求出错
-                System.out.println(EntityUtils.toString(response.getEntity(), "utf-8") + url); //打印错误信息
+                String result = EntityUtils.toString(response.getEntity(), "utf-8");
+                logger.info("{} url:{}", result, url);//打印错误信息
                 return null;
             }
             out = EntityUtils.toString(response.getEntity(), "utf-8");
-            jsonObject = JSONObject.parseObject(out);
+            jsonObject = JSON.parseObject(out);
         } catch (IOException e) {
-//            e.printStackTrace();
-        	log.error(e);
+            logger.error("doGet异常", e);
         } finally {
             if (httpGet != null) {
                 httpGet.releaseConnection();
@@ -99,7 +98,7 @@ public class HttpSendUtil {
     /**
      * 发送 POST 请求
      *
-     * @param url API接口URL
+     * @param url    API接口URL
      * @param params 参数map
      * @return
      */
@@ -119,14 +118,14 @@ public class HttpSendUtil {
             response = httpclient.execute(httpPost);
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
-                System.out.println(EntityUtils.toString(response.getEntity(), "utf-8") + "url: " +url + "params: " + params); //打印错误信息
+                String result = EntityUtils.toString(response.getEntity(), "utf-8");
+                logger.info("{} url:{} parms {}", result, url, params);//打印错误信息
                 return null;
             }
             out = EntityUtils.toString(response.getEntity(), "utf-8");
-            jsonObject = JSONObject.parseObject(out);
+            jsonObject = JSON.parseObject(out);
         } catch (Exception e) {
-//            e.printStackTrace();
-        	log.error(e);
+            logger.error("doPost异常", e);
         } finally {
             if (httpPost != null) {
                 httpPost.releaseConnection();
@@ -157,16 +156,15 @@ public class HttpSendUtil {
 
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
-                    return null;
+                    return new X509Certificate[]{};
                 }
             };
             ctx.init(null, new TrustManager[]{tm}, null);
             sslsf = new SSLConnectionSocketFactory(ctx, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         } catch (GeneralSecurityException e) {
-//            e.printStackTrace();
-        	log.error(e);
+            logger.error("创建SSL安全连接异常", e);
         }
         return sslsf;
-    } 
-    
+    }
+
 }

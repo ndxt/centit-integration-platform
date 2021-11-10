@@ -160,18 +160,19 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
         env.put(Context.PROVIDER_URL, ldapUrl);
         Date now = DatetimeOpt.currentUtilDate();
         try {
+            String distName = "distinguishedName";
             LdapContext ctx = new InitialLdapContext(env, null);
             SearchControls searchCtls = new SearchControls();
             searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             Map<String,UnitInfo> allUnits = new HashMap<>();
             String searchFilter = "(objectCategory=group)";//
-            String[] returnedAtts = {"name","description","distinguishedName","managedBy"};
+            String[] returnedAtts = new String[]{"name", "description", distName, "managedBy"};
             searchCtls.setReturningAttributes(returnedAtts);
             NamingEnumeration<SearchResult> answer = ctx.search(searchBase, searchFilter,searchCtls);
             while (answer.hasMoreElements()) {
                 SearchResult sr = answer.next();
                 Attributes attrs = sr.getAttributes();
-                String distinguishedName = getAttributeString(attrs,"distinguishedName");
+                String distinguishedName = getAttributeString(attrs, distName);
                 String unitName = getAttributeString(attrs,"description");
                 if(unitName==null || distinguishedName==null)
                     continue;
@@ -201,8 +202,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
             }
 
             searchFilter = "(&(objectCategory=person)(objectClass=user))";//"(objectCategory=group)"
-            String[] userReturnedAtts = {"memberOf","displayName","sAMAccountName",
-                    "mail","distinguishedName"};
+            String[] userReturnedAtts = new String[]{"memberOf", "displayName", "sAMAccountName",
+                "mail", distName};
             searchCtls.setReturningAttributes(userReturnedAtts);
             answer = ctx.search(searchBase, searchFilter,searchCtls);
             while (answer.hasMoreElements()) {
@@ -242,7 +243,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     userInfoDao.getUserByUserWord(userWord) == null) {
                     userInfo.setUserWord(userWord);
                 }
-                userInfo.setUserTag(getAttributeString(attrs,"distinguishedName"));
+                userInfo.setUserTag(getAttributeString(attrs, distName));
                 userInfo.setUserName(userName);
                 userInfo.setUpdateDate(now);
                 if(createUser)
