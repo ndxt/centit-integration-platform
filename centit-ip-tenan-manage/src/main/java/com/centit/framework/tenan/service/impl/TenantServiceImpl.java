@@ -414,7 +414,15 @@ public class TenantServiceImpl implements TenantService {
         tenantBusinessLog.setApplyBusinessTime(nowDate());
         tenantBusinessLog.setSuccessBusinessTime(nowDate());
         tenantBusinessLog.setBusinessState("T");
+        tenantBusinessLog.setBusinessId(null);
         tenantBusinessLogDao.saveNewObject(tenantBusinessLog);
+        //更新租户所有人
+        TenantInfo dbTenantInfo = tenantInfoDao.getObjectById(tenantBusinessLog.getTopUnit());
+        if (null == dbTenantInfo){
+            return ResponseData.makeErrorMessage("租户信息不存在!");
+        }
+        dbTenantInfo.setOwnUser(tenantBusinessLog.getAssigneeUserCode());
+        tenantInfoDao.updateObject(dbTenantInfo);
         return ResponseData.makeSuccessResponse("转让申请提交成功!");
     }
 
@@ -430,7 +438,10 @@ public class TenantServiceImpl implements TenantService {
         }
         tenantBusinessLogDao.updateObject(tenantBusinessLog);
         if ("T".equals(businessState)) {
-
+            TenantInfo tenantInfo = new TenantInfo();
+            tenantInfo.setTopUnit(tenantBusinessLog.getTopUnit());
+            tenantInfo.setOwnUser(tenantBusinessLog.getAssigneeUserCode());
+            tenantInfoDao.updateObject(tenantInfo);
         }
         return null;
     }
