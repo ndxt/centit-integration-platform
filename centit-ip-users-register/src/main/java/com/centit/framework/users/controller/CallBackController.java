@@ -120,7 +120,10 @@ public class CallBackController extends BaseController {
         String decodeEncrypt = null;
         try {
             //encrypt解密
-            decodeEncrypt = createDingTalkEncryptor(suitetbId).getDecryptMsg(msgSignature, timeStamp, nonce, encrypt);
+            DingTalkEncryptor dingTalkEncryptor = createDingTalkEncryptor(suitetbId);
+            if (null != dingTalkEncryptor) {
+                decodeEncrypt = dingTalkEncryptor.getDecryptMsg(msgSignature, timeStamp, nonce, encrypt);
+            }
         } catch (DingTalkEncryptException e) {
             logger.error("异常:", e);
         }
@@ -141,7 +144,10 @@ public class CallBackController extends BaseController {
         Map<String, String> jsonMap = null;
         try {
             //jsonMap是需要返回给钉钉服务器的加密数据包
-            jsonMap = createDingTalkEncryptor(suitetbId).getEncryptedMap(res, timeStampLong, nonce);
+            DingTalkEncryptor dingTalkEncryptor = createDingTalkEncryptor(suitetbId);
+            if (null != dingTalkEncryptor) {
+                jsonMap = dingTalkEncryptor.getEncryptedMap(res, timeStampLong, nonce);
+            }
         } catch (DingTalkEncryptException e) {
             logger.error("异常:", e);
         }
@@ -167,13 +173,14 @@ public class CallBackController extends BaseController {
             if (null != suite) {
                 //套件注册成功后生成的suite_key
                 suiteKey = suite.getSuiteKey();
+                if (!"".equals(suiteKey) && suiteKey != null) { //当suite_key存在时，即套件创建成功
+                    dingTalkEncryptor = new DingTalkEncryptor(suite.getToken(), suite.getEncodingAesKey(), suiteKey);  //创建加解密类
+                } else {  //当suite_key不存在时，第一次创建套件
+                    dingTalkEncryptor = new DingTalkEncryptor(suite.getToken(), suite.getEncodingAesKey(),
+                        appConfig.getAppKey());  //创建加解密类
+                }
             }
-            if (!"".equals(suiteKey) && suiteKey != null) { //当suite_key存在时，即套件创建成功
-                dingTalkEncryptor = new DingTalkEncryptor(suite.getToken(), suite.getEncodingAesKey(), suiteKey);  //创建加解密类
-            } else {  //当suite_key不存在时，第一次创建套件
-                dingTalkEncryptor = new DingTalkEncryptor(suite.getToken(), suite.getEncodingAesKey(),
-                    appConfig.getAppKey());  //创建加解密类
-            }
+
         } catch (DingTalkEncryptException e) {
             logger.error("异常:", e);
         }

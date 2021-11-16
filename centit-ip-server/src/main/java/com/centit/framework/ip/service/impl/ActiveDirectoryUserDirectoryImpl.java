@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -159,18 +160,19 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
         env.put(Context.PROVIDER_URL, ldapUrl);
         Date now = DatetimeOpt.currentUtilDate();
         try {
+            String distName = "distinguishedName";
             LdapContext ctx = new InitialLdapContext(env, null);
             SearchControls searchCtls = new SearchControls();
             searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             Map<String,UnitInfo> allUnits = new HashMap<>();
             String searchFilter = "(objectCategory=group)";//
-            String[] returnedAtts = {"name","description","distinguishedName","managedBy"};
+            String[] returnedAtts = new String[]{"name", "description", distName, "managedBy"};
             searchCtls.setReturningAttributes(returnedAtts);
             NamingEnumeration<SearchResult> answer = ctx.search(searchBase, searchFilter,searchCtls);
             while (answer.hasMoreElements()) {
                 SearchResult sr = answer.next();
                 Attributes attrs = sr.getAttributes();
-                String distinguishedName = getAttributeString(attrs,"distinguishedName");
+                String distinguishedName = getAttributeString(attrs, distName);
                 String unitName = getAttributeString(attrs,"description");
                 if(unitName==null || distinguishedName==null)
                     continue;
@@ -200,8 +202,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
             }
 
             searchFilter = "(&(objectCategory=person)(objectClass=user))";//"(objectCategory=group)"
-            String[] userReturnedAtts = {"memberOf","displayName","sAMAccountName",
-                    "mail","distinguishedName"};
+            String[] userReturnedAtts = new String[]{"memberOf", "displayName", "sAMAccountName",
+                "mail", distName};
             searchCtls.setReturningAttributes(userReturnedAtts);
             answer = ctx.search(searchBase, searchFilter,searchCtls);
             while (answer.hasMoreElements()) {
@@ -221,27 +223,27 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     userInfo.setCreateDate(now);
                     createUser = true;
                 }
-                String regEmail = getAttributeString(attrs,"mail");
-                if(StringUtils.isNotBlank(regEmail)){
-                    if(regEmail.length() < 60 && userInfoDao.getUserByRegEmail(regEmail)==null)
-                        userInfo.setRegEmail(regEmail);
+                String regEmail = getAttributeString(attrs, "mail");
+                if (StringUtils.isNotBlank(regEmail) && regEmail.length() < 60 &&
+                    userInfoDao.getUserByRegEmail(regEmail) == null) {
+                    userInfo.setRegEmail(regEmail);
                 }
-                String regCellPhone = getAttributeString(attrs,"mobilePhone");
-                if(StringUtils.isNotBlank(regCellPhone)){
-                    if(regCellPhone.length() <15 && userInfoDao.getUserByRegCellPhone(regCellPhone)==null)
-                        userInfo.setRegCellPhone(regCellPhone);
+                String regCellPhone = getAttributeString(attrs, "mobilePhone");
+                if (StringUtils.isNotBlank(regCellPhone) && regCellPhone.length() < 15 &&
+                    userInfoDao.getUserByRegCellPhone(regCellPhone) == null) {
+                    userInfo.setRegCellPhone(regCellPhone);
                 }
-                String idCardNo = getAttributeString(attrs,"idCard");
-                if(StringUtils.isNotBlank(idCardNo)){
-                    if(idCardNo.length() <20 && userInfoDao.getUserByIdCardNo(idCardNo)==null)
-                        userInfo.setIdCardNo(idCardNo);
+                String idCardNo = getAttributeString(attrs, "idCard");
+                if (StringUtils.isNotBlank(idCardNo) && idCardNo.length() < 20 &&
+                    userInfoDao.getUserByIdCardNo(idCardNo) == null) {
+                    userInfo.setIdCardNo(idCardNo);
                 }
                 String userWord = getAttributeString(attrs,"jobNo");
-                if(StringUtils.isNotBlank(userWord)){
-                    if(userWord.length() <20 && userInfoDao.getUserByUserWord(userWord)==null)
-                        userInfo.setUserWord(userWord);
+                if (StringUtils.isNotBlank(userWord) && userWord.length() < 20 &&
+                    userInfoDao.getUserByUserWord(userWord) == null) {
+                    userInfo.setUserWord(userWord);
                 }
-                userInfo.setUserTag(getAttributeString(attrs,"distinguishedName"));
+                userInfo.setUserTag(getAttributeString(attrs, distName));
                 userInfo.setUserName(userName);
                 userInfo.setUpdateDate(now);
                 if(createUser)
@@ -272,7 +274,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                             }
                             List<UserUnit> uus = userUnitDao.listObjectByUserUnit(
                                     userInfo.getUserCode(),u.getUnitCode());
-                            if(uus==null || uus.size()==0){
+                            if (CollectionUtils.isEmpty(uus)) {
                                 UserUnit uu = new UserUnit();
                                 uu.setUserUnitId(UuidOpt.getUuidAsString());
                                 uu.setUnitCode(u.getUnitCode());

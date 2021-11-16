@@ -74,7 +74,7 @@ public class DingTalkEncryptor {
         // 加密
         String encrypt = encrypt(Utils.getRandomStr(RANDOM_LENGTH), plaintext);
         String signature = getSignature(token, String.valueOf(timeStamp), nonce, encrypt);
-        Map<String, String> resultMap = new HashMap<String, String>();
+        Map<String, String> resultMap = new HashMap<>();
         resultMap.put("msg_signature", signature);
         resultMap.put("encrypt", encrypt);
         resultMap.put("timeStamp", String.valueOf(timeStamp));
@@ -99,8 +99,7 @@ public class DingTalkEncryptor {
             throw new DingTalkEncryptException(DingTalkEncryptException.COMPUTE_SIGNATURE_ERROR);
         }
         // 解密
-        String result = decrypt(encryptMsg);
-        return result;
+        return decrypt(encryptMsg);
     }
 
 
@@ -129,8 +128,7 @@ public class DingTalkEncryptor {
             IvParameterSpec iv = new IvParameterSpec(aesKey, 0, 16);
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
             byte[] encrypted = cipher.doFinal(unencrypted);
-            String result = base64.encodeToString(encrypted);
-            return result;
+            return base64.encodeToString(encrypted);
         } catch (Exception e) {
             throw new DingTalkEncryptException(DingTalkEncryptException.COMPUTE_ENCRYPT_TEXT_ERROR);
         }
@@ -192,7 +190,7 @@ public class DingTalkEncryptor {
         try {
             String[] array = new String[]{token, timestamp, nonce, encrypt};
             Arrays.sort(array);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < 4; i++) {
                 sb.append(array[i]);
             }
@@ -201,7 +199,7 @@ public class DingTalkEncryptor {
             md.update(str.getBytes());
             byte[] digest = md.digest();
 
-            StringBuffer hexstr = new StringBuffer();
+            StringBuilder hexstr = new StringBuilder();
             String shaHex = "";
             for (int i = 0; i < digest.length; i++) {
                 shaHex = Integer.toHexString(digest[i] & 0xFF);

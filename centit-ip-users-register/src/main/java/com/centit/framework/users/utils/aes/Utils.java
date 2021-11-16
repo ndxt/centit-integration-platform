@@ -1,26 +1,40 @@
 package com.centit.framework.users.utils.aes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Random;
 
 /**
  * 加解密工具类
  */
 public class Utils {
+
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
     /**
      *
      * @return
      */
     public static String getRandomStr(int count) {
         String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        Random random = new Random();
-        StringBuffer sb = new StringBuffer();
+        Random random = null;
+        try {
+            random = SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("getRandomStr异常", e);
+        }
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
-            int number = random.nextInt(base.length());
-            sb.append(base.charAt(number));
+            if (null != random) {
+                int number = random.nextInt(base.length());
+                sb.append(base.charAt(number));
+            }
         }
         return sb.toString();
     }
-
 
     /*
      * int转byte数组,高位在前
