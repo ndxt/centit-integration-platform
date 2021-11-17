@@ -15,6 +15,10 @@ public class TenantConstant {
      *租户组员角色代码
      */
     public static final String TENANT_NORMAL_MEMBER_ROLE_CODE = "ZHZY";
+    /**
+     * 租户管理员
+     */
+    public static final String TENANT_OWNE_ROLE_CODE = "OWN";
 
     /**
      * 应用中的开发组长

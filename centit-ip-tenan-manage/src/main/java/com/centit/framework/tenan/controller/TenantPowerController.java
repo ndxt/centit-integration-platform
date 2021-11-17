@@ -57,6 +57,24 @@ public class TenantPowerController extends BaseController {
         }
     }
 
+
+    @ApiOperation(
+        value = "当前用户是否在租户中的角色",
+        notes = "所有者：OWN 管理员：ZHGLY，普通成员：ZHZY 不在租户内：\"\" 参数：topUnit:租户id"
+    )
+    @RequestMapping(value = "/userTenantRole", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public ResponseData userTenantRole(@RequestParam("topUnit")String topUnit) {
+
+        try {
+            return ResponseData.makeResponseData(tenantPowerManage.userTenantRole(topUnit));
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("当前用户是否在租户中的角色,错误原因{},租户id：{}", e, topUnit);
+            return ResponseData.makeErrorMessage("当前用户是否在租户中的角色!");
+        }
+    }
+
     @ApiOperation(
         value = "判断当前用户是否为租户成员",
         notes = "判断当前用户是否为租户成员 topUnit:租户id"

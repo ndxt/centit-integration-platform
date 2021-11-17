@@ -317,7 +317,25 @@ public class TenanController extends BaseController {
 
     }
 
+    @ApiOperation(
+        value = "设置租户成员角色",
+        notes = "设置租户成员角色"
+    )
+    @RequestMapping(value = "/deleteTenantRole", method = RequestMethod.DELETE)
+    @WrapUpResponseBody
+    public ResponseData deleteTenantRole( TenantMemberQo tenantMemberQo) {
 
+        try {
+            return tenantService.deleteTenantRole(tenantMemberQo);
+        } catch (ObjectException obe) {
+            return ResponseData.makeErrorMessage(obe.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("删除租户成员角色出错，错误原因:{},入参:{}", e, tenantMemberQo.toString());
+        }
+        return ResponseData.makeErrorMessage("删除租户成员角色出错");
+
+    }
     @ApiOperation(
         value = "获取用户所在租户",
         notes = "获取用户所在租户"
@@ -381,6 +399,18 @@ public class TenanController extends BaseController {
         Map<String, Object> paramMap = collectRequestParameters(request);
 
         return tenantService.findUsers(paramMap);
+
+    }
+
+
+    @ApiOperation(
+        value = "修改租户信息",
+        notes = "修改租户信息"
+    )
+    @RequestMapping(value = "/updateTenant", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData updateTenant(@RequestBody TenantInfo tenantInfo) {
+        return tenantService.updateTenant(tenantInfo);
 
     }
 

@@ -61,6 +61,24 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         return workGroupDao.listObjectsByProperties(filterMap).size() > 0;
     }
 
+
+    @Override
+    public String userTenantRole(String topUnit) {
+        if (StringUtils.isBlank(topUnit)){
+            throw new ObjectException("topUnit不能为空");
+        }
+        if (this.userIsTenantOwner(topUnit)){
+            return TENANT_OWNE_ROLE_CODE;
+        }
+        if (this.userIsTenantAdmin(topUnit)){
+            return TENANT_ADMIN_ROLE_CODE;
+        }
+        if (this.userIsTenantMember(topUnit)){
+            return TENANT_NORMAL_MEMBER_ROLE_CODE;
+        }
+        return "";
+    }
+
     @Override
     public boolean userIsTenantAdmin(String topUnit) throws ObjectException {
         String userCode = WebOptUtils.getCurrentUserCode(
@@ -181,12 +199,18 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsSystemAdmin(String userCode) {
-        return userIsTenantAdmin(userCode, SYSTEM_TENANT_TOP_UNIT_CODE);
+        return !CollectionUtils.sizeIsEmpty(userUnitDao.listUserUnitsByUserCode(SYSTEM_TENANT_TOP_UNIT_CODE,userCode));
     }
 
     @Override
     public boolean userIsSystemAdmin() {
-        return userIsTenantAdmin(SYSTEM_TENANT_TOP_UNIT_CODE);
+        String userCode = WebOptUtils.getCurrentUserCode(
+            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        if (StringUtils.isBlank(userCode)) {
+            throw new ObjectException("用户未登录!");
+        }
+
+        return !CollectionUtils.sizeIsEmpty(userUnitDao.listUserUnitsByUserCode(SYSTEM_TENANT_TOP_UNIT_CODE,userCode));
     }
 
     /**

@@ -136,6 +136,14 @@ public interface TenantService {
 
 
     /**
+     * 删除租户成员角色
+     * @param tenantMemberQo
+     * @return
+     */
+    ResponseData deleteTenantRole(TenantMemberQo tenantMemberQo);
+
+
+    /**
      *移除开发中的成员
      * @param groupId
      * @param userCode
@@ -205,5 +213,12 @@ public interface TenantService {
      * @return
      */
     ResponseData deleteTenant(Map<String, Object> parameters);
+
+    /**
+     * 更新租户信息，为系统管理员和租户所有者，租户管理员使用
+     * @param tenantInfo
+     * @return
+     */
+    ResponseData updateTenant(TenantInfo tenantInfo);
 
 }

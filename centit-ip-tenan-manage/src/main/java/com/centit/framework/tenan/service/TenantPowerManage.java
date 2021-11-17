@@ -43,6 +43,13 @@ public interface TenantPowerManage {
     boolean userIsTenantAdmin(String userCode, String topUnit);
 
     /**
+     * 租户是否为管理员或所有这
+     * @param topUnit
+     * @return
+     */
+    String userTenantRole(String topUnit);
+
+    /**
      * 判断当前用户是否为租户管理员
      *
      * @param topUnit topUnit 租户id
