@@ -761,22 +761,6 @@ public class TenantServiceImpl implements TenantService {
         return resultMap;
     }
 
-    /**
-     * 通过osInfo 信息保存workGroup
-     *
-     * @param osInfo 应用基本信息
-     */
-    private void saveWorkGroupByOSInfo(OsInfo osInfo) {
-        osInfoDao.saveNewObject(osInfo);
-        WorkGroup workGroup = new WorkGroup();
-        WorkGroupParameter workGroupParameter = workGroup.getWorkGroupParameter();
-        workGroupParameter.setGroupId(osInfo.getOsId());
-        workGroupParameter.setUserCode(osInfo.getCreated());
-        workGroupParameter.setRoleCode(APPLICATION_ADMIN_ROLE_CODE);
-        workGroup.setCreator(osInfo.getCreated());
-        workGroup.setIsValid("T");
-        workGroupDao.saveNewObject(workGroup);
-    }
 
 
     /**
