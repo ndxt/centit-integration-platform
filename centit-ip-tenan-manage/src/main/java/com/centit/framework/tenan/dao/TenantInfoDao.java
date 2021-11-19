@@ -1,10 +1,14 @@
 package com.centit.framework.tenan.dao;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
+import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.tenan.po.TenantInfo;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
-import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.utils.PageDesc;
+import com.centit.support.database.utils.QueryAndNamedParams;
+import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
@@ -22,6 +26,17 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
         return super.listObjectsByProperties(filterMap,pageDesc);
     }
 
+    /**
+     * 查询租户信息和租户所有者对应的用户名
+     * @param filterMap
+     * @param pageDesc
+     * @return
+     */
+    public JSONArray listTenantInfoWithOwnUserName(Map<String,Object> filterMap,PageDesc pageDesc){
+        String sql = " SELECT A.TOP_UNIT, A.UNIT_NAME, A.OWN_USER, B.USER_NAME FROM F_TENANT_INFO A JOIN  F_USERINFO B ON A.OWN_USER = B.USER_CODE WHERE   A.IS_AVAILABLE = 'T' [:(LIKE)unitName | AND A.UNIT_NAME LIKE :unitName ] order by A.UNIT_NAME ";
+        QueryAndNamedParams qap = QueryUtils.translateQuery(sql, filterMap);
+        return DatabaseOptUtils.listObjectsByNamedSqlAsJson(this, qap.getQuery(), qap.getParams(), pageDesc);
+    }
     /**
      *把请求参数转换为过滤参数
      * @param pageListTenantInfoQo
@@ -81,8 +96,8 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
      * @return
      */
     public boolean userIsOwner(String topUnit,String userCode) {
-
-        Map<String, Object> filterMap = CollectionsOpt.createHashMap("topUnit", topUnit, "ownUser", userCode);
-        return super.listObjectsByProperties(filterMap).size() > 0;
+        String sql = " SELECT COUNT(1) FROM `F_TENANT_INFO` WHERE TOP_UNIT = ? AND OWN_USER = ? ";
+        return NumberBaseOpt.castObjectToInteger(
+            DatabaseOptUtils.getScalarObjectQuery(this, sql,new Object[]{topUnit, userCode}))> 0;
     }
 }

@@ -381,7 +381,7 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/pageListTenants", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public PageQueryResult<TenantInfo> pageListTenants(@ParamName("unitName") String unitName, PageDesc pageDesc) {
+    public PageQueryResult pageListTenants(@ParamName("unitName") String unitName, PageDesc pageDesc) {
         if (StringUtils.isBlank(unitName)) {
             throw new ObjectException("unitName不能为空");
         }

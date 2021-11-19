@@ -188,7 +188,7 @@ public interface TenantService {
      * @param pageDesc
      * @return
      */
-    PageQueryResult<TenantInfo> pageListTenants(String unitName , PageDesc pageDesc);
+    PageQueryResult pageListTenants(String unitName , PageDesc pageDesc);
 
     /**
      * 精确查找用户

@@ -288,6 +288,7 @@ public class TenantServiceImpl implements TenantService {
         if (null == oldUserByCode) {
             return ResponseData.makeErrorMessage("用户信息不存在");
         }
+        //由于需要根据邮箱或这手机号确认用户身份，所以不允许用户直接修改邮箱和手机号码
         userinfo.setRegEmail(null);
         userinfo.setRegCellPhone(null);
         userinfo.setUpdateDate(nowDate());
@@ -431,6 +432,11 @@ public class TenantServiceImpl implements TenantService {
         }
         dbTenantInfo.setOwnUser(tenantBusinessLog.getAssigneeUserCode());
         tenantInfoDao.updateObject(dbTenantInfo);
+        //转让后的租户所有人设置为管理员
+        WorkGroupParameter workGroupParameter = new WorkGroupParameter(dbTenantInfo.getTopUnit(), tenantBusinessLog.getAssigneeUserCode(), TENANT_ADMIN_ROLE_CODE);
+        WorkGroup workGroup = new WorkGroup();
+        workGroup.setWorkGroupParameter(workGroupParameter);
+        updateWorkGroupRole(workGroup);
         return ResponseData.makeSuccessResponse("转让申请提交成功!");
     }
 
@@ -624,22 +630,9 @@ public class TenantServiceImpl implements TenantService {
 
 
     @Override
-    public PageQueryResult<TenantInfo> pageListTenants(String unitName, PageDesc pageDesc) {
-        HashMap<String, Object> filterMap = new HashMap<>();
-        filterMap.put("unitName_lk", StringUtils.join("%", unitName, "%"));
-        filterMap.put("isAvailable", "T");
-        List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(filterMap, pageDesc);
-        if (null == tenantInfos || tenantInfos.isEmpty()) {
-            return PageQueryResult.createResult(tenantInfos, pageDesc);
-        }
-        //去除敏感信息
-        tenantInfos.forEach(tenantInfo -> {
-            tenantInfo.setOwnUser(null);
-            tenantInfo.setSourceUrl(null);
-            tenantInfo.setMemo(null);
-            tenantInfo.setUseLimittime(null);
-        });
-        return PageQueryResult.createResult(tenantInfos, pageDesc);
+    public PageQueryResult pageListTenants(String unitName, PageDesc pageDesc) {
+        JSONArray jsonArray = tenantInfoDao.listTenantInfoWithOwnUserName(CollectionsOpt.createHashMap("unitName", unitName), pageDesc);
+        return PageQueryResult.createResult(jsonArray, pageDesc);
     }
 
     @Override
@@ -659,7 +652,7 @@ public class TenantServiceImpl implements TenantService {
         if (CollectionUtils.sizeIsEmpty(userInfos)) {
             return ResponseData.makeResponseData(CollectionUtils.emptyCollection());
         }
-        //排除已经被邀请的用户且没有蛇和,或者属于本单位的人员
+        //排除已经被邀请的用户且没有审核,或者属于本单位的人员
         Set<String> userInfoUserCodes = userInfos.stream().map(UserInfo::getUserCode).collect(Collectors.toSet());
         List<TenantMemberApply> alreadyApply = tenantMemberApplyDao.listObjectsByProperties(
             CollectionsOpt.createHashMap("userCode_in", CollectionsOpt.listToArray(userInfoUserCodes),
