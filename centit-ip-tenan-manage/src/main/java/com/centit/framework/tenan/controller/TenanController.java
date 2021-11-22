@@ -5,6 +5,7 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.po.*;
@@ -22,8 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -152,6 +151,9 @@ public class TenanController extends BaseController {
             MapUtils.getString(parameters,"userCode"))){
             return ResponseData.makeErrorMessage("topUnit或userCode不能为空");
         }
+        //todo:权限校验
+        //如果为普通用户取消申请，只能取消自己的申请
+        //如果为管理员取消申请，只能取消当前所属单位的申请
         return tenantService.cancelApply(parameters);
     }
 
@@ -176,7 +178,7 @@ public class TenanController extends BaseController {
     @RequestMapping(value = "/agreeJoin", method = RequestMethod.POST)
     @WrapUpResponseBody
     public ResponseData agreeJoin(@RequestBody @Validated TenantMemberApplyVo tenantMemberApply) {
-
+        //todo:权限校验
         return tenantService.agreeJoin(tenantMemberApply);
     }
 
@@ -219,8 +221,7 @@ public class TenanController extends BaseController {
         if (StringUtils.isBlank(topUnit)) {
             return ResponseData.makeErrorMessage("参数topUnit不能为空");
         }
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
             return ResponseData.makeErrorMessage("当前用户未登录");
         }
@@ -308,7 +309,7 @@ public class TenanController extends BaseController {
         try {
             return tenantService.assignTenantRole(tenantMemberQo);
         } catch (ObjectException obe) {
-            return ResponseData.makeErrorMessage(obe.getMessage());
+            return ResponseData.makeErrorMessage(obe.getExceptionCode(),obe.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("设置租户成员角色出错，错误原因:{},入参:{}", e, tenantMemberQo.toString());
@@ -318,8 +319,8 @@ public class TenanController extends BaseController {
     }
 
     @ApiOperation(
-        value = "设置租户成员角色",
-        notes = "设置租户成员角色"
+        value = "移除租户成员角色",
+        notes = "移除租户成员角色"
     )
     @RequestMapping(value = "/deleteTenantRole", method = RequestMethod.DELETE)
     @WrapUpResponseBody
@@ -328,7 +329,7 @@ public class TenanController extends BaseController {
         try {
             return tenantService.deleteTenantRole(tenantMemberQo);
         } catch (ObjectException obe) {
-            return ResponseData.makeErrorMessage(obe.getMessage());
+            return ResponseData.makeErrorMessage(obe.getExceptionCode(),obe.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("删除租户成员角色出错，错误原因:{},入参:{}", e, tenantMemberQo.toString());

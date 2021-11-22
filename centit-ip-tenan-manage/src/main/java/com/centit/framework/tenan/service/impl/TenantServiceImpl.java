@@ -163,9 +163,9 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("用户未登录,请重新登录!");
         }
         //限制一个用户只能申请一个租户
-        List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap("ownUser", userCode));
-        if (!CollectionUtils.sizeIsEmpty(tenantInfos)){
-           return ResponseData.makeErrorMessage("您已经拥有一个租户，不能再次申请!");
+        List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap("ownUser", userCode, "isAvailable", "T"));
+        if (!CollectionUtils.sizeIsEmpty(tenantInfos)) {
+            return ResponseData.makeErrorMessage("您已经拥有一个租户，不能再次申请!");
         }
         tenantInfo.setCreator(userCode);
         tenantInfo.setOwnUser(userCode);
@@ -427,7 +427,7 @@ public class TenantServiceImpl implements TenantService {
         tenantBusinessLogDao.saveNewObject(tenantBusinessLog);
         //更新租户所有人
         TenantInfo dbTenantInfo = tenantInfoDao.getObjectById(tenantBusinessLog.getTopUnit());
-        if (null == dbTenantInfo){
+        if (null == dbTenantInfo) {
             return ResponseData.makeErrorMessage("租户信息不存在!");
         }
         dbTenantInfo.setOwnUser(tenantBusinessLog.getAssigneeUserCode());
@@ -490,8 +490,11 @@ public class TenantServiceImpl implements TenantService {
     @Transactional
     public ResponseData assignTenantRole(TenantMemberQo tenantMemberQo) {
         String checkString = optTenantRoleCheck(tenantMemberQo);
-        if (StringUtils.isNotBlank(checkString)){
+        if (StringUtils.isNotBlank(checkString)) {
             return ResponseData.makeErrorMessage(checkString);
+        }
+        if (!StringUtils.equals(tenantMemberQo.getRoleCode(), TENANT_ADMIN_ROLE_CODE)) {
+            return ResponseData.makeErrorMessage("角色代码有误!");
         }
         updateWorkGroupRole(tenantMemberQo, tenantMemberQo.getTopUnit());
         return ResponseData.makeSuccessResponse("操作成功!");
@@ -500,8 +503,12 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public ResponseData deleteTenantRole(TenantMemberQo tenantMemberQo) {
         String checkString = optTenantRoleCheck(tenantMemberQo);
-        if (StringUtils.isNotBlank(checkString)){
+        if (StringUtils.isNotBlank(checkString)) {
             return ResponseData.makeErrorMessage(checkString);
+        }
+        boolean memberIsTenantOwner = tenantPowerManage.userIsTenantOwner(tenantMemberQo.getMemberUserCode(), tenantMemberQo.getTopUnit());
+        if (memberIsTenantOwner) {
+            return ResponseData.makeErrorMessage("租户所有者的管理员角色不允许被删除!");
         }
         WorkGroup workGroup = new WorkGroup();
         WorkGroupParameter workGroupParameter = new WorkGroupParameter(tenantMemberQo.getTopUnit(), tenantMemberQo.getMemberUserCode(), tenantMemberQo.getRoleCode());
@@ -512,6 +519,7 @@ public class TenantServiceImpl implements TenantService {
 
     /**
      * 检查必填项
+     *
      * @param tenantMemberQo
      * @return
      */
@@ -526,9 +534,6 @@ public class TenantServiceImpl implements TenantService {
         boolean userHasPower = tenantPowerManage.userIsTenantOwner(topUnit) || tenantPowerManage.userIsTenantAdmin(topUnit);
         if (!userHasPower) {
             return "当前人员没有操作权限!";
-        }
-        if (!equalsAny(tenantMemberQo.getRoleCode(), TENANT_ADMIN_ROLE_CODE, TENANT_NORMAL_MEMBER_ROLE_CODE)) {
-            return "角色代码有误!";
         }
         return null;
     }
@@ -610,7 +615,7 @@ public class TenantServiceImpl implements TenantService {
         if (StringUtils.isBlank(userCode)) {
             return ResponseData.makeErrorMessage("userCode 不能为空");
         }
-        List<TenantInfo> tenantInfos = userTenantsByUserCode(userCode);
+        List<TenantInfo> tenantInfos = tenantInfoDao.listUserTenant(CollectionsOpt.createHashMap("userCode", userCode));
         if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
             return ResponseData.makeResponseData(Collections.emptyList());
         }
@@ -690,27 +695,27 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ResponseData updateTenant(TenantInfo tenantInfo) {
-        if (StringUtils.isBlank(tenantInfo.getTopUnit())){
+        if (StringUtils.isBlank(tenantInfo.getTopUnit())) {
             return ResponseData.makeErrorMessage("topUnit 不能为空!");
         }
 
         boolean isSystemAdmin = tenantPowerManage.userIsSystemAdmin();
         TenantInfo dbTenant = tenantInfoDao.getObjectById(tenantInfo);
         //平台管理员,可以修改租户基本信息中的所有属性
-        if (isSystemAdmin){
+        if (isSystemAdmin) {
             tenantInfoDao.updateObject(tenantInfo);
         }
         //管理员或租户所有者只能修改租户信息中的名称
         boolean isTenantManage = tenantPowerManage.userIsTenantAdmin(tenantInfo.getTopUnit())
             || tenantPowerManage.userIsTenantOwner(tenantInfo.getTopUnit());
         String oldUnitName = dbTenant.getUnitName();
-        if (isTenantManage && !dbTenant.getUnitName().equals(tenantInfo.getUnitName())){
+        if (isTenantManage && !dbTenant.getUnitName().equals(tenantInfo.getUnitName())) {
             dbTenant.setUnitName(tenantInfo.getUnitName());
             tenantInfoDao.updateObject(dbTenant);
         }
 
         //如果租户名改变，同时修改单位名称
-        if ((isSystemAdmin || isTenantManage) && !oldUnitName.equals(tenantInfo.getUnitName())){
+        if ((isSystemAdmin || isTenantManage) && !oldUnitName.equals(tenantInfo.getUnitName())) {
             UnitInfo unitInfo = unitInfoDao.getObjectById(tenantInfo.getTopUnit());
             unitInfo.setUnitName(tenantInfo.getUnitName());
             unitInfoDao.updateUnit(unitInfo);
@@ -754,7 +759,6 @@ public class TenantServiceImpl implements TenantService {
         }
         return resultMap;
     }
-
 
 
     /**
@@ -893,7 +897,7 @@ public class TenantServiceImpl implements TenantService {
             HashMap<String, Object> map = new HashMap<>();
             map.put("deptCode", key);
             String unitName = unitInfos.stream().filter(unitInfo -> unitInfo.getUnitCode().equals(key)).findAny().map(UnitInfo::getUnitName).orElseGet(() -> "");
-            if (StringUtils.isBlank(unitName)){
+            if (StringUtils.isBlank(unitName)) {
                 logger.warn("deptCode:" + key + "对应的deptName为空，跳过本次循环...");
                 continue;
             }
@@ -909,11 +913,11 @@ public class TenantServiceImpl implements TenantService {
                     map1.put("userRankText", "");
                 }
                 return map1;
-            }).filter(map1->{
-                if (StringUtils.isAnyEmpty(MapUtils.getString(map1,"userRank"),MapUtils.getString(map1,"userRankText"))){
+            }).filter(map1 -> {
+                if (StringUtils.isAnyEmpty(MapUtils.getString(map1, "userRank"), MapUtils.getString(map1, "userRankText"))) {
                     logger.info("userRank或userRankText为空，跳过");
                     return false;
-                }else {
+                } else {
                     return true;
                 }
             }).collect(Collectors.toList());
@@ -1266,25 +1270,6 @@ public class TenantServiceImpl implements TenantService {
         return true;
     }
 
-    /**
-     * 获取用户所在的租户
-     *
-     * @param userCode
-     * @return
-     */
-    private List<TenantInfo> userTenantsByUserCode(String userCode) {
-        List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("userCode", userCode));
-        if (CollectionUtils.sizeIsEmpty(userUnits)) {
-            return null;
-        }
-        Set<String> topUnits = userUnits.stream().map(UserUnit::getTopUnit).filter(StringUtils::isNotBlank).collect(Collectors.toSet());
-        if (CollectionUtils.sizeIsEmpty(topUnits)) {
-            return null;
-        }
-        return tenantInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap("topUnit_in",
-            CollectionsOpt.listToArray(topUnits), "isAvailable", "T"));
-
-    }
 
     /**
      * 根据userCode和topUnit查询数据
@@ -1477,30 +1462,6 @@ public class TenantServiceImpl implements TenantService {
         oldTenantInfo.setPassTime(nowDate());
     }
 
-    /**
-     * 补充userinfo中的角色信息
-     *
-     * @param userInfoJsonArray 用户信息集合
-     * @return
-     */
-    private List<Map> extendUserRoleByWorkGroup( JSONArray userInfoJsonArray) {
-        List<Map> userMaps = userInfoJsonArray.toJavaList(Map.class);
-        for (Map map : userMaps) {
-            String roleCode = MapUtils.getString(map, "roleCode");
-            if (StringUtils.isBlank(roleCode)){
-                map.put("roleCode", TENANT_NORMAL_MEMBER_ROLE_CODE);
-                map.put("roleName", "组员");
-            }
-            if (TENANT_NORMAL_MEMBER_ROLE_CODE.equals(roleCode)){
-                map.put("roleName", "组员");
-            }
-
-            if (TENANT_ADMIN_ROLE_CODE.equals(roleCode)){
-                map.put("roleName", "管理员");
-            }
-        }
-        return userMaps;
-    }
 
     /**
      * 初始化租户信息
@@ -1511,7 +1472,7 @@ public class TenantServiceImpl implements TenantService {
     private void initTenant(TenantInfo newTenantInfo, TenantInfo oldTenantInfo) {
         //如果用户基本信息中topUnit为空为当前新建租户的topUnit
         UserInfo userInfo = userInfoDao.getUserByCode(oldTenantInfo.getOwnUser());
-        if (StringUtils.isBlank(userInfo.getTopUnit())){
+        if (StringUtils.isBlank(userInfo.getTopUnit())) {
             userInfo.setTopUnit(oldTenantInfo.getTopUnit());
             userInfo.setPrimaryUnit(oldTenantInfo.getTopUnit());
             userInfoDao.updateUser(userInfo);
