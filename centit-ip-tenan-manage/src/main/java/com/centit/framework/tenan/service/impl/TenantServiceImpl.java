@@ -613,7 +613,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public ResponseData userTenants(String userCode) {
         if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage("userCode 不能为空");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"userCode 不能为空");
         }
         List<TenantInfo> tenantInfos = tenantInfoDao.listUserTenant(CollectionsOpt.createHashMap("userCode", userCode));
         if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
