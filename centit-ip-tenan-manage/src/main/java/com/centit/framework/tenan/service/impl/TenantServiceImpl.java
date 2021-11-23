@@ -278,7 +278,7 @@ public class TenantServiceImpl implements TenantService {
     @Transactional
     public ResponseData updateUserInfo(UserInfo userinfo) {
         if (StringUtils.isBlank(userinfo.getUserCode())) {
-            return ResponseData.makeErrorMessage("userCode不能为空");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"userCode不能为空");
         }
         if (!userinfo.getUserCode().equals(WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()))) {
