@@ -47,7 +47,6 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        CodeRepositoryCache.setEvictCacheExtOpt(osInfoManager);
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
         WebOptUtils.setIsTenant(supportTenant);
