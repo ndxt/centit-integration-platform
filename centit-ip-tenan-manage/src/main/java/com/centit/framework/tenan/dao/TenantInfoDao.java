@@ -6,10 +6,12 @@ import com.centit.framework.jdbc.dao.DatabaseOptUtils;
 import com.centit.framework.tenan.po.TenantInfo;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.database.orm.OrmDaoUtils;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -36,6 +38,21 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
         String sql = " SELECT A.TOP_UNIT, A.UNIT_NAME, A.OWN_USER, B.USER_NAME FROM F_TENANT_INFO A JOIN  F_USERINFO B ON A.OWN_USER = B.USER_CODE WHERE   A.IS_AVAILABLE = 'T' [:(LIKE)unitName | AND A.UNIT_NAME LIKE :unitName ] order by A.UNIT_NAME ";
         QueryAndNamedParams qap = QueryUtils.translateQuery(sql, filterMap);
         return DatabaseOptUtils.listObjectsByNamedSqlAsJson(this, qap.getQuery(), qap.getParams(), pageDesc);
+    }
+
+
+    /**
+     * 获取用户所在租户
+     * @param filterMap
+     * @return
+     */
+    public List<TenantInfo> listUserTenant(Map<String,Object> filterMap){
+        String sql = " SELECT \n" +
+            "DISTINCT \n" +
+            "A.TOP_UNIT, A.UNIT_NAME,A.SOURCE_URL,A.OWN_USER\n" +
+            "FROM F_TENANT_INFO A  JOIN F_USERUNIT B ON A.TOP_UNIT = B.TOP_UNIT WHERE A.IS_AVAILABLE = 'T'   AND B.USER_CODE = :userCode " ;
+        return getJdbcTemplate().execute((ConnectionCallback<List<TenantInfo>>) conn ->OrmDaoUtils.queryObjectsByNamedParamsSql(conn, sql ,
+            filterMap, TenantInfo.class));
     }
     /**
      *把请求参数转换为过滤参数

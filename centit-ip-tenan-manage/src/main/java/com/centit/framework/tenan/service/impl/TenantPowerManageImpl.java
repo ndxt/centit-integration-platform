@@ -1,5 +1,6 @@
 package com.centit.framework.tenan.service.impl;
 
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.system.dao.UserUnitDao;
 import com.centit.framework.tenan.dao.TenantInfoDao;
@@ -49,7 +50,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         String userCode = WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
-            throw new ObjectException("用户未登录!");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
         return userIsTenantOwner(userCode, topUnit);
     }
@@ -65,7 +66,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
     @Override
     public String userTenantRole(String topUnit) {
         if (StringUtils.isBlank(topUnit)){
-            throw new ObjectException("topUnit不能为空");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"topUnit不能为空");
         }
         if (this.userIsTenantOwner(topUnit)){
             return TENANT_OWNE_ROLE_CODE;
@@ -84,7 +85,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         String userCode = WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
-            throw new ObjectException("用户未登录!");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
         return userIsTenantAdmin(userCode, topUnit);
     }
@@ -100,7 +101,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         String userCode = WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
-            throw new ObjectException("用户未登录!");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
         return userIsTenantMember(userCode, topUnit);
     }
@@ -117,7 +118,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         String userCode = WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
-            throw new ObjectException("用户未登录!");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
         return userIsApplicationAdmin(userCode, osId);
     }
@@ -133,7 +134,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         String userCode = WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
-            throw new ObjectException("用户未登录!");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
         return userIsApplicationMember(userCode, osId);
     }
@@ -207,7 +208,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
         String userCode = WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
-            throw new ObjectException("用户未登录!");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
 
         return !CollectionUtils.sizeIsEmpty(userUnitDao.listUserUnitsByUserCode(SYSTEM_TENANT_TOP_UNIT_CODE,userCode));
