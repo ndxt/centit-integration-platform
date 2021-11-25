@@ -144,22 +144,6 @@ public interface TenantService {
 
 
     /**
-     *移除开发中的成员
-     * @param groupId
-     * @param userCode
-     * @return
-     */
-    ResponseData removeApplicationMember(String groupId,String userCode);
-
-    /**
-     * 获取组员列表信息
-     * @param groupId 组id
-     * @return 应用中成员信息
-     */
-    ResponseData listApplicationMember(String groupId);
-
-
-    /**
      * 用户所在租户
      * @param userCode 用户code
      * @return
@@ -173,13 +157,6 @@ public interface TenantService {
      * @return
      */
     ResponseData listTenantApplication(String topUnit);
-
-    /**
-     * 根据属性获取组信息
-     * @param paramMap 过滤参数
-     * @return
-     */
-    ResponseData listWorkGroupByProperties(Map<String,Object> paramMap);
 
 
     /**

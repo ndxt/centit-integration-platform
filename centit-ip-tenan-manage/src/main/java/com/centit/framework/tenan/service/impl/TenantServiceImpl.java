@@ -6,6 +6,7 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.system.dao.*;
@@ -26,8 +27,6 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
-import com.centit.support.database.utils.QueryAndNamedParams;
-import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -105,8 +104,6 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private WorkGroupManager workGroupManager;
 
-    @Autowired
-    private TenantMemberDao tenantMemberDao;
 
     @Autowired
     private OsInfoDao osInfoDao;
@@ -160,7 +157,7 @@ public class TenantServiceImpl implements TenantService {
         String userCode = WebOptUtils.getCurrentUserCode(
             ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
         if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage("用户未登录,请重新登录!");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录,请重新登录!");
         }
         //限制一个用户只能申请一个租户
         List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap("ownUser", userCode, "isAvailable", "T"));
@@ -466,8 +463,7 @@ public class TenantServiceImpl implements TenantService {
             //如果当前用户是平台管理员，则可以查看所有人的申请信息
             tenantInfo.setOwnUser(null);
         } else {
-            tenantInfo.setOwnUser(WebOptUtils.getCurrentUserCode(
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+            tenantInfo.setOwnUser(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
         }
         List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(tenantInfo, pageDesc);
         return PageQueryResult.createResult(tenantInfos, pageDesc);
@@ -540,77 +536,6 @@ public class TenantServiceImpl implements TenantService {
 
 
     @Override
-    public ResponseData removeApplicationMember(String groupId, String userCode) {
-        if (!tenantPowerManage.userIsApplicationAdmin(groupId)) {
-            return ResponseData.makeErrorMessage("当前用户没有操作权限!");
-        }
-        if (!tenantPowerManage.userIsApplicationMember(userCode, groupId)) {
-            return ResponseData.makeErrorMessage("用户不在开发组中!");
-        }
-        if (tenantPowerManage.userIsApplicationAdmin(userCode, groupId)) {
-            return ResponseData.makeErrorMessage("组长不允许被移除");
-        }
-        List<WorkGroup> workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, groupId);
-        if (!CollectionUtils.isEmpty(workGroups) && workGroups.size() == 1) {
-            workGroupDao.deleteObjectForceById(workGroups.get(0));
-        } else {
-            logger.warn("移除班组人员时，发现班组人员异常,groupId={},userCode={},workGroups={}", groupId, userCode, workGroups.toString());
-            return ResponseData.makeErrorMessage("发现数据异常，停止操作!");
-        }
-        return ResponseData.makeSuccessResponse("移除成功!");
-    }
-
-    @Override
-    public ResponseData listApplicationMember(String groupId) {
-        List<WorkGroup> workGroups = workGroupDao.listObjectsByProperties(CollectionsOpt.createHashMap("groupId", groupId));
-        if (CollectionUtils.isEmpty(workGroups)) {
-            return ResponseData.makeResponseData(CollectionUtils.emptyCollection());
-        }
-        List<Map> resultMaps = JSONArray.parseArray(JSONArray.toJSONString(workGroups), Map.class);
-        resultMaps.forEach(map -> {
-            UserInfo userInfo = userInfoDao.getUserByCode(MapUtils.getString(map, "userCode"));
-            if (null != userInfo) {
-                map.put("userName", userInfo.getUserName());
-            } else {
-                map.put("userName", "");
-            }
-        });
-        return ResponseData.makeResponseData(resultMaps);
-    }
-
-    /**
-     * 校验WorkGroup参数
-     *
-     * @param workGroup 工作组
-     * @return 判断结果字符串
-     */
-    private String checkWorkGroup(WorkGroup workGroup) {
-        WorkGroupParameter workGroupParameter = workGroup.getWorkGroupParameter();
-        String groupId = workGroupParameter.getGroupId();
-        String userCode = workGroupParameter.getUserCode();
-        if (StringUtils.isAnyBlank(groupId, userCode)) {
-            return "groupId,userCode不能为为空";
-        }
-        String roleCode = workGroupParameter.getRoleCode();
-        if (!equalsAny(roleCode, APPLICATION_ADMIN_ROLE_CODE, APPLICATION_NORMAL_MEMBER_ROLE_CODE)) {
-            return String.format("roleCode应该是%s,%s中的一个", APPLICATION_ADMIN_ROLE_CODE, APPLICATION_NORMAL_MEMBER_ROLE_CODE);
-        }
-
-        if (!tenantPowerManage.userIsApplicationAdmin(groupId)) {
-            return "当前操作人不具备操作权限";
-        }
-
-        if (null == osInfoDao.getObjectById(workGroupParameter.getGroupId())) {
-            return "groupId不存在!";
-        }
-        workGroup.setCreator(WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
-        workGroup.setIsValid("T");
-        return null;
-    }
-
-
-    @Override
     public ResponseData userTenants(String userCode) {
         if (StringUtils.isBlank(userCode)) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"userCode 不能为空");
@@ -628,10 +553,6 @@ public class TenantServiceImpl implements TenantService {
         return ResponseData.makeResponseData(osInfoDao.listOsInfoByUnit(topUnit));
     }
 
-    @Override
-    public ResponseData listWorkGroupByProperties(Map<String, Object> paramMap) {
-        return ResponseData.makeResponseData(workGroupDao.listObjectsByProperties(paramMap));
-    }
 
 
     @Override
@@ -726,42 +647,6 @@ public class TenantServiceImpl implements TenantService {
 
 
     /**
-     * 通过userCode userName regCellPhone精确查找用户
-     *
-     * @param paramMap
-     * @return
-     */
-    private List<UserInfo> getUserInfosByExactUserName(Map<String, Object> paramMap) {
-        Map<String, Object> filterMap = filterMapAbsentKey(new String[]{"userCode", "userName", "regCellPhone"}, paramMap);
-        String querySql = "select  USER_CODE, USER_PIN, IS_VALID, USER_TYPE, LOGIN_NAME, USER_NAME, ENGLISH_NAME, USER_DESC, LOGIN_TIMES, ACTIVE_TIME, PWD_EXPIRED_TIME, REG_EMAIL, USER_PWD, REG_CELL_PHONE, ID_CARD_NO, USER_WORD, USER_TAG, USER_ORDER, TOP_UNIT, PRIMARY_UNIT, CREATE_DATE, CREATOR, UPDATOR, UPDATE_DATE from F_USERINFO where 1=1  [  userName| and USER_NAME = :userName ] [ userCode| AND USER_CODE = :userCode ]  [ regCellPhone | AND REG_CELL_PHONE = :regCellPhone ]";
-        QueryAndNamedParams qapSql = QueryUtils.translateQuery(querySql, filterMap);
-        return userInfoDao.listObjectsBySql(qapSql.getQuery(), paramMap);
-    }
-
-
-    /**
-     * 筛选出map中指定key对应的数据
-     *
-     * @param keys 需要筛选出的key
-     * @param map  需要呗筛选的map
-     * @return 筛选后的结果 如果map中不存在keys中指定的key，结果中也不会存在
-     */
-    private Map<String, Object> filterMapAbsentKey(String[] keys, Map<String, Object> map) {
-        if (CollectionUtils.sizeIsEmpty(map)) {
-            return new HashMap<>();
-        }
-        ArrayList<String> keyList = new ArrayList<>(map.keySet());
-        HashMap<String, Object> resultMap = new HashMap<>();
-        for (String key : keys) {
-            if (keyList.contains(key)) {
-                resultMap.put(key, map.get(key));
-            }
-        }
-        return resultMap;
-    }
-
-
-    /**
      * 在TenantInfo中添加字段isOwner
      *
      * @param userCode
@@ -777,15 +662,10 @@ public class TenantServiceImpl implements TenantService {
         if (CollectionUtils.isNotEmpty(topUnitCodes)) {
             workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, CollectionsOpt.listToArray(topUnitCodes));
         }
-        UserInfo userInfo = userInfoDao.getUserByCode(userCode);
-        String primaryUnit = "";
-        if (null != userInfo) {
-            primaryUnit = userInfo.getPrimaryUnit();
-        }
         List<Map> tenantJsonArrays = JSONArray.parseArray(JSONArray.toJSONString(tenantInfos), Map.class);
         if (CollectionUtils.isNotEmpty(tenantJsonArrays)) {
             for (Map tenantJson : tenantJsonArrays) {
-                extendTenantsAttribute(userCode, workGroups, primaryUnit, tenantJson);
+                extendTenantsAttribute(userCode, workGroups, tenantJson);
             }
         }
         return tenantJsonArrays;
@@ -796,11 +676,10 @@ public class TenantServiceImpl implements TenantService {
      *
      * @param userCode    用户code
      * @param workGroups  成员角色
-     * @param primaryUnit 用户主机构
      * @param tenantJson  Tenant
      */
     @SuppressWarnings("unchecked")
-    private void extendTenantsAttribute(String userCode, List<WorkGroup> workGroups, String primaryUnit, Map tenantJson) {
+    private void extendTenantsAttribute(String userCode, List<WorkGroup> workGroups, Map tenantJson) {
         if (MapUtils.getString(tenantJson, "ownUser").equals(userCode)) {
             tenantJson.put("isOwner", "T");
         } else {

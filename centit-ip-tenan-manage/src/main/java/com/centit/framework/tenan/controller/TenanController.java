@@ -151,9 +151,6 @@ public class TenanController extends BaseController {
             MapUtils.getString(parameters,"userCode"))){
             return ResponseData.makeErrorMessage("topUnit或userCode不能为空");
         }
-        //todo:权限校验
-        //如果为普通用户取消申请，只能取消自己的申请
-        //如果为管理员取消申请，只能取消当前所属单位的申请
         return tenantService.cancelApply(parameters);
     }
 
@@ -178,7 +175,6 @@ public class TenanController extends BaseController {
     @RequestMapping(value = "/agreeJoin", method = RequestMethod.POST)
     @WrapUpResponseBody
     public ResponseData agreeJoin(@RequestBody @Validated TenantMemberApplyVo tenantMemberApply) {
-        //todo:权限校验
         return tenantService.agreeJoin(tenantMemberApply);
     }
 
@@ -223,7 +219,7 @@ public class TenanController extends BaseController {
         }
         String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage("当前用户未登录");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"当前用户未登录");
         }
         try {
             return tenantService.quitTenant(topUnit, userCode);
