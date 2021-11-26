@@ -1,5 +1,6 @@
 package com.centit.framework.tenan.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -7,8 +8,10 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.po.*;
+import com.centit.framework.tenan.service.TenantPowerManage;
 import com.centit.framework.tenan.service.TenantService;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
 import com.centit.framework.tenan.vo.TenantMemberApplyVo;
@@ -20,6 +23,7 @@ import io.swagger.annotations.*;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +41,9 @@ public class TenanController extends BaseController {
 
     @Autowired
     private TenantService tenantService;
+
+    @Autowired
+    private TenantPowerManage tenantPowerManage;
 
     @Autowired
     protected PlatformEnvironment platformEnvironment;
@@ -410,5 +417,27 @@ public class TenanController extends BaseController {
         return tenantService.updateTenant(tenantInfo);
 
     }
-
+    @ApiOperation(value = "获取用户登录信息",notes = "是对/mainframe/currentuser接口的扩展")
+    @RequestMapping(value = {"/currentuser"},method = {RequestMethod.GET})
+    @WrapUpResponseBody
+    public Object getCurrentUser(HttpServletRequest request) {
+        Object ud = WebOptUtils.getLoginUser(request);
+        if (ud == null) {
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "用户没有登录或者超时，请重新登录！");
+        }
+        if (ud instanceof CentitUserDetails){
+            CentitUserDetails centitUserDetails = (CentitUserDetails) ud;
+            JSONObject userInfo = centitUserDetails.getUserInfo();
+            if (StringUtils.isBlank(userInfo.getString("tenantRole"))){
+                String topUnitCode = centitUserDetails.getTopUnitCode();
+                String tenantRole= "";
+                if (StringUtils.isNotBlank(topUnitCode)){
+                    tenantRole = tenantPowerManage.userTenantRole(topUnitCode);
+                }
+                userInfo.put("tenantRole",tenantRole);
+                SecurityContextHolder.getContext().setAuthentication(centitUserDetails);
+            }
+        }
+        return ud;
+    }
 }
