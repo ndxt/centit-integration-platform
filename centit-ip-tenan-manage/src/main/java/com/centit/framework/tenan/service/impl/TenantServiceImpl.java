@@ -535,16 +535,12 @@ public class TenantServiceImpl implements TenantService {
     }
 
 
-    @Override
-    public ResponseData userTenants(String userCode) {
-        if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"userCode 不能为空");
-        }
+    public List<Map> userTenants(String userCode) {
         List<TenantInfo> tenantInfos = tenantInfoDao.listUserTenant(CollectionsOpt.createHashMap("userCode", userCode));
-        if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
-            return ResponseData.makeResponseData(Collections.emptyList());
+        if (CollectionUtils.sizeIsEmpty(tenantInfos)){
+            return Collections.emptyList();
         }
-        return ResponseData.makeResponseData(formatTenants(userCode, tenantInfos));
+        return formatTenants(userCode, tenantInfos);
     }
 
 

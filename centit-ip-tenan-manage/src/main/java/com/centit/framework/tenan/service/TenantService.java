@@ -9,6 +9,7 @@ import com.centit.framework.tenan.vo.TenantMemberApplyVo;
 import com.centit.framework.tenan.vo.TenantMemberQo;
 import com.centit.support.database.utils.PageDesc;
 
+import java.util.List;
 import java.util.Map;
 
 public interface TenantService {
@@ -148,7 +149,7 @@ public interface TenantService {
      * @param userCode 用户code
      * @return
      */
-    ResponseData userTenants(String userCode);
+    List<Map> userTenants(String userCode);
 
 
     /**

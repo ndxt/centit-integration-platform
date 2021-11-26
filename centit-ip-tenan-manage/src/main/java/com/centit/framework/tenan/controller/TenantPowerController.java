@@ -6,6 +6,7 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.tenan.service.TenantPowerManage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,12 +67,15 @@ public class TenantPowerController extends BaseController {
     @WrapUpResponseBody
     public ResponseData userTenantRole(@RequestParam("topUnit")String topUnit) {
 
+        if (StringUtils.isBlank(topUnit)){
+            return ResponseData.makeResponseData("");
+        }
         try {
             return ResponseData.makeResponseData(tenantPowerManage.userTenantRole(topUnit));
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("当前用户是否在租户中的角色,错误原因{},租户id：{}", e, topUnit);
-            return ResponseData.makeErrorMessage("当前用户是否在租户中的角色!");
+            return ResponseData.makeErrorMessage("当前用户不在租户中的角色!");
         }
     }
 

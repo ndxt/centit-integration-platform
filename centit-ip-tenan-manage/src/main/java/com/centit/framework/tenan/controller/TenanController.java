@@ -23,12 +23,12 @@ import io.swagger.annotations.*;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -154,8 +154,8 @@ public class TenanController extends BaseController {
     @WrapUpResponseBody
     public ResponseData cancelApply(HttpServletRequest request) {
         Map<String, Object> parameters = collectRequestParameters(request);
-        if (StringUtils.isAnyBlank(MapUtils.getString(parameters,"topUnit"),
-            MapUtils.getString(parameters,"userCode"))){
+        if (StringUtils.isAnyBlank(MapUtils.getString(parameters, "topUnit"),
+            MapUtils.getString(parameters, "userCode"))) {
             return ResponseData.makeErrorMessage("topUnit或userCode不能为空");
         }
         return tenantService.cancelApply(parameters);
@@ -169,7 +169,7 @@ public class TenanController extends BaseController {
     @WrapUpResponseBody
     public ResponseData deleteTenant(HttpServletRequest request) {
         Map<String, Object> parameters = collectRequestParameters(request);
-        if (StringUtils.isBlank(MapUtils.getString(parameters,"topUnit"))){
+        if (StringUtils.isBlank(MapUtils.getString(parameters, "topUnit"))) {
             return ResponseData.makeErrorMessage("topUnit不能为空");
         }
         return tenantService.deleteTenant(parameters);
@@ -226,7 +226,7 @@ public class TenanController extends BaseController {
         }
         String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"当前用户未登录");
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN, "当前用户未登录");
         }
         try {
             return tenantService.quitTenant(topUnit, userCode);
@@ -312,7 +312,7 @@ public class TenanController extends BaseController {
         try {
             return tenantService.assignTenantRole(tenantMemberQo);
         } catch (ObjectException obe) {
-            return ResponseData.makeErrorMessage(obe.getExceptionCode(),obe.getMessage());
+            return ResponseData.makeErrorMessage(obe.getExceptionCode(), obe.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("设置租户成员角色出错，错误原因:{},入参:{}", e, tenantMemberQo.toString());
@@ -327,12 +327,12 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/deleteTenantRole", method = RequestMethod.DELETE)
     @WrapUpResponseBody
-    public ResponseData deleteTenantRole( TenantMemberQo tenantMemberQo) {
+    public ResponseData deleteTenantRole(TenantMemberQo tenantMemberQo) {
 
         try {
             return tenantService.deleteTenantRole(tenantMemberQo);
         } catch (ObjectException obe) {
-            return ResponseData.makeErrorMessage(obe.getExceptionCode(),obe.getMessage());
+            return ResponseData.makeErrorMessage(obe.getExceptionCode(), obe.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("删除租户成员角色出错，错误原因:{},入参:{}", e, tenantMemberQo.toString());
@@ -340,6 +340,7 @@ public class TenanController extends BaseController {
         return ResponseData.makeErrorMessage("删除租户成员角色出错");
 
     }
+
     @ApiOperation(
         value = "获取用户所在租户",
         notes = "获取用户所在租户"
@@ -348,9 +349,13 @@ public class TenanController extends BaseController {
     @WrapUpResponseBody
     public ResponseData userTenants(HttpServletRequest request) {
 
-        String userCode =WebOptUtils.getCurrentUserCode(request);
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)) {
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录!");
+        }
         try {
-            return tenantService.userTenants(userCode);
+            List<Map> userTenants = tenantService.userTenants(userCode);
+            return ResponseData.makeResponseData(userTenants);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("获取用户所在租户出错，错误原因:{},入参:{}", e, userCode);
@@ -417,27 +422,33 @@ public class TenanController extends BaseController {
         return tenantService.updateTenant(tenantInfo);
 
     }
-    @ApiOperation(value = "获取用户登录信息",notes = "是对/mainframe/currentuser接口的扩展")
-    @RequestMapping(value = {"/currentuser"},method = {RequestMethod.GET})
+
+    @ApiOperation(value = "获取用户登录信息", notes = "是对/mainframe/currentuser接口的扩展")
+    @RequestMapping(value = {"/currentuser"}, method = {RequestMethod.GET})
     @WrapUpResponseBody
     public Object getCurrentUser(HttpServletRequest request) {
         Object ud = WebOptUtils.getLoginUser(request);
         if (ud == null) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "用户没有登录或者超时，请重新登录！");
         }
-        if (ud instanceof CentitUserDetails){
+        String userCode = "";
+        //tenantRole和userTenant信息随时有可能改变，所以不建议放到SecurityContext中
+        if (ud instanceof CentitUserDetails) {
+            //补充tenantRole字段信息
             CentitUserDetails centitUserDetails = (CentitUserDetails) ud;
             JSONObject userInfo = centitUserDetails.getUserInfo();
-            if (StringUtils.isBlank(userInfo.getString("tenantRole"))){
-                String topUnitCode = centitUserDetails.getTopUnitCode();
-                String tenantRole= "";
-                if (StringUtils.isNotBlank(topUnitCode)){
-                    tenantRole = tenantPowerManage.userTenantRole(topUnitCode);
-                }
-                userInfo.put("tenantRole",tenantRole);
-                SecurityContextHolder.getContext().setAuthentication(centitUserDetails);
+            userCode = userInfo.getString("userCode");
+            String topUnitCode = centitUserDetails.getTopUnitCode();
+            String tenantRole = "";
+            if (StringUtils.isNotBlank(topUnitCode)) {
+                tenantRole = tenantPowerManage.userTenantRole(topUnitCode);
             }
+            userInfo.put("tenantRole", tenantRole);
         }
-        return ud;
+        //补充userTenants字段信息
+        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(ud));
+        List<Map> userTenants = tenantService.userTenants(userCode);
+        jsonObject.put("userTenants", userTenants);
+        return jsonObject;
     }
 }
