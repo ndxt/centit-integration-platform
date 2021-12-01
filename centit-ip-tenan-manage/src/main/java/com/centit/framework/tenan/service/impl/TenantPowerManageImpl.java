@@ -2,6 +2,7 @@ package com.centit.framework.tenan.service.impl;
 
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.system.dao.UserUnitDao;
 import com.centit.framework.tenan.dao.TenantInfoDao;
 import com.centit.product.dao.WorkGroupDao;
@@ -16,8 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,8 +46,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsTenantOwner(String topUnit) throws ObjectException {
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
@@ -82,8 +80,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsTenantAdmin(String topUnit) throws ObjectException {
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
@@ -98,8 +95,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsTenantMember(String topUnit) throws ObjectException {
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
@@ -115,8 +111,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsApplicationAdmin(String osId) throws ObjectException {
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
@@ -131,8 +126,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsApplicationMember(String osId) throws ObjectException {
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }
@@ -205,8 +199,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
 
     @Override
     public boolean userIsSystemAdmin() {
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if (StringUtils.isBlank(userCode)) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录!");
         }

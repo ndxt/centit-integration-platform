@@ -167,11 +167,17 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/deleteTenant", method = RequestMethod.PUT)
     @WrapUpResponseBody
+    //@RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}注销租户",tag = "{userCodes}")
     public ResponseData deleteTenant(HttpServletRequest request) {
         Map<String, Object> parameters = collectRequestParameters(request);
         if (StringUtils.isBlank(MapUtils.getString(parameters, "topUnit"))) {
             return ResponseData.makeErrorMessage("topUnit不能为空");
         }
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)){
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录");
+        }
+        logger.info("用户:{}注销租户{}信息",userCode,MapUtils.getString(parameters, "topUnit"));
         return tenantService.deleteTenant(parameters);
     }
 
@@ -202,6 +208,7 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/updateUserInfo", method = RequestMethod.PUT)
     @WrapUpResponseBody
+    //@RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}更新用户信息",tag = "{userCodes}")
     public ResponseData updateUserInfo(@RequestBody UserInfo userInfo) {
 
         try {
@@ -244,6 +251,7 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/removeTenantMember", method = RequestMethod.PUT)
     @WrapUpResponseBody
+    //@RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}把成员移除租户",tag = "{userCodes}")
     public ResponseData removeTenantMember(@RequestBody Map<String, Object> paraMaps) {
         String topUnit = MapUtils.getString(paraMaps, "topUnit");
         String userCode = MapUtils.getString(paraMaps, "userCode");
@@ -265,6 +273,7 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/businessTenant", method = RequestMethod.POST)
     @WrapUpResponseBody
+    //@RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}租户转让申请",tag = "{userCodes}")
     public ResponseData businessTenant(@RequestBody @Validated TenantBusinessLog tenantBusinessLog) {
 
         try {
@@ -327,6 +336,7 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/deleteTenantRole", method = RequestMethod.DELETE)
     @WrapUpResponseBody
+    //@RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}移除租户成员角色",tag = "{userCodes}")
     public ResponseData deleteTenantRole(TenantMemberQo tenantMemberQo) {
 
         try {
@@ -418,6 +428,7 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/updateTenant", method = RequestMethod.PUT)
     @WrapUpResponseBody
+    //@RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}修改租户信息",tag = "{userCodes}")
     public ResponseData updateTenant(@RequestBody TenantInfo tenantInfo) {
         return tenantService.updateTenant(tenantInfo);
 

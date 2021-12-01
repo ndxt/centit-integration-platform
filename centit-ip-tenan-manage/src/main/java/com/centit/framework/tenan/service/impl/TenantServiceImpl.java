@@ -168,11 +168,13 @@ public class TenantServiceImpl implements TenantService {
         tenantInfo.setOwnUser(userCode);
         saveTenantInfo(tenantInfo);
         initTenant(new TenantInfo(), tenantInfo);
+        batchEvictCache("UserInfo","UnitInfo","UnitUser","UserUnit","UserRole","DataDictionary");
         return ResponseData.makeSuccessResponse("租户申请成功!");
     }
 
 
     @Override
+    @Transactional
     public ResponseData applyJoinTenant(TenantMemberApply tenantMemberApply) {
 
         UserInfo userInfo = userInfoDao.getUserByCode(tenantMemberApply.getUserCode());
@@ -266,6 +268,7 @@ public class TenantServiceImpl implements TenantService {
         //同意申请，给用户分配机构
         if (tenantMemberApply.getApplyState().equals("3")) {
             saveTenantUserUnit(tenantMemberApply);
+            CodeRepositoryCache.evictCache("UserUnit");
         }
         return ResponseData.makeSuccessResponse();
     }
@@ -310,10 +313,12 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("租户所有者不允许退出租户");
         }
         removeTenantMemberRelation(topUnit, userCode);
+        CodeRepositoryCache.evictCache("UserUnit");
         return ResponseData.makeSuccessResponse("已退出该机构!");
     }
 
     @Override
+    @Transactional
     public ResponseData removeTenantMember(String topUnit, String userCode) {
         if (!isTenantManger(topUnit)) {
             return ResponseData.makeErrorMessage("该用户没有操作权限!");
@@ -325,6 +330,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("管理员或租户所有者不允许被移除租户!");
         }
         removeTenantMemberRelation(topUnit, userCode);
+        CodeRepositoryCache.evictCache("UserUnit");
         return ResponseData.makeSuccessResponse("移除成功!");
     }
 
@@ -401,8 +407,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeSuccessResponse("无权转让该租户!");
         }
 
-        tenantBusinessLog.setAssignorUserCode(WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+        tenantBusinessLog.setAssignorUserCode(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
         String assignorUserCode = tenantBusinessLog.getAssignorUserCode();
         String assigneeUserCode = tenantBusinessLog.getAssigneeUserCode();
         List<String> userCodes = CollectionsOpt.createList(assignorUserCode, assigneeUserCode);
@@ -429,7 +434,7 @@ public class TenantServiceImpl implements TenantService {
         }
         dbTenantInfo.setOwnUser(tenantBusinessLog.getAssigneeUserCode());
         tenantInfoDao.updateObject(dbTenantInfo);
-        //转让后的租户所有人设置为管理员
+        //为转让后的租户所有人设置为管理员
         WorkGroupParameter workGroupParameter = new WorkGroupParameter(dbTenantInfo.getTopUnit(), tenantBusinessLog.getAssigneeUserCode(), TENANT_ADMIN_ROLE_CODE);
         WorkGroup workGroup = new WorkGroup();
         workGroup.setWorkGroupParameter(workGroupParameter);
@@ -438,6 +443,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseData adminCheckTenantBusiness(TenantBusinessLog tenantBusinessLog) {
 
         if (StringUtils.isBlank(tenantBusinessLog.getBusinessId())) {
@@ -453,8 +459,12 @@ public class TenantServiceImpl implements TenantService {
             tenantInfo.setTopUnit(tenantBusinessLog.getTopUnit());
             tenantInfo.setOwnUser(tenantBusinessLog.getAssigneeUserCode());
             tenantInfoDao.updateObject(tenantInfo);
+            WorkGroupParameter groupParameter = new WorkGroupParameter(tenantInfo.getTopUnit(), tenantInfo.getOwnUser(), TENANT_ADMIN_ROLE_CODE);
+            WorkGroup workGroup = new WorkGroup();
+            workGroup.setWorkGroupParameter(groupParameter);
+            updateWorkGroupRole(workGroup);
         }
-        return null;
+        return ResponseData.makeSuccessResponse();
     }
 
     @Override
@@ -497,6 +507,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseData deleteTenantRole(TenantMemberQo tenantMemberQo) {
         String checkString = optTenantRoleCheck(tenantMemberQo);
         if (StringUtils.isNotBlank(checkString)) {
@@ -520,9 +531,8 @@ public class TenantServiceImpl implements TenantService {
      * @return
      */
     private String optTenantRoleCheck(TenantMemberQo tenantMemberQo) {
-        boolean check = StringUtils.isBlank(tenantMemberQo.getRoleCode())
-            || StringUtils.isBlank(tenantMemberQo.getMemberUserCode())
-            || StringUtils.isBlank(tenantMemberQo.getTopUnit());
+        boolean check = StringUtils.isAnyBlank(tenantMemberQo.getRoleCode(),
+            tenantMemberQo.getMemberUserCode(), tenantMemberQo.getTopUnit());
         if (check) {
             return "参数roleCode,topUnit,memberUserCode不能为空!";
         }
@@ -587,6 +597,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseData cancelApply(Map<String, Object> parameters) {
         TenantMemberApply tenantMemberApply = tenantMemberApplyDao.getObjectByProperties(parameters);
         if (null != tenantMemberApply && StringUtils.equalsAny(tenantMemberApply.getApplyState(), "1", "2")) {
@@ -596,15 +607,27 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    @Transactional
     public ResponseData deleteTenant(Map<String, Object> parameters) {
-
-        if (!tenantPowerManage.userIsTenantOwner(MapUtils.getString(parameters, "topUnit"))) {
+        String topUnit = MapUtils.getString(parameters, "topUnit");
+        if (!tenantPowerManage.userIsTenantOwner(topUnit)) {
             return ResponseData.makeErrorMessage("只有租户所有者才能注销租户");
         }
-        TenantInfo tenantInfo = new TenantInfo();
-        tenantInfo.setTopUnit(MapUtils.getString(parameters, "topUnit"));
-        tenantInfo.setIsAvailable("F");
-        tenantInfoDao.updateObject(tenantInfo);
+        //删除租户信息
+        tenantInfoDao.deleteObjectById(topUnit);
+        //删除单位信息
+        unitInfoDao.deleteObjectById(topUnit);
+        //删除单位人员关联关系
+        userUnitDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("topUnit",topUnit));
+        //删除字典信息
+        List<DataCatalog> dataCatalogs = dataCatalogDao.listDataCatalogByUnit(topUnit);
+        if (!CollectionUtils.sizeIsEmpty(dataCatalogs)){
+            List<String> dataCatalogIds = dataCatalogs.stream().map(DataCatalog::getCatalogCode).collect(Collectors.toList());
+            dataCatalogDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("topUnit",topUnit));
+            dataDictionaryDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("catalogCode_in",
+                CollectionsOpt.listToArray(dataCatalogIds)));
+        }
+        batchEvictCache("UnitInfo","UserUnit","DataDictionary");
         return ResponseData.makeSuccessResponse();
 
     }
@@ -636,6 +659,7 @@ public class TenantServiceImpl implements TenantService {
             UnitInfo unitInfo = unitInfoDao.getObjectById(tenantInfo.getTopUnit());
             unitInfo.setUnitName(tenantInfo.getUnitName());
             unitInfoDao.updateUnit(unitInfo);
+            CodeRepositoryCache.evictCache("UnitInfo");
         }
 
         return ResponseData.makeSuccessResponse("修改成功!");
@@ -917,6 +941,7 @@ public class TenantServiceImpl implements TenantService {
         userUnit.setTopUnit(unitInfo.getTopUnit());
         userUnit.setCreateDate(unitInfo.getCreateDate());
         userUnit.setCreator(tenantInfo.getOwnUser());
+        userUnit.setRelType("T");
         userUnitDao.saveNewObject(userUnit);
     }
 
@@ -1215,8 +1240,7 @@ public class TenantServiceImpl implements TenantService {
         userRoleId.setUserCode(userCode);
         userRole.setId(userRoleId);
         userRole.setObtainDate(new Date(System.currentTimeMillis()));
-        userRole.setCreator(WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+        userRole.setCreator(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
         userRoleDao.saveNewObject(userRole);
     }
 
@@ -1356,5 +1380,14 @@ public class TenantServiceImpl implements TenantService {
         oldTenantInfo.setIsAvailable("T");
         tenantInfoDao.updateObject(oldTenantInfo);
         saveTenantRelationData(oldTenantInfo);
+    }
+    /**
+     *批量刷新缓存
+     * @param cacheNames
+     */
+    private void batchEvictCache(String ...cacheNames) {
+        for (String cacheName : cacheNames) {
+            CodeRepositoryCache.evictCache(cacheName);
+        }
     }
 }
