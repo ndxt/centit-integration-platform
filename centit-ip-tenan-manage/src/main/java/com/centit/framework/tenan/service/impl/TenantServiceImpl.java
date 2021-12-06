@@ -555,13 +555,6 @@ public class TenantServiceImpl implements TenantService {
 
 
     @Override
-    public ResponseData listTenantApplication(String topUnit) {
-        return ResponseData.makeResponseData(osInfoDao.listOsInfoByUnit(topUnit));
-    }
-
-
-
-    @Override
     public PageQueryResult pageListTenants(String unitName, PageDesc pageDesc) {
         JSONArray jsonArray = tenantInfoDao.listTenantInfoWithOwnUserName(CollectionsOpt.createHashMap("unitName", unitName), pageDesc);
         return PageQueryResult.createResult(jsonArray, pageDesc);
@@ -761,18 +754,24 @@ public class TenantServiceImpl implements TenantService {
             tenantJson.put("deptNames", new ArrayList<>());
             return;
         }
-        List<String> userRanks = userUnits.stream().filter(userUnit -> StringUtils.isNotBlank(userUnit.getUserRank()))
-            .map(UserUnit::getUserRank).collect(Collectors.toList());
-        tenantJson.put("userRank", Optional.ofNullable(userRanks).orElse(new ArrayList<>()));
+        //翻译userRank
+        ArrayList<String> userRankList = new ArrayList<>();
         ArrayList<String> userRankTexts = new ArrayList<>();
-        for (String userRank : userRanks) {
-            IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userRank);
+        for (UserUnit userUnit : userUnits) {
+            String userRank = userUnit.getUserRank();
+            String topUnit = userUnit.getTopUnit();
+            if (StringUtils.isBlank(userRank)){
+                continue;
+            }
+            userRankList.add(userRank);
+            IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userRank, topUnit);
             if (null != rankType) {
                 userRankTexts.add(rankType.getDataValue());
             }
         }
+        tenantJson.put("userRank",userRankList);
         tenantJson.put("userRankText", userRankTexts);
-        Set<String> unitCodes = userUnits.stream().map(UserUnit::getTopUnit).collect(Collectors.toSet());
+        List<String> unitCodes = userUnits.stream().map(UserUnit::getTopUnit).collect(Collectors.toList());
         List<UnitInfo> unitInfos = unitInfoDao.listObjectsByProperties(
             CollectionsOpt.createHashMap("unitCode_in", CollectionsOpt.listToArray(unitCodes)));
         //部门信息
@@ -805,7 +804,7 @@ public class TenantServiceImpl implements TenantService {
             List<HashMap<String, Object>> userRankList = groupByUnitCode.get(key).stream().map(userUnit -> {
                 HashMap<String, Object> map1 = new HashMap<>();
                 map1.put("userRank", userUnit.getUserRank());
-                IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userUnit.getUserRank());
+                IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userUnit.getUserRank(),userUnit.getTopUnit());
                 if (null != rankType) {
                     map1.put("userRankText", rankType.getDataValue());
                 } else {

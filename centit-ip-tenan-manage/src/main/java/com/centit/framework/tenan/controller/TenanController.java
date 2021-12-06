@@ -1,8 +1,7 @@
 package com.centit.framework.tenan.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.common.*;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
@@ -193,7 +192,7 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "平台管理员审核租户",
-        notes = "平台管理员审核租户，请求体(租户信息)"
+        notes = "平台管理员审核租户，请求体(租户信息)---暂时没用到"
     )
     @RequestMapping(value = "/adminCheckTenant", method = RequestMethod.POST)
     @WrapUpResponseBody
@@ -371,25 +370,6 @@ public class TenanController extends BaseController {
             logger.error("获取用户所在租户出错，错误原因:{},入参:{}", e, userCode);
         }
         return ResponseData.makeErrorMessage("获取用户所在租户出错");
-
-    }
-
-
-    @ApiOperation(
-        value = "获取租户下的应用列表",
-        notes = "获取租户下的应用列表"
-    )
-    @RequestMapping(value = "/listTenantApplication", method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public ResponseData listTenantApplication(@RequestParam("topUnit") String topUnit) {
-
-        try {
-            return tenantService.listTenantApplication(topUnit);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("获取租户下的应用列表出错，错误原因:{},入参:{}", e, topUnit);
-        }
-        return ResponseData.makeErrorMessage("获取租户下的应用列表失败!");
 
     }
 

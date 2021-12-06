@@ -153,14 +153,6 @@ public interface TenantService {
 
 
     /**
-     * 获取租户下的应用列表
-     * @param topUnit 租户id
-     * @return
-     */
-    ResponseData listTenantApplication(String topUnit);
-
-
-    /**
      * 根据unitName 模糊查询租户信息
      * @param unitName
      * @param pageDesc
