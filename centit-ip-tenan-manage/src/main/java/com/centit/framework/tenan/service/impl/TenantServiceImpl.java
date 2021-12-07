@@ -610,6 +610,10 @@ public class TenantServiceImpl implements TenantService {
         tenantInfoDao.deleteObjectById(topUnit);
         //删除单位信息
         unitInfoDao.deleteObjectById(topUnit);
+
+        //删除租户所有者系统角色
+        userRoleDao.deleteObjectById(new UserRoleId( MapUtils.getString(parameters,"userCode"),"sysadmin"));
+
         //删除单位人员关联关系
         userUnitDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("topUnit",topUnit));
         //删除字典信息
@@ -1299,6 +1303,8 @@ public class TenantServiceImpl implements TenantService {
         dataCatalog.setCatalogName(catalogName);
         dataCatalog.setTopUnit(topUnitCode);
         dataCatalog.setCatalogCode(topUnitCode + catalogCodeSuffix);
+        dataCatalog.setCatalogType("L");
+        dataCatalog.setCatalogStyle("S");
         return dataCatalog;
     }
 
@@ -1335,6 +1341,8 @@ public class TenantServiceImpl implements TenantService {
         dataDictionaryId.setDataCode(dataCode);
         dataDictionary.setId(dataDictionaryId);
         dataDictionary.setDataValue(dataValue);
+        dataDictionary.setDataStyle("S");
+        dataDictionary.setDataTag("T");
         return dataDictionary;
     }
 

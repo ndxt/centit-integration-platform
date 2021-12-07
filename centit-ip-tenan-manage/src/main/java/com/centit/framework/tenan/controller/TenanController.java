@@ -176,6 +176,7 @@ public class TenanController extends BaseController {
         if (StringUtils.isBlank(userCode)){
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录");
         }
+        parameters.put("userCode",userCode);
         logger.info("用户:{}注销租户{}信息",userCode,MapUtils.getString(parameters, "topUnit"));
         return tenantService.deleteTenant(parameters);
     }
