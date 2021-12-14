@@ -159,6 +159,12 @@
             <artifactId>centit-ip-users-register</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>work-group-dubbo-server-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <profiles>
