@@ -9,6 +9,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IDataDictionary;
+import com.centit.framework.model.basedata.IUnitInfo;
 import com.centit.framework.system.dao.*;
 import com.centit.framework.system.po.*;
 import com.centit.product.adapter.api.WorkGroupManager;
@@ -56,7 +57,7 @@ public class TenantServiceImpl implements TenantService {
     /**
      * 数据库个数上限
      */
-    @Value("${databaseNumberLimit:1}")
+    @Value("${databaseNumberLimit:20}")
     private int databaseNumberLimit;
 
     /**
@@ -74,8 +75,21 @@ public class TenantServiceImpl implements TenantService {
     /**
      * 应用个数上限
      */
-    @Value("${osNumberLimit:1}")
+    @Value("${osNumberLimit:5}")
     private int osNumberLimit;
+
+    /**
+     * 租户下用户总数上限
+     */
+    @Value("${userNumberLimit:100}")
+    private int userNumberLimit;
+
+    /**
+     * 租户下单位个数上限
+     */
+    @Value("${osNumberLimit:20}")
+    private int unitNumberLimit;
+
 
     @Autowired
     private UserInfoDao userInfoDao;
@@ -671,10 +685,7 @@ public class TenantServiceImpl implements TenantService {
      * @return
      */
     private List<Map> formatTenants(String userCode, List<TenantInfo> tenantInfos) {
-        Set<String> topUnitCodes = new HashSet<>();
-        if (CollectionUtils.isNotEmpty(tenantInfos)) {
-            topUnitCodes = tenantInfos.stream().map(TenantInfo::getTopUnit).collect(Collectors.toSet());
-        }
+        Set<String> topUnitCodes = tenantInfos.stream().map(TenantInfo::getTopUnit).collect(Collectors.toSet());
         List<WorkGroup> workGroups = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(topUnitCodes)) {
             workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, CollectionsOpt.listToArray(topUnitCodes));
@@ -718,8 +729,7 @@ public class TenantServiceImpl implements TenantService {
         boolean isAdmin = MapUtils.getString(tenantJson, "roleCode", "").equals(TENANT_ADMIN_ROLE_CODE)
             || MapUtils.getString(tenantJson, "isOwner").equals("T");
         tenantJson.put("isAdmin", isAdmin);
-        List<UserUnit> userUnits = userUnitDao.listObjectsByProperties(CollectionsOpt.createHashMap("userCode", userCode, "topUnit", topUnit));
-        extendTenantsUserRanks(tenantJson, userUnits);
+        extendTenantsUserRanks(tenantJson, (List<UserUnit>) CodeRepositoryUtil.listUserUnits(topUnit, userCode));
 
     }
 
@@ -751,6 +761,7 @@ public class TenantServiceImpl implements TenantService {
      * @param userUnits  userUnits集合
      */
     private void extendTenantsUserRanks(Map tenantJson, List<UserUnit> userUnits) {
+        String topUnit = MapUtils.getString(tenantJson, "topUnit");
         if (CollectionUtils.sizeIsEmpty(userUnits)) {
             tenantJson.put("userRank", new ArrayList<>());
             tenantJson.put("userRankText", new ArrayList<>());
@@ -759,11 +770,11 @@ public class TenantServiceImpl implements TenantService {
             return;
         }
         //翻译userRank
-        ArrayList<String> userRankList = new ArrayList<>();
+        /*ArrayList<String> userRankList = new ArrayList<>();
         ArrayList<String> userRankTexts = new ArrayList<>();
         for (UserUnit userUnit : userUnits) {
             String userRank = userUnit.getUserRank();
-            String topUnit = userUnit.getTopUnit();
+           // String topUnit = userUnit.getTopUnit();
             if (StringUtils.isBlank(userRank)){
                 continue;
             }
@@ -774,59 +785,63 @@ public class TenantServiceImpl implements TenantService {
             }
         }
         tenantJson.put("userRank",userRankList);
-        tenantJson.put("userRankText", userRankTexts);
-        List<String> unitCodes = userUnits.stream().map(UserUnit::getTopUnit).collect(Collectors.toList());
-        List<UnitInfo> unitInfos = unitInfoDao.listObjectsByProperties(
-            CollectionsOpt.createHashMap("unitCode_in", CollectionsOpt.listToArray(unitCodes)));
+        tenantJson.put("userRankText", userRankTexts);*/
+
+        List<String> unitCodes = userUnits.stream().map(UserUnit::getUnitCode).filter(unitCode->!unitCode.equals(topUnit)).collect(Collectors.toList());
+        List<String> deptNames = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, unitCodes).stream().map(IUnitInfo::getUnitName).collect(Collectors.toList());
         //部门信息
         tenantJson.put("deptCodes", unitCodes);
-        tenantJson.put("deptNames", unitInfos.stream().map(UnitInfo::getUnitName).collect(Collectors.toSet()));
+        tenantJson.put("deptNames", deptNames);
 
-        tenantJson.put("deptList", transformDeptList(userUnits, unitInfos));
+        tenantJson.put("deptList", transformDeptList(userUnits));
     }
 
     /**
      * 整合单位结构数据
      *
      * @param userUnits 用户单位关联信息
-     * @param unitInfos 机构信息
      * @return
      */
-    private ArrayList<HashMap<String, Object>> transformDeptList(List<UserUnit> userUnits, List<UnitInfo> unitInfos) {
-        Map<String, List<UserUnit>> groupByUnitCode = userUnits.stream().collect(Collectors.groupingBy(UserUnit::getUnitCode));
+    private ArrayList<HashMap<String, Object>> transformDeptList(List<UserUnit> userUnits) {
+
         ArrayList<HashMap<String, Object>> deptList = new ArrayList<>();
-        for (String key : groupByUnitCode.keySet()) {
+        for (UserUnit userUnit : userUnits) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put("deptCode", key);
-            String unitName = unitInfos.stream().filter(unitInfo -> unitInfo.getUnitCode().equals(key)).findAny().map(UnitInfo::getUnitName).orElseGet(() -> "");
-            if (StringUtils.isBlank(unitName)) {
-                logger.warn("deptCode:" + key + "对应的deptName为空，跳过本次循环...");
-                continue;
+            List userRankList = new ArrayList();
+            int keyIndex = findMapListKeyIndex(deptList,"deptCode", userUnit.getUnitCode());
+            if (keyIndex>-1){
+               map = deptList.get(keyIndex);
+                Object userRankListObj = map.get("userRankList");
+                if (userRankListObj instanceof List){
+                    userRankList = (List) userRankListObj;
+                }
+            }else {
+                map.put("deptCode",userUnit.getUnitCode());
+                if (StringUtils.isBlank(userUnit.getTopUnit())){
+                    logger.warn("userUnit数据，userUnitId："+userUnit.getUserUnitId()+"topUnit为空!");
+                    continue;
+                }
+                map.put("deptName",CodeRepositoryUtil.getUnitName(userUnit.getTopUnit(),userUnit.getUnitCode()));
             }
-            map.put("deptName", unitName);
-            //获取岗位集合
-            List<HashMap<String, Object>> userRankList = groupByUnitCode.get(key).stream().map(userUnit -> {
-                HashMap<String, Object> map1 = new HashMap<>();
-                map1.put("userRank", userUnit.getUserRank());
-                IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userUnit.getUserRank(),userUnit.getTopUnit());
-                if (null != rankType) {
-                    map1.put("userRankText", rankType.getDataValue());
-                } else {
-                    map1.put("userRankText", "");
-                }
-                return map1;
-            }).filter(map1 -> {
-                if (StringUtils.isAnyEmpty(MapUtils.getString(map1, "userRank"), MapUtils.getString(map1, "userRankText"))) {
-                    logger.info("userRank或userRankText为空，跳过");
-                    return false;
-                } else {
-                    return true;
-                }
-            }).collect(Collectors.toList());
+            HashMap<String, Object> map1 = new HashMap<>();
+            String userRank = userUnit.getUserRank();
+            IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", userRank,userUnit.getTopUnit());
+            map1.put("userRank",userRank);
+            map1.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
+            userRankList.add(map1);
             map.put("userRankList", userRankList);
             deptList.add(map);
         }
         return deptList;
+    }
+
+    private int findMapListKeyIndex(List<HashMap<String, Object>> mapList,String key,String value) {
+        for (int i = 0; i < mapList.size(); i++) {
+            if (value.equals(MapUtils.getString(mapList.get(i), key))){
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**

@@ -90,19 +90,27 @@ public class TenantInfo implements Serializable {
 
     @Column(name = "database_number_limit")
     @ApiModelProperty(value = "数据库个数上限 ,数据类型：D", name = "databaseNumberLimit")
-    private int databaseNumberLimit;
+    private Integer databaseNumberLimit;
 
     @Column(name = "os_number_limit")
     @ApiModelProperty(value = "应用个数上限 数据类型：O", name = "osNumberLimit")
-    private int osNumberLimit;
+    private Integer osNumberLimit;
 
     @Column(name = "file_space_limit")
     @ApiModelProperty(value = "文件服务空间上限 数据类型：F", name = "fileSpaceLimit")
-    private int fileSpaceLimit;
+    private Integer fileSpaceLimit;
 
     @Column(name = "data_space_limit")
     @ApiModelProperty(value = "数据空间上限 数据类型：C", name = "dataSpaceLimit")
-    private int dataSpaceLimit;
+    private Integer dataSpaceLimit;
+
+    @Column(name = "user_number_limit")
+    @ApiModelProperty(value = "租户下用户总数上限 ", name = "userNumberLimit")
+    private Integer userNumberLimit;
+
+    @Column(name = "unit_number_limit")
+    @ApiModelProperty(value = "租户下单位个数上限 ", name = "unitNumberLimit")
+    private Integer unitNumberLimit;
 
     public String getTopUnit() {
         return topUnit;
@@ -224,36 +232,52 @@ public class TenantInfo implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public int getDatabaseNumberLimit() {
+    public Integer getDatabaseNumberLimit() {
         return databaseNumberLimit;
     }
 
-    public void setDatabaseNumberLimit(int databaseNumberLimit) {
+    public void setDatabaseNumberLimit(Integer databaseNumberLimit) {
         this.databaseNumberLimit = databaseNumberLimit;
     }
 
-    public int getOsNumberLimit() {
+    public Integer getOsNumberLimit() {
         return osNumberLimit;
     }
 
-    public void setOsNumberLimit(int osNumberLimit) {
+    public void setOsNumberLimit(Integer osNumberLimit) {
         this.osNumberLimit = osNumberLimit;
     }
 
-    public int getFileSpaceLimit() {
+    public Integer getFileSpaceLimit() {
         return fileSpaceLimit;
     }
 
-    public void setFileSpaceLimit(int fileSpaceLimit) {
+    public void setFileSpaceLimit(Integer fileSpaceLimit) {
         this.fileSpaceLimit = fileSpaceLimit;
     }
 
-    public int getDataSpaceLimit() {
+    public Integer getDataSpaceLimit() {
         return dataSpaceLimit;
     }
 
-    public void setDataSpaceLimit(int dataSpaceLimit) {
+    public void setDataSpaceLimit(Integer dataSpaceLimit) {
         this.dataSpaceLimit = dataSpaceLimit;
+    }
+
+    public Integer getUserNumberLimit() {
+        return userNumberLimit;
+    }
+
+    public void setUserNumberLimit(Integer userNumberLimit) {
+        this.userNumberLimit = userNumberLimit;
+    }
+
+    public Integer getUnitNumberLimit() {
+        return unitNumberLimit;
+    }
+
+    public void setUnitNumberLimit(Integer unitNumberLimit) {
+        this.unitNumberLimit = unitNumberLimit;
     }
 
     @Override
@@ -278,6 +302,8 @@ public class TenantInfo implements Serializable {
             ", osNumberLimit=" + osNumberLimit +
             ", fileSpaceLimit=" + fileSpaceLimit +
             ", dataSpaceLimit=" + dataSpaceLimit +
+            ", userNumberLimit=" + userNumberLimit +
+            ", unitNumberLimit=" + unitNumberLimit +
             '}';
     }
 }
