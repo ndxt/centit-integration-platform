@@ -18,12 +18,6 @@
 
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-static-jdbc</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
