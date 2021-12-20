@@ -23,6 +23,11 @@
             <artifactId>framework-adapter</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>integraton-platform-dubbo-adapter</artifactId>
+            <version>${centit.framework.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

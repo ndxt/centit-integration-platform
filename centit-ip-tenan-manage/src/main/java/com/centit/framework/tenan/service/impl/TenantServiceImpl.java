@@ -787,13 +787,13 @@ public class TenantServiceImpl implements TenantService {
         tenantJson.put("userRank",userRankList);
         tenantJson.put("userRankText", userRankTexts);*/
 
-        List<String> unitCodes = userUnits.stream().map(UserUnit::getUnitCode).filter(unitCode->!unitCode.equals(topUnit)).collect(Collectors.toList());
-        List<String> deptNames = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, unitCodes).stream().map(IUnitInfo::getUnitName).collect(Collectors.toList());
+        Set<String> unitCodes = userUnits.stream().map(UserUnit::getUnitCode).filter(unitCode->!unitCode.equals(topUnit)).collect(Collectors.toSet());
+        Set<String> deptNames = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, unitCodes).stream().map(IUnitInfo::getUnitName).collect(Collectors.toSet());
         //部门信息
         tenantJson.put("deptCodes", unitCodes);
         tenantJson.put("deptNames", deptNames);
 
-        tenantJson.put("deptList", transformDeptList(userUnits));
+        tenantJson.put("deptList", transformDeptList(userUnits,topUnit));
     }
 
     /**
@@ -802,35 +802,42 @@ public class TenantServiceImpl implements TenantService {
      * @param userUnits 用户单位关联信息
      * @return
      */
-    private ArrayList<HashMap<String, Object>> transformDeptList(List<UserUnit> userUnits) {
+    /***
+     * 整合单位结构数据
+     * @param userUnits 用户单位关联信息
+     * @param topUnit 由于userUnits中的数据有可能存在topUnit为空的情况，这里需要指定topUnit
+     * @return
+     */
+    private ArrayList<HashMap<String, Object>> transformDeptList(List<UserUnit> userUnits,String topUnit) {
 
         ArrayList<HashMap<String, Object>> deptList = new ArrayList<>();
+        int keyIndex;
         for (UserUnit userUnit : userUnits) {
-            HashMap<String, Object> map = new HashMap<>();
+            HashMap<String, Object> deptListMap = new HashMap<>();
             List userRankList = new ArrayList();
-            int keyIndex = findMapListKeyIndex(deptList,"deptCode", userUnit.getUnitCode());
+            keyIndex = findMapListKeyIndex(deptList,"deptCode", userUnit.getUnitCode());
             if (keyIndex>-1){
-               map = deptList.get(keyIndex);
-                Object userRankListObj = map.get("userRankList");
+                deptListMap = deptList.get(keyIndex);
+                Object userRankListObj = deptListMap.get("userRankList");
                 if (userRankListObj instanceof List){
                     userRankList = (List) userRankListObj;
                 }
             }else {
-                map.put("deptCode",userUnit.getUnitCode());
-                if (StringUtils.isBlank(userUnit.getTopUnit())){
-                    logger.warn("userUnit数据，userUnitId："+userUnit.getUserUnitId()+"topUnit为空!");
-                    continue;
-                }
-                map.put("deptName",CodeRepositoryUtil.getUnitName(userUnit.getTopUnit(),userUnit.getUnitCode()));
+                deptListMap.put("deptCode",userUnit.getUnitCode());
+                deptListMap.put("deptName",CodeRepositoryUtil.getUnitName(topUnit,userUnit.getUnitCode()));
             }
-            HashMap<String, Object> map1 = new HashMap<>();
+            HashMap<String, Object> userRankMap = new HashMap<>();
             String userRank = userUnit.getUserRank();
             IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", userRank,userUnit.getTopUnit());
-            map1.put("userRank",userRank);
-            map1.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
-            userRankList.add(map1);
-            map.put("userRankList", userRankList);
-            deptList.add(map);
+            userRankMap.put("userRank",userRank);
+            userRankMap.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
+            userRankList.add(userRankMap);
+            deptListMap.put("userRankList", userRankList);
+            if (keyIndex==-1){
+                deptList.add(deptListMap);
+            }else {
+                deptList.set(keyIndex,deptListMap);
+            }
         }
         return deptList;
     }

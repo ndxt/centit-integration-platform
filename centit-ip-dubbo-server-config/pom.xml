@@ -23,6 +23,12 @@
             <artifactId>framework-adapter</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
+        <!--提供租户管理对外接口-->
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>integraton-platform-dubbo-adapter</artifactId>
+            <version>${centit.framework.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

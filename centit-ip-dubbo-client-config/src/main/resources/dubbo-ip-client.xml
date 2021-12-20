@@ -15,4 +15,5 @@
     <!--<dubbo:reference id="userService" interface="com.kami.service.UserService" >
         <dubbo:method name="findOne" cache="lru" />
     </dubbo:reference>-->
+    <dubbo:reference id="tenantManageService" interface="com.centit.tenant.dubbo.adapter.TenantManageService" init="false"/>
 </beans>

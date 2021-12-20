@@ -14,5 +14,6 @@
 
     <!-- Spring使用xml方式注册Bean -->
 <!--     <bean id="operateFileLibraryImpl" class="com.centit.fileserver.service.impl.FileLibraryInfoManagerImpl"/>-->
-
+    <dubbo:service interface="com.centit.tenant.dubbo.adapter.TenantManageService" ref="tenantManageServiceImpl" protocol="dubbo">
+    </dubbo:service>
 </beans>
