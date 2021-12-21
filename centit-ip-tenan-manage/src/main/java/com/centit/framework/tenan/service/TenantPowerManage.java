@@ -113,47 +113,6 @@ public interface TenantPowerManage {
      */
     boolean userIsApplicationMember(String osId) throws ObjectException;
 
-    /**
-     * 获取租户资源上限
-     * @param topUnit 租户id
-     * @return 租户详情
-     */
-    TenantInfo tenantResourceLimit(String topUnit);
-
-    /**
-     * 租户已用资源
-     * @param topUnit 租户id
-     * @return map中对应的key：
-     *       SOURCE_TYPE：资源code
-     *      SOURCE_TYPE_COUNT：已用个数
-     */
-    List<Map<String, Object>> tenantResourceUsed(String topUnit);
-
-    /**
-     * 租户资源详情
-     * @param topUnit 租户id
-     * @return map中对应的key：
-     *      sourceType 资源类型
-     *      limit 资源限制个数
-     *      usedSource 已用资源个数
-     *      useAble可用资源个数
-     *      isLimit 是否达到上限 true:达到上限 false：未达到上限
-     */
-    ArrayList<HashMap<String, Object>> tenantResourceDetails(String topUnit);
-
-
-    /**
-     * 租户指定资源详情
-     * @param topUnit 租户id
-     * @param resourceType 租户类型
-     * @return map中对应的key：
-     *      sourceType 资源类型
-     *      limit 资源限制个数
-     *      usedSource 已用资源个数
-     *      useAble可用资源个数
-     *      isLimit 是否达到上限 true:达到上限 false：未达到上限
-     */
-    HashMap<String, Object> specialResourceDetails(String topUnit, String resourceType);
 
     /**
      * 校验用户是否为system租户成员
@@ -180,4 +139,17 @@ public interface TenantPowerManage {
      * @return true：是 false：否
      */
     boolean userIsSystemAdmin();
+
+    /**
+     * 租户中用户数量是否达到限制
+     * @return true:超出限制 false：未超出限制
+     */
+    boolean userNumberLimitIsOver(String topUnit);
+
+    /**
+     *  租户中单位数量是否达到限制
+     * @param topUnit true:超出限制 false：未超出限制
+     * @return
+     */
+    boolean unitNumberLimitIsOver(String topUnit);
 }

@@ -2,6 +2,8 @@ package com.centit.framework.tenan.service;
 
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
+import com.centit.framework.system.po.UnitInfo;
+import com.centit.framework.system.po.UserUnit;
 import com.centit.framework.tenan.po.*;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.tenan.vo.PageListTenantInfoQo;
@@ -190,5 +192,23 @@ public interface TenantService {
      * @return
      */
     ResponseData updateTenant(TenantInfo tenantInfo);
+
+    /**
+     * 创建单位 是对 com.centit.framework.system.service.SysUnitManager#saveNewUnitInfo(com.centit.framework.system.po.UnitInfo)
+     * 接口的再次封装
+     * @param unitInfo
+     * @return
+     */
+    ResponseData addTenantUnit(UnitInfo unitInfo);
+
+    /**
+     * 新增用户 是对 com.centit.framework.system.controller.UserInfoController#create(com.centit.framework.system.po.UserInfo, com.centit.framework.system.po.UserUnit, javax.servlet.http.HttpServletRequest)
+     * 接口的再次封装
+     * @param userInfo 用户信息
+     * @param userUnit 用户单位信息
+     * @return
+     */
+    ResponseData addTenantUser(UserInfo userInfo, UserUnit userUnit);
+
 
 }

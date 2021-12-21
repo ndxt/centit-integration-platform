@@ -12,6 +12,8 @@ import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.model.basedata.IUnitInfo;
 import com.centit.framework.system.dao.*;
 import com.centit.framework.system.po.*;
+import com.centit.framework.system.service.SysUnitManager;
+import com.centit.framework.system.service.SysUserManager;
 import com.centit.product.adapter.api.WorkGroupManager;
 import com.centit.product.adapter.po.WorkGroup;
 import com.centit.product.adapter.po.WorkGroupParameter;
@@ -118,10 +120,6 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private WorkGroupManager workGroupManager;
 
-
-    @Autowired
-    private OsInfoDao osInfoDao;
-
     @Autowired
     private TenantPowerManage tenantPowerManage;
 
@@ -137,6 +135,12 @@ public class TenantServiceImpl implements TenantService {
 
     @Autowired
     private DataDictionaryDao dataDictionaryDao;
+
+    @Autowired
+    private SysUnitManager sysUnitManager;
+
+    @Autowired
+    private SysUserManager sysUserManager;
 
     @Override
     @Transactional
@@ -168,18 +172,13 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ResponseData applyAddTenant(TenantInfo tenantInfo) {
-        String userCode = WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
-        if (StringUtils.isBlank(userCode)) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"用户未登录,请重新登录!");
-        }
+
         //限制一个用户只能申请一个租户
-        List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap("ownUser", userCode, "isAvailable", "T"));
+        List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(
+            CollectionsOpt.createHashMap("ownUser", tenantInfo.getOwnUser(), "isAvailable", "T"));
         if (!CollectionUtils.sizeIsEmpty(tenantInfos)) {
             return ResponseData.makeErrorMessage("您已经拥有一个租户，不能再次申请!");
         }
-        tenantInfo.setCreator(userCode);
-        tenantInfo.setOwnUser(userCode);
         saveTenantInfo(tenantInfo);
         initTenant(new TenantInfo(), tenantInfo);
         batchEvictCache("UserInfo","UnitInfo","UnitUser","UserUnit","UserRole","DataDictionary");
@@ -205,6 +204,10 @@ public class TenantServiceImpl implements TenantService {
         //如果申请类型为用户申请加入租户，则unitCode为空
         if ("1".equals(tenantMemberApply.getApplyType())) {
             tenantMemberApply.setUnitCode(null);
+        }
+        //如果是租户邀请用户，判断租户下用户数量是否达到限制
+        if ("2".equals(tenantMemberApply.getApplyType()) && tenantPowerManage.userNumberLimitIsOver(tenantInfo.getTopUnit())){
+            return ResponseData.makeErrorMessage("用户数量达到上限!");
         }
         tenantMemberApplyDao.saveTenantMemberApply(tenantMemberApply);
         return ResponseData.makeSuccessResponse("申请成功,等待对方同意!");
@@ -253,8 +256,6 @@ public class TenantServiceImpl implements TenantService {
         oldTenantInfo.setMemo(tenantInfo.getMemo());
         oldTenantInfo.setIsAvailable(tenantInfo.getIsAvailable());
         oldTenantInfo.setUpdateTime(nowDate());
-        tenantInfo.setUpdator(WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         if ("F".equals(tenantInfo.getIsAvailable())) {
             oldTenantInfo.setPassTime(null);
             tenantInfoDao.updateObject(oldTenantInfo);
@@ -274,7 +275,10 @@ public class TenantServiceImpl implements TenantService {
         if (!equalsAny(applyState, "3", "4")) {
             return ResponseData.makeErrorMessage("applyState属性值有误");
         }
-
+        if ("3".equals(applyState)&&tenantPowerManage.userNumberLimitIsOver(tenantMemberApplyVo.getTopUnit())){
+            //同意加入租户后，判断租户下用户是否达到限制
+           return ResponseData.makeErrorMessage("用户数量达到上限!");
+        }
         TenantMemberApply tenantMemberApply = new TenantMemberApply();
         BeanUtils.copyProperties(tenantMemberApplyVo, tenantMemberApply);
         tenantMemberApplyDao.updateObject(tenantMemberApply);
@@ -674,6 +678,46 @@ public class TenantServiceImpl implements TenantService {
         }
 
         return ResponseData.makeSuccessResponse("修改成功!");
+    }
+
+    @Override
+    @Transactional
+    public ResponseData addTenantUnit(UnitInfo unitInfo) {
+        if (WebOptUtils.isTenant && tenantPowerManage.unitNumberLimitIsOver(unitInfo.getTopUnit())){
+            return ResponseData.makeErrorMessage("单位数量达到上限!");
+        }
+        if (sysUnitManager.hasSameName(unitInfo)) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT, String.format("机构名%s已存在，请更换！",unitInfo.getUnitName()));
+        }
+        List<UnitInfo> unitInfos = sysUnitManager.listObjects(CollectionsOpt.createHashMap("unitWord",unitInfo.getUnitWord()));
+        if (unitInfos != null && unitInfos.size() > 0) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT,String.format("机构编码%s已存在，请更换！",unitInfo.getUnitName()));
+        }
+        if(unitInfo.getUnitOrder()==null || unitInfo.getUnitOrder()==0) {
+            while (!sysUnitManager.isUniqueOrder(unitInfo)) {
+                unitInfo.setUnitOrder(unitInfo.getUnitOrder() + 1);
+            }
+        }
+        sysUnitManager.saveNewUnitInfo(unitInfo);
+        return ResponseData.makeResponseData(unitInfo);
+    }
+
+    @Override
+    @Transactional
+    public ResponseData addTenantUser(UserInfo userInfo, UserUnit userUnit) {
+        if (WebOptUtils.isTenant && tenantPowerManage.userNumberLimitIsOver(userUnit.getTopUnit())){
+            return ResponseData.makeErrorMessage("用户数量达到上限!");
+        }
+        UserInfo dbUserInfo = sysUserManager.loadUserByLoginname(userInfo.getLoginName());
+        if (null != dbUserInfo) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT, String.format("登录名%s已存在，请更换！",userInfo.getLoginName()));
+        }
+        if (null != userInfo.getUserRoles()) {
+            userInfo.getUserRoles().forEach(userRole -> userRole.setUserCode(userInfo.getUserCode()));
+        }
+        userUnit.setUserOrder(userInfo.getUserOrder());
+        sysUserManager.saveNewUserInfo(userInfo, userUnit);
+        return ResponseData.makeResponseData(userInfo);
     }
 
 
@@ -1375,17 +1419,25 @@ public class TenantServiceImpl implements TenantService {
      * @param oldTenantInfo 需要被持久化的租户基本信息
      */
     private void saveTenantDefaultResourcesAttribute(TenantInfo tenantInfo, TenantInfo oldTenantInfo) {
-        if (tenantInfo.getDatabaseNumberLimit() == 0) {
+        if (null == tenantInfo.getDatabaseNumberLimit() || tenantInfo.getDatabaseNumberLimit() == 0) {
             oldTenantInfo.setDatabaseNumberLimit(databaseNumberLimit);
         }
-        if (tenantInfo.getOsNumberLimit() == 0) {
+        if (null == tenantInfo.getOsNumberLimit() || tenantInfo.getOsNumberLimit() == 0) {
             oldTenantInfo.setOsNumberLimit(osNumberLimit);
         }
-        if (tenantInfo.getDataSpaceLimit() == 0) {
+        if (null == tenantInfo.getDataSpaceLimit() || tenantInfo.getDataSpaceLimit() == 0) {
             oldTenantInfo.setDataSpaceLimit(dataSpaceLimit);
         }
-        if (tenantInfo.getFileSpaceLimit() == 0) {
+        if (null == tenantInfo.getFileSpaceLimit() || tenantInfo.getFileSpaceLimit() == 0) {
             oldTenantInfo.setFileSpaceLimit(fileSpaceLimit);
+        }
+
+        if (null == tenantInfo.getUserNumberLimit() || tenantInfo.getUserNumberLimit() == 0) {
+            oldTenantInfo.setFileSpaceLimit(userNumberLimit);
+        }
+
+        if (null == tenantInfo.getUnitNumberLimit() || tenantInfo.getUnitNumberLimit() == 0) {
+            oldTenantInfo.setFileSpaceLimit(unitNumberLimit);
         }
         oldTenantInfo.setPassTime(nowDate());
     }

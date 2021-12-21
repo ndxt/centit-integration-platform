@@ -7,8 +7,11 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.system.po.UnitInfo;
 import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.system.po.UserUnit;
 import com.centit.framework.tenan.po.*;
 import com.centit.framework.tenan.service.TenantPowerManage;
 import com.centit.framework.tenan.service.TenantService;
@@ -27,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +51,9 @@ public class TenanController extends BaseController {
     @Autowired
     protected PlatformEnvironment platformEnvironment;
 
+    public String getOptId() {
+        return "TENANMAG";
+    }
     @ApiOperation(
         value = "注册用户账号",
         notes = "注册用户账号,请求体(用户基本信息)"
@@ -70,8 +77,13 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/applyAddTenant", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData applyAddTenant(@RequestBody @Validated TenantInfo tenantInfo) {
-
+    public ResponseData applyAddTenant(@RequestBody @Validated TenantInfo tenantInfo,HttpServletRequest request) {
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)) {
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
+        tenantInfo.setCreator(userCode);
+        tenantInfo.setOwnUser(userCode);
         try {
             return tenantService.applyAddTenant(tenantInfo);
         } catch (Exception e) {
@@ -187,7 +199,13 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/agreeJoin", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData agreeJoin(@RequestBody @Validated TenantMemberApplyVo tenantMemberApply) {
+    public ResponseData agreeJoin(@RequestBody @Validated TenantMemberApplyVo tenantMemberApply,HttpServletRequest request) {
+        if (StringUtils.isBlank(WebOptUtils.getCurrentUserCode(request))){
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
+        if (StringUtils.isBlank(tenantMemberApply.getTopUnit())){
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR,"topUnit不能为空!");
+        }
         return tenantService.agreeJoin(tenantMemberApply);
     }
 
@@ -197,8 +215,12 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/adminCheckTenant", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData adminCheckTenant(@RequestBody TenantInfo tenantInfo) {
-
+    public ResponseData adminCheckTenant(@RequestBody TenantInfo tenantInfo,HttpServletRequest request) {
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)){
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录");
+        }
+        tenantInfo.setUpdator(userCode);
         return tenantService.adminCheckTenant(tenantInfo);
     }
 
@@ -442,5 +464,51 @@ public class TenanController extends BaseController {
         List<Map> userTenants = tenantService.userTenants(userCode);
         jsonObject.put("userTenants", userTenants);
         return jsonObject;
+    }
+
+    @ApiOperation(value = "新建机构", notes = "新建一个机构。")
+    @ApiImplicitParam(
+        name = "unitInfo", value = "json格式，机构信息对象",
+        paramType = "body", dataTypeClass = UnitInfo.class)
+    @RequestMapping(value = {"/addTenantUnit"},method = RequestMethod.POST)
+    @RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}新增机构",
+        tag="{ui.unitCode}:{ui.unitName}")
+    @WrapUpResponseBody
+    public ResponseData addTenantUnit(@ParamName("ui")@Valid UnitInfo unitInfo,HttpServletRequest request) {
+        if (WebOptUtils.isTenant){
+            String topUnit = WebOptUtils.getCurrentTopUnit(request);
+            if (StringUtils.isBlank(topUnit)){
+                throw new ObjectException("topUnit不能为空!");
+            }
+            unitInfo.setTopUnit(topUnit);
+        }
+        return tenantService.addTenantUnit(unitInfo);
+
+    }
+
+    @ApiOperation(value = "新增用户", notes = "新增用户。")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "userInfo", value = "json格式，用户对象信息",
+            paramType = "body", dataTypeClass = UserInfo.class),
+        @ApiImplicitParam(
+            name = "userUnit", value = "json格式，用户机构对象信息",
+            paramType = "body", dataTypeClass = UserUnit.class)
+    })
+    @RequestMapping(value = {"/addTenantUser"},method = RequestMethod.POST)
+    @RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}新增用户",
+        tag = "{us.userCode}")
+    @WrapUpResponseBody
+    public ResponseData addTenantUser(@ParamName("us") @Valid UserInfo userInfo, UserUnit userUnit, HttpServletRequest request) {
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)){
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
+        if (null == userUnit || StringUtils.isBlank(userUnit.getTopUnit())){
+            return ResponseData.makeErrorMessage("topUnit不能为空!");
+        }
+        userUnit.setCreator(userCode);
+        return tenantService.addTenantUser(userInfo,userUnit);
+
     }
 }
