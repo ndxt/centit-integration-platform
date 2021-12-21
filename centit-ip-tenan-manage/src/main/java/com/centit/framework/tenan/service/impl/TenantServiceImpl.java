@@ -858,7 +858,7 @@ public class TenantServiceImpl implements TenantService {
         int keyIndex;
         for (UserUnit userUnit : userUnits) {
             HashMap<String, Object> deptListMap = new HashMap<>();
-            List userRankList = new ArrayList();
+            List<HashMap<String,Object>> userRankList = new ArrayList();
             keyIndex = findMapListKeyIndex(deptList,"deptCode", userUnit.getUnitCode());
             if (keyIndex>-1){
                 deptListMap = deptList.get(keyIndex);
@@ -872,11 +872,13 @@ public class TenantServiceImpl implements TenantService {
             }
             HashMap<String, Object> userRankMap = new HashMap<>();
             String userRank = userUnit.getUserRank();
-            IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", userRank,userUnit.getTopUnit());
-            userRankMap.put("userRank",userRank);
-            userRankMap.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
-            userRankList.add(userRankMap);
-            deptListMap.put("userRankList", userRankList);
+            if (findMapListKeyIndex(userRankList,"userRank",userRank)==-1){
+                IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", userRank,userUnit.getTopUnit());
+                userRankMap.put("userRank",userRank);
+                userRankMap.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
+                userRankList.add(userRankMap);
+                deptListMap.put("userRankList", userRankList);
+            }
             if (keyIndex==-1){
                 deptList.add(deptListMap);
             }else {
