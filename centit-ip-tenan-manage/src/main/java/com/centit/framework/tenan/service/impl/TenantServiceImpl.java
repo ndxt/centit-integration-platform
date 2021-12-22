@@ -767,7 +767,9 @@ public class TenantServiceImpl implements TenantService {
         } else {
             tenantJson.put("roleCode", "");
         }
-        tenantJson.put("roleName", translateTenantRole(roleCode));
+        if(roleCode!=null) {
+            tenantJson.put("roleName", translateTenantRole(roleCode));
+        }
 
         //判断当前用户是否为租户所有者或管理员
         boolean isAdmin = MapUtils.getString(tenantJson, "roleCode", "").equals(TENANT_ADMIN_ROLE_CODE)
@@ -890,7 +892,7 @@ public class TenantServiceImpl implements TenantService {
 
     private int findMapListKeyIndex(List<HashMap<String, Object>> mapList,String key,String value) {
         for (int i = 0; i < mapList.size(); i++) {
-            if (value.equals(MapUtils.getString(mapList.get(i), key))){
+            if (value!=null && value.equals(MapUtils.getString(mapList.get(i), key))){
                 return i;
             }
         }
