@@ -36,8 +36,6 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-persistence-extend</artifactId>
-            <version>1.1.1812</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
