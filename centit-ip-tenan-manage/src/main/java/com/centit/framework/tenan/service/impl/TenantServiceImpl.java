@@ -752,22 +752,12 @@ public class TenantServiceImpl implements TenantService {
      */
     @SuppressWarnings("unchecked")
     private void extendTenantsAttribute(String userCode, List<WorkGroup> workGroups, Map tenantJson) {
-        if (MapUtils.getString(tenantJson, "ownUser").equals(userCode)) {
-            tenantJson.put("isOwner", "T");
-        } else {
-            tenantJson.put("isOwner", "F");
-        }
-
+        tenantJson.put("isOwner",MapUtils.getString(tenantJson, "ownUser").equals(userCode)? "T":"F");
         String topUnit = MapUtils.getString(tenantJson, "topUnit");
         WorkGroup workGroup = getWorkGroupByUserCodeAndTopUnit(userCode, topUnit, workGroups);
-        String roleCode = null;
-        if (null != workGroup) {
-            roleCode = workGroup.getWorkGroupParameter().getRoleCode();
-            tenantJson.put("roleCode", roleCode);
-        } else {
-            tenantJson.put("roleCode", "");
-        }
-        if(roleCode!=null) {
+        String roleCode = null != workGroup ? workGroup.getWorkGroupParameter().getRoleCode() : "";
+        tenantJson.put("roleCode",  roleCode);
+        if(StringUtils.isNotBlank(roleCode)) {
             tenantJson.put("roleName", translateTenantRole(roleCode));
         }
 
@@ -815,24 +805,6 @@ public class TenantServiceImpl implements TenantService {
             tenantJson.put("deptNames", new ArrayList<>());
             return;
         }
-        //翻译userRank
-        /*ArrayList<String> userRankList = new ArrayList<>();
-        ArrayList<String> userRankTexts = new ArrayList<>();
-        for (UserUnit userUnit : userUnits) {
-            String userRank = userUnit.getUserRank();
-           // String topUnit = userUnit.getTopUnit();
-            if (StringUtils.isBlank(userRank)){
-                continue;
-            }
-            userRankList.add(userRank);
-            IDataDictionary rankType = CodeRepositoryUtil.getDataPiece("RankType", userRank, topUnit);
-            if (null != rankType) {
-                userRankTexts.add(rankType.getDataValue());
-            }
-        }
-        tenantJson.put("userRank",userRankList);
-        tenantJson.put("userRankText", userRankTexts);*/
-
         Set<String> unitCodes = userUnits.stream().map(UserUnit::getUnitCode).filter(unitCode->!unitCode.equals(topUnit)).collect(Collectors.toSet());
         Set<String> deptNames = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, unitCodes).stream().map(IUnitInfo::getUnitName).collect(Collectors.toSet());
         //部门信息
@@ -875,6 +847,7 @@ public class TenantServiceImpl implements TenantService {
             HashMap<String, Object> userRankMap = new HashMap<>();
             String userRank = userUnit.getUserRank();
             if (findMapListKeyIndex(userRankList,"userRank",userRank)==-1){
+                userRankMap.put("userUnitId",userUnit.getUserUnitId());
                 IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", userRank,userUnit.getTopUnit());
                 userRankMap.put("userRank",userRank);
                 userRankMap.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
