@@ -1,16 +1,17 @@
 package com.centit.framework.ip.config;
 
+import com.alibaba.nacos.api.annotation.NacosProperties;
+import com.alibaba.nacos.spring.context.annotation.config.EnableNacosConfig;
+import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
+import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
 import com.centit.framework.components.impl.NotificationCenterImpl;
 import com.centit.framework.config.InitialWebRuntimeEnvironment;
 import com.centit.framework.config.SpringSecurityCasConfig;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
-import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
-import com.centit.framework.system.service.impl.DBPlatformEnvironment;
-import com.centit.support.algorithm.BooleanBaseOpt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 
@@ -24,6 +25,9 @@ import org.springframework.context.annotation.*;
         SpringSecurityCasConfig.class,
         SpringSecurityDaoConfig.class,
         JdbcConfig.class})
+@EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
+@NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}",groupId = "CENTIT", autoRefreshed = true)}
+)
 public class ServiceConfig {
 
     @Value("${app.support.tenant:false}")

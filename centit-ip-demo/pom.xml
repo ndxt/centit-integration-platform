@@ -51,6 +51,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-config</artifactId>
+            <version>${centit.framework.version}</version>
         </dependency>
 
         <dependency>
@@ -66,6 +67,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-system-web</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- spring-security-oauth 这个包中同时实现了OAuth2 的服务端和客户端

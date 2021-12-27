@@ -248,12 +248,13 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/quitTenant", method = RequestMethod.PUT)
     @WrapUpResponseBody
-    public ResponseData quitTenant(@RequestBody Map<String, Object> paraMaps) {
+    public ResponseData quitTenant(@RequestBody Map<String, Object> paraMaps,HttpServletRequest request) {
+        //paraMaps 也可以通过 collectRequestParameters(request)获取
         String topUnit = MapUtils.getString(paraMaps, "topUnit");
         if (StringUtils.isBlank(topUnit)) {
             return ResponseData.makeErrorMessage("参数topUnit不能为空");
         }
-        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
+        String userCode = WebOptUtils.getCurrentUserCode(request);
         if (StringUtils.isBlank(userCode)) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN, "当前用户未登录");
         }

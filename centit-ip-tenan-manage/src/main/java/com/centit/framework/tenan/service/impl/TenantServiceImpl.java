@@ -128,6 +128,9 @@ public class TenantServiceImpl implements TenantService {
     private PlatformEnvironment platformEnvironment;
 
     @Autowired
+    private RoleInfoDao roleInfoDao;
+
+    @Autowired
     private UserRoleDao userRoleDao;
 
     @Autowired
@@ -348,7 +351,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("管理员或租户所有者不允许被移除租户!");
         }
         removeTenantMemberRelation(topUnit, userCode);
-        CodeRepositoryCache.evictCache("UserUnit");
+        batchEvictCache("UserInfo","UserUnit","UnitUser","UserRoles");
         return ResponseData.makeSuccessResponse("移除成功!");
     }
 
@@ -384,12 +387,6 @@ public class TenantServiceImpl implements TenantService {
         paraMap.put("topUnit", topUnit);
         paraMap.put("userCode", userCode);
         userUnitDao.deleteObjectsByProperties(paraMap);
-        if (!userInTenant(userCode)) {
-            UserInfo userInfo = new UserInfo();
-            userInfo.setIsValid("W");
-            userInfo.setUserCode(userCode);
-            userInfoDao.updateObject(userInfo);
-        }
     }
 
     /**
@@ -414,6 +411,49 @@ public class TenantServiceImpl implements TenantService {
     private void removeTenantMemberRelation(String unitCode, String userCode) {
         removeUserUnit(unitCode, userCode);
         removeWorkGroup(unitCode, userCode);
+        removeUserRole(unitCode,userCode);
+        updateUserInfoAfterRemoveTenantUser(unitCode, userCode);
+
+
+    }
+
+    /**
+     * 1.用户只加入了unitCode一个租户 更新属性 isValid="W"  topUnit="" primaryUnit=""
+     * 2.用户加入不止一个租户
+     *      当topUnit=unitCode时，更新属性 topUnit="" primaryUnit=""
+     *      当topUnit!=unitCode时 不更新属性
+     * @param unitCode 租户topUnit
+     * @param userCode 用户code
+     */
+    private void updateUserInfoAfterRemoveTenantUser(String unitCode, String userCode) {
+        List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("userCode", userCode));
+        Set<String> topUnits = userUnits.stream().filter(userUnit -> StringUtils.isNotBlank(userUnit.getTopUnit())&&!unitCode.equals(userUnit.getTopUnit()))
+            .map(UserUnit::getTopUnit).collect(Collectors.toSet());
+        UserInfo userInfo = userInfoDao.getUserByCode(userCode);
+        if (CollectionUtils.sizeIsEmpty(topUnits)){
+            userInfo.setIsValid("W");
+        }
+        if (null != userInfo.getTopUnit()&&userInfo.getTopUnit().equals(unitCode)){
+            userInfo.setTopUnit("");
+            userInfo.setPrimaryUnit("");
+        }
+        userInfo.setUserCode(userCode);
+        userInfoDao.updateObject(userInfo);
+    }
+
+
+    /**
+     * 删除单位中人员的关联角色
+     * @param unitCode topUnit
+     * @param userCode userCode
+     */
+    private void removeUserRole(String unitCode,String userCode) {
+        List<RoleInfo> roleInfos = roleInfoDao.listAllRoleByUnit(unitCode);
+        if (CollectionUtils.sizeIsEmpty(roleInfos)){
+            return;
+        }
+        List<String> roleCodes = roleInfos.stream().map(RoleInfo::getRoleCode).collect(Collectors.toList());
+        userRoleDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("userCode",userCode,"roleCode_in",CollectionsOpt.listToArray(roleCodes)));
     }
 
     @Override
@@ -1051,6 +1091,8 @@ public class TenantServiceImpl implements TenantService {
         List<UserUnit> userUnits = userUnitDao.listObjectByUserUnit(oldTenantMemberApply.getUserCode(), oldTenantMemberApply.getUnitCode());
         if (userUnits.size() == 0) {
             UserUnit userUnit = new UserUnit();
+            //设置被邀请的单位为主机构
+            userUnit.setRelType("T");
             userUnit.setUserCode(oldTenantMemberApply.getUserCode());
             userUnit.setUnitCode(oldTenantMemberApply.getUnitCode());
             userUnit.setTopUnit(oldTenantMemberApply.getTopUnit());
@@ -1193,29 +1235,6 @@ public class TenantServiceImpl implements TenantService {
             return false;
         }
     }
-
-
-    /**
-     * 用户是否已经归属与租户
-     *
-     * @param userCode 用户code
-     * @return true：归属于至少一个租户
-     */
-    private boolean userInTenant(String userCode) {
-        List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("userCode", userCode));
-        if (CollectionUtils.sizeIsEmpty(userUnits)) {
-            return false;
-        }
-        Set<String> topUnits = userUnits.stream().filter(userUnit -> StringUtils.isNotBlank(userUnit.getTopUnit()))
-            .map(UserUnit::getTopUnit).collect(Collectors.toSet());
-        List<TenantInfo> tenantInfos = tenantInfoDao.listObjects(CollectionsOpt.createHashMap("topUnit_in",
-            CollectionsOpt.listToArray(topUnits)));
-        if (CollectionUtils.sizeIsEmpty(tenantInfos)) {
-            return false;
-        }
-        return true;
-    }
-
 
     /**
      * 根据userCode和topUnit查询数据
