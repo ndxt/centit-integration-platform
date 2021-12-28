@@ -1044,9 +1044,12 @@ public class TenantServiceImpl implements TenantService {
         unitInfo.setIsValid("T");
         unitInfo.setTopUnit(tenantInfo.getTopUnit());
         unitInfo.setUnitCode(tenantInfo.getTopUnit());
+        unitInfo.setUnitWord(tenantInfo.getTopUnit());
         unitInfo.setUnitManager(tenantInfo.getCreator());
         unitInfo.setUnitName(tenantInfo.getUnitName());
-        unitInfo.setUnitType("E");
+        unitInfo.setUnitShortName(tenantInfo.getUnitName());
+        unitInfo.setUnitOrder(1L);
+        unitInfo.setUnitType("T");
         unitInfoDao.saveNewObject(unitInfo);
         return unitInfo;
     }
@@ -1329,7 +1332,8 @@ public class TenantServiceImpl implements TenantService {
             DATA_CATALOG_UNIT_TYPE_SUFFIX, "机构类别");
         dataCatalogDao.saveNewObject(unitTypeDataCatalog);
         String unitTypeCatalogCode = unitTypeDataCatalog.getCatalogCode();
-        String[][] unitTypeElements = {{unitTypeCatalogCode, "A", "一般机构"}, {unitTypeCatalogCode, "I", "项目组"}, {unitTypeCatalogCode, "O", "业务机构"}};
+        String[][] unitTypeElements = {{unitTypeCatalogCode, "A", "一般机构"}, {unitTypeCatalogCode, "I", "项目组"},
+            {unitTypeCatalogCode, "O", "业务机构"},{unitTypeCatalogCode, "T", "租户"}};
         batchSaveDataDictionary(unitTypeElements);
 
         //用户职务类型字典 RankType
