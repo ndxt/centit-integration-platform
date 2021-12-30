@@ -1359,7 +1359,7 @@ public class TenantServiceImpl implements TenantService {
 
         //初始化职级字典 PostRank
         DataCatalog postRankDataCatalog = defaultDataCatalog(userCode, topUnitCode,
-            DATA_CATALOG_STATION_SUFFIX, "职级");
+            DATA_CATALOG_POSTRANK_SUFFIX, "职级");
         dataCatalogDao.saveNewObject(stationTypeDataCatalog);
         String[][] postRankElements = {{postRankDataCatalog.getCatalogCode(), "ZJ", "专家"}, {postRankDataCatalog.getCatalogCode(), "GCS", "工程师"}};
         batchSaveDataDictionary(postRankElements);
