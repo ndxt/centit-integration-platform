@@ -12,7 +12,6 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 
 /**
@@ -29,9 +28,6 @@ import org.springframework.context.annotation.*;
 @NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}",groupId = "CENTIT", autoRefreshed = true)}
 )
 public class ServiceConfig {
-
-    @Value("${app.support.tenant:false}")
-    protected String supportTenant;
 
     @Bean
     @Lazy(value = false)
