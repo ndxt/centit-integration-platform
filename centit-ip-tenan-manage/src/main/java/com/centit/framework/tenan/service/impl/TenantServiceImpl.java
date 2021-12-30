@@ -59,37 +59,37 @@ public class TenantServiceImpl implements TenantService {
     /**
      * 数据库个数上限
      */
-    @Value("${databaseNumberLimit:20}")
+    @Value("${app.tenant.resource.database_number_limit:20}")
     private int databaseNumberLimit;
 
     /**
      * 数据空间上限
      */
-    @Value("${dataSpaceLimit:1}")
+    @Value("${app.tenant.resource.data_space_limit:1}")
     private int dataSpaceLimit;
 
     /**
      * 文件服务空间上限
      */
-    @Value("${fileSpaceLimit:1}")
+    @Value("${app.tenant.resource.file_space_limit:1}")
     private int fileSpaceLimit;
 
     /**
      * 应用个数上限
      */
-    @Value("${osNumberLimit:5}")
+    @Value("${app.tenant.resource.os_number_limit:5}")
     private int osNumberLimit;
 
     /**
      * 租户下用户总数上限
      */
-    @Value("${userNumberLimit:100}")
+    @Value("${app.tenant.resource.user_number_limit:100}")
     private int userNumberLimit;
 
     /**
      * 租户下单位个数上限
      */
-    @Value("${osNumberLimit:20}")
+    @Value("${app.tenant.resource.unit_number_limit:20}")
     private int unitNumberLimit;
 
 
@@ -674,6 +674,9 @@ public class TenantServiceImpl implements TenantService {
 
         //删除单位人员关联关系
         userUnitDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("topUnit",topUnit));
+
+        // 删除租户工作组信息
+        workGroupDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("groupId",topUnit));
         //删除字典信息
         List<DataCatalog> dataCatalogs = dataCatalogDao.listDataCatalogByUnit(topUnit);
         if (!CollectionUtils.sizeIsEmpty(dataCatalogs)){
@@ -682,6 +685,8 @@ public class TenantServiceImpl implements TenantService {
             dataDictionaryDao.deleteObjectsByProperties(CollectionsOpt.createHashMap("catalogCode_in",
                 CollectionsOpt.listToArray(dataCatalogIds)));
         }
+        //刷新当前人登录信息
+        SecurityContextHolder.getContext().setAuthentication(platformEnvironment.loadUserDetailsByUserCode(MapUtils.getString(parameters,"userCode")));
         batchEvictCache("UnitInfo","UserUnit","DataDictionary");
         return ResponseData.makeSuccessResponse();
 
@@ -1351,6 +1356,13 @@ public class TenantServiceImpl implements TenantService {
         dataCatalogDao.saveNewObject(stationTypeDataCatalog);
         String[][] stationTypeElements = {{stationTypeDataCatalog.getCatalogCode(), "PT", "普通岗位"}, {stationTypeDataCatalog.getCatalogCode(), "LD", "领导岗位"}};
         batchSaveDataDictionary(stationTypeElements);
+
+        //初始化职级字典 PostRank
+        DataCatalog postRankDataCatalog = defaultDataCatalog(userCode, topUnitCode,
+            DATA_CATALOG_STATION_SUFFIX, "职级");
+        dataCatalogDao.saveNewObject(stationTypeDataCatalog);
+        String[][] postRankElements = {{postRankDataCatalog.getCatalogCode(), "ZJ", "专家"}, {postRankDataCatalog.getCatalogCode(), "GCS", "工程师"}};
+        batchSaveDataDictionary(postRankElements);
     }
 
     /**
@@ -1383,11 +1395,10 @@ public class TenantServiceImpl implements TenantService {
         if (null == elements || elements.length == 0) {
             return;
         }
-        for (String[] element : elements) {
-            if (element.length < 3) {
-                throw new ObjectException("保存字段数据出错，期待参数个数为3，实际为" + element.length);
-            }
-            dataDictionaryDao.saveNewObject(defaultDataDictionary(element[0], element[1], element[2]));
+        for (int i = 0; i < elements.length; i++) {
+            DataDictionary dataDictionary = defaultDataDictionary(elements[i][0], elements[i][1], elements[i][2]);
+            dataDictionary.setDataOrder(i);
+            dataDictionaryDao.saveNewObject(dataDictionary);
         }
 
     }
@@ -1433,11 +1444,11 @@ public class TenantServiceImpl implements TenantService {
         }
 
         if (null == tenantInfo.getUserNumberLimit() || tenantInfo.getUserNumberLimit() == 0) {
-            oldTenantInfo.setFileSpaceLimit(userNumberLimit);
+            oldTenantInfo.setUserNumberLimit(userNumberLimit);
         }
 
         if (null == tenantInfo.getUnitNumberLimit() || tenantInfo.getUnitNumberLimit() == 0) {
-            oldTenantInfo.setFileSpaceLimit(unitNumberLimit);
+            oldTenantInfo.setUnitNumberLimit(unitNumberLimit);
         }
         oldTenantInfo.setPassTime(nowDate());
     }

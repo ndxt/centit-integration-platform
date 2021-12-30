@@ -47,12 +47,6 @@
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-session-redis</artifactId>
         </dependency>
-        <!--采用依赖就近原则，指定nacos-spring-context依赖nacos-client 2.0.3版本-->
-        <dependency>
-            <groupId>com.alibaba.nacos</groupId>
-            <artifactId>nacos-client</artifactId>
-            <version>2.0.3</version>
-        </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-config</artifactId>
