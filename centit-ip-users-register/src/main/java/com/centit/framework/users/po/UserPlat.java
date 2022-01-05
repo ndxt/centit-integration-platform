@@ -94,6 +94,13 @@ public class UserPlat implements java.io.Serializable {
     private String userName;
 
     private String isUsed;
+
+    /**
+     * weChatName 微信名
+     */
+    @Column(name = "WECHAT_NAME")
+    @ApiModelProperty(value = "微信名", name = "weChatName")
+    private String weChatName;
     //结束
 
     // Constructors
@@ -232,5 +239,13 @@ public class UserPlat implements java.io.Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getWeChatName() {
+        return weChatName;
+    }
+
+    public void setWeChatName(String weChatName) {
+        this.weChatName = weChatName;
     }
 }

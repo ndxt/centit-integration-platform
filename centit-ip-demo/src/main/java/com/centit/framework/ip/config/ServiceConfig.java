@@ -12,6 +12,8 @@ import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import org.springframework.context.annotation.*;
 
 /**
@@ -71,6 +73,11 @@ public class ServiceConfig {
     @Bean
     public InstantiationServiceBeanPostProcessor instantiationServiceBeanPostProcessor() {
         return new InstantiationServiceBeanPostProcessor();
+    }
+
+    @Bean
+    public WxMpService wxMpService() {
+        return new WxMpServiceImpl();
     }
 
 }

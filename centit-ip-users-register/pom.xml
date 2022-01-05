@@ -50,8 +50,14 @@
             <artifactId>taobao-sdk-java-auto-source</artifactId>
             <version>1479188381469-20210528</version>
         </dependency>
-    </dependencies>
 
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-mp</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
+    </dependencies>
     <build>
         <!--<resources>
             <resource>
