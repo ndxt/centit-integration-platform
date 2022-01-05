@@ -55,11 +55,9 @@ public class WeChatLogin extends BaseController {
      * @return
      */
     private WxMpUser getWxUser(String code){
-        WxMpOAuth2AccessToken wxMpOAuth2AccessToken = new WxMpOAuth2AccessToken();
         WxMpUser wxMpUser = new WxMpUser();
         try {
-            //通过code获取access_token
-            wxMpOAuth2AccessToken = wxOpenService.oauth2getAccessToken(code);
+            WxMpOAuth2AccessToken wxMpOAuth2AccessToken = this.getAccessToken(code);
             wxMpUser = wxOpenService.oauth2getUserInfo(wxMpOAuth2AccessToken, null);
         } catch (WxErrorException e) {
             e.printStackTrace();
@@ -67,6 +65,29 @@ public class WeChatLogin extends BaseController {
         return wxMpUser;
     }
 
+    /**
+     * 获取access_token
+     * @param code
+     * @return
+     */
+    private WxMpOAuth2AccessToken getAccessToken(String code){
+        WxMpOAuth2AccessToken wxMpOAuth2AccessToken = new WxMpOAuth2AccessToken();
+        try {
+            //通过code获取access_token
+            wxMpOAuth2AccessToken = wxOpenService.oauth2getAccessToken(code);
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+        }
+        return wxMpOAuth2AccessToken;
+    }
+
+    /**
+     * 获取用户信息
+     * @param code
+     * @param state
+     * @param request
+     * @return
+     */
     @GetMapping("/qrUserInfo")
     @WrapUpResponseBody
     public ResponseData qrUserInfo(@RequestParam("code") String code,
