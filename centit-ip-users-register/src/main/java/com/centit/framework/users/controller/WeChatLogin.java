@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author zfg
+ * 微信登录controller
+ * @author tian_y
  */
 @Controller
 @RequestMapping("/wxlogin")
@@ -126,7 +127,6 @@ public class WeChatLogin extends BaseController {
     public ResponseData bindUserInfo(@RequestParam("code") String code,
                                      @RequestParam("userCode") String userCode,
                                      HttpServletRequest request) {
-
         WxMpUser wxMpUser = this.getWxUser(code);
         //从token中获取openid(授权用户唯一标识)
         String openId = wxMpUser.getOpenId();

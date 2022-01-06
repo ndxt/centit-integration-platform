@@ -51,6 +51,7 @@
             <version>1479188381469-20210528</version>
         </dependency>
 
+        <!-- 微信框架 参考：https://github.com/Wechat-Group/weixin-java-tools -->
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-mp</artifactId>
