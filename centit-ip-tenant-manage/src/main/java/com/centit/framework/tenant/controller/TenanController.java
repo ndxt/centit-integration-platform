@@ -415,11 +415,15 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/pageListTenants", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public PageQueryResult pageListTenants(@ParamName("unitName") String unitName, PageDesc pageDesc) {
-        if (StringUtils.isBlank(unitName)) {
+    public PageQueryResult pageListTenants( PageDesc pageDesc,HttpServletRequest request) {
+        Map<String, Object> map = collectRequestParameters(request);
+        if (StringUtils.isBlank(MapUtils.getString(map,"unitName"))) {
             throw new ObjectException("unitName不能为空");
         }
-        return tenantService.pageListTenants(unitName, pageDesc);
+        if (StringUtils.isNotBlank(MapUtils.getString(map,"otherTenant"))){
+            map.put("userCode",WebOptUtils.getCurrentUserCode(request));
+        }
+        return tenantService.pageListTenants(map, pageDesc);
 
     }
 

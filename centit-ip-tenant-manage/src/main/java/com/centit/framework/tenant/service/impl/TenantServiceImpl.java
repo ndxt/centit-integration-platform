@@ -1,6 +1,8 @@
 package com.centit.framework.tenant.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryCache;
@@ -32,6 +34,7 @@ import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.tenant.service.TenantService;
 import com.centit.framework.tenant.vo.TenantMemberApplyVo;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
@@ -616,8 +619,8 @@ public class TenantServiceImpl implements TenantService {
 
 
     @Override
-    public PageQueryResult pageListTenants(String unitName, PageDesc pageDesc) {
-        JSONArray jsonArray = tenantInfoDao.listTenantInfoWithOwnUserName(CollectionsOpt.createHashMap("unitName", unitName), pageDesc);
+    public PageQueryResult pageListTenants(Map<String,Object> filerMap, PageDesc pageDesc) {
+        JSONArray jsonArray = tenantInfoDao.listTenantInfoWithOwnUserName(filerMap, pageDesc);
         return PageQueryResult.createResult(jsonArray, pageDesc);
     }
 
@@ -847,68 +850,36 @@ public class TenantServiceImpl implements TenantService {
     private void extendTenantsUserRanks(Map tenantJson, List<UserUnit> userUnits) {
         String topUnit = MapUtils.getString(tenantJson, "topUnit");
         if (CollectionUtils.sizeIsEmpty(userUnits)) {
-            tenantJson.put("userRank", new ArrayList<>());
-            tenantJson.put("userRankText", new ArrayList<>());
-            tenantJson.put("deptCodes", new ArrayList<>());
-            tenantJson.put("deptNames", new ArrayList<>());
+            tenantJson.put("deptTree", new ArrayList<>());
             return;
         }
-        Set<String> unitCodes = userUnits.stream().map(UserUnit::getUnitCode).filter(unitCode->!unitCode.equals(topUnit)).collect(Collectors.toSet());
-        Set<String> deptNames = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, unitCodes).stream().map(IUnitInfo::getUnitName).collect(Collectors.toSet());
-        //部门信息
-        tenantJson.put("deptCodes", unitCodes);
-        tenantJson.put("deptNames", deptNames);
-
-        tenantJson.put("deptList", transformDeptList(userUnits,topUnit));
+        List<UnitInfo> unitInfos = CodeRepositoryUtil.getAllUnits(topUnit, "T").stream().map(iUnitInfo -> (UnitInfo) (iUnitInfo)).collect(Collectors.toList());
+        tenantJson.put("deptTree", sortUnitInfosAsTreeAttachUserRank(unitInfos,userUnits));
     }
 
-    /**
-     * 整合单位结构数据
-     *
-     * @param userUnits 用户单位关联信息
-     * @return
-     */
-    /***
-     * 整合单位结构数据
-     * @param userUnits 用户单位关联信息
-     * @param topUnit 由于userUnits中的数据有可能存在topUnit为空的情况，这里需要指定topUnit
-     * @return
-     */
-    private ArrayList<HashMap<String, Object>> transformDeptList(List<UserUnit> userUnits,String topUnit) {
-
-        ArrayList<HashMap<String, Object>> deptList = new ArrayList<>();
-        int keyIndex;
-        for (UserUnit userUnit : userUnits) {
-            HashMap<String, Object> deptListMap = new HashMap<>();
-            List<HashMap<String,Object>> userRankList = new ArrayList();
-            keyIndex = findMapListKeyIndex(deptList,"deptCode", userUnit.getUnitCode());
-            if (keyIndex>-1){
-                deptListMap = deptList.get(keyIndex);
-                Object userRankListObj = deptListMap.get("userRankList");
-                if (userRankListObj instanceof List){
-                    userRankList = (List) userRankListObj;
-                }
-            }else {
-                deptListMap.put("deptCode",userUnit.getUnitCode());
-                deptListMap.put("deptName",CodeRepositoryUtil.getUnitName(topUnit,userUnit.getUnitCode()));
-            }
-            HashMap<String, Object> userRankMap = new HashMap<>();
-            String userRank = userUnit.getUserRank();
-            if (findMapListKeyIndex(userRankList,"userRank",userRank)==-1){
-                userRankMap.put("userUnitId",userUnit.getUserUnitId());
-                IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", userRank,userUnit.getTopUnit());
-                userRankMap.put("userRank",userRank);
+    private  JSONObject appendUserRank(IUnitInfo unitInfo,List<UserUnit> userUnits){
+        if(unitInfo==null){
+            return null;
+        }
+        JSONObject json = (JSONObject) JSON.toJSON(unitInfo);
+        List<UserUnit> userUnitMatch = userUnits.stream().filter(un -> json.getString("unitCode").equals(un.getUnitCode())).collect(Collectors.toList());
+        if (CollectionUtils.sizeIsEmpty(userUnitMatch)){
+            return json;
+        }
+        List<HashMap<String,Object>> userRankList=null;
+        for (UserUnit unitMatch : userUnitMatch) {
+            userRankList=null == json.get("userRankList")? new ArrayList<>():(List<HashMap<String, Object>>) json.get("userRankList");
+            if (findMapListKeyIndex(userRankList, "userRank", unitMatch.getUserRank())==-1){
+                HashMap<String, Object> userRankMap = new HashMap<>();
+                userRankMap.put("userUnitId",unitMatch.getUserUnitId());
+                IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", unitMatch.getUserRank(),unitMatch.getTopUnit());
+                userRankMap.put("userRank",unitMatch.getUserRank());
                 userRankMap.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
                 userRankList.add(userRankMap);
-                deptListMap.put("userRankList", userRankList);
-            }
-            if (keyIndex==-1){
-                deptList.add(deptListMap);
-            }else {
-                deptList.set(keyIndex,deptListMap);
             }
         }
-        return deptList;
+        json.put("userRankList",userRankList);
+        return json;
     }
 
     private int findMapListKeyIndex(List<HashMap<String, Object>> mapList,String key,String value) {
@@ -1484,5 +1455,38 @@ public class TenantServiceImpl implements TenantService {
         for (String cacheName : cacheNames) {
             CodeRepositoryCache.evictCache(cacheName);
         }
+    }
+
+    private JSONArray sortUnitInfosAsTreeAttachUserRank(List<UnitInfo> listObjects, List<UserUnit> userUnits) {
+        JSONArray unitInfoJsonArray = (JSONArray) JSON.toJSON(listObjects);
+        Iterator<Object> iterator = unitInfoJsonArray.iterator();
+        while (iterator.hasNext()) {
+            JSONObject unitInfoJsonObject = (JSONObject) iterator.next();
+            if (StringBaseOpt.isNvl(unitInfoJsonObject.getString("parentUnit")) || "0".equals(unitInfoJsonObject.getString("parentUnit"))) {
+                continue;
+            }
+            for (Object o : unitInfoJsonArray) {
+                JSONObject opt = (JSONObject) o;
+                if (opt.getString("unitCode").equals(unitInfoJsonObject.getString("parentUnit"))) {
+                    JSONArray children = opt.getJSONArray("children");
+                    JSONObject jsonObject = appendUserRank(JSON.toJavaObject(unitInfoJsonObject, IUnitInfo.class), userUnits);
+                    unitInfoJsonObject.put("userRankList",jsonObject.getJSONArray("userRankList"));
+                    children.add(unitInfoJsonObject);
+                    break;
+                }
+            }
+        }
+        // 获取顶级的父级菜单
+        JSONArray jsonArray = new JSONArray();
+        for (Object o : unitInfoJsonArray) {
+            JSONObject opt = (JSONObject) o;
+            if (StringBaseOpt.isNvl(opt.getString("parentUnit")) || "0".equals(opt.getString("parentUnit"))) {
+                IUnitInfo iUnitInfo = JSON.toJavaObject(opt, IUnitInfo.class);
+                JSONObject jsonObject = appendUserRank(iUnitInfo, userUnits);
+                opt.put("userRankList",jsonObject.getJSONArray("userRankList"));
+                jsonArray.add(opt);
+            }
+        }
+        return jsonArray;
     }
 }

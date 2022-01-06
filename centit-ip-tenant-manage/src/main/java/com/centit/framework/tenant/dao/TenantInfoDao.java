@@ -10,6 +10,7 @@ import com.centit.support.database.orm.OrmDaoUtils;
 import com.centit.support.database.utils.PageDesc;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.stereotype.Repository;
@@ -35,8 +36,14 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
      * @return
      */
     public JSONArray listTenantInfoWithOwnUserName(Map<String,Object> filterMap,PageDesc pageDesc){
-        String sql = " SELECT A.TOP_UNIT, A.UNIT_NAME, A.OWN_USER, B.USER_NAME FROM F_TENANT_INFO A JOIN  F_USERINFO B ON A.OWN_USER = B.USER_CODE WHERE   A.IS_AVAILABLE = 'T' [:(LIKE)unitName | AND A.UNIT_NAME LIKE :unitName ] order by A.UNIT_NAME ";
+        String sql = " SELECT A.TOP_UNIT, A.UNIT_NAME, A.OWN_USER, B.USER_NAME " +
+            " FROM F_TENANT_INFO A JOIN  F_USERINFO B ON A.OWN_USER = B.USER_CODE " +
+            " WHERE   A.IS_AVAILABLE = 'T' [:(LIKE)unitName | AND A.UNIT_NAME LIKE :unitName ] " +
+            "[ :otherTenant | AND A.top_unit not in ( SELECT DISTINCT b_1.TOP_UNIT FROM f_userunit a_1 join f_unitinfo b_1  on a_1.TOP_UNIT = b_1.TOP_UNIT WHERE a_1.USER_CODE = :userCode  ) ] order by A.UNIT_NAME ";
         QueryAndNamedParams qap = QueryUtils.translateQuery(sql, filterMap);
+        if (StringUtils.isNotBlank(MapUtils.getString(filterMap,"otherTenant"))){
+            qap.addParam("userCode",MapUtils.getString(filterMap,"userCode"));
+        }
         return DatabaseOptUtils.listObjectsByNamedSqlAsJson(this, qap.getQuery(), qap.getParams(), pageDesc);
     }
 
