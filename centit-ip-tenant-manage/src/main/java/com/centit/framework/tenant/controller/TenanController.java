@@ -485,7 +485,7 @@ public class TenanController extends BaseController {
         paramsMap.put("appKey", wxAppConfig.getAppID());
         UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
         //微信用户名
-        jsonObject.put("weChatName", null == userPlat.getWeChatName()?"":userPlat.getWeChatName());
+        jsonObject.put("weChatName", null == userPlat?"":userPlat.getWeChatName());
         return jsonObject;
     }
 
