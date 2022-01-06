@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,10 +91,11 @@ public class WeChatLogin extends BaseController {
      * @return
      */
     @GetMapping("/qrUserInfo")
-    @WrapUpResponseBody
-    public ResponseData qrUserInfo(@RequestParam("code") String code,
+    public String qrUserInfo(@RequestParam("code") String code,
                                    @RequestParam("state") String state,
-                                   HttpServletRequest request) {
+                                   @RequestParam("returnUrl") String returnUrl,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) throws IOException {
         WxMpUser wxMpUser = this.getWxUser(code);
         //从token中获取openid
         String openId = wxMpUser.getOpenId();
@@ -108,13 +110,13 @@ public class WeChatLogin extends BaseController {
         if(userPlat != null){
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
             SecurityContextHolder.getContext().setAuthentication(ud);
-            resultMap.put("userInfo", ud);
-            resultMap.put("userCode", userPlat.getUserCode());
-            resultMap.put("accessToken", request.getSession().getId());
-            return ResponseData.makeResponseData(resultMap);
-        }else{
-            return ResponseData.makeErrorMessage("获取系统用户信息失败");
         }
+        if(returnUrl != null && returnUrl.indexOf("?")>-1){
+            returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
+        }else{
+            returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
+        }
+        return "redirect:" + returnUrl;
     }
 
     /**
@@ -137,15 +139,7 @@ public class WeChatLogin extends BaseController {
         paramsMap.put("appKey", wxAppConfig.getAppID());
         UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
         if(userPlat != null){
-            userPlat.setUnionId(unionId);
-            userPlat.setUserId(openId);
-            //微信平台
-            userPlat.setPlatId("2");
-            userPlat.setCorpId("");
-            userPlat.setAppKey(wxAppConfig.getAppID());
-            userPlat.setAppSecret(wxAppConfig.getAppSecret());
-            userPlat.setWeChatName(weChatName);
-            userPlatService.updateUserPlat(userPlat);
+            return ResponseData.makeErrorMessage("微信账号已绑定，请勿重复绑定！");
         }else{
             CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
             if (null != userDetails) {

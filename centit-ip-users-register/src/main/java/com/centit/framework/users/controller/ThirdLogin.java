@@ -54,12 +54,13 @@ public class ThirdLogin {
     @GetMapping(value = "/login")
     public void qrAuthorize(@RequestParam("type") String type,
                             @RequestParam("userCode") String userCode,
+                            @RequestParam("returnUrl") String returnUrl,
                             HttpServletResponse response) throws IOException {
         String url = "";
         String authorizeUrl = "";
         if(WECHAT_LOGIN.equals(type)){
             //微信登录
-            url = wxAppConfig.getRedirectLoginUri();
+            url = wxAppConfig.getRedirectLoginUri() + "?returnUrl=" + returnUrl;
             authorizeUrl = wxOpenService.buildQrConnectUrl(url, WxConsts.QRCONNECT_SCOPE_SNSAPI_LOGIN, "");
         }else if(WECHAT_BIND.equals(type)){
             //微信账号绑定

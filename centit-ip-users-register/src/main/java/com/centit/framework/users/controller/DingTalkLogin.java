@@ -82,7 +82,6 @@ public class DingTalkLogin extends BaseController {
      * @throws ApiException
      */
     @GetMapping(value = "/getUserInfo")
-    @WrapUpResponseBody
     public ResponseData getUserInfo(@RequestParam("code") String code, @RequestParam("state") String state,
                                     HttpServletRequest request) throws ApiException {
         //获取access_token
@@ -164,6 +163,78 @@ public class DingTalkLogin extends BaseController {
             }
         }
         return ResponseData.makeResponseData(resultMap);
+    }
+
+    /**
+     * 绑定钉钉用户
+     * @param code
+     * @param userCode
+     * @param request
+     * @return
+     * @throws ApiException
+     */
+    @GetMapping(value = "/bindUserInfo")
+    @WrapUpResponseBody
+    public ResponseData bindUserInfo(@RequestParam("code") String code,
+                                    @RequestParam("userCode") String userCode,
+                                    HttpServletRequest request) throws ApiException {
+
+        if(userCode == null || "".equals(userCode)){
+            return ResponseData.makeErrorMessage("userCode为空");
+        }
+        //获取access_token
+        String accessToken = "";
+        ResponseData accessTokenData = tokenService.getAccessToken();
+        if (accessTokenData.getCode() != 0) {
+            return ResponseData.makeErrorMessage(accessTokenData.getCode(), accessTokenData.getMessage());
+        }
+        accessToken = accessTokenData.getData().toString();
+
+        if (StringUtils.isBlank(accessToken)) {
+            return ResponseData.makeErrorMessage("获取钉钉access_token失败");
+        }
+
+        //获取用户unionid
+        ResponseData unionIdData = dingTalkLoginService.getUserByCode(code);
+        if (unionIdData.getCode() != 0) {
+            return ResponseData.makeErrorMessage(unionIdData.getCode(), unionIdData.getMessage());
+        }
+        String unionid = unionIdData.getData().toString();
+
+        //根据unionid获取userid
+        ResponseData userIdData = dingTalkLoginService.getUserByUnionId(accessToken, unionid);
+        if (userIdData.getCode() != 0) {
+            return ResponseData.makeErrorMessage(userIdData.getCode(), userIdData.getMessage());
+        }
+        String userId = userIdData.getData().toString();
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("userId", userId);
+        paramsMap.put("corpId", appConfig.getCorpId());
+        paramsMap.put("appKey", appConfig.getAppKey());
+        paramsMap.put("appSecret", appConfig.getAppSecret());
+        UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
+        if(userPlat != null){
+            return ResponseData.makeErrorMessage("钉钉账号已绑定，请勿重复绑定！");
+        }else{
+            CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
+            if (null != userDetails) {
+                UserPlat newUser = new UserPlat();
+                newUser.setUserCode(userDetails.getUserCode());
+                Map<String, Object> platMap = new HashMap<>();
+                platMap.put("corpId", appConfig.getCorpId());
+                Platform platform = platformService.getPlatformByProperties(platMap);
+                if (null != platform) {
+                    newUser.setPlatId(platform.getPlatId());
+                }
+                newUser.setCorpId(appConfig.getCorpId());
+                newUser.setAppKey(appConfig.getAppKey());
+                newUser.setAppSecret(appConfig.getAppSecret());
+                newUser.setUnionId(unionid);
+                newUser.setUserId(userId);
+                userPlatService.saveUserPlat(newUser);
+            }
+        }
+        return ResponseData.successResponse;
     }
 
     private String getAccessToken() {
