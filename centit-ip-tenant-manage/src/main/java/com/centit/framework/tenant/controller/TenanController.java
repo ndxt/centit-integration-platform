@@ -19,6 +19,9 @@ import com.centit.framework.tenant.vo.TenantMemberQo;
 import com.centit.framework.tenant.po.TenantBusinessLog;
 import com.centit.framework.tenant.po.TenantInfo;
 import com.centit.framework.tenant.po.TenantMemberApply;
+import com.centit.framework.users.config.WxAppConfig;
+import com.centit.framework.users.po.UserPlat;
+import com.centit.framework.users.service.UserPlatService;
 import com.centit.support.common.ObjectException;
 import com.centit.support.common.ParamName;
 import com.centit.support.database.utils.PageDesc;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +55,12 @@ public class TenanController extends BaseController {
 
     @Autowired
     protected PlatformEnvironment platformEnvironment;
+
+    @Autowired
+    private WxAppConfig wxAppConfig;
+
+    @Autowired
+    private UserPlatService userPlatService;
 
     public String getOptId() {
         return "TENANMAG";
@@ -465,6 +475,13 @@ public class TenanController extends BaseController {
         JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(ud));
         List<Map> userTenants = tenantService.userTenants(userCode);
         jsonObject.put("userTenants", userTenants);
+        //获取微信用户信息
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("userCode", userCode);
+        paramsMap.put("appKey", wxAppConfig.getAppID());
+        UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
+        //微信用户名
+        jsonObject.put("weChatName", userPlat.getWeChatName());
         return jsonObject;
     }
 
