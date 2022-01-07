@@ -850,11 +850,15 @@ public class TenantServiceImpl implements TenantService {
     private void extendTenantsUserRanks(Map tenantJson, List<UserUnit> userUnits) {
         String topUnit = MapUtils.getString(tenantJson, "topUnit");
         if (CollectionUtils.sizeIsEmpty(userUnits)) {
-            tenantJson.put("deptTree", new ArrayList<>());
+            tenantJson.put("deptTree", null);
             return;
         }
-        List<UnitInfo> unitInfos = CodeRepositoryUtil.getAllUnits(topUnit, "T").stream().map(iUnitInfo -> (UnitInfo) (iUnitInfo)).collect(Collectors.toList());
-        tenantJson.put("deptTree", sortUnitInfosAsTreeAttachUserRank(unitInfos,userUnits));
+        //只获取userUnits及其上级部门的 单位信息
+        List<String> unitCodes = userUnits.stream().map(UserUnit::getUnitCode).collect(Collectors.toList());
+        List<UnitInfo> simpleUnitInfos = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, unitCodes).stream().filter(ui -> StringUtils.isNotBlank(ui.getUnitPath()))
+            .flatMap(ui -> Arrays.stream(ui.getUnitPath().split("/"))).filter(StringUtils::isNotBlank).distinct().
+                map(unitCode -> (UnitInfo)CodeRepositoryUtil.getUnitInfoByCode(topUnit, unitCode)).filter(Objects::nonNull).collect(Collectors.toList());
+        tenantJson.put("deptTree", sortUnitInfosAsTreeAttachUserRank(simpleUnitInfos,userUnits));
     }
 
     private  JSONObject appendUserRank(IUnitInfo unitInfo,List<UserUnit> userUnits){
@@ -1029,6 +1033,7 @@ public class TenantServiceImpl implements TenantService {
         unitInfo.setUnitShortName(tenantInfo.getUnitName());
         unitInfo.setUnitOrder(1L);
         unitInfo.setUnitType("T");
+        unitInfo.setUnitPath("/"+tenantInfo.getTopUnit());
         unitInfoDao.saveNewObject(unitInfo);
         return unitInfo;
     }
@@ -1457,7 +1462,7 @@ public class TenantServiceImpl implements TenantService {
         }
     }
 
-    private JSONArray sortUnitInfosAsTreeAttachUserRank(List<UnitInfo> listObjects, List<UserUnit> userUnits) {
+    private JSONObject sortUnitInfosAsTreeAttachUserRank(List<UnitInfo> listObjects, List<UserUnit> userUnits) {
         JSONArray unitInfoJsonArray = (JSONArray) JSON.toJSON(listObjects);
         Iterator<Object> iterator = unitInfoJsonArray.iterator();
         while (iterator.hasNext()) {
@@ -1477,16 +1482,15 @@ public class TenantServiceImpl implements TenantService {
             }
         }
         // 获取顶级的父级菜单
-        JSONArray jsonArray = new JSONArray();
         for (Object o : unitInfoJsonArray) {
             JSONObject opt = (JSONObject) o;
             if (StringBaseOpt.isNvl(opt.getString("parentUnit")) || "0".equals(opt.getString("parentUnit"))) {
                 IUnitInfo iUnitInfo = JSON.toJavaObject(opt, IUnitInfo.class);
                 JSONObject jsonObject = appendUserRank(iUnitInfo, userUnits);
                 opt.put("userRankList",jsonObject.getJSONArray("userRankList"));
-                jsonArray.add(opt);
+                return opt;
             }
         }
-        return jsonArray;
+        return null;
     }
 }
