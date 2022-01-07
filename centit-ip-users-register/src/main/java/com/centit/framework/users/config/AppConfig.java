@@ -23,6 +23,9 @@ public class AppConfig {
     @Value("${dingtalk.redirect_uri}")
     private String redirectUri;
 
+    @Value("${dingtalk.redirect_binduri}")
+    private String redirectBindUri;
+
     public String getAppKey() {
         return appKey;
     }
@@ -61,5 +64,13 @@ public class AppConfig {
 
     public void setRedirectUri(String redirectUri) {
         this.redirectUri = redirectUri;
+    }
+
+    public String getRedirectBindUri() {
+        return redirectBindUri;
+    }
+
+    public void setRedirectBindUri(String redirectBindUri) {
+        this.redirectBindUri = redirectBindUri;
     }
 }

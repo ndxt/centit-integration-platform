@@ -158,7 +158,7 @@ public class DingTalkLogin extends BaseController {
                 userPlatService.saveUserPlat(newUser);
             }
         }
-        if(returnUrl != null && returnUrl.indexOf("?")>-1){
+        if(returnUrl != null && returnUrl.contains("?")){
             returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
         }else{
             returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
@@ -178,37 +178,37 @@ public class DingTalkLogin extends BaseController {
      * @throws ApiException
      */
     @GetMapping(value = "/bindUserInfo")
-    @WrapUpResponseBody
-    public ResponseData bindUserInfo(@RequestParam("code") String code,
-                                    @RequestParam("userCode") String userCode,
-                                    HttpServletRequest request) throws ApiException {
+    public String bindUserInfo(@RequestParam("code") String code,
+                               @RequestParam("userCode") String userCode,
+                               @RequestParam("returnUrl") String returnUrl,
+                               HttpServletRequest request) throws ApiException {
 
         if(userCode == null || "".equals(userCode)){
-            return ResponseData.makeErrorMessage("userCode为空");
+            throw new ObjectException("500", "userCode为空");
         }
         //获取access_token
         String accessToken = "";
         ResponseData accessTokenData = tokenService.getAccessToken();
         if (accessTokenData.getCode() != 0) {
-            return ResponseData.makeErrorMessage(accessTokenData.getCode(), accessTokenData.getMessage());
+            throw new ObjectException(accessTokenData.getCode(), accessTokenData.getMessage());
         }
         accessToken = accessTokenData.getData().toString();
 
         if (StringUtils.isBlank(accessToken)) {
-            return ResponseData.makeErrorMessage("获取钉钉access_token失败");
+            throw new ObjectException("500", "获取钉钉access_token失败");
         }
 
         //获取用户unionid
         ResponseData unionIdData = dingTalkLoginService.getUserByCode(code);
         if (unionIdData.getCode() != 0) {
-            return ResponseData.makeErrorMessage(unionIdData.getCode(), unionIdData.getMessage());
+            throw new ObjectException(unionIdData.getCode(), unionIdData.getMessage());
         }
         String unionid = unionIdData.getData().toString();
 
         //根据unionid获取userid
         ResponseData userIdData = dingTalkLoginService.getUserByUnionId(accessToken, unionid);
         if (userIdData.getCode() != 0) {
-            return ResponseData.makeErrorMessage(userIdData.getCode(), userIdData.getMessage());
+            throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
         }
         String userId = userIdData.getData().toString();
         Map<String, Object> paramsMap = new HashMap<>();
@@ -218,7 +218,7 @@ public class DingTalkLogin extends BaseController {
         paramsMap.put("appSecret", appConfig.getAppSecret());
         UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
         if(userPlat != null){
-            return ResponseData.makeErrorMessage("钉钉账号已绑定，请勿重复绑定！");
+            throw new ObjectException("500", "钉钉账号已绑定，请勿重复绑定！");
         }else{
             CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
             if (null != userDetails) {
@@ -238,7 +238,16 @@ public class DingTalkLogin extends BaseController {
                 userPlatService.saveUserPlat(newUser);
             }
         }
-        return ResponseData.successResponse;
+        if (returnUrl != null && returnUrl.contains("?")) {
+            returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
+        } else {
+            returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
+        }
+        //占位符 替换成/#/(特殊字符)
+        if (returnUrl != null && returnUrl.indexOf("/A/") > -1) {
+            returnUrl = returnUrl.replace("/A/", "/#/");
+        }
+        return "redirect:" + returnUrl;
     }
 
     private String getAccessToken() {
