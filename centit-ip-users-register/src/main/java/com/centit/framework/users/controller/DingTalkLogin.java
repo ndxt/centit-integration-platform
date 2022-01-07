@@ -1,36 +1,24 @@
 package com.centit.framework.users.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.dto.DingUnitDTO;
 import com.centit.framework.users.dto.DingUserDTO;
-import com.centit.framework.users.po.Platform;
-import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.DingTalkLoginService;
-import com.centit.framework.users.service.PlatformService;
 import com.centit.framework.users.service.TokenService;
-import com.centit.framework.users.service.UserPlatService;
-import com.centit.support.common.ObjectException;
-import com.taobao.api.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author zfg
@@ -49,15 +37,6 @@ public class DingTalkLogin extends BaseController {
     @Autowired
     private DingTalkLoginService dingTalkLoginService;
 
-    @Autowired
-    private UserPlatService userPlatService;
-
-    @Autowired
-    private PlatformEnvironment platformEnvironment;
-
-    @Autowired
-    private PlatformService platformService;
-
     @ApiOperation(value = "钉钉二维码登录", notes = "钉钉二维码登录。")
     @GetMapping(value = "/qrconnect")
     public void qrConnect(HttpServletResponse response) throws IOException {
@@ -72,182 +51,6 @@ public class DingTalkLogin extends BaseController {
         String authorizeUrl = UrlConstant.URL_GET_SNSCONNECT + "?appid=" + appConfig.getAppKey() + "&response_type=code" +
             "&scope=snsapi_login&redirect_uri=" + appConfig.getRedirectUri();
         response.sendRedirect(authorizeUrl);
-    }
-
-    /**
-     * 登录回调获取授权用户的个人信息
-     *
-     * @param code  授权码
-     * @param state
-     * @return
-     * @throws ApiException
-     */
-    @GetMapping(value = "/getUserInfo")
-    public String getUserInfo(@RequestParam("code") String code,
-                              @RequestParam("state") String state,
-                              @RequestParam("returnUrl") String returnUrl,
-                              HttpServletRequest request) throws ApiException {
-        //获取access_token
-        String accessToken = "";
-        ResponseData accessTokenData = tokenService.getAccessToken();
-        if (accessTokenData.getCode() != 0) {
-            throw new ObjectException(accessTokenData.getCode(), accessTokenData.getMessage());
-        }
-        accessToken = accessTokenData.getData().toString();
-
-        if (StringUtils.isBlank(accessToken)) {
-            throw new ObjectException(accessTokenData.getCode(), "获取钉钉access_token失败");
-        }
-
-        //获取用户unionid
-        ResponseData unionIdData = dingTalkLoginService.getUserByCode(code);
-        if (unionIdData.getCode() != 0) {
-            throw new ObjectException(unionIdData.getCode(), unionIdData.getMessage());
-        }
-        String unionid = unionIdData.getData().toString();
-
-        //根据unionid获取userid
-        ResponseData userIdData = dingTalkLoginService.getUserByUnionId(accessToken, unionid);
-        if (userIdData.getCode() != 0) {
-            throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
-        }
-        String userId = userIdData.getData().toString();
-
-        //根据userId获取用户详情
-        ResponseData userInfoData = dingTalkLoginService.getUserInfo(accessToken, userId);
-        if (userInfoData.getCode() != 0) {
-            throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
-        }
-        JSONObject jsonObject = JSONObject.parseObject(userInfoData.getData().toString());
-        String regPhone = "";
-        if (null != jsonObject) {
-            JSONObject userObject = JSONObject.parseObject(jsonObject.getString("result"));
-            if (null != userObject) {
-                regPhone = userObject.getString("mobile");
-            }
-        }
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("userId", userId);
-        paramsMap.put("corpId", appConfig.getCorpId());
-        paramsMap.put("appKey", appConfig.getAppKey());
-        paramsMap.put("appSecret", appConfig.getAppSecret());
-        UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-        if (null != userPlat) {
-            userPlat.setUnionId(unionid);
-            userPlatService.updateUserPlat(userPlat);
-            CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
-            SecurityContextHolder.getContext().setAuthentication(ud);
-        } else if (userPlat == null && StringUtils.isNotBlank(regPhone)) {
-            //通过手机号获取用户信息,保存至userPlat表，下次登录直接查询userPlat
-            CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByRegCellPhone(regPhone);
-            if (null != userDetails) {
-                SecurityContextHolder.getContext().setAuthentication(userDetails);
-                UserPlat newUser = new UserPlat();
-                newUser.setUserCode(userDetails.getUserCode());
-                Map<String, Object> platMap = new HashMap<>();
-                platMap.put("corpId", appConfig.getCorpId());
-                Platform platform = platformService.getPlatformByProperties(platMap);
-                if (null != platform) {
-                    newUser.setPlatId(platform.getPlatId());
-                }
-                newUser.setCorpId(appConfig.getCorpId());
-                newUser.setAppKey(appConfig.getAppKey());
-                newUser.setAppSecret(appConfig.getAppSecret());
-                newUser.setUnionId(unionid);
-                newUser.setUserId(userId);
-                userPlatService.saveUserPlat(newUser);
-            }
-        }
-        if(returnUrl != null && returnUrl.contains("?")){
-            returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
-        }else{
-            returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
-        }
-        if(returnUrl != null && returnUrl.indexOf("/A/")>-1){
-            returnUrl = returnUrl.replace("/A/", "/#/");
-        }
-        return "redirect:" + returnUrl;
-    }
-
-    /**
-     * 绑定钉钉用户
-     * @param code
-     * @param userCode
-     * @param request
-     * @return
-     * @throws ApiException
-     */
-    @GetMapping(value = "/bindUserInfo")
-    public String bindUserInfo(@RequestParam("code") String code,
-                               @RequestParam("userCode") String userCode,
-                               @RequestParam("returnUrl") String returnUrl,
-                               HttpServletRequest request) throws ApiException {
-
-        if(userCode == null || "".equals(userCode)){
-            throw new ObjectException("500", "userCode为空");
-        }
-        //获取access_token
-        String accessToken = "";
-        ResponseData accessTokenData = tokenService.getAccessToken();
-        if (accessTokenData.getCode() != 0) {
-            throw new ObjectException(accessTokenData.getCode(), accessTokenData.getMessage());
-        }
-        accessToken = accessTokenData.getData().toString();
-
-        if (StringUtils.isBlank(accessToken)) {
-            throw new ObjectException("500", "获取钉钉access_token失败");
-        }
-
-        //获取用户unionid
-        ResponseData unionIdData = dingTalkLoginService.getUserByCode(code);
-        if (unionIdData.getCode() != 0) {
-            throw new ObjectException(unionIdData.getCode(), unionIdData.getMessage());
-        }
-        String unionid = unionIdData.getData().toString();
-
-        //根据unionid获取userid
-        ResponseData userIdData = dingTalkLoginService.getUserByUnionId(accessToken, unionid);
-        if (userIdData.getCode() != 0) {
-            throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
-        }
-        String userId = userIdData.getData().toString();
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("userId", userId);
-        paramsMap.put("corpId", appConfig.getCorpId());
-        paramsMap.put("appKey", appConfig.getAppKey());
-        paramsMap.put("appSecret", appConfig.getAppSecret());
-        UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-        if(userPlat != null){
-            throw new ObjectException("500", "钉钉账号已绑定，请勿重复绑定！");
-        }else{
-            CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
-            if (null != userDetails) {
-                UserPlat newUser = new UserPlat();
-                newUser.setUserCode(userDetails.getUserCode());
-                Map<String, Object> platMap = new HashMap<>();
-                platMap.put("corpId", appConfig.getCorpId());
-                Platform platform = platformService.getPlatformByProperties(platMap);
-                if (null != platform) {
-                    newUser.setPlatId(platform.getPlatId());
-                }
-                newUser.setCorpId(appConfig.getCorpId());
-                newUser.setAppKey(appConfig.getAppKey());
-                newUser.setAppSecret(appConfig.getAppSecret());
-                newUser.setUnionId(unionid);
-                newUser.setUserId(userId);
-                userPlatService.saveUserPlat(newUser);
-            }
-        }
-        if (returnUrl != null && returnUrl.contains("?")) {
-            returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
-        } else {
-            returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
-        }
-        //占位符 替换成/#/(特殊字符)
-        if (returnUrl != null && returnUrl.indexOf("/A/") > -1) {
-            returnUrl = returnUrl.replace("/A/", "/#/");
-        }
-        return "redirect:" + returnUrl;
     }
 
     private String getAccessToken() {

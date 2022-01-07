@@ -20,10 +20,10 @@ public class AppConfig {
     @Value("${dingtalk.corp_id}")
     private String corpId;
 
-    @Value("${dingtalk.redirect_uri}")
+    @Value("${third.redirect_uri}")
     private String redirectUri;
 
-    @Value("${dingtalk.redirect_binduri}")
+    @Value("${third.redirect_binduri}")
     private String redirectBindUri;
 
     public String getAppKey() {

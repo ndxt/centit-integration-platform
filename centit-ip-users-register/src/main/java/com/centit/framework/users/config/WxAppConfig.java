@@ -12,10 +12,10 @@ public class WxAppConfig {
     @Value("${wechat.appsecret}")
     private String appSecret;
 
-    @Value("${wechat.redirectloginuri}")
+    @Value("${third.redirect_uri}")
     private String redirectLoginUri;
 
-    @Value("${wechat.redirectbinduri}")
+    @Value("${third.redirect_binduri}")
     private String redirectBindUri;
 
     public String getAppID() {

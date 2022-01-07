@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
+import me.chanjar.weixin.common.util.http.URIUtil;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
@@ -105,63 +106,30 @@ public class ThirdLogin {
         String authorizeUrl = "";
         if(WECHAT_LOGIN.equals(type)){
             //微信登录
-            url = wxAppConfig.getRedirectLoginUri() + "?returnUrl=" + returnUrl;
+            //url = wxAppConfig.getRedirectLoginUri() + "?returnUrl=" + returnUrl;
+            url = wxAppConfig.getRedirectLoginUri() + "?type=" + type + "&returnUrl=" + returnUrl;
             authorizeUrl = wxOpenService.buildQrConnectUrl(url, WxConsts.QRCONNECT_SCOPE_SNSAPI_LOGIN, "");
         }else if(WECHAT_BIND.equals(type)){
             //微信账号绑定
             if(userCode == null || "".equals(userCode)){
                 throw new ObjectException("缺少参数userCode;");
             }
-            url = wxAppConfig.getRedirectBindUri() + "?returnUrl=" + returnUrl + "&userCode=" + userCode;
+            url = wxAppConfig.getRedirectBindUri() + "?type=" + type + "&returnUrl=" + returnUrl + "&userCode=" + userCode;
             authorizeUrl = wxOpenService.buildQrConnectUrl(url, WxConsts.QRCONNECT_SCOPE_SNSAPI_LOGIN, "");
         }else if(DING_LOGIN.equals(type)){
             //钉钉登陆页面
+            url = URIUtil.encodeURIComponent(appConfig.getRedirectUri() + "?type=" + type + "&returnUrl=" + returnUrl);
             authorizeUrl = UrlConstant.URL_GET_QRCONNECT + "?appid=" + appConfig.getAppKey() + "&response_type=code" +
-                "&scope=snsapi_login&redirect_uri=" + appConfig.getRedirectUri() + "?returnUrl=" + returnUrl;
+                "&scope=snsapi_login&redirect_uri=" + url;
         }else if(DING_BIND.equals(type)){
-            //钉钉绑定页面
+            //钉钉账号绑定
+            if(userCode == null || "".equals(userCode)){
+                throw new ObjectException("缺少参数userCode;");
+            }
+            url = URIUtil.encodeURIComponent(appConfig.getRedirectBindUri() + "?type=" + type + "&returnUrl=" + returnUrl + "&userCode=" + userCode);
             authorizeUrl = UrlConstant.URL_GET_QRCONNECT + "?appid=" + appConfig.getAppKey() + "&response_type=code" +
-                "&scope=snsapi_login&redirect_uri=" + appConfig.getRedirectBindUri() + "?returnUrl=" + returnUrl;
+                "&scope=snsapi_login&redirect_uri=" + url;
         }
-        response.sendRedirect(authorizeUrl);
-    }
-
-    @ApiOperation(value = "微信、钉钉、QQ二维码登录/绑定", notes = "微信、钉钉、QQ二维码登录/绑定")
-    @ApiImplicitParams({
-        @ApiImplicitParam(
-            name = "type", value = "请求类型;登录:wx;绑定:wxBind;钉钉:ding",
-            required = true, paramType = "body", dataType = "String"),
-        @ApiImplicitParam(
-            name = "userCode", value = "用户名,类型为bind时,不可为空",
-            required = true, paramType = "body", dataType = "String")
-    })
-    @GetMapping(value = "/thirdLogin")
-    public void thirdLogin(@RequestParam("type") String type,
-                            @RequestParam("userCode") String userCode,
-                            @RequestParam("returnUrl") String returnUrl,
-                            HttpServletResponse response) throws IOException {
-        String url = "";
-        String authorizeUrl = "";
-        if(WECHAT_LOGIN.equals(type)){
-            //微信登录
-            url = wxAppConfig.getRedirectLoginUri() + "?type=" + WECHAT_LOGIN + "&returnUrl=" + returnUrl;
-            authorizeUrl = wxOpenService.buildQrConnectUrl(url, WxConsts.QRCONNECT_SCOPE_SNSAPI_LOGIN, "");
-        }else if(WECHAT_BIND.equals(type)){
-            //微信账号绑定
-            if(userCode == null || "".equals(userCode)){
-                throw new ObjectException("缺少参数userCode;");
-            }
-            url = wxAppConfig.getRedirectBindUri() + "?type=" + WECHAT_BIND + "&returnUrl=" + returnUrl + "&userCode=" + userCode;
-            authorizeUrl = wxOpenService.buildQrConnectUrl(url, WxConsts.QRCONNECT_SCOPE_SNSAPI_LOGIN, "");
-        }else if(DING_LOGIN.equals(type)){
-            //钉钉登陆页面
-            authorizeUrl = UrlConstant.URL_GET_QRCONNECT + "?appid=" + appConfig.getAppKey() + "&response_type=code" +
-                "&scope=snsapi_login&redirect_uri=" + appConfig.getRedirectUri() + "?type=" + DING_LOGIN + "&returnUrl=" + returnUrl;
-        }else if(DING_BIND.equals(type)){
-            //钉钉绑定页面
-            authorizeUrl = UrlConstant.URL_GET_QRCONNECT + "?appid=" + appConfig.getAppKey() + "&response_type=code" +
-                "&scope=snsapi_login&redirect_uri=" + appConfig.getRedirectBindUri() + "?type=" + DING_BIND + "&returnUrl=" + returnUrl;
-        }else if(QQ_LOGIN.equals(type)){}else if(QQ_BIND.equals(type)){}
         response.sendRedirect(authorizeUrl);
     }
 
@@ -293,7 +261,7 @@ public class ThirdLogin {
                     newUser.setCorpId("");
                     newUser.setAppKey(wxAppConfig.getAppID());
                     newUser.setAppSecret(wxAppConfig.getAppSecret());
-                    newUser.setWeChatName(weChatName);
+                    newUser.setUserName(weChatName);
                     userPlatService.saveUserPlat(newUser);
                 }
             }
@@ -323,6 +291,20 @@ public class ThirdLogin {
                 throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
             }
             String userId = userIdData.getData().toString();
+
+            //根据userId获取用户详情
+            ResponseData userInfoData = dingTalkLoginService.getUserInfo(accessToken, userId);
+            if (userInfoData.getCode() != 0) {
+                throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
+            }
+            JSONObject jsonObject = JSONObject.parseObject(userInfoData.getData().toString());
+            String name = "";
+            if (null != jsonObject) {
+                JSONObject userObject = JSONObject.parseObject(jsonObject.getString("result"));
+                if (null != userObject) {
+                    name = userObject.getString("name");
+                }
+            }
             paramsMap.put("userId", userId);
             paramsMap.put("corpId", appConfig.getCorpId());
             paramsMap.put("appKey", appConfig.getAppKey());
@@ -344,6 +326,7 @@ public class ThirdLogin {
                     newUser.setAppSecret(appConfig.getAppSecret());
                     newUser.setUnionId(unionid);
                     newUser.setUserId(userId);
+                    newUser.setUserName(name);
                     userPlatService.saveUserPlat(newUser);
                 }
             }

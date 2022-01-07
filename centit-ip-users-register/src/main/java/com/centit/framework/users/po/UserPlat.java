@@ -91,15 +91,15 @@ public class UserPlat implements java.io.Serializable {
         condition = GeneratorCondition.ALWAYS, value = "today()")
     private Date updateDate;
 
+    /**
+     * 第三方用户名
+     */
+    @Column(name = "USER_NAME")
+    @ApiModelProperty(value = "微信名", name = "weChatName")
     private String userName;
 
     private String isUsed;
 
-    /**
-     * weChatName 微信名
-     */
-    @Column(name = "WECHAT_NAME")
-    @ApiModelProperty(value = "微信名", name = "weChatName")
     private String weChatName;
     //结束
 
