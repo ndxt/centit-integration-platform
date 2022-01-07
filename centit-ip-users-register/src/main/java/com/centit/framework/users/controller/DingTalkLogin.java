@@ -16,6 +16,7 @@ import com.centit.framework.users.service.DingTalkLoginService;
 import com.centit.framework.users.service.PlatformService;
 import com.centit.framework.users.service.TokenService;
 import com.centit.framework.users.service.UserPlatService;
+import com.centit.support.common.ObjectException;
 import com.taobao.api.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -82,38 +83,40 @@ public class DingTalkLogin extends BaseController {
      * @throws ApiException
      */
     @GetMapping(value = "/getUserInfo")
-    public ResponseData getUserInfo(@RequestParam("code") String code, @RequestParam("state") String state,
-                                    HttpServletRequest request) throws ApiException {
+    public String getUserInfo(@RequestParam("code") String code,
+                              @RequestParam("state") String state,
+                              @RequestParam("returnUrl") String returnUrl,
+                              HttpServletRequest request) throws ApiException {
         //获取access_token
         String accessToken = "";
         ResponseData accessTokenData = tokenService.getAccessToken();
         if (accessTokenData.getCode() != 0) {
-            return ResponseData.makeErrorMessage(accessTokenData.getCode(), accessTokenData.getMessage());
+            throw new ObjectException(accessTokenData.getCode(), accessTokenData.getMessage());
         }
         accessToken = accessTokenData.getData().toString();
 
         if (StringUtils.isBlank(accessToken)) {
-            return ResponseData.makeErrorMessage("获取钉钉access_token失败");
+            throw new ObjectException(accessTokenData.getCode(), "获取钉钉access_token失败");
         }
 
         //获取用户unionid
         ResponseData unionIdData = dingTalkLoginService.getUserByCode(code);
         if (unionIdData.getCode() != 0) {
-            return ResponseData.makeErrorMessage(unionIdData.getCode(), unionIdData.getMessage());
+            throw new ObjectException(unionIdData.getCode(), unionIdData.getMessage());
         }
         String unionid = unionIdData.getData().toString();
 
         //根据unionid获取userid
         ResponseData userIdData = dingTalkLoginService.getUserByUnionId(accessToken, unionid);
         if (userIdData.getCode() != 0) {
-            return ResponseData.makeErrorMessage(userIdData.getCode(), userIdData.getMessage());
+            throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
         }
         String userId = userIdData.getData().toString();
 
         //根据userId获取用户详情
         ResponseData userInfoData = dingTalkLoginService.getUserInfo(accessToken, userId);
         if (userInfoData.getCode() != 0) {
-            return ResponseData.makeErrorMessage(userIdData.getCode(), userIdData.getMessage());
+            throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
         }
         JSONObject jsonObject = JSONObject.parseObject(userInfoData.getData().toString());
         String regPhone = "";
@@ -123,7 +126,6 @@ public class DingTalkLogin extends BaseController {
                 regPhone = userObject.getString("mobile");
             }
         }
-        Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("userId", userId);
         paramsMap.put("corpId", appConfig.getCorpId());
@@ -135,9 +137,6 @@ public class DingTalkLogin extends BaseController {
             userPlatService.updateUserPlat(userPlat);
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
             SecurityContextHolder.getContext().setAuthentication(ud);
-            resultMap.put("userInfo", ud);
-            resultMap.put("userCode", userPlat.getUserCode());
-            resultMap.put("accessToken", request.getSession().getId());
         } else if (userPlat == null && StringUtils.isNotBlank(regPhone)) {
             //通过手机号获取用户信息,保存至userPlat表，下次登录直接查询userPlat
             CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByRegCellPhone(regPhone);
@@ -157,12 +156,17 @@ public class DingTalkLogin extends BaseController {
                 newUser.setUnionId(unionid);
                 newUser.setUserId(userId);
                 userPlatService.saveUserPlat(newUser);
-                resultMap.put("userInfo", userDetails);
-                resultMap.put("userCode", userDetails.getUserCode());
-                resultMap.put("accessToken", request.getSession().getId());
             }
         }
-        return ResponseData.makeResponseData(resultMap);
+        if(returnUrl != null && returnUrl.indexOf("?")>-1){
+            returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
+        }else{
+            returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
+        }
+        if(returnUrl != null && returnUrl.indexOf("/A/")>-1){
+            returnUrl = returnUrl.replace("/A/", "/#/");
+        }
+        return "redirect:" + returnUrl;
     }
 
     /**
