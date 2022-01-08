@@ -197,7 +197,7 @@ public class ThirdLogin {
             msg = "QQ";
         }
         if(userPlat == null){
-            returnUrl = "http://ceshi.centit.com/locode/A/login?accessToken=noUser&type=" + type;
+            returnUrl = appConfig.getRedirectLoginUrl() + "A/login?accessToken=noUser&type=" + type;
         } else {
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
             SecurityContextHolder.getContext().setAuthentication(ud);

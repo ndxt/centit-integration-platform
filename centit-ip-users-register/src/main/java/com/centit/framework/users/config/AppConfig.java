@@ -26,6 +26,9 @@ public class AppConfig {
     @Value("${third.redirect_binduri}")
     private String redirectBindUri;
 
+    @Value("${third.redirect_loginuri}")
+    private String redirectLoginUrl;
+
     public String getAppKey() {
         return appKey;
     }
@@ -72,5 +75,13 @@ public class AppConfig {
 
     public void setRedirectBindUri(String redirectBindUri) {
         this.redirectBindUri = redirectBindUri;
+    }
+
+    public String getRedirectLoginUrl() {
+        return redirectLoginUrl;
+    }
+
+    public void setRedirectLoginUrl(String redirectLoginUrl) {
+        this.redirectLoginUrl = redirectLoginUrl;
     }
 }
