@@ -200,7 +200,7 @@ public class ThirdLogin {
             msg = "QQ";
         }
         if(userPlat == null){
-            throw new ObjectException("500", "未绑定" + msg + "，暂时无法登录！");
+            throw new ObjectException(ResponseData.ERROR_BAD_REQUEST, "未绑定" + msg + "，暂时无法登录！");
         }else {
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
             SecurityContextHolder.getContext().setAuthentication(ud);
