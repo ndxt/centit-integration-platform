@@ -16,10 +16,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import me.chanjar.weixin.common.api.WxConsts;
-import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.common.util.http.URIUtil;
 import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,7 +187,6 @@ public class ThirdLogin {
                 throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
             }
             String userId = userIdData.getData().toString();
-
             paramsMap.put("userId", userId);
             paramsMap.put("corpId", appConfig.getCorpId());
             paramsMap.put("appKey", appConfig.getAppKey());
@@ -200,22 +197,22 @@ public class ThirdLogin {
             msg = "QQ";
         }
         if(userPlat == null){
-            throw new ObjectException(ResponseData.ERROR_BAD_REQUEST, "未绑定" + msg + "，暂时无法登录！");
-        }else {
+            returnUrl = URIUtil.encodeURIComponent("http://ceshi.centit.com/locode/A/login?accessToken=noUser&type=" + type);
+        } else {
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
             SecurityContextHolder.getContext().setAuthentication(ud);
+            if (returnUrl != null && returnUrl.contains("?")) {
+                returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
+            } else {
+                returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
+            }
         }
-        if (returnUrl != null && returnUrl.contains("?")) {
-            returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
-        } else {
-            returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
-        }
+
         //占位符 替换成/#/(特殊字符)
         if (returnUrl != null && returnUrl.indexOf("/A/") > -1) {
             returnUrl = returnUrl.replace("/A/", "/#/");
         }
         return "redirect:" + returnUrl;
-
     }
 
     /**
