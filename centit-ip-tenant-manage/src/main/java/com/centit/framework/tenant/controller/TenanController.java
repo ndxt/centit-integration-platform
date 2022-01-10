@@ -482,7 +482,6 @@ public class TenanController extends BaseController {
         //获取微信用户信息
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("userCode", userCode);
-        paramsMap.put("appKey", wxAppConfig.getAppID());
         List<UserPlat> userPlats = userPlatService.listObjects(paramsMap, null);
         //第三方登录信息
         jsonObject.put("userPlats", (userPlats != null && userPlats.size() > 0) ? userPlats : "");
