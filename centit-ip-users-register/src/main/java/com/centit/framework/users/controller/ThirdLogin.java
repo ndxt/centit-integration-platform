@@ -185,6 +185,7 @@ public class ThirdLogin {
             ResponseData userIdData = dingTalkLoginService.getUserByUnionId(accessToken, unionid);
             if (userIdData.getCode() != 0) {
                 throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
+                //returnUrl = appConfig.getRedirectLoginUrl() + "A/login?accessToken=noUser&type=" + type;
             }
             String userId = userIdData.getData().toString();
             paramsMap.put("userId", userId);

@@ -48,7 +48,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             response = client.execute(request, appConfig.getAppKey(), appConfig.getAppSecret());
         } catch (ApiException e) {
             logger.error("Failed to {}", UrlConstant.URL_GET_USER_BYCODE, e);
-            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to getUserByCode: " + e.getErrMsg());
+            return ResponseData.makeErrorMessage("Failed to getUserByCode: " + e.getErrMsg());
         }
         if (!response.isSuccess()) {
             return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
@@ -73,7 +73,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             response = client.execute(request, accessToken);
         } catch (ApiException e) {
             logger.error("Failed to {}", UrlConstant.URL_USER_GET, e);
-            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to getUserByUnionId: " + e.getErrMsg());
+            return ResponseData.makeErrorMessage("Failed to getUserByUnionId: " + e.getErrMsg());
         }
         if (!response.isSuccess()) {
             return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
@@ -99,7 +99,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             response = client.execute(request, accessToken);
         } catch (ApiException e) {
             logger.error("Failed to {}", UrlConstant.URL_GET_USER, e);
-            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to getUserInfo: " + e.getErrMsg());
+            return ResponseData.makeErrorMessage("Failed to getUserInfo: " + e.getErrMsg());
         }
         if (!response.isSuccess()) {
             return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
@@ -133,7 +133,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             response = client.execute(request, accessToken);
         } catch (ApiException e) {
             logger.error("Failed to {}", UrlConstant.USER_CREATE, e);
-            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to userCreate: " + e.getErrMsg());
+            return ResponseData.makeErrorMessage("Failed to userCreate: " + e.getErrMsg());
         }
         if (!response.isSuccess()) {
             return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
@@ -171,7 +171,7 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
             response = client.execute(request, accessToken);
         } catch (ApiException e) {
             logger.error("Failed to {}", UrlConstant.DEPARTMENT_CREATE, e);
-            return ResponseData.makeErrorMessage(Integer.valueOf(e.getErrCode()), "Failed to unitCreate: " + e.getErrMsg());
+            return ResponseData.makeErrorMessage("Failed to unitCreate: " + e.getErrMsg());
         }
         if (!response.isSuccess()) {
             return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());

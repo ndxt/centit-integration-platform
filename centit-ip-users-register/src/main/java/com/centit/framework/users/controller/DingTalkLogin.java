@@ -3,11 +3,15 @@ package com.centit.framework.users.controller;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.framework.system.dao.UnitInfoDao;
+import com.centit.framework.system.po.UnitInfo;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.dto.DingUnitDTO;
 import com.centit.framework.users.dto.DingUserDTO;
+import com.centit.framework.users.po.SocialDeptAuth;
 import com.centit.framework.users.service.DingTalkLoginService;
+import com.centit.framework.users.service.SocialDeptAuthService;
 import com.centit.framework.users.service.TokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +40,12 @@ public class DingTalkLogin extends BaseController {
 
     @Autowired
     private DingTalkLoginService dingTalkLoginService;
+
+    @Autowired
+    private SocialDeptAuthService socialDeptAuthService;
+
+    @Autowired
+    private UnitInfoDao unitInfoDao;
 
     @ApiOperation(value = "钉钉二维码登录", notes = "钉钉二维码登录。")
     @GetMapping(value = "/qrconnect")
@@ -70,6 +80,16 @@ public class DingTalkLogin extends BaseController {
         String accessToken = getAccessToken();
         if (StringUtils.isBlank(accessToken)) {
             return ResponseData.makeErrorMessage("获取钉钉access_token失败");
+        }
+        String unitCode = userInfo.getPrimaryUnit();
+        SocialDeptAuth socialDeptAuth = socialDeptAuthService.getObjectById(unitCode);
+        if (null == socialDeptAuth) {
+            UnitInfo unitInfo = unitInfoDao.getObjectById(unitCode);
+            DingUnitDTO dingUnitDTO = new DingUnitDTO();
+            dingUnitDTO.setUnitCode(unitCode);
+            dingUnitDTO.setParentUnit(unitInfo.getParentUnit());
+            dingUnitDTO.setUnitName(unitInfo.getUnitName());
+            dingTalkLoginService.unitCreate(accessToken, dingUnitDTO);
         }
         return dingTalkLoginService.userCreate(accessToken, userInfo);
     }
