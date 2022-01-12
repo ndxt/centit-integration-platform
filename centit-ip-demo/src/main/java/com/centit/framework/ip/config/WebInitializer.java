@@ -17,8 +17,6 @@ public class WebInitializer implements WebApplicationInitializer {
         WebConfig.registerServletConfig(servletContext, "system",
             "/system/*",
             SystemSpringMvcConfig.class,SwaggerConfig.class);
-        WebConfig.registerServletConfig(servletContext, "workgroup",
-            "/workgroup/*", WorkGroupSpringMvcConfig.class,SwaggerConfig.class);
         WebConfig.registerRequestContextListener(servletContext);
         WebConfig.registerSingleSignOutHttpSessionListener(servletContext);
 
