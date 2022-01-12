@@ -1,5 +1,7 @@
 package com.centit.framework.tenant.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.*;
 import com.centit.framework.core.controller.BaseController;
@@ -35,9 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/tenant")
@@ -398,7 +398,7 @@ public class TenanController extends BaseController {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "您未登录!");
         }
         try {
-            List<Map> userTenants = tenantService.userTenants(userCode);
+            JSONArray userTenants = tenantService.userTenants(userCode);
             return ResponseData.makeResponseData(userTenants);
         } catch (Exception e) {
             e.printStackTrace();
@@ -476,8 +476,8 @@ public class TenanController extends BaseController {
             userInfo.put("tenantRole", tenantRole);
         }
         //补充userTenants字段信息
-        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(ud));
-        List<Map> userTenants = tenantService.userTenants(userCode);
+        JSONObject jsonObject = (JSONObject) JSON.toJSON(ud);
+        JSONArray userTenants = tenantService.userTenants(userCode);
         jsonObject.put("userTenants", userTenants);
         //获取微信用户信息
         Map<String, Object> paramsMap = new HashMap<>();

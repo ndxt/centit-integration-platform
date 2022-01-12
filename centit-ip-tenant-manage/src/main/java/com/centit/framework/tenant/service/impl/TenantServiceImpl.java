@@ -11,11 +11,11 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IDataDictionary;
-import com.centit.framework.model.basedata.IUnitInfo;
 import com.centit.framework.system.dao.*;
 import com.centit.framework.system.po.*;
 import com.centit.framework.system.service.SysUnitManager;
 import com.centit.framework.system.service.SysUserManager;
+import com.centit.framework.system.service.WorkGroupManager;
 import com.centit.framework.tenant.constant.TenantConstant;
 import com.centit.framework.tenant.dao.TenantBusinessLogDao;
 import com.centit.framework.tenant.dao.TenantInfoDao;
@@ -26,10 +26,6 @@ import com.centit.framework.tenant.po.TenantMemberApply;
 import com.centit.framework.tenant.service.TenantPowerManage;
 import com.centit.framework.tenant.vo.PageListTenantInfoQo;
 import com.centit.framework.tenant.vo.TenantMemberQo;
-import com.centit.product.adapter.api.WorkGroupManager;
-import com.centit.product.adapter.po.WorkGroup;
-import com.centit.product.adapter.po.WorkGroupParameter;
-import com.centit.product.dao.WorkGroupDao;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.tenant.service.TenantService;
 import com.centit.framework.tenant.vo.TenantMemberApplyVo;
@@ -609,10 +605,10 @@ public class TenantServiceImpl implements TenantService {
     }
 
 
-    public List<Map> userTenants(String userCode) {
+    public JSONArray userTenants(String userCode) {
         List<TenantInfo> tenantInfos = tenantInfoDao.listUserTenant(CollectionsOpt.createHashMap("userCode", userCode));
         if (CollectionUtils.sizeIsEmpty(tenantInfos)){
-            return Collections.emptyList();
+            return new JSONArray();
         }
         return formatTenants(userCode, tenantInfos);
     }
@@ -779,17 +775,18 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantInfos
      * @return
      */
-    private List<Map> formatTenants(String userCode, List<TenantInfo> tenantInfos) {
+    private JSONArray formatTenants(String userCode, List<TenantInfo> tenantInfos) {
         Set<String> topUnitCodes = tenantInfos.stream().map(TenantInfo::getTopUnit).collect(Collectors.toSet());
         List<WorkGroup> workGroups = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(topUnitCodes)) {
             workGroups = listWorkGroupByUserCodeAndTopUnit(userCode, CollectionsOpt.listToArray(topUnitCodes));
         }
-        List<Map> tenantJsonArrays = JSONArray.parseArray(JSONArray.toJSONString(tenantInfos), Map.class);
-        if (CollectionUtils.isNotEmpty(tenantJsonArrays)) {
-            for (Map tenantJson : tenantJsonArrays) {
-                extendTenantsAttribute(userCode, workGroups, tenantJson);
-            }
+        JSONArray tenantJsonArrays = ((JSONArray) JSON.toJSON(tenantInfos));
+        if (CollectionUtils.isEmpty(tenantJsonArrays)) {
+            return tenantJsonArrays;
+        }
+        for (Object tenantJson : tenantJsonArrays) {
+            extendTenantsAttribute(userCode, workGroups, (JSONObject) tenantJson);
         }
         return tenantJsonArrays;
     }
@@ -802,7 +799,7 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantJson  Tenant
      */
     @SuppressWarnings("unchecked")
-    private void extendTenantsAttribute(String userCode, List<WorkGroup> workGroups, Map tenantJson) {
+    private void extendTenantsAttribute(String userCode, List<WorkGroup> workGroups, JSONObject tenantJson) {
         tenantJson.put("isOwner",MapUtils.getString(tenantJson, "ownUser").equals(userCode)? "T":"F");
         String topUnit = MapUtils.getString(tenantJson, "topUnit");
         WorkGroup workGroup = getWorkGroupByUserCodeAndTopUnit(userCode, topUnit, workGroups);
@@ -853,37 +850,64 @@ public class TenantServiceImpl implements TenantService {
             tenantJson.put("deptTree", null);
             return;
         }
-        //只获取userUnits及其上级部门的 单位信息
-        List<String> unitCodes = userUnits.stream().map(UserUnit::getUnitCode).collect(Collectors.toList());
-        List<UnitInfo> simpleUnitInfos = CodeRepositoryUtil.getUnitInfosByCodes(topUnit, unitCodes).stream().filter(ui -> StringUtils.isNotBlank(ui.getUnitPath()))
-            .flatMap(ui -> Arrays.stream(ui.getUnitPath().split("/"))).filter(StringUtils::isNotBlank).distinct().
-                map(unitCode -> (UnitInfo)CodeRepositoryUtil.getUnitInfoByCode(topUnit, unitCode)).filter(Objects::nonNull).collect(Collectors.toList());
+        List<UnitInfo> simpleUnitInfos = listParentUnitInfo(userUnits, topUnit);
         tenantJson.put("deptTree", sortUnitInfosAsTreeAttachUserRank(simpleUnitInfos,userUnits));
     }
 
-    private  JSONObject appendUserRank(IUnitInfo unitInfo,List<UserUnit> userUnits){
-        if(unitInfo==null){
+    private  List<UnitInfo> listParentUnitInfo(List<UserUnit> userUnits,String topUnit){
+        List<UnitInfo> unitInfos = new ArrayList<>();
+        HashSet<String> unitCods = new HashSet<>();
+        for (UserUnit userUnit : userUnits) {
+            String unitCode =userUnit.getUnitCode();
+            //如果单位子父级别之间形成闭环则不会跳出循环
+            while (true){
+                UnitInfo unitInfo = (UnitInfo) CodeRepositoryUtil.getUnitInfoByCode(topUnit,unitCode );
+                if (null != unitInfo){
+                    if (StringUtils.isBlank(unitInfo.getParentUnit())
+                        ||unitInfo.getUnitCode().equals(unitInfo.getParentUnit())||"0".equals(unitInfo.getParentUnit())){
+                        if (unitCods.add(unitInfo.getUnitCode())){
+                            unitInfos.add(unitInfo);
+                        }
+                        break;
+                    }
+                    if (unitCods.add(unitInfo.getUnitCode())){
+                        unitInfos.add(unitInfo);
+                    }
+                    if (StringUtils.isBlank(unitInfo.getParentUnit())){
+                        break;
+                    }
+                    unitCode = unitInfo.getParentUnit();
+                }else {
+                    break;
+                }
+            }
+        }
+        return unitInfos;
+    }
+
+    private  JSONObject appendUserRank(JSONObject unitInfoJsonObject,List<UserUnit> userUnits){
+        if(unitInfoJsonObject==null){
             return null;
         }
-        JSONObject json = (JSONObject) JSON.toJSON(unitInfo);
-        List<UserUnit> userUnitMatch = userUnits.stream().filter(un -> json.getString("unitCode").equals(un.getUnitCode())).collect(Collectors.toList());
+        List<UserUnit> userUnitMatch = userUnits.stream()
+            .filter(un -> unitInfoJsonObject.getString("unitCode").equals(un.getUnitCode())).collect(Collectors.toList());
         if (CollectionUtils.sizeIsEmpty(userUnitMatch)){
-            return json;
+            return unitInfoJsonObject;
         }
-        List<HashMap<String,Object>> userRankList=null;
+        List<HashMap<String,Object>> userRankList=new ArrayList<>();
         for (UserUnit unitMatch : userUnitMatch) {
-            userRankList=null == json.get("userRankList")? new ArrayList<>():(List<HashMap<String, Object>>) json.get("userRankList");
             if (findMapListKeyIndex(userRankList, "userRank", unitMatch.getUserRank())==-1){
                 HashMap<String, Object> userRankMap = new HashMap<>();
                 userRankMap.put("userUnitId",unitMatch.getUserUnitId());
-                IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType", unitMatch.getUserRank(),unitMatch.getTopUnit());
+                IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType",
+                    unitMatch.getUserRank(),unitMatch.getTopUnit());
                 userRankMap.put("userRank",unitMatch.getUserRank());
                 userRankMap.put("userRankText",null == rankTypeDic?"":rankTypeDic.getDataValue());
                 userRankList.add(userRankMap);
             }
         }
-        json.put("userRankList",userRankList);
-        return json;
+        unitInfoJsonObject.put("userRankList",userRankList);
+        return unitInfoJsonObject;
     }
 
     private int findMapListKeyIndex(List<HashMap<String, Object>> mapList,String key,String value) {
@@ -930,8 +954,8 @@ public class TenantServiceImpl implements TenantService {
         workGroupParameter.setRoleCode(tenantMemberQo.getRoleCode());
         workGroup.setWorkGroupParameter(workGroupParameter);
         workGroup.setUpdateDate(nowDate());
-        workGroup.setUpdator(WebOptUtils.getCurrentUserCode(
-            ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+
+        workGroup.setUpdator(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
         updateWorkGroupRole(workGroup);
     }
 
@@ -954,8 +978,7 @@ public class TenantServiceImpl implements TenantService {
             workGroupManager.updateWorkGroup(workGroup);
         }
         if (workGroups.size() == 0) {
-            workGroup.setCreator(WebOptUtils.getCurrentUserCode(
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
+            workGroup.setCreator(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
             workGroup.setAuthTime(nowDate());
             workGroupDao.saveNewObject(workGroup);
         }
@@ -1467,14 +1490,15 @@ public class TenantServiceImpl implements TenantService {
         Iterator<Object> iterator = unitInfoJsonArray.iterator();
         while (iterator.hasNext()) {
             JSONObject unitInfoJsonObject = (JSONObject) iterator.next();
-            if (StringBaseOpt.isNvl(unitInfoJsonObject.getString("parentUnit")) || "0".equals(unitInfoJsonObject.getString("parentUnit"))) {
+            String parentUnit = unitInfoJsonObject.getString("parentUnit");
+            if (StringBaseOpt.isNvl(parentUnit) ||"0".equals(parentUnit)) {
                 continue;
             }
             for (Object o : unitInfoJsonArray) {
                 JSONObject opt = (JSONObject) o;
-                if (opt.getString("unitCode").equals(unitInfoJsonObject.getString("parentUnit"))) {
+                if (opt.getString("unitCode").equals(parentUnit)) {
                     JSONArray children = opt.getJSONArray("children");
-                    JSONObject jsonObject = appendUserRank(JSON.toJavaObject(unitInfoJsonObject, IUnitInfo.class), userUnits);
+                    JSONObject jsonObject = appendUserRank(unitInfoJsonObject, userUnits);
                     unitInfoJsonObject.put("userRankList",jsonObject.getJSONArray("userRankList"));
                     children.add(unitInfoJsonObject);
                     break;
@@ -1484,9 +1508,9 @@ public class TenantServiceImpl implements TenantService {
         // 获取顶级的父级菜单
         for (Object o : unitInfoJsonArray) {
             JSONObject opt = (JSONObject) o;
-            if (StringBaseOpt.isNvl(opt.getString("parentUnit")) || "0".equals(opt.getString("parentUnit"))) {
-                IUnitInfo iUnitInfo = JSON.toJavaObject(opt, IUnitInfo.class);
-                JSONObject jsonObject = appendUserRank(iUnitInfo, userUnits);
+            String parentUnit = opt.getString("parentUnit");
+            if (StringBaseOpt.isNvl(parentUnit) || "0".equals(parentUnit)) {
+                JSONObject jsonObject = appendUserRank(opt, userUnits);
                 opt.put("userRankList",jsonObject.getJSONArray("userRankList"));
                 return opt;
             }

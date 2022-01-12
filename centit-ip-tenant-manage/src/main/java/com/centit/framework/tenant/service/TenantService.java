@@ -1,5 +1,6 @@
 package com.centit.framework.tenant.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.system.po.UnitInfo;
@@ -13,7 +14,6 @@ import com.centit.framework.tenant.po.TenantInfo;
 import com.centit.framework.tenant.po.TenantMemberApply;
 import com.centit.support.database.utils.PageDesc;
 
-import java.util.List;
 import java.util.Map;
 
 public interface TenantService {
@@ -153,7 +153,7 @@ public interface TenantService {
      * @param userCode 用户code
      * @return
      */
-    List<Map> userTenants(String userCode);
+    JSONArray userTenants(String userCode);
 
 
     /**
