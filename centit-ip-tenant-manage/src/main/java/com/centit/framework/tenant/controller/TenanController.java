@@ -411,7 +411,7 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "查询租户信息",
-        notes = "根据unitName模糊查询租户信息"
+        notes = "根据unitName精确查询租户信息"
     )
     @RequestMapping(value = "/pageListTenants", method = RequestMethod.GET)
     @WrapUpResponseBody
