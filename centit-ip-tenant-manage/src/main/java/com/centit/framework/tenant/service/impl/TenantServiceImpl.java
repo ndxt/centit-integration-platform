@@ -628,7 +628,7 @@ public class TenantServiceImpl implements TenantService {
         String regCellPhone = MapUtils.getString(paramMap, "regCellPhone");
         String userCode = MapUtils.getString(paramMap, "userCode");
         if (StringUtils.isAllBlank(userName, regCellPhone, userCode)) {
-            return ResponseData.makeErrorMessage("userName,regCellPhone,userCode不能全为空");
+            return ResponseData.makeResponseData("");
         }
         if (StringUtils.isBlank(unitCode)) {
             return ResponseData.makeErrorMessage("unitCode不能为空");
