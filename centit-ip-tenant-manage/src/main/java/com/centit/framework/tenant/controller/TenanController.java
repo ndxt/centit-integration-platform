@@ -418,7 +418,9 @@ public class TenanController extends BaseController {
     public PageQueryResult pageListTenants( PageDesc pageDesc,HttpServletRequest request) {
         Map<String, Object> map = collectRequestParameters(request);
         if (StringUtils.isBlank(MapUtils.getString(map,"unitName"))) {
-            throw new ObjectException("unitName不能为空");
+            //租户名称为空时，直接返回空值
+            JSONArray jsonArray = new JSONArray();
+            return PageQueryResult.createResult(jsonArray, pageDesc);
         }
         if (StringUtils.isNotBlank(MapUtils.getString(map,"otherTenant"))){
             map.put("userCode",WebOptUtils.getCurrentUserCode(request));
