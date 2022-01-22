@@ -244,12 +244,11 @@ public class ThirdLogin {
             String openId = wxMpUser.getOpenId();
             String unionId = wxMpUser.getUnionId();
             String weChatName = wxMpUser.getNickname();
-            paramsMap.put("userCode", userCode);
             paramsMap.put("appKey", wxAppConfig.getAppID());
             paramsMap.put("unionId", unionId);
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
             if(userPlat != null){
-                throw new ObjectException("500", "微信账号已绑定，请勿重复绑定！");
+                returnUrl = returnUrl + "&accessToken=noBind";
             }else{
                 if (null != userDetails) {
                     newUser.setUnionId(unionId);
@@ -309,7 +308,7 @@ public class ThirdLogin {
             paramsMap.put("appSecret", appConfig.getAppSecret());
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
             if(userPlat != null){
-                throw new ObjectException("500", "钉钉账号已绑定，请勿重复绑定！");
+                returnUrl = returnUrl + "&accessToken=noBind";
             }else{
                 if (null != userDetails) {
                     newUser.setUserCode(userDetails.getUserCode());
@@ -331,10 +330,12 @@ public class ThirdLogin {
         }else if(QQ_BIND.equals(type)){
 
         }
-        if (returnUrl != null && returnUrl.contains("?")) {
-            returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
-        } else {
-            returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
+        if(userPlat == null){
+            if (returnUrl != null && returnUrl.contains("?")) {
+                returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
+            } else {
+                returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
+            }
         }
         //占位符 替换成/#/(特殊字符)
         if (returnUrl != null && returnUrl.indexOf("/A/") > -1) {
