@@ -248,7 +248,7 @@ public class ThirdLogin {
             paramsMap.put("unionId", unionId);
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
             if(userPlat != null){
-                returnUrl = returnUrl + "&accessToken=noBind";
+                returnUrl = returnUrl + "?accessToken=noBind";
             }else{
                 if (null != userDetails) {
                     newUser.setUnionId(unionId);
@@ -308,7 +308,7 @@ public class ThirdLogin {
             paramsMap.put("appSecret", appConfig.getAppSecret());
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
             if(userPlat != null){
-                returnUrl = returnUrl + "&accessToken=noBind";
+                returnUrl = returnUrl + "?accessToken=noBind";
             }else{
                 if (null != userDetails) {
                     newUser.setUserCode(userDetails.getUserCode());
