@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -52,29 +51,29 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     @Qualifier("userInfoDao")
     private UserInfoDao userInfoDao;
 
-    @Value("${userdirectory.ldap.url:}")
+    //@Value("${userdirectory.ldap.url:}")
     private String ldapUrl;
 
-    @Value("${userdirectory.ldap.username:}")
+    //@Value("${userdirectory.ldap.username:}")
     private String ldapUser;
 
-    @Value("${userdirectory.ldap.userpassword:}")
+    //@Value("${userdirectory.ldap.userpassword:}")
     private String ldapUserPwd;
 
-    @Value("${userdirectory.ldap.searchbase:}")
+    //@Value("${userdirectory.ldap.searchbase:}")
     private String searchBase;
 
     //等级默认为普通员工 YG
-    @Value("${userdirectory.default.rank:YG}")
+    //@Value("${userdirectory.default.rank:YG}")
     @NotNull
     private String defaultRank;
 
     //岗位默认为普通职员 ZY
-    @Value("${userdirectory.default.station:ZY}")
+    //@Value("${userdirectory.default.station:ZY}")
     @NotNull
     private String defaultStation;
 
-    @Value("${userdirectory.default.rolecode:}")
+    //@Value("${userdirectory.default.rolecode:}")
     private String defaultUserRole;
 
     public String getDefaultUserRole() {
@@ -134,8 +133,9 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     }
 
     public static String getAttributeString(Attribute attr){
-        if(attr==null)
+        if(attr==null) {
             return null;
+        }
         try {
             return StringBaseOpt.objectToString(attr.get());
         } catch (NamingException e) {
@@ -150,14 +150,15 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public int synchroniseUserDirectory() {
+    public int synchroniseUserDirectory(UserSyncDirectory directory) {
         Properties env = new Properties();
         //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
+        String searchBase = directory.getSearchBase();
         env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
-        env.put(Context.SECURITY_PRINCIPAL, ldapUser);
-        env.put(Context.SECURITY_CREDENTIALS, ldapUserPwd);
-        env.put(Context.PROVIDER_URL, ldapUrl);
+        env.put(Context.SECURITY_PRINCIPAL, directory.getUser());
+        env.put(Context.SECURITY_CREDENTIALS, directory.getUserPwd());
+        env.put(Context.PROVIDER_URL, directory.getUrl());
         Date now = DatetimeOpt.currentUtilDate();
         try {
             String distName = "distinguishedName";
@@ -174,8 +175,9 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 Attributes attrs = sr.getAttributes();
                 String distinguishedName = getAttributeString(attrs, distName);
                 String unitName = getAttributeString(attrs,"description");
-                if(unitName==null || distinguishedName==null)
+                if(unitName==null || distinguishedName==null){
                     continue;
+                }
                 UnitInfo unitInfo = unitInfoDao.getUnitByTag(distinguishedName);
                 boolean createNew = unitInfo==null;
                 if(createNew){
@@ -211,8 +213,9 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 Attributes attrs = sr.getAttributes();
                 String loginName = getAttributeString(attrs,"sAMAccountName");
                 String userName = getAttributeString(attrs,"displayName");
-                if(userName==null || loginName==null)
+                if(userName==null || loginName==null){
                     continue;
+                }
                 boolean createUser=false;
                 UserInfo userInfo = userInfoDao.getUserByLoginName(loginName);
                 if(userInfo==null) {
@@ -246,14 +249,14 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 userInfo.setUserTag(getAttributeString(attrs, distName));
                 userInfo.setUserName(userName);
                 userInfo.setUpdateDate(now);
-                if(createUser)
+                if(createUser) {
                     userInfoDao.saveNewObject(userInfo);
-                else
+                }else{
                     userInfoDao.updateUser(userInfo);
-
-                if(createUser && StringUtils.isNoneBlank(this.defaultUserRole)){
+                }
+                if(createUser && StringUtils.isNoneBlank(directory.getDefaultUserRole())){
                     UserRole role = new UserRole(
-                            new UserRoleId(userInfo.getUserCode(), defaultUserRole));
+                            new UserRoleId(userInfo.getUserCode(), directory.getDefaultUserRole()));
                     role.setObtainDate(now);
                     role.setCreateDate(now);
                     role.setChangeDesc("LDAP同步时默认设置。");
@@ -285,8 +288,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                                 }else{
                                     uu.setRelType("F");
                                 }
-                                uu.setUserRank(defaultRank);
-                                uu.setUserStation(defaultStation);
+                                uu.setUserRank(directory.getDefaultRank());
+                                uu.setUserStation(directory.getDefaultStation());
                                 userUnitDao.saveNewObject(uu);
                             }
                         }

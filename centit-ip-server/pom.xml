@@ -36,5 +36,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-users-register</artifactId>
+            <version>5.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

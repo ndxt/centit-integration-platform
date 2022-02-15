@@ -85,4 +85,9 @@ public class UrlConstant {
      * 获取部门详情
      */
     public static final String URL_DEPARTMENT_GET = HOST + "/topapi/v2/department/get";
+
+    /**
+     * 获取部门用户详情
+     */
+    public static final String URL_USER_LIST = HOST + "/topapi/v2/user/list";
 }

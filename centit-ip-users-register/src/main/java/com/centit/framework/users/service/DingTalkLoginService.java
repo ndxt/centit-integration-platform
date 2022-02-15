@@ -1,6 +1,9 @@
 package com.centit.framework.users.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.users.dto.DingUnitDTO;
 import com.centit.framework.users.dto.DingUserDTO;
 
@@ -20,4 +23,11 @@ public interface DingTalkLoginService {
     ResponseData unitCreate(String accessToken, DingUnitDTO unitInfo);
 
     ResponseData getUnitInfo(String accessToken, String deptId);
+
+    JSONArray getUnitList(String accessToken, String deptId);
+
+    JSONObject getUnitUserList(String accessToken, String deptId);
+
+    int synchroniseUserDirectory(UserSyncDirectory directory);
+
 }
