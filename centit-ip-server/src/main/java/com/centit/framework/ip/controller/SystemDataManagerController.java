@@ -33,7 +33,7 @@ public class SystemDataManagerController  extends BaseController {
 
     @ApiOperation(value="用户组织同步",notes="用户组织同步")
     @WrapUpResponseBody
-    @RequestMapping(value = "/syncuserdirectory/{directory}",
+    @RequestMapping(value = "/syncuserdirectory",
             method = RequestMethod.POST)
     public void syncUserDirectory(@RequestBody String directory) {
         UserSyncDirectory userSyncDirectory = userSyncDirectoryManager.getObjectById(directory);
