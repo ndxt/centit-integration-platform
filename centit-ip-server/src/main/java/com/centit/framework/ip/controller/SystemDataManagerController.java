@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -33,8 +34,8 @@ public class SystemDataManagerController  extends BaseController {
     @ApiOperation(value="用户组织同步",notes="用户组织同步")
     @WrapUpResponseBody
     @RequestMapping(value = "/syncuserdirectory/{directory}",
-            method = RequestMethod.GET)
-    public void syncUserDirectory(@PathVariable String directory) {
+            method = RequestMethod.POST)
+    public void syncUserDirectory(@RequestBody String directory) {
         UserSyncDirectory userSyncDirectory = userSyncDirectoryManager.getObjectById(directory);
         if(userSyncDirectory != null && userSyncDirectory.getType().equalsIgnoreCase("LDAP")){
             activeDirectoryUserDirectory.synchroniseUserDirectory(userSyncDirectory);
