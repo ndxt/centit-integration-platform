@@ -183,6 +183,12 @@
             </properties>
         </profile>
         <profile>
+            <id>prev</id>
+            <properties>
+                <profiles.active>prev</profiles.active>
+            </properties>
+        </profile>
+        <profile>
 			<id>dev</id>
 			<properties>
 				<profiles.active></profiles.active>
@@ -234,6 +240,7 @@
                     <exclude>system.properties</exclude>
                     <exclude>demo/*</exclude>
                     <exclude>pressure-test/*</exclude>
+                    <exclude>prev/*</exclude>
                 </excludes>
             </resource>
             <resource>
