@@ -1,7 +1,7 @@
 <html>
 <head>
   <script>
-    location.href = 'http://ceshi.centit.com/cloud'
+    location.href = 'http://cloud.centit.com/locode'
   </script>
 </head>
 </html>
