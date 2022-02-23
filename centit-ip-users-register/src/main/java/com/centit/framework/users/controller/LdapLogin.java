@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -49,7 +49,7 @@ public class LdapLogin {
     private UserSyncDirectoryManager userSyncDirectoryManager;
 
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
-    @GetMapping(value = "/login")
+    @PostMapping(value = "/login")
     public String login(@RequestParam("loginName") String loginName,
                         @RequestParam("passWord") String passWord,
                         @RequestParam("returnUrl") String returnUrl,
