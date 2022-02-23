@@ -169,6 +169,7 @@ public class TenantServiceImpl implements TenantService {
         userInfo.setIsValid("W");
         userInfo.setUserType("U");
         userInfo.setTopUnit("");
+        userInfo.setUserOrder(1L);
         userInfoDao.saveNewObject(userInfo);
         return ResponseData.makeSuccessResponse("注册成功!");
     }
@@ -762,6 +763,9 @@ public class TenantServiceImpl implements TenantService {
         if (null != userInfo.getUserRoles()) {
             userInfo.getUserRoles().forEach(userRole -> userRole.setUserCode(userInfo.getUserCode()));
         }
+        if (null == userInfo.getUserOrder()){
+            userInfo.setUserOrder(1L);
+        }
         userUnit.setUserOrder(userInfo.getUserOrder());
         sysUserManager.saveNewUserInfo(userInfo, userUnit);
         return ResponseData.makeResponseData(userInfo);
@@ -1331,7 +1335,7 @@ public class TenantServiceImpl implements TenantService {
         DataCatalog userTypeDataCatalog = defaultDataCatalog(userCode, topUnitCode,
             DATA_CATALOG_UESR_TYPE_SUFFIX, "用户类型");
         dataCatalogDao.saveNewObject(userTypeDataCatalog);
-        String[][] userTypeElements = {{userTypeDataCatalog.getCatalogCode(), "A", "普通用户"}};
+        String[][] userTypeElements = {{userTypeDataCatalog.getCatalogCode(), "U", "普通用户"}};
         batchSaveDataDictionary(userTypeElements);
 
         //机构类型数据字典unitType
