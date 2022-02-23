@@ -50,12 +50,12 @@ public class LdapLogin {
 
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
-    public String login(@RequestParam("loginName") String loginName,
-                        @RequestParam("passWord") String passWord,
+    public String login(@RequestParam("username") String username,
+                        @RequestParam("password") String password,
                         @RequestParam("returnUrl") String returnUrl,
                         HttpServletResponse response) throws Exception {
 
-        Map<String, Object> map = searchLdapUserByloginName(loginName);
+        Map<String, Object> map = searchLdapUserByloginName(username);
         if(map==null || map.isEmpty()){
             throw new ObjectException(500, "用户找不到！");
         }
@@ -63,7 +63,7 @@ public class LdapLogin {
         try {
             boolean passed = checkUserPasswordByDn(
                 Pretreatment.mapTemplateString("CN={name},CN=Users,DC=centit,DC=com",map),
-                passWord);
+                password);
             if(!passed){
                 throw new ObjectException(500, "用户名密码不匹配。");
             }
