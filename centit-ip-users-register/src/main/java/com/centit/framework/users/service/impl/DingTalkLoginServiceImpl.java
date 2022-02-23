@@ -149,6 +149,10 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
      */
     @Override
     public ResponseData userCreate(String accessToken, DingUserDTO userInfo) {
+        ResponseData userByMobile = getUserByMobile(accessToken, userInfo.getRegCellPhone());
+        if (userByMobile.getCode() == 0) {
+            return ResponseData.makeResponseData("该手机用户已存在，无需同步");
+        }
         DingTalkClient client = new DefaultDingTalkClient(UrlConstant.USER_CREATE);
         OapiV2UserCreateRequest request = new OapiV2UserCreateRequest();
         request.setName(userInfo.getUserName());
@@ -292,6 +296,31 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
         }
         accessToken = accessTokenData.getData().toString();
         return accessToken;
+    }
+
+    /**
+     * 访问/topapi/v2/user/getbymobile 根据手机号查询用户
+     *
+     * @param accessToken
+     * @param mobile
+     * @return
+     */
+    @Override
+    public ResponseData getUserByMobile(String accessToken, String mobile) {
+        DingTalkClient client = new DefaultDingTalkClient(UrlConstant.URL_GET_USER_BYMOBILE);
+        OapiV2UserGetbymobileRequest request = new OapiV2UserGetbymobileRequest();
+        request.setMobile(mobile);
+        OapiV2UserGetbymobileResponse response;
+        try {
+            response = client.execute(request, accessToken);
+        } catch (ApiException e) {
+            logger.error("Failed to {}", UrlConstant.URL_GET_USER_BYMOBILE, e);
+            return ResponseData.makeErrorMessage("Failed to getUserByMobile: " + e.getErrMsg());
+        }
+        if (!response.isSuccess()) {
+            return ResponseData.makeErrorMessage(Integer.valueOf(response.getErrorCode()), response.getErrmsg());
+        }
+        return ResponseData.makeResponseData(response.getBody());
     }
 
     @Override
