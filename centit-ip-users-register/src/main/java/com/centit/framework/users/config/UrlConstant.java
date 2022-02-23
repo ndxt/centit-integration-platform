@@ -67,6 +67,11 @@ public class UrlConstant {
     public static final String URL_USER_SIMPLELIST = HOST + "/user/simplelist";
 
     /**
+     * 根据手机号查询用户
+     */
+    public static final String URL_GET_USER_BYMOBILE = HOST + "/topapi/v2/user/getbymobile";
+
+    /**
      * 创建用户
      */
     public static final String USER_CREATE = HOST + "/topapi/v2/user/create";

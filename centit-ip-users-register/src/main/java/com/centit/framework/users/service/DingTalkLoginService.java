@@ -30,4 +30,6 @@ public interface DingTalkLoginService {
 
     int synchroniseUserDirectory(UserSyncDirectory directory);
 
+    ResponseData getUserByMobile(String accessToken, String mobile);
+
 }

@@ -7,6 +7,7 @@ import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.config.WxAppConfig;
+import com.centit.framework.users.dto.DingUserDTO;
 import com.centit.framework.users.po.Platform;
 import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.*;
@@ -325,6 +326,12 @@ public class ThirdLogin {
                     newUser.setUserId(userId);
                     newUser.setUserName(name);
                     userPlatService.saveUserPlat(newUser);
+                    String regCellPhone = userDetails.getUserInfo().getString("regCellPhone");
+                    DingUserDTO dingUserDTO = new DingUserDTO();
+                    dingUserDTO.setUserName(userDetails.getUsername());
+                    dingUserDTO.setRegCellPhone(regCellPhone);
+                    dingUserDTO.setPrimaryUnit(userDetails.getCurrentUnitCode());
+                    dingTalkLoginService.userCreate(accessToken, dingUserDTO);
                 }
             }
         }else if(QQ_BIND.equals(type)){
