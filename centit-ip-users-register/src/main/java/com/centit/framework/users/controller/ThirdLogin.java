@@ -238,6 +238,7 @@ public class ThirdLogin {
         Map<String, Object> paramsMap = new HashMap<>();
         UserPlat userPlat = new UserPlat();
         CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
+        String regCellPhone = userDetails.getUserInfo().getString("regCellPhone");
         UserPlat newUser = new UserPlat();
         if(WECHAT_BIND.equals(type)){
             WxMpUser wxMpUser = weChatService.getWxUser(code);
@@ -271,6 +272,12 @@ public class ThirdLogin {
                 throw new ObjectException(accessTokenData.getCode(), accessTokenData.getMessage());
             }
             accessToken = accessTokenData.getData().toString();
+
+            DingUserDTO dingUserDTO = new DingUserDTO();
+            dingUserDTO.setUserName(userDetails.getUsername());
+            dingUserDTO.setRegCellPhone(regCellPhone);
+            dingUserDTO.setPrimaryUnit(userDetails.getCurrentUnitCode());
+            dingTalkLoginService.userCreate(accessToken, dingUserDTO);
 
             if (StringUtils.isBlank(accessToken)) {
                 throw new ObjectException("500", "获取钉钉access_token失败");
@@ -326,12 +333,7 @@ public class ThirdLogin {
                     newUser.setUserId(userId);
                     newUser.setUserName(name);
                     userPlatService.saveUserPlat(newUser);
-                    String regCellPhone = userDetails.getUserInfo().getString("regCellPhone");
-                    DingUserDTO dingUserDTO = new DingUserDTO();
-                    dingUserDTO.setUserName(userDetails.getUsername());
-                    dingUserDTO.setRegCellPhone(regCellPhone);
-                    dingUserDTO.setPrimaryUnit(userDetails.getCurrentUnitCode());
-                    dingTalkLoginService.userCreate(accessToken, dingUserDTO);
+
                 }
             }
         }else if(QQ_BIND.equals(type)){
