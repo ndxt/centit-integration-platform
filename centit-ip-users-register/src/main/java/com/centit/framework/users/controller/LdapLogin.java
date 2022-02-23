@@ -1,5 +1,7 @@
 package com.centit.framework.users.controller;
 
+import com.centit.framework.common.ResponseData;
+import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.UserSyncDirectory;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -28,6 +31,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.*;
@@ -50,29 +54,31 @@ public class LdapLogin {
 
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
-    public String login(@RequestParam("username") String username,
-                        @RequestParam("password") String password,
-                        @RequestParam("returnUrl") String returnUrl,
-                        HttpServletResponse response) throws Exception {
+    @WrapUpResponseBody
+    public ResponseData login(@RequestParam("username") String username,
+                              @RequestParam("password") String password,
+                              HttpServletRequest request) throws Exception {
 
         Map<String, Object> map = searchLdapUserByloginName(username);
+        Map<String, Object> sessionMap = new HashMap<>();
         if(map==null || map.isEmpty()){
-            throw new ObjectException(500, "用户找不到！");
+            return ResponseData.makeErrorMessage("未查询到用户");
         }
-
         try {
             boolean passed = checkUserPasswordByDn(
                 Pretreatment.mapTemplateString("CN={name},CN=Users,DC=centit,DC=com",map),
                 password);
             if(!passed){
-                throw new ObjectException(500, "用户名密码不匹配。");
+                return ResponseData.makeErrorMessage("用户名密码不匹配。");
             }
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(map.get("sAMAccountName") + "");
             SecurityContextHolder.getContext().setAuthentication(ud);
+            sessionMap.put("accessToken", request.getSession().getId());
+            sessionMap.put("userInfo", ud);
         } catch (NamingException e) {
-            throw new ObjectException(500, "系统错误");
+            return ResponseData.makeErrorMessage("系统错误。");
         }
-        return "redirect:" + returnUrl;
+        return ResponseData.makeResponseData(sessionMap);
     }
 
     public Map<String, Object> searchLdapUserByloginName(String loginName){
