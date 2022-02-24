@@ -158,11 +158,11 @@ public interface TenantService {
 
     /**
      * 根据unitName 模糊查询租户信息
-     * @param filerMap
+     * @param filterMap
      * @param pageDesc
      * @return
      */
-    PageQueryResult pageListTenants(Map<String,Object> filerMap , PageDesc pageDesc);
+    PageQueryResult pageListTenants(Map<String,Object> filterMap , PageDesc pageDesc);
 
     /**
      * 精确查找用户

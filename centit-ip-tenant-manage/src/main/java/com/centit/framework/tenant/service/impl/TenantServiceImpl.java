@@ -616,8 +616,8 @@ public class TenantServiceImpl implements TenantService {
 
 
     @Override
-    public PageQueryResult pageListTenants(Map<String,Object> filerMap, PageDesc pageDesc) {
-        JSONArray jsonArray = tenantInfoDao.listTenantInfoWithOwnUserName(filerMap, pageDesc);
+    public PageQueryResult pageListTenants(Map<String,Object> filterMap, PageDesc pageDesc) {
+        JSONArray jsonArray = tenantInfoDao.listTenantInfoWithOwnUserName(filterMap, pageDesc);
         return PageQueryResult.createResult(jsonArray, pageDesc);
     }
 
