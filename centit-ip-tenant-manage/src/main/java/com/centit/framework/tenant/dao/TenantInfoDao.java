@@ -120,7 +120,7 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
      * @return
      */
     public boolean userIsOwner(String topUnit,String userCode) {
-        String sql = " SELECT COUNT(1) FROM `F_TENANT_INFO` WHERE TOP_UNIT = ? AND OWN_USER = ? ";
+        String sql = " SELECT COUNT(1) FROM F_TENANT_INFO WHERE TOP_UNIT = ? AND OWN_USER = ? ";
         return NumberBaseOpt.castObjectToInteger(
             DatabaseOptUtils.getScalarObjectQuery(this, sql,new Object[]{topUnit, userCode}))> 0;
     }
