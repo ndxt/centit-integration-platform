@@ -23,6 +23,7 @@ import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.*;
 import com.dingtalk.api.response.*;
 import com.taobao.api.ApiException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,6 +360,19 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
                     if(createNew){
                         unitInfoDao.saveNewObject(unitInfo);
                         unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
+                        UnitInfo pUnit = unitInfoDao.getObjectById(unitInfo.getParentUnit());
+                        if (pUnit != null) {
+                            unitInfo.setUnitPath(pUnit.getUnitPath() + "/" + unitInfo.getUnitCode());
+                            //加上租户
+                            unitInfo.setTopUnit(pUnit.getTopUnit());
+                        }
+                        if (StringUtils.isBlank(unitInfo.getTopUnit()) && StringUtils.isNotBlank(unitInfo.getUnitPath())) {
+                            String[] unitCodeArray = unitInfo.getUnitPath().split("/");
+                            if (ArrayUtils.isNotEmpty(unitCodeArray) && unitCodeArray.length > 1) {
+                                //加上租户
+                                unitInfo.setTopUnit(unitCodeArray[1]);
+                            }
+                        }
                         unitInfoDao.updateUnit(unitInfo);
                     }else {
                         unitInfoDao.updateUnit(unitInfo);
@@ -402,6 +416,15 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
                         UnitInfo unitInfo = unitInfoDao.getUnitByTag(unitArray.getString(0));
                         if(unitInfo != null){
                             userInfo.setPrimaryUnit(unitInfo.getUnitCode());
+                            if (null != unitInfo && StringUtils.isNotBlank(unitInfo.getTopUnit())) {
+                                userInfo.setTopUnit(unitInfo.getTopUnit());
+                            }
+                            if (null != unitInfo && StringUtils.isBlank(userInfo.getTopUnit()) && StringUtils.isNotBlank(unitInfo.getUnitPath())) {
+                                String[] unitCodeArray = unitInfo.getUnitPath().split("/");
+                                if (ArrayUtils.isNotEmpty(unitCodeArray) && unitCodeArray.length > 1) {
+                                    userInfo.setTopUnit(unitCodeArray[1]);
+                                }
+                            }
                         }
                     }
                     userInfo.setUpdateDate(now);

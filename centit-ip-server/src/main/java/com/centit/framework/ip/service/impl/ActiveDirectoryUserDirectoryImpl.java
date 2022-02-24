@@ -1,6 +1,7 @@
 package com.centit.framework.ip.service.impl;
 
 import com.centit.framework.ip.service.UserDirectory;
+import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.system.dao.UnitInfoDao;
 import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.framework.system.dao.UserRoleDao;
@@ -9,11 +10,14 @@ import com.centit.framework.system.po.*;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
+import com.centit.support.compiler.Pretreatment;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -51,6 +55,10 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     @Qualifier("userInfoDao")
     private UserInfoDao userInfoDao;
 
+    @Autowired
+    @NotNull
+    private CentitPasswordEncoder passwordEncoder;
+
     //@Value("${userdirectory.ldap.url:}")
     private String ldapUrl;
 
@@ -75,6 +83,9 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 
     //@Value("${userdirectory.default.rolecode:}")
     private String defaultUserRole;
+
+    @Value("${framework.password.default.generator:}")
+    protected String defaultPassWorkFormat;
 
     public String getDefaultUserRole() {
         return defaultUserRole;
@@ -195,11 +206,23 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 if(createNew){
                     unitInfoDao.saveNewObject(unitInfo);
                     unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
+                    UnitInfo parentUnit = unitInfoDao.getObjectById(unitInfo.getParentUnit());
+                    if (parentUnit != null) {
+                        unitInfo.setUnitPath(parentUnit.getUnitPath() + "/" + unitInfo.getUnitCode());
+                        //加上租户
+                        unitInfo.setTopUnit(parentUnit.getTopUnit());
+                    }
+                    if (StringUtils.isBlank(unitInfo.getTopUnit()) && StringUtils.isNotBlank(unitInfo.getUnitPath())) {
+                        String[] unitCodeArray = unitInfo.getUnitPath().split("/");
+                        if (ArrayUtils.isNotEmpty(unitCodeArray) && unitCodeArray.length > 1) {
+                            //加上租户
+                            unitInfo.setTopUnit(unitCodeArray[1]);
+                        }
+                    }
                     unitInfoDao.updateUnit(unitInfo);
                 }else {
                     unitInfoDao.updateUnit(unitInfo);
                 }
-
                 allUnits.put(distinguishedName, unitInfo);
             }
 
@@ -224,6 +247,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     userInfo.setIsValid("T");
                     userInfo.setLoginName(loginName);
                     userInfo.setCreateDate(now);
+                    userInfo.setUserPin(getDefaultPassword(userInfo.getUserCode()));
                     createUser = true;
                 }
                 String regEmail = getAttributeString(attrs, "mail");
@@ -274,6 +298,17 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                             if ((StringUtils.isNotBlank(u.getUnitCode()))&&(StringUtils.isBlank(userInfo.getPrimaryUnit()))) {
                                 userInfo.setPrimaryUnit(u.getUnitCode());
                                 userInfoDao.updateUser(userInfo);
+                                UnitInfo unitInfo = unitInfoDao.getObjectById(userInfo.getPrimaryUnit());
+                                if (null != unitInfo && StringUtils.isNotBlank(unitInfo.getTopUnit())) {
+                                    userInfo.setTopUnit(unitInfo.getTopUnit());
+                                }
+                                if (null != unitInfo && StringUtils.isBlank(userInfo.getTopUnit()) && StringUtils.isNotBlank(unitInfo.getUnitPath())) {
+                                    String[] unitCodeArray = unitInfo.getUnitPath().split("/");
+                                    if (ArrayUtils.isNotEmpty(unitCodeArray) && unitCodeArray.length > 1) {
+                                        userInfo.setTopUnit(unitCodeArray[1]);
+                                    }
+                                }
+                                userInfoDao.updateUser(userInfo);
                             }
                             List<UserUnit> uus = userUnitDao.listObjectByUserUnit(
                                     userInfo.getUserCode(),u.getUnitCode());
@@ -303,5 +338,13 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
             logger.error(e.getMessage(),e);
             return -1;
         }
+    }
+
+    private String getDefaultPassword(String userCode) {
+        String rawPass = "000000";
+        if(StringUtils.isNotBlank(defaultPassWorkFormat)){
+            rawPass = Pretreatment.mapTemplateString(defaultPassWorkFormat,userCode);
+        }
+        return passwordEncoder.createPassword(rawPass, userCode);
     }
 }
