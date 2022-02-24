@@ -38,7 +38,7 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
     public JSONArray listTenantInfoWithOwnUserName(Map<String,Object> filterMap,PageDesc pageDesc){
         String sql = " SELECT A.TOP_UNIT, A.UNIT_NAME, A.OWN_USER, B.USER_NAME " +
             " FROM F_TENANT_INFO A JOIN  F_USERINFO B ON A.OWN_USER = B.USER_CODE " +
-            " WHERE   A.IS_AVAILABLE = 'T' [ :unitName | AND A.UNIT_NAME = :unitName ] " +
+            " WHERE   A.IS_AVAILABLE = 'T' [ :(like)unitName | AND A.UNIT_NAME like :unitName ] " +
             "[ :otherTenant | AND A.top_unit not in ( SELECT DISTINCT b_1.TOP_UNIT FROM f_userunit a_1 join f_unitinfo b_1  on a_1.TOP_UNIT = b_1.TOP_UNIT WHERE a_1.USER_CODE = :userCode  ) ] order by A.UNIT_NAME ";
         QueryAndNamedParams qap = QueryUtils.translateQuery(sql, filterMap);
         if (StringUtils.isNotBlank(MapUtils.getString(filterMap,"otherTenant"))){
