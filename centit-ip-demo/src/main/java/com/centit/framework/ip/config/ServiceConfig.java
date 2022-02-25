@@ -10,10 +10,14 @@ import com.centit.framework.config.SpringSecurityCasConfig;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
 import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
+import com.centit.product.oa.EmailMessageSenderImpl;
+import com.centit.support.security.AESSecurityUtils;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 
 /**
@@ -54,6 +58,25 @@ public class ServiceConfig {
         //notificationCenter.registerMessageSender("innerMsg",innerMessageManager);
         return notificationCenter;
     }
+
+    @Bean
+    public NotificationCenter notificationCenter(@Autowired PlatformEnvironment platformEnvironment) {
+        NewEmailMessageSenderImpl messageManager = new NewEmailMessageSenderImpl();
+        messageManager.setHostName("mail.centit.com");
+        messageManager.setSmtpPort(25);
+        messageManager.setUserName("developer@centit.com");
+        messageManager.setUserPassword("centitdev.1");
+        messageManager.setServerEmail("developer@centit.com");
+
+        NotificationCenterImpl notificationCenter = new NotificationCenterImpl();
+        notificationCenter.setPlatformEnvironment(platformEnvironment);
+        //禁用发送email
+        notificationCenter.registerMessageSender("email", messageManager);
+        notificationCenter.appointDefaultSendType("email");
+
+        return notificationCenter;
+    }
+
 
     /*引入依赖包含这个日志写入bean
       <dependency>
