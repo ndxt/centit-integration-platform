@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.aliyun.dysmsapi20170525.models.*;
 import com.aliyun.teaopenapi.models.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.Random;
  */
 @Controller
 @RequestMapping("/vateCode")
-@Api(value = "邮箱、手机号验证码接口")
+@Api(value = "邮箱、手机号验证码接口", tags = "邮箱、手机号验证码接口")
 public class VateCodeController extends BaseController {
 
     @Autowired
@@ -45,9 +46,9 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/checkOldDate", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData checkOldDate(@RequestBody JSONObject paramMap, HttpServletRequest request){
-        String phone = paramMap.getString("phone");
-        String email = paramMap.getString("email");
+    public ResponseData checkOldDate(@RequestParam("phone") String phone,
+                                     @RequestParam("email") String email,
+                                     HttpServletRequest request){
         UserInfo userInfo = new UserInfo();
         String msg = "";
         if(phone != null && !phone.equals("")){
@@ -70,9 +71,9 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/getEmailCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData getEmailCode(@RequestBody JSONObject paramMap, HttpServletRequest request) {
-        String userCode = paramMap.getString("userCode");
-        String newEmail = paramMap.getString("email");
+    public ResponseData getEmailCode(@RequestParam("userCode") String userCode,
+                                     @RequestParam("email") String newEmail,
+                                     HttpServletRequest request) {
         if(userCode == null){
             return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN, "为查询到当前用户的UserCode");
         }
@@ -96,12 +97,17 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/getPhoneCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public SendSmsResponse getPhoneCode(@RequestBody JSONObject paramMap, HttpServletRequest request) throws Exception {
-        String userCode = paramMap.getString("userCode");
-        String phone = paramMap.getString("phone");
+    public SendSmsResponse getPhoneCode(@RequestParam("userCode") String userCode,
+                                        @RequestParam("phone") String phone,
+                                        HttpServletRequest request) throws Exception {
+        UserInfo userInfo = userInfoDao.getUserByCode(userCode);
+        if(userInfo == null){
+            throw new Exception("未查询到用户");
+        }
         String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
         JSONObject jSONObject = new JSONObject();
-        jSONObject.put("code",verifyCode);
+        jSONObject.put("code", verifyCode);
+        jSONObject.put("product", "用户"+userInfo.getUserName());
         //+GrP3D07U/aR2WDtm9iTSUeJ0F00X0f75Byebbcw8fc=
         //String accessKeyId = AESSecurityUtils.encryptAndBase64("LTAI5tEa6fT8PoidN8PkQNnN", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
         //gqdjhi7JEasb2uiOW/riueAXA4vvOxsgYfmdRbAqwIU=
@@ -127,10 +133,10 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/checkCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData checkEmailCode(@RequestBody JSONObject paramMap, HttpServletRequest request){
+    public ResponseData checkEmailCode(@RequestParam("userCode") String userCode,
+                                       @RequestParam("code") String code,
+                                       HttpServletRequest request){
         try {
-            String code = paramMap.getString("code");
-            String userCode = paramMap.getString("userCode");
             if (code == null) {
                 return ResponseData.makeErrorMessage(500, "请输入验证码！");
             }
