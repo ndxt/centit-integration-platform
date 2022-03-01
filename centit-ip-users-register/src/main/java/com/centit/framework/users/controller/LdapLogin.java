@@ -1,6 +1,7 @@
 package com.centit.framework.users.controller;
 
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -72,6 +73,7 @@ public class LdapLogin {
                 return ResponseData.makeErrorMessage("用户名密码不匹配。");
             }
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(map.get("sAMAccountName") + "");
+            ud.setLoginIp(WebOptUtils.getRequestAddr(request));
             SecurityContextHolder.getContext().setAuthentication(ud);
             sessionMap.put("accessToken", request.getSession().getId());
             sessionMap.put("userInfo", ud);

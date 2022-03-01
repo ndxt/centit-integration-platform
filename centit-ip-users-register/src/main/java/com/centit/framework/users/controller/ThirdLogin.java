@@ -2,6 +2,7 @@ package com.centit.framework.users.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.users.config.AppConfig;
@@ -202,6 +203,7 @@ public class ThirdLogin {
             returnUrl = appConfig.getRedirectLoginUrl() + "A/login?accessToken=noUser&type=" + type;
         } else {
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
+            ud.setLoginIp(WebOptUtils.getRequestAddr(request));
             SecurityContextHolder.getContext().setAuthentication(ud);
             if (returnUrl != null && returnUrl.contains("?")) {
                 returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
