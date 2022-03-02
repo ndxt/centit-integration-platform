@@ -11,6 +11,8 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IDataDictionary;
+import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.security.model.JsonCentitUserDetails;
 import com.centit.framework.system.dao.*;
 import com.centit.framework.system.po.*;
 import com.centit.framework.system.service.SysUnitManager;
@@ -324,12 +326,13 @@ public class TenantServiceImpl implements TenantService {
         }
         userInfoDao.updateUser(userinfo);
         //刷新缓存中的人员信息
-        SecurityContextHolder.getContext()
-            .setAuthentication(platformEnvironment.loadUserDetailsByUserCode(userinfo.getUserCode()));
+        reloadAuthentication(userinfo.getUserCode());
         //人员新增更新成功后刷新缓存
         CodeRepositoryCache.evictCache("UserInfo");
         return ResponseData.makeSuccessResponse();
     }
+
+
 
     @Override
     @Transactional
@@ -690,7 +693,7 @@ public class TenantServiceImpl implements TenantService {
                 CollectionsOpt.listToArray(dataCatalogIds)));
         }
         //刷新当前人登录信息
-        SecurityContextHolder.getContext().setAuthentication(platformEnvironment.loadUserDetailsByUserCode(MapUtils.getString(parameters,"userCode")));
+        reloadAuthentication(MapUtils.getString(parameters, "userCode"));
         batchEvictCache("UnitInfo","UserUnit","DataDictionary");
         return ResponseData.makeSuccessResponse();
 
@@ -738,7 +741,8 @@ public class TenantServiceImpl implements TenantService {
         if (sysUnitManager.hasSameName(unitInfo)) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT, String.format("机构名%s已存在，请更换！",unitInfo.getUnitName()));
         }
-        List<UnitInfo> unitInfos = sysUnitManager.listObjects(CollectionsOpt.createHashMap("unitWord",unitInfo.getUnitWord()));
+        Map<String, Object> filerMap = CollectionsOpt.createHashMap("depNo", unitInfo.getDepNo(), "topUnit", unitInfo.getTopUnit());
+        List<UnitInfo> unitInfos = sysUnitManager.listObjects(filerMap);
         if (unitInfos != null && unitInfos.size() > 0) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT,String.format("机构编码%s已存在，请更换！",unitInfo.getUnitName()));
         }
@@ -1521,5 +1525,23 @@ public class TenantServiceImpl implements TenantService {
             }
         }
         return null;
+    }
+
+    private void reloadAuthentication(String userCode) {
+        CentitUserDetails centitUserDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
+        centitUserDetails.setLoginIp(getUserIp());
+        SecurityContextHolder.getContext().setAuthentication(centitUserDetails);
+    }
+    /**
+     * 获取用户ip地址
+     * @return
+     */
+    private String getUserIp(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof JsonCentitUserDetails){
+            JsonCentitUserDetails userDetails = (JsonCentitUserDetails) principal;
+            return userDetails.getLoginIp();
+        }
+        return "";
     }
 }
