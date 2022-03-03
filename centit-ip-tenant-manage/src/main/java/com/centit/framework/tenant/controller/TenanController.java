@@ -134,7 +134,7 @@ public class TenanController extends BaseController {
         dataTypeClass = String.class),
         @ApiImplicitParam(
             name = "userCode/topUnit",
-            value = "用户代码或机构代码[userCode=][topUnit=]",
+            value = "用户代码或机构代码[userCode=][topUnit=][unitCode=](topUnit和unitCode传入任意一个即可)",
             paramType = "String",
             dataTypeClass = String.class),
         @ApiImplicitParam(

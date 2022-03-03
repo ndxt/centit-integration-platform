@@ -39,6 +39,7 @@ import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,16 +226,17 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public PageQueryResult listApplyInfo(Map<String, Object> parameters, PageDesc pageDesc) {
 
-        if (null == parameters.get("applyState") && null == parameters.get("applyState_in")) {
+        if (!ObjectUtils.anyNotNull(parameters.get("applyState"),parameters.get("applyState_in"))) {
             throw new ObjectException("缺少参数applyState;");
         }
-        if (null == parameters.get("userCode") && null == parameters.get("topUnit")) {
-            throw new ObjectException("缺少参数userCode或topUnit;");
+
+        if (!ObjectUtils.anyNotNull(parameters.get("userCode"),parameters.get("topUnit"),parameters.get("unitCode"))) {
+            throw new ObjectException("缺少参数userCode或topUnit或unitCode;");
         }
         if (null != parameters.get("applyState_in")) {
             parameters.put("applyState_in", MapUtils.getString(parameters, "applyState_in").split(","));
         }
-        List<TenantMemberApply> tenantMemberApplies = tenantMemberApplyDao.listObjectsByProperties(parameters);
+        List<TenantMemberApply> tenantMemberApplies = tenantMemberApplyDao.listObjectsByProperties(parameters,pageDesc);
         if (CollectionUtils.sizeIsEmpty(tenantMemberApplies)) {
             return PageQueryResult.createResult(Collections.emptyList(), pageDesc);
         }
@@ -651,6 +653,12 @@ public class TenantServiceImpl implements TenantService {
         List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("topUnit", unitCode));
         userInfos = userInfos.stream().filter(userInfo ->
             null == getUserUnitByUserCode(userUnits, userInfo.getUserCode()) && !applyUserCodes.contains(userInfo.getUserCode())).collect(Collectors.toList());
+        //脱敏操作
+        userInfos.forEach(userInfo ->{
+            userInfo.setUserPwd(null);
+            userInfo.setUserPin(null);
+            userInfo.setRegCellPhone(cleanPhoneSensitive(userInfo.getRegCellPhone()));
+        } );
         return ResponseData.makeResponseData(userInfos);
     }
 
@@ -741,8 +749,8 @@ public class TenantServiceImpl implements TenantService {
         if (sysUnitManager.hasSameName(unitInfo)) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT, String.format("机构名%s已存在，请更换！",unitInfo.getUnitName()));
         }
-        Map<String, Object> filerMap = CollectionsOpt.createHashMap("depNo", unitInfo.getDepNo(), "topUnit", unitInfo.getTopUnit());
-        List<UnitInfo> unitInfos = sysUnitManager.listObjects(filerMap);
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("depNo", unitInfo.getDepNo(), "topUnit", unitInfo.getTopUnit());
+        List<UnitInfo> unitInfos = sysUnitManager.listObjects(filterMap);
         if (unitInfos != null && unitInfos.size() > 0) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT,String.format("机构编码%s已存在，请更换！",unitInfo.getUnitName()));
         }
@@ -1543,5 +1551,30 @@ public class TenantServiceImpl implements TenantService {
             return userDetails.getLoginIp();
         }
         return "";
+    }
+
+    /**
+     * 对手机号进行脱敏操作
+     * @param phoneNo
+     * @return
+     */
+    private String cleanPhoneSensitive(String phoneNo){
+        if (StringUtils.isBlank(phoneNo)){
+            return "";
+        }
+        int firstLength = 0;
+        int endLength;
+        int phoneLength = phoneNo.length();
+        if (phoneLength>10){
+            firstLength = 3;
+            endLength= 4;
+        }else if (phoneLength>5){
+            firstLength = 2;
+            endLength= 2;
+        }else {
+            endLength = 1;
+        }
+        String reg = "(\\w{"+firstLength+"})\\w*(\\w{"+endLength+"})";
+        return phoneNo.replaceAll(reg, "$1*****$2");
     }
 }
