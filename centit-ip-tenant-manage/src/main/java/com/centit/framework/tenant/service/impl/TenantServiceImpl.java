@@ -1131,10 +1131,10 @@ public class TenantServiceImpl implements TenantService {
 
     /**
      * 格式化tenantMemberApplies
-     *
      * @param tenantMemberApplies
+     * @return
      */
-    private List<TenantMemberApplyVo> formatMemberApply(List<TenantMemberApply> tenantMemberApplies) {
+    private JSONArray formatMemberApply(List<TenantMemberApply> tenantMemberApplies) {
         HashSet<String> topUnitCodes = new HashSet<>();
         HashSet<String> userCodes = new HashSet<>();
         for (TenantMemberApply tenantMemberApply : tenantMemberApplies) {
@@ -1144,27 +1144,25 @@ public class TenantServiceImpl implements TenantService {
         }
         List<UnitInfo> unitInfos = getUnitInfosByUnitCodes(new ArrayList<>(topUnitCodes));
         List<UserInfo> userInfos = getUserInfosByUserCodes(new ArrayList<>(userCodes));
-
-        ArrayList<TenantMemberApplyVo> tenantMemberApplyVos = new ArrayList<>();
-        for (TenantMemberApply tenantMemberApply : tenantMemberApplies) {
-            TenantMemberApplyVo tenantMemberApplyVo = new TenantMemberApplyVo();
-            BeanUtils.copyProperties(tenantMemberApply, tenantMemberApplyVo);
-            UnitInfo unitInfo = getUnitInfoByUnitCode(unitInfos, tenantMemberApply.getTopUnit());
-            UserInfo userInfo = getUserInfoByUserCode(userInfos, tenantMemberApply.getUserCode());
-            UserInfo inviterUserInfo = getUserInfoByUserCode(userInfos, tenantMemberApply.getInviterUserCode());
+        JSONArray memberJsonArray = (JSONArray) JSON.toJSON(tenantMemberApplies);
+        for (Object member : memberJsonArray) {
+            JSONObject jsonMember = (JSONObject) member;
+            UnitInfo unitInfo = getUnitInfoByUnitCode(unitInfos, jsonMember.getString("topUnit"));
+            UserInfo userInfo = getUserInfoByUserCode(userInfos, jsonMember.getString("userCode"));
+            UserInfo inviterUserInfo = getUserInfoByUserCode(userInfos, jsonMember.getString("inviterUserCode"));
             if (null != unitInfo) {
-                tenantMemberApplyVo.setUnitName(unitInfo.getUnitName());
+                jsonMember.put("unitName",unitInfo.getUnitName());
             }
             if (null != userInfo) {
-                tenantMemberApplyVo.setUserName(userInfo.getUserName());
+                jsonMember.put("userName",userInfo.getUserName());
+                jsonMember.put("loginName",userInfo.getLoginName());
             }
             if (null != inviterUserInfo) {
-                tenantMemberApplyVo.setInviterUserName(inviterUserInfo.getUserName());
+                jsonMember.put("inviterUserName",inviterUserInfo.getUserName());
             }
-            tenantMemberApplyVos.add(tenantMemberApplyVo);
         }
 
-        return tenantMemberApplyVos;
+        return memberJsonArray;
     }
 
     /**
