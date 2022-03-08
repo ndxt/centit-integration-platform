@@ -167,9 +167,18 @@ public class VateCodeController extends BaseController {
     public ResponseData findPwd(@RequestParam(value = "loginname") String loginname,
                                 HttpServletRequest request) throws Exception {
         try {
+            UserInfo userInfo = new UserInfo();
             if(loginname.indexOf('@')>0){
+                userInfo = userInfoDao.getUserByRegEmail(loginname);
+                if(userInfo == null){
+                    return ResponseData.makeErrorMessage("用户不存在");
+                }
                 sendEmail(loginname, loginname, request);
             }else{
+                userInfo = userInfoDao.getUserByRegCellPhone(loginname);
+                if(userInfo == null){
+                    return ResponseData.makeErrorMessage("用户不存在");
+                }
                 sendPhone(loginname, loginname, "", request);
             }
             return ResponseData.successResponse;
