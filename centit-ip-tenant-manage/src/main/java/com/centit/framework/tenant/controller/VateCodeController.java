@@ -13,7 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.aliyun.dysmsapi20170525.models.*;
@@ -41,54 +40,23 @@ public class VateCodeController extends BaseController {
     private UserInfoDao userInfoDao;
 
     @ApiOperation(
-        value = "验证邮箱或者手机号是否重复",
-        notes = "验证邮箱或者手机号是否重复"
-    )
-    @RequestMapping(value = "/checkOldDate", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public ResponseData checkOldDate(@RequestParam("phone") String phone,
-                                     @RequestParam("email") String email,
-                                     HttpServletRequest request){
-        UserInfo userInfo = new UserInfo();
-        String msg = "";
-        if(phone != null && !phone.equals("")){
-            msg = "手机号";
-            userInfo = userInfoDao.getUserByRegCellPhone(phone);
-        }
-        if(email != null && !email.equals("")){
-            msg = "邮箱";
-            userInfo = userInfoDao.getUserByRegEmail(email);
-        }
-        if (userInfo == null) {
-            return ResponseData.makeSuccessResponse();
-        }
-        return ResponseData.makeErrorMessage("此"+msg+"已被使用");
-    }
-
-    @ApiOperation(
         value = "获取Email验证码",
         notes = "获取Email验证码"
     )
     @RequestMapping(value = "/getEmailCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData getEmailCode(@RequestParam("userCode") String userCode,
-                                     @RequestParam("email") String newEmail,
+    public ResponseData getEmailCode(@RequestParam(value = "userCode", required = false) String userCode,
+                                     @RequestParam("email") String email,
                                      HttpServletRequest request) {
-        if(userCode == null){
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN, "为查询到当前用户的UserCode");
+        UserInfo userInfo = userInfoDao.getUserByRegEmail(email);
+        if (userInfo != null) {
+            return ResponseData.makeErrorMessage("此邮箱已被使用！");
         }
-        String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
-        String message = "您的验证码为:" + verifyCode + "，该码有效期为5分钟，该码只能使用一次!";
-        List<String> sendMessageUser = new ArrayList<>();
-        sendMessageUser.add(newEmail);
-        JSONObject json = new JSONObject();
-        json.put("email", newEmail);
-        json.put("verifyCode", verifyCode);
-        json.put("createTime", System.currentTimeMillis());
-        request.getSession().setAttribute(userCode, json);
-        return notificationCenter.sendMessage("system", sendMessageUser,
-            NoticeMessage.create().operation("email").method("post").subject("您有新邮件")
-            .content(message));
+        String key = userCode;
+        if(userCode == null){
+            key = email;
+        }
+        return sendEmail(email, key, request);
     }
 
     @ApiOperation(
@@ -97,34 +65,20 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/getPhoneCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public SendSmsResponse getPhoneCode(@RequestParam("userCode") String userCode,
+    public SendSmsResponse getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
                                         @RequestParam("phone") String phone,
                                         HttpServletRequest request) throws Exception {
-        UserInfo userInfo = userInfoDao.getUserByCode(userCode);
-        if(userInfo == null){
-            throw new Exception("未查询到用户");
+        if(phone != null && !phone.equals("")){
+            UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
+            if (userInfo != null) {
+                throw new Exception("此手机号已被使用！");
+            }
         }
-        String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
-        JSONObject jSONObject = new JSONObject();
-        jSONObject.put("code", verifyCode);
-        jSONObject.put("product", "用户"+userInfo.getUserName());
-        //+GrP3D07U/aR2WDtm9iTSUeJ0F00X0f75Byebbcw8fc=
-        //String accessKeyId = AESSecurityUtils.encryptAndBase64("LTAI5tEa6fT8PoidN8PkQNnN", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
-        //gqdjhi7JEasb2uiOW/riueAXA4vvOxsgYfmdRbAqwIU=
-        //String accessKeySecret = AESSecurityUtils.encryptAndBase64("SeirpGApf75fAow1rT1qVJ7v0zqCRy", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
-        com.aliyun.dysmsapi20170525.Client client = VateCodeController.createClient();
-        SendSmsRequest sendSmsRequest = new SendSmsRequest()
-            .setSignName("身份验证")
-            .setTemplateCode("SMS_65920066")
-            .setPhoneNumbers(phone)
-            .setTemplateParam(jSONObject.toString());
-        JSONObject json = new JSONObject();
-        json.put("phone", phone);
-        json.put("verifyCode", verifyCode);
-        json.put("createTime", System.currentTimeMillis());
-        request.getSession().setAttribute(userCode, json);
-        // 复制代码运行请自行打印 API 的返回值
-        return client.sendSms(sendSmsRequest);
+        String key = userCode;
+        if(userCode == null){
+            key = phone;
+        }
+        return sendPhone(phone, key, userCode, request);
     }
 
     @ApiOperation(
@@ -133,14 +87,15 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/checkCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData checkEmailCode(@RequestParam("userCode") String userCode,
+    public ResponseData checkEmailCode(@RequestParam(value = "userCode", required=false) String userCode,
+                                       @RequestParam("key") String key,
                                        @RequestParam("code") String code,
                                        HttpServletRequest request){
         try {
             if (code == null) {
                 return ResponseData.makeErrorMessage(500, "请输入验证码！");
             }
-            JSONObject json = JSONObject.parseObject(request.getSession().getAttribute(userCode) + "");
+            JSONObject json = JSONObject.parseObject(request.getSession().getAttribute(key) + "");
             if(json == null){
                 return ResponseData.makeErrorMessage(500, "未发送验证码！");
             }
@@ -164,13 +119,59 @@ public class VateCodeController extends BaseController {
                     logger.info("用户:{}修改用户信息手机",userCode);
                 }
                 userInfoDao.updateUser(user);
-                request.getSession().removeAttribute(userCode);
             }
+            request.getSession().removeAttribute(key);
             return ResponseData.makeSuccessResponse();
         }catch (Exception e) {
             e.printStackTrace();
         }
         return ResponseData.errorResponse;
+    }
+
+
+    public ResponseData sendEmail(String email, String key, HttpServletRequest request){
+        String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
+        String message = "您的验证码为:" + verifyCode + "，该码有效期为5分钟，该码只能使用一次!";
+        List<String> sendMessageUser = new ArrayList<>();
+        sendMessageUser.add(email);
+        JSONObject json = new JSONObject();
+        json.put("email", email);
+        json.put("verifyCode", verifyCode);
+        json.put("createTime", System.currentTimeMillis());
+        request.getSession().setAttribute(key, json);
+        return notificationCenter.sendMessage("system", sendMessageUser,
+            NoticeMessage.create().operation("email").method("post").subject("您有新邮件")
+                .content(message));
+    }
+
+    public SendSmsResponse sendPhone(String phone, String key, String userCode, HttpServletRequest request)
+            throws Exception{
+        String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("code", verifyCode);
+        UserInfo userInfo = userInfoDao.getUserByCode(userCode);
+        if(userInfo == null){
+            jSONObject.put("product", "用户");
+        }else{
+            jSONObject.put("product", "用户"+userInfo.getUserName());
+        }
+        //+GrP3D07U/aR2WDtm9iTSUeJ0F00X0f75Byebbcw8fc=
+        //String accessKeyId = AESSecurityUtils.encryptAndBase64("LTAI5tEa6fT8PoidN8PkQNnN", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
+        //gqdjhi7JEasb2uiOW/riueAXA4vvOxsgYfmdRbAqwIU=
+        //String accessKeySecret = AESSecurityUtils.encryptAndBase64("SeirpGApf75fAow1rT1qVJ7v0zqCRy", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
+        com.aliyun.dysmsapi20170525.Client client = VateCodeController.createClient();
+        SendSmsRequest sendSmsRequest = new SendSmsRequest()
+            .setSignName("身份验证")
+            .setTemplateCode("SMS_65920066")
+            .setPhoneNumbers(phone)
+            .setTemplateParam(jSONObject.toString());
+        JSONObject json = new JSONObject();
+        json.put("phone", phone);
+        json.put("verifyCode", verifyCode);
+        json.put("createTime", System.currentTimeMillis());
+        request.getSession().setAttribute(key, json);
+        // 复制代码运行请自行打印 API 的返回值
+        return client.sendSms(sendSmsRequest);
     }
 
     /**
