@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 验证码接口
@@ -38,6 +40,34 @@ public class VateCodeController extends BaseController {
 
     @Autowired
     private UserInfoDao userInfoDao;
+
+    @ApiOperation(
+        value = "验证唯一性",
+        notes = "验证唯一性"
+    )
+    @RequestMapping(value = "/checkOnly", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData checkOnly(@RequestParam(value = "loginname") String loginname,
+                                  HttpServletRequest request) throws Exception{
+        UserInfo userInfo = new UserInfo();
+        String msg = "";
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher isNum = pattern.matcher(loginname);
+        if(loginname.indexOf('@')>0){
+            msg = "邮件";
+            userInfo = userInfoDao.getUserByRegEmail(loginname);
+        }else if(loginname.length() == 11 && isNum.matches()){
+            msg = "手机号";
+            userInfo = userInfoDao.getUserByRegCellPhone(loginname);
+        }else{
+            msg = "账号";
+            userInfo = userInfoDao.getUserByLoginName(loginname);
+        }
+        if(userInfo != null){
+            return ResponseData.makeErrorMessage("此" + msg + "已被使用！");
+        }
+        return ResponseData.successResponse;
+    }
 
     @ApiOperation(
         value = "获取Email验证码",
@@ -82,12 +112,12 @@ public class VateCodeController extends BaseController {
     }
 
     @ApiOperation(
-        value = "验证验证码",
-        notes = "验证验证码"
+        value = "校验和更新",
+        notes = "校验和更新"
     )
     @RequestMapping(value = "/checkCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData checkEmailCode(@RequestParam(value = "userCode", required=false) String userCode,
+    public ResponseData checkCode(@RequestParam(value = "userCode", required=false) String userCode,
                                        @RequestParam("key") String key,
                                        @RequestParam("code") String code,
                                        HttpServletRequest request){
@@ -122,6 +152,70 @@ public class VateCodeController extends BaseController {
             }
             request.getSession().removeAttribute(key);
             return ResponseData.makeSuccessResponse();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseData.errorResponse;
+    }
+
+    @ApiOperation(
+        value = "找回密码(发送验证码 手机/邮箱)",
+        notes = "找回密码(发送验证码 手机/邮箱)"
+    )
+    @RequestMapping(value = "/findPwd", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData findPwd(@RequestParam(value = "loginname") String loginname,
+                                HttpServletRequest request) throws Exception {
+        try {
+            if(loginname.indexOf('@')>0){
+                sendEmail(loginname, loginname, request);
+            }else{
+                sendPhone(loginname, loginname, "", request);
+            }
+            return ResponseData.successResponse;
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseData.errorResponse;
+        }
+
+
+    }
+
+    @ApiOperation(
+        value = "校验并返回用户信息",
+        notes = "校验并返回用户信息"
+    )
+    @RequestMapping(value = "/checkCodeUser", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData checkCodeUser(@RequestParam("key") String key,
+                                       @RequestParam("code") String code,
+                                       HttpServletRequest request){
+        try {
+            if (code == null) {
+                return ResponseData.makeErrorMessage(500, "请输入验证码！");
+            }
+            JSONObject json = JSONObject.parseObject(request.getSession().getAttribute(key) + "");
+            if(json == null){
+                return ResponseData.makeErrorMessage(500, "未发送验证码！");
+            }
+            String verifyCode = json.getString("verifyCode");
+            Long createTime = json.getLong("createTime");
+            String email = json.getString("email");
+            String phone = json.getString("phone");
+            if (!verifyCode.equals(code)) {
+                return ResponseData.makeErrorMessage(500, "验证码错误！");
+            }
+            if ((System.currentTimeMillis() - createTime) > 1000 * 60 * 5) {
+                return ResponseData.makeErrorMessage(500, "验证码已过期！");
+            }
+            UserInfo userInfo = new UserInfo();
+            if(email != null && !email.equals("")){
+                userInfo = userInfoDao.getUserByRegEmail(email);
+            }else if(phone != null && !phone.equals("")){
+                userInfo = userInfoDao.getUserByRegCellPhone(phone);
+            }
+            request.getSession().removeAttribute(key);
+            return ResponseData.makeResponseData(userInfo);
         }catch (Exception e) {
             e.printStackTrace();
         }
