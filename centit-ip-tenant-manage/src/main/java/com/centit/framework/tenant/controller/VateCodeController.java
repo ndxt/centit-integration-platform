@@ -20,9 +20,7 @@ import com.aliyun.teaopenapi.models.*;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +39,8 @@ public class VateCodeController extends BaseController {
     @Autowired
     private UserInfoDao userInfoDao;
 
+    private static Pattern pattern = Pattern.compile("[0-9]*");
+
     @ApiOperation(
         value = "验证唯一性",
         notes = "验证唯一性"
@@ -51,7 +51,6 @@ public class VateCodeController extends BaseController {
                                   HttpServletRequest request) throws Exception{
         UserInfo userInfo = new UserInfo();
         String msg = "";
-        Pattern pattern = Pattern.compile("[0-9]*");
         Matcher isNum = pattern.matcher(loginname);
         if(loginname.indexOf('@')>0){
             msg = "邮件";
@@ -102,6 +101,9 @@ public class VateCodeController extends BaseController {
             UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
             if (userInfo != null) {
                 throw new Exception("此手机号已被使用！");
+//                Map<String, Object> map = new HashMap<String, Object>();
+//                map.put("SYSTEM_ERROR", "此手机号已被使用");
+//                return SendSmsResponse.build(map);
             }
         }
         String key = userCode;
@@ -179,7 +181,8 @@ public class VateCodeController extends BaseController {
                 if(userInfo == null){
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
-                sendPhone(loginname, loginname, "", request);
+                SendSmsResponse s = sendPhone(loginname, loginname, "", request);
+                //System.out.println(s.body);
             }
             return ResponseData.successResponse;
         }catch (Exception e){
@@ -252,11 +255,14 @@ public class VateCodeController extends BaseController {
         String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
         JSONObject jSONObject = new JSONObject();
         jSONObject.put("code", verifyCode);
-        UserInfo userInfo = userInfoDao.getUserByCode(userCode);
-        if(userInfo == null){
-            jSONObject.put("product", "用户");
+        if(userCode != null && !userCode.equals("")){
+            UserInfo userInfo = new UserInfo();
+            userInfo = userInfoDao.getUserByCode(userCode);
+            if(userInfo == null){
+                jSONObject.put("product", "用户"+userInfo.getUserName());
+            }
         }else{
-            jSONObject.put("product", "用户"+userInfo.getUserName());
+            jSONObject.put("product", "用户");
         }
         //+GrP3D07U/aR2WDtm9iTSUeJ0F00X0f75Byebbcw8fc=
         //String accessKeyId = AESSecurityUtils.encryptAndBase64("LTAI5tEa6fT8PoidN8PkQNnN", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
