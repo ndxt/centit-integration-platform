@@ -101,11 +101,10 @@ public class VateCodeController extends BaseController {
         if(phone != null && !phone.equals("")){
             UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
             if (userInfo != null) {
- //               throw new Exception("此手机号已被使用！");
-                Map<String, Object> map = new HashMap<String, Object>();
-                //map.put("SYSTEM_ERROR", "此手机号已被使用");
-                map.put("body", "{message:'此手机号已被使用'}");
-                return (SendSmsResponse) TeaModel.toModel(map, new SendSmsResponse());
+               throw new Exception("此手机号已被使用！");
+//                Map<String, Object> map = new HashMap<String, Object>();
+//                map.put("body", "{message:'此手机号已被使用'}");
+//                return (SendSmsResponse) TeaModel.toModel(map, new SendSmsResponse());
             }
         }
         String key = userCode;
