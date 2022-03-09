@@ -82,11 +82,11 @@ public class VateCodeController extends BaseController {
         if (userInfo != null) {
             return ResponseData.makeErrorMessage("此邮箱已被使用！");
         }
-        String key = userCode;
-        if(userCode == null){
-            key = email;
-        }
-        return sendEmail(email, key, request);
+//        String key = userCode;
+//        if(userCode == null){
+//            key = email;
+//        }
+        return sendEmail(email, email, request);
     }
 
     @ApiOperation(
@@ -107,11 +107,11 @@ public class VateCodeController extends BaseController {
 //                return (SendSmsResponse) TeaModel.toModel(map, new SendSmsResponse());
             }
         }
-        String key = userCode;
-        if(userCode == null){
-            key = phone;
-        }
-        return sendPhone(phone, key, userCode, request);
+//        String key = userCode;
+//        if(userCode == null){
+//            key = phone;
+//        }
+        return sendPhone(phone, phone, userCode, request);
     }
 
     @ApiOperation(
