@@ -1,6 +1,7 @@
 package com.centit.framework.tenant.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.tea.TeaModel;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -103,7 +104,7 @@ public class VateCodeController extends BaseController {
                 throw new Exception("此手机号已被使用！");
 //                Map<String, Object> map = new HashMap<String, Object>();
 //                map.put("SYSTEM_ERROR", "此手机号已被使用");
-//                return SendSmsResponse.build(map);
+//                return (SendSmsResponse) TeaModel.toModel(map, new SendSmsResponse());
             }
         }
         String key = userCode;
@@ -141,16 +142,18 @@ public class VateCodeController extends BaseController {
             if ((System.currentTimeMillis() - createTime) > 1000 * 60 * 5) {
                 return ResponseData.makeErrorMessage(500, "验证码已过期！");
             }
-            UserInfo user = userInfoDao.getUserByCode(userCode);
-            if (user != null) {
-                if(email != null && !email.equals("")){
-                    user.setRegEmail(email);
-                    logger.info("用户:{}修改用户信息邮箱",userCode);
-                }else if(phone != null && !phone.equals("")){
-                    user.setRegCellPhone(phone);
-                    logger.info("用户:{}修改用户信息手机",userCode);
+            if(userCode != null && !userCode.equals("")){
+                UserInfo user = userInfoDao.getUserByCode(userCode);
+                if (user != null) {
+                    if(email != null && !email.equals("")){
+                        user.setRegEmail(email);
+                        logger.info("用户:{}修改用户信息邮箱",userCode);
+                    }else if(phone != null && !phone.equals("")){
+                        user.setRegCellPhone(phone);
+                        logger.info("用户:{}修改用户信息手机",userCode);
+                    }
+                    userInfoDao.updateUser(user);
                 }
-                userInfoDao.updateUser(user);
             }
             request.getSession().removeAttribute(key);
             return ResponseData.makeSuccessResponse();
