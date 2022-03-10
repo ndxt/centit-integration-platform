@@ -121,7 +121,7 @@ public interface TenantService {
      * @param tenantInfo
      * @return
      */
-    PageQueryResult<TenantInfo> pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc);
+    PageQueryResult pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc);
 
 
     /**

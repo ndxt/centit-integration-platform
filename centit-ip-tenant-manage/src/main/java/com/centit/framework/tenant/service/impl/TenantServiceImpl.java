@@ -11,6 +11,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IDataDictionary;
+import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.JsonCentitUserDetails;
 import com.centit.framework.system.dao.*;
@@ -535,7 +536,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public PageQueryResult<TenantInfo> pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc) {
+    public PageQueryResult pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc) {
         if (tenantPowerManage.userIsSystemMember()) {
             //如果当前用户是平台管理员，则可以查看所有人的申请信息
             tenantInfo.setOwnUser(null);
@@ -543,7 +544,7 @@ public class TenantServiceImpl implements TenantService {
             tenantInfo.setOwnUser(WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest()));
         }
         List<TenantInfo> tenantInfos = tenantInfoDao.listObjectsByProperties(tenantInfo, pageDesc);
-        return PageQueryResult.createResult(tenantInfos, pageDesc);
+        return PageQueryResult.createResult(translateTenantInfos(tenantInfos), pageDesc);
     }
 
     @Override
@@ -1574,5 +1575,17 @@ public class TenantServiceImpl implements TenantService {
         }
         String reg = "(\\w{"+firstLength+"})\\w*(\\w{"+endLength+"})";
         return phoneNo.replaceAll(reg, "$1*****$2");
+    }
+
+    private JSONArray translateTenantInfos(List<TenantInfo> tenantInfos){
+        JSONArray jsonArray = new JSONArray();
+        for (TenantInfo tenantInfo : tenantInfos) {
+            Map<String, ? extends IUserInfo> userRepo = CodeRepositoryUtil.getUserRepo(tenantInfo.getTopUnit());
+            IUserInfo ownUserInfo = userRepo.get(tenantInfo.getOwnUser());
+            JSONObject jsonObject = (JSONObject) JSONObject.toJSON(tenantInfo);
+            jsonObject.put("ownUserName", null == ownUserInfo ? "" : ownUserInfo.getUserName());
+            jsonArray.add(jsonObject);
+        }
+        return jsonArray;
     }
 }

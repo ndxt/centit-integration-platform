@@ -326,7 +326,7 @@ public class TenanController extends BaseController {
     )
     @RequestMapping(value = "/pageListTenantApply", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public PageQueryResult<TenantInfo> pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc) {
+    public PageQueryResult pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc) {
 
         return tenantService.pageListTenantApply(tenantInfo, pageDesc);
 
