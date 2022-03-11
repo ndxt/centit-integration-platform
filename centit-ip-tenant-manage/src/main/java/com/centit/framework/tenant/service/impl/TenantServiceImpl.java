@@ -213,13 +213,64 @@ public class TenantServiceImpl implements TenantService {
 
         tenantMemberApply.setApplyTime(nowDate());
         //如果申请类型为用户申请加入租户，则unitCode为空
+        String userCode = WebOptUtils.getCurrentUserCode(RequestThreadLocal.getLocalThreadWrapperRequest());
         if ("1".equals(tenantMemberApply.getApplyType())) {
+            if (!StringUtils.equals(userCode,tenantMemberApply.getUserCode())){
+                throw new ObjectException(ResponseData.ERROR_FIELD_INPUT_CONFLICT,"申请信息有误");
+            }
             tenantMemberApply.setUnitCode(null);
         }
         //如果是租户邀请用户，判断租户下用户数量是否达到限制
-        if ("2".equals(tenantMemberApply.getApplyType()) && tenantPowerManage.userNumberLimitIsOver(tenantInfo.getTopUnit())){
-            return ResponseData.makeErrorMessage("用户数量达到上限!");
+        if ("2".equals(tenantMemberApply.getApplyType())){
+            if (!tenantPowerManage.userIsTenantAdmin(userCode,tenantMemberApply.getTopUnit())){
+                throw new ObjectException(ResponseData.ERROR_FIELD_INPUT_CONFLICT,"邀请信息有误");
+            }
+            if (tenantPowerManage.userNumberLimitIsOver(tenantInfo.getTopUnit())){
+                return ResponseData.makeErrorMessage("用户数量达到上限!");
+            }
         }
+        tenantMemberApplyDao.saveTenantMemberApply(tenantMemberApply);
+        return ResponseData.makeSuccessResponse("申请成功,等待对方同意!");
+    }
+
+    @Override
+    public ResponseData userApplyJoinTenant(TenantMemberApply tenantMemberApply) {
+
+        IUserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApply.getTopUnit(), tenantMemberApply.getUserCode());
+        if (Objects.nonNull(userInfo)){
+            return ResponseData.makeErrorMessage("您已经是改租户成员，无需重复申请");
+        }
+
+        TenantInfo tenantInfo = tenantInfoDao.getObjectById(tenantMemberApply.getTopUnit());
+        if (null == tenantInfo || !"T".equals(tenantInfo.getIsAvailable())) {
+            return ResponseData.makeErrorMessage("租户信息不存在,或租户状态不可用!");
+        }
+        tenantMemberApply.setApplyTime(nowDate());
+        tenantMemberApply.setApplyType("1");
+        tenantMemberApply.setUnitCode(null);
+        tenantMemberApplyDao.saveTenantMemberApply(tenantMemberApply);
+        return ResponseData.makeSuccessResponse("申请成功,等待对方同意!");
+    }
+
+    @Override
+    public ResponseData adminApplyUserJoinTenant(TenantMemberApply tenantMemberApply) {
+        boolean isTenantAdmin = tenantPowerManage.userIsTenantAdmin(tenantMemberApply.getInviterUserCode(), tenantMemberApply.getTopUnit());
+        if (!isTenantAdmin){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_UNAUTHORIZED,"您没有邀请权限");
+        }
+        IUserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApply.getTopUnit(), tenantMemberApply.getUserCode());
+        if (Objects.nonNull(userInfo)){
+            return ResponseData.makeErrorMessage("用户已经是本租户成员，无需重复邀请!");
+        }
+        if (Objects.isNull(userInfoDao.getUserByCode(tenantMemberApply.getUserCode()))) {
+            return ResponseData.makeErrorMessage("用户信息不存在!");
+        }
+        tenantMemberApply.setApplyTime(nowDate());
+        tenantMemberApply.setApplyType("2");
+        //如果是租户邀请用户，判断租户下用户数量是否达到限制
+        if (tenantPowerManage.userNumberLimitIsOver(tenantMemberApply.getTopUnit())){
+             return ResponseData.makeErrorMessage("用户数量达到上限!");
+         }
         tenantMemberApplyDao.saveTenantMemberApply(tenantMemberApply);
         return ResponseData.makeSuccessResponse("申请成功,等待对方同意!");
     }
@@ -258,7 +309,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("topUnit字段属性为空");
         }
 
-        if (!equalsAny(tenantInfo.getIsAvailable(), "T", "F")) {
+        if (!StringUtils.equalsAny(tenantInfo.getIsAvailable(), "T", "F")) {
             return ResponseData.makeErrorMessage("isAvailable字段属性有误");
         }
         TenantInfo oldTenantInfo = tenantInfoDao.getObjectById(tenantInfo.getTopUnit());
@@ -283,13 +334,16 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional
     public ResponseData agreeJoin(TenantMemberApplyVo tenantMemberApplyVo) {
-        String applyState = tenantMemberApplyVo.getApplyState();
-        if (!equalsAny(applyState, "3", "4")) {
-            return ResponseData.makeErrorMessage("applyState属性值有误");
+        if (StringUtils.isBlank(tenantMemberApplyVo.getUserCode())){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_INTERNAL_SERVER_ERROR,"userCode不能为空");
         }
-        if ("3".equals(applyState)&&tenantPowerManage.userNumberLimitIsOver(tenantMemberApplyVo.getTopUnit())){
-            //同意加入租户后，判断租户下用户是否达到限制
-           return ResponseData.makeErrorMessage("用户数量达到上限!");
+        String applyState = tenantMemberApplyVo.getApplyState();
+        if (!StringUtils.equalsAny(applyState, "3", "4")) {
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_INTERNAL_SERVER_ERROR,"applyState属性值有误");
+        }
+        IUserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApplyVo.getTopUnit(), tenantMemberApplyVo.getUserCode());
+        if (Objects.nonNull(userInfo)){
+            return ResponseData.makeErrorMessage("用户已加入租户，无需重复审核!");
         }
         TenantMemberApply tenantMemberApply = new TenantMemberApply();
         BeanUtils.copyProperties(tenantMemberApplyVo, tenantMemberApply);
@@ -297,6 +351,10 @@ public class TenantServiceImpl implements TenantService {
 
         //同意申请，给用户分配机构
         if (tenantMemberApply.getApplyState().equals("3")) {
+            if (tenantPowerManage.userNumberLimitIsOver(tenantMemberApplyVo.getTopUnit())){
+                //同意加入租户后，判断租户下用户是否达到限制
+                return ResponseData.makeErrorMessage("用户数量达到上限!");
+            }
             saveTenantUserUnit(tenantMemberApply);
             CodeRepositoryCache.evictCache("UserUnit");
         }
@@ -518,7 +576,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("businessId字段属性值不能为空!");
         }
         String businessState = tenantBusinessLog.getBusinessState();
-        if (!equalsAny(businessState, "T", "F")) {
+        if (!StringUtils.equalsAny(businessState, "T", "F")) {
             return ResponseData.makeErrorMessage("businessState字段属性值有误");
         }
         tenantBusinessLogDao.updateObject(tenantBusinessLog);
@@ -1238,29 +1296,6 @@ public class TenantServiceImpl implements TenantService {
         return null;
     }
 
-
-    /**
-     * 判断后面的字符是否包含第一个字符
-     *
-     * @param cs
-     * @param searchCharSequences
-     * @return
-     */
-    private boolean equalsAny(CharSequence cs, CharSequence... searchCharSequences) {
-        if (!StringUtils.isEmpty(cs) && !ArrayUtils.isEmpty(searchCharSequences)) {
-            CharSequence[] var2 = searchCharSequences;
-            int var3 = searchCharSequences.length;
-            for (int var4 = 0; var4 < var3; ++var4) {
-                CharSequence searchCharSequence = var2[var4];
-                if (cs.equals(searchCharSequence)) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * 根据userCode和topUnit查询数据

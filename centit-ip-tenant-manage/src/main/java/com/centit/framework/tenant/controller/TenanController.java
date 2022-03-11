@@ -121,6 +121,57 @@ public class TenanController extends BaseController {
         }
     }
 
+    @ApiOperation(
+        value = "用户申请加入租户",
+        notes = "用户申请加入租户"
+    )
+    @RequestMapping(value = "/userApplyJoinTenant", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData userApplyJoinTenant(@RequestBody TenantMemberApply tenantMemberApply,HttpServletRequest request) {
+
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
+        if (StringUtils.isBlank(tenantMemberApply.getTopUnit())){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,"topUnit不能为空");
+        }
+        tenantMemberApply.setUserCode(userCode);
+        tenantMemberApply.setInviterUserCode(userCode);
+        try {
+            return tenantService.userApplyJoinTenant(tenantMemberApply);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("成员申请失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
+            return ResponseData.makeErrorMessage("成员申请失败!");
+        }
+    }
+
+    @ApiOperation(
+        value = "管理员邀请用户加入租户",
+        notes = "管理员邀请用户加入租户"
+    )
+    @RequestMapping(value = "/adminApplyUserJoinTenant", method = RequestMethod.POST)
+    @WrapUpResponseBody
+    public ResponseData adminApplyUserJoinTenant(@RequestBody TenantMemberApply tenantMemberApply,HttpServletRequest request) {
+
+        if (StringUtils.isBlank(tenantMemberApply.getUserCode())){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_NOT_VALID,"userCode不能为空");
+        }
+        String currentUserCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(currentUserCode)){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
+        tenantMemberApply.setTopUnit(WebOptUtils.getCurrentTopUnit(request));
+        tenantMemberApply.setInviterUserCode(currentUserCode);
+        try {
+            return tenantService.adminApplyUserJoinTenant(tenantMemberApply);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("成员申请失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
+            return ResponseData.makeErrorMessage("成员申请失败!");
+        }
+    }
 
     @ApiOperation(
         value = "列出申请信息",
@@ -217,6 +268,42 @@ public class TenanController extends BaseController {
         if (StringUtils.isBlank(tenantMemberApply.getTopUnit())){
             throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR,"topUnit不能为空!");
         }
+        return tenantService.agreeJoin(tenantMemberApply);
+    }
+
+    @ApiOperation(
+        value = "用户同意加入租户",
+        notes = "用户同意加入租户"
+    )
+    @RequestMapping(value = "/userAgreeJoin", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData userAgreeJoin(@RequestBody TenantMemberApplyVo tenantMemberApply, HttpServletRequest request) {
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)){
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
+        if (StringUtils.isBlank(tenantMemberApply.getTopUnit())){
+            throw new ObjectException(ResponseData.ERROR_INTERNAL_SERVER_ERROR,"topUnit不能为空!");
+        }
+        tenantMemberApply.setUserCode(userCode);
+        return tenantService.agreeJoin(tenantMemberApply);
+    }
+
+    @ApiOperation(
+        value = "管理员同意用户加入租户",
+        notes = "管理员同意用户加入租户"
+    )
+    @RequestMapping(value = "/adminAgreeJoin", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData adminAgreeJoin(@RequestBody TenantMemberApplyVo tenantMemberApply, HttpServletRequest request) {
+        if (StringUtils.isBlank(WebOptUtils.getCurrentUserCode(request))){
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
+        String topUnit = WebOptUtils.getCurrentTopUnit(request);
+        if (StringUtils.isBlank(topUnit) || !tenantPowerManage.userIsTenantAdmin(topUnit)){
+            return ResponseData.makeErrorMessage(ResponseData.HTTP_UNAUTHORIZED,"您没有权限操作!");
+        }
+        tenantMemberApply.setTopUnit(topUnit);
         return tenantService.agreeJoin(tenantMemberApply);
     }
 

@@ -45,6 +45,20 @@ public interface TenantService {
      */
     ResponseData applyJoinTenant(TenantMemberApply tenantMemberApply);
 
+    /**
+     * 用户申请加入租户
+     * @param tenantMemberApply
+     * @return
+     */
+    ResponseData userApplyJoinTenant(TenantMemberApply tenantMemberApply);
+
+    /**
+     * 管理员邀请用户加入租户
+     * @param tenantMemberApply
+     * @return
+     */
+    ResponseData adminApplyUserJoinTenant(TenantMemberApply tenantMemberApply);
+
 
     /**
      * 列出申请信息
