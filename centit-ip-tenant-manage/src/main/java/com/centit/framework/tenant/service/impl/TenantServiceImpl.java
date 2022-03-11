@@ -1106,7 +1106,7 @@ public class TenantServiceImpl implements TenantService {
         UserUnit userUnit = new UserUnit();
         userUnit.setUserUnitId(UuidOpt.getUuidAsString32());
         userUnit.setUserCode(tenantInfo.getOwnUser());
-        userUnit.setUserOrder(0L);
+        userUnit.setUserOrder(1L);
         userUnit.setUnitCode(unitInfo.getUnitCode());
         userUnit.setTopUnit(unitInfo.getTopUnit());
         userUnit.setCreateDate(unitInfo.getCreateDate());
@@ -1184,7 +1184,7 @@ public class TenantServiceImpl implements TenantService {
             userUnit.setUserCode(oldTenantMemberApply.getUserCode());
             userUnit.setUnitCode(oldTenantMemberApply.getUnitCode());
             userUnit.setTopUnit(oldTenantMemberApply.getTopUnit());
-            userUnit.setUserOrder(0L);
+            userUnit.setUserOrder(1L);
             userUnit.setCreator(oldTenantMemberApply.getInviterUserCode());
             userUnitDao.saveNewObject(userUnit);
         }
