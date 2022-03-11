@@ -1184,6 +1184,7 @@ public class TenantServiceImpl implements TenantService {
             userUnit.setUserCode(oldTenantMemberApply.getUserCode());
             userUnit.setUnitCode(oldTenantMemberApply.getUnitCode());
             userUnit.setTopUnit(oldTenantMemberApply.getTopUnit());
+            userUnit.setUserOrder(0L);
             userUnit.setCreator(oldTenantMemberApply.getInviterUserCode());
             userUnitDao.saveNewObject(userUnit);
         }
