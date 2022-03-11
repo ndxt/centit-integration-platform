@@ -142,8 +142,8 @@ public class TenanController extends BaseController {
             return tenantService.userApplyJoinTenant(tenantMemberApply);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("成员申请失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
-            return ResponseData.makeErrorMessage("成员申请失败!");
+            logger.error("用户申请加入租户失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
+            return ResponseData.makeErrorMessage("用户申请加入租户失败!");
         }
     }
 
@@ -168,8 +168,8 @@ public class TenanController extends BaseController {
             return tenantService.adminApplyUserJoinTenant(tenantMemberApply);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("成员申请失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
-            return ResponseData.makeErrorMessage("成员申请失败!");
+            logger.error("管理员邀请用户加入租户失败,错误原因{},申请数据：{}", e, tenantMemberApply.toString());
+            return ResponseData.makeErrorMessage("管理员邀请用户加入租户失败!");
         }
     }
 
