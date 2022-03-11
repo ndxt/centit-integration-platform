@@ -39,7 +39,6 @@ import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -191,8 +190,9 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("您已经拥有一个租户，不能再次申请!");
         }
         saveTenantInfo(tenantInfo);
-        initTenant(new TenantInfo(), tenantInfo);
-        batchEvictCache("UserInfo","UnitInfo","UnitUser","UserUnit","UserRole","DataDictionary");
+        TenantInfo newTenantInfo = new TenantInfo();
+        initTenant(newTenantInfo, tenantInfo);
+        batchEvictCache(newTenantInfo.getTopUnit(),"UserInfo","UnitInfo","UnitUser","UserUnit","UserRole","DataDictionary");
         return ResponseData.makeSuccessResponse("租户申请成功!");
     }
 
@@ -356,7 +356,8 @@ public class TenantServiceImpl implements TenantService {
                 return ResponseData.makeErrorMessage("用户数量达到上限!");
             }
             saveTenantUserUnit(tenantMemberApply);
-            CodeRepositoryCache.evictCache("UserUnit");
+            CodeRepositoryCache.evictCache("UserInfo",tenantMemberApplyVo.getTopUnit());
+            CodeRepositoryCache.evictCache("UserUnit",tenantMemberApplyVo.getTopUnit());
         }
         return ResponseData.makeSuccessResponse();
     }
@@ -402,7 +403,8 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("租户所有者不允许退出租户");
         }
         removeTenantMemberRelation(topUnit, userCode);
-        CodeRepositoryCache.evictCache("UserUnit");
+        CodeRepositoryCache.evictCache("UserUnit",topUnit);
+        CodeRepositoryCache.evictCache("UserInfo",topUnit);
         return ResponseData.makeSuccessResponse("已退出该机构!");
     }
 
@@ -419,7 +421,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("管理员或租户所有者不允许被移除租户!");
         }
         removeTenantMemberRelation(topUnit, userCode);
-        batchEvictCache("UserInfo","UserUnit","UnitUser","UserRoles");
+        batchEvictCache(topUnit,"UserInfo","UserUnit","UnitUser","UserRoles");
         return ResponseData.makeSuccessResponse("移除成功!");
     }
 
@@ -761,7 +763,7 @@ public class TenantServiceImpl implements TenantService {
         }
         //刷新当前人登录信息
         reloadAuthentication(MapUtils.getString(parameters, "userCode"));
-        batchEvictCache("UnitInfo","UserUnit","DataDictionary");
+        batchEvictCache(topUnit,"UnitInfo","UserUnit","DataDictionary");
         return ResponseData.makeSuccessResponse();
 
     }
@@ -793,7 +795,7 @@ public class TenantServiceImpl implements TenantService {
             UnitInfo unitInfo = unitInfoDao.getObjectById(tenantInfo.getTopUnit());
             unitInfo.setUnitName(tenantInfo.getUnitName());
             unitInfoDao.updateUnit(unitInfo);
-            CodeRepositoryCache.evictCache("UnitInfo");
+            CodeRepositoryCache.evictCache("UnitInfo",tenantInfo.getTopUnit());
         }
 
         return ResponseData.makeSuccessResponse("修改成功!");
@@ -1530,9 +1532,13 @@ public class TenantServiceImpl implements TenantService {
      *批量刷新缓存
      * @param cacheNames
      */
-    private void batchEvictCache(String ...cacheNames) {
+    private void batchEvictCache(String topUnit,String ...cacheNames) {
         for (String cacheName : cacheNames) {
-            CodeRepositoryCache.evictCache(cacheName);
+            if (StringUtils.isNotBlank(topUnit)){
+                CodeRepositoryCache.evictCache(cacheName,topUnit);
+            }else {
+                CodeRepositoryCache.evictCache(cacheName);
+            }
         }
     }
 
