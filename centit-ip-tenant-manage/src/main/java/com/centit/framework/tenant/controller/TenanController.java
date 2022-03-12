@@ -107,7 +107,7 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "申请加入租户",
-        notes = "可以是用户主动申请，也可以是管理员邀请,请求体(租户成员申请信息)"
+        notes = "可以是用户主动申请，也可以是管理员邀请,请求体(租户成员申请信息)，***废弃接口"
     )
     @RequestMapping(value = "/applyJoinTenant", method = RequestMethod.POST)
     @WrapUpResponseBody
@@ -228,7 +228,7 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "撤销申请",
-        notes = "用户或者租户撤销申请或邀请"
+        notes = "用户或者租户撤销申请或邀请 ***废弃接口"
     )
     @ApiImplicitParams({@ApiImplicitParam(
         name = "topUnit",
@@ -326,7 +326,7 @@ public class TenanController extends BaseController {
 
     @ApiOperation(
         value = "同意加入租户",
-        notes = "可以是平台管理员审核用户的加入,也可以是普通用户同意管理员的邀请"
+        notes = "可以是平台管理员审核用户的加入,也可以是普通用户同意管理员的邀请 ***废弃接口"
     )
     @RequestMapping(value = "/agreeJoin", method = RequestMethod.POST)
     @WrapUpResponseBody
