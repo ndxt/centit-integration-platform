@@ -813,7 +813,7 @@ public class TenantServiceImpl implements TenantService {
         Map<String, Object> filterMap = CollectionsOpt.createHashMap("depNo", unitInfo.getDepNo(), "topUnit", unitInfo.getTopUnit());
         List<UnitInfo> unitInfos = sysUnitManager.listObjects(filterMap);
         if (unitInfos != null && unitInfos.size() > 0) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT,String.format("机构编码%s已存在，请更换！",unitInfo.getUnitName()));
+            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT,String.format("机构编码%s已存在，请更换！",unitInfo.getDepNo()));
         }
         if(unitInfo.getUnitOrder()==null || unitInfo.getUnitOrder()==0) {
             while (!sysUnitManager.isUniqueOrder(unitInfo)) {
@@ -1394,7 +1394,7 @@ public class TenantServiceImpl implements TenantService {
         dataCatalogDao.saveNewObject(unitTypeDataCatalog);
         String unitTypeCatalogCode = unitTypeDataCatalog.getCatalogCode();
         String[][] unitTypeElements = {{unitTypeCatalogCode, "A", "一般机构"}, {unitTypeCatalogCode, "I", "项目组"},
-            {unitTypeCatalogCode, "O", "业务机构"},{unitTypeCatalogCode, "T", "租户"}};
+            {unitTypeCatalogCode, "O", "业务机构"}};
         batchSaveDataDictionary(unitTypeElements);
 
         //用户职务类型字典 RankType

@@ -24,6 +24,7 @@ import com.centit.framework.tenant.po.TenantMemberApply;
 import com.centit.framework.users.config.WxAppConfig;
 import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.UserPlatService;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.common.ParamName;
 import com.centit.support.database.utils.PageDesc;
@@ -125,6 +126,12 @@ public class TenanController extends BaseController {
         value = "用户申请加入租户",
         notes = "用户申请加入租户"
     )
+    @ApiImplicitParams({@ApiImplicitParam(
+        name = "topUnit",
+        value = "租户id",
+        paramType = "String",
+        dataTypeClass = String.class)}
+    )
     @RequestMapping(value = "/userApplyJoinTenant", method = RequestMethod.POST)
     @WrapUpResponseBody
     public ResponseData userApplyJoinTenant(@RequestBody TenantMemberApply tenantMemberApply,HttpServletRequest request) {
@@ -150,6 +157,18 @@ public class TenanController extends BaseController {
     @ApiOperation(
         value = "管理员邀请用户加入租户",
         notes = "管理员邀请用户加入租户"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+        name = "unitCode",
+        value = "部门code，非必填，传入之后，邀请人会被分配到改部门，不传则会分配到顶级机构",
+        paramType = "String",
+        dataTypeClass = String.class),
+        @ApiImplicitParam(
+            name = "userCode",
+            value = "用户code",
+            paramType = "String",
+            dataTypeClass = String.class)
+    }
     )
     @RequestMapping(value = "/adminApplyUserJoinTenant", method = RequestMethod.POST)
     @WrapUpResponseBody
@@ -234,6 +253,56 @@ public class TenanController extends BaseController {
         return tenantService.cancelApply(parameters);
     }
 
+    @ApiOperation(value = "用户撤销申请",notes = "用户撤销申请")
+    @ApiImplicitParams({@ApiImplicitParam(
+        name = "topUnit",
+        value = "租户id",
+        paramType = "String",
+        dataTypeClass = String.class)
+    }
+    )
+    @RequestMapping(value = "/userCancelApply", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData userCancelApply(@RequestBody TenantMemberApply tenantMemberApply,HttpServletRequest request) {
+        String topUnit = tenantMemberApply.getTopUnit();
+        if (StringUtils.isBlank(topUnit)){
+            return ResponseData.makeErrorMessage("topUnit不能为空");
+        }
+        String currentUserCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(currentUserCode)){
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您还未登录!");
+        }
+        Map<String, Object> parameters = CollectionsOpt.createHashMap("userCode", currentUserCode,"topUnit",  topUnit);
+        return tenantService.cancelApply(parameters);
+    }
+
+    @ApiOperation(
+        value = "租户撤销邀请",
+        notes = "租户撤销邀请"
+    )
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+            name = "userCode",
+            value = "用户code",
+            paramType = "String",
+            dataTypeClass = String.class)
+    }
+    )
+    @RequestMapping(value = "/adminCancelApply", method = RequestMethod.PUT)
+    @WrapUpResponseBody
+    public ResponseData adminCancelApply(@RequestBody TenantMemberApply tenantMemberApply,HttpServletRequest request) {
+        String userCode = tenantMemberApply.getUserCode();
+        if (StringUtils.isBlank(userCode)){
+            return ResponseData.makeErrorMessage("userCode不能为空");
+        }
+        String topUnit = WebOptUtils.getCurrentTopUnit(request);
+        if (!tenantPowerManage.userIsTenantAdmin(topUnit)){
+            throw new ObjectException(ResponseData.HTTP_UNAUTHORIZED,"您没有操作权限!");
+        }
+        Map<String, Object> parameters = CollectionsOpt.createHashMap("userCode",userCode, "topUnit",  topUnit);
+        return tenantService.cancelApply(parameters);
+    }
+
     @ApiOperation(
         value = "注销租户",
         notes = "注销租户，只有租户所有者才可以操作"
@@ -275,6 +344,18 @@ public class TenanController extends BaseController {
         value = "用户同意加入租户",
         notes = "用户同意加入租户"
     )
+    @ApiImplicitParams({@ApiImplicitParam(
+        name = "topUnit",
+        value = "租户id",
+        paramType = "String",
+        dataTypeClass = String.class),
+        @ApiImplicitParam(
+            name = "applyState",
+            value = "申请状态 3：同意加入 4：不同意加入",
+            paramType = "String",
+            dataTypeClass = String.class)
+    }
+    )
     @RequestMapping(value = "/userAgreeJoin", method = RequestMethod.PUT)
     @WrapUpResponseBody
     public ResponseData userAgreeJoin(@RequestBody TenantMemberApplyVo tenantMemberApply, HttpServletRequest request) {
@@ -292,6 +373,18 @@ public class TenanController extends BaseController {
     @ApiOperation(
         value = "管理员同意用户加入租户",
         notes = "管理员同意用户加入租户"
+    )
+    @ApiImplicitParams({@ApiImplicitParam(
+        name = "applyState",
+        value = "是否通过 3：通过 4：不通过",
+        paramType = "String",
+        dataTypeClass = String.class),
+        @ApiImplicitParam(
+            name = "userCode",
+            value = "用户code",
+            paramType = "String",
+            dataTypeClass = String.class)
+    }
     )
     @RequestMapping(value = "/adminAgreeJoin", method = RequestMethod.PUT)
     @WrapUpResponseBody
