@@ -1,7 +1,10 @@
 package com.centit.framework.tenant.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.dysmsapi20170525.Client;
+import com.aliyun.tea.TeaConverter;
 import com.aliyun.tea.TeaModel;
+import com.aliyun.tea.TeaPair;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -9,6 +12,7 @@ import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.basedata.NoticeMessage;
 import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.framework.system.po.UserInfo;
+import com.centit.support.common.ObjectException;
 import com.centit.support.security.AESSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.aliyun.dysmsapi20170525.models.*;
 import com.aliyun.teaopenapi.models.*;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -82,10 +87,6 @@ public class VateCodeController extends BaseController {
         if (userInfo != null) {
             return ResponseData.makeErrorMessage("此邮箱已被使用！");
         }
-//        String key = userCode;
-//        if(userCode == null){
-//            key = email;
-//        }
         return sendEmail(email, email, request);
     }
 
@@ -94,23 +95,22 @@ public class VateCodeController extends BaseController {
         notes = "获取手机验证码"
     )
     @RequestMapping(value = "/getPhoneCode", method = RequestMethod.POST)
-    @WrapUpResponseBody
-    public SendSmsResponse getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
+    @ResponseBody
+    public SendSmsResponseBody getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
                                         @RequestParam("phone") String phone,
                                         HttpServletRequest request) throws Exception {
         if(phone != null && !phone.equals("")){
             UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
             if (userInfo != null) {
-               throw new Exception("此手机号已被使用！");
-//                Map<String, Object> map = new HashMap<String, Object>();
-//                map.put("body", "{message:'此手机号已被使用'}");
-//                return (SendSmsResponse) TeaModel.toModel(map, new SendSmsResponse());
+                //throw new Exception("此手机号已被使用！");
+                Map<String, Object> map = new HashMap<String, Object>();
+                Map<String, Object> bodyMap = new HashMap<String, Object>();
+                bodyMap.put("Message", "此手机号已被使用");
+                bodyMap.put("Code", 500);
+                map.put("body", bodyMap);
+                return TeaModel.toModel(map, new SendSmsResponse()).getBody();
             }
         }
-//        String key = userCode;
-//        if(userCode == null){
-//            key = phone;
-//        }
         return sendPhone(phone, phone, userCode, request);
     }
 
@@ -184,7 +184,7 @@ public class VateCodeController extends BaseController {
                 if(userInfo == null){
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
-                SendSmsResponse s = sendPhone(loginname, loginname, "", request);
+                SendSmsResponseBody s = sendPhone(loginname, loginname, "", request);
                 //System.out.println(s.body);
             }
             return ResponseData.successResponse;
@@ -253,7 +253,7 @@ public class VateCodeController extends BaseController {
                 .content(message));
     }
 
-    public SendSmsResponse sendPhone(String phone, String key, String userCode, HttpServletRequest request)
+    public SendSmsResponseBody sendPhone(String phone, String key, String userCode, HttpServletRequest request)
             throws Exception{
         String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
         JSONObject jSONObject = new JSONObject();
@@ -285,7 +285,7 @@ public class VateCodeController extends BaseController {
         json.put("createTime", System.currentTimeMillis());
         request.getSession().setAttribute(key, json);
         // 复制代码运行请自行打印 API 的返回值
-        return client.sendSms(sendSmsRequest);
+        return client.sendSms(sendSmsRequest).getBody();
     }
 
     /**
