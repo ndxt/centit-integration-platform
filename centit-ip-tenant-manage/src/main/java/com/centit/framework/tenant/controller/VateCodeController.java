@@ -111,7 +111,11 @@ public class VateCodeController extends BaseController {
                 return TeaModel.toModel(map, new SendSmsResponse()).getBody();
             }
         }
-        return sendPhone(phone, phone, userCode, request);
+        SendSmsResponseBody s = sendPhone(phone, phone, userCode, request);
+        if(s != null && s.getCode() != null && s.getCode().equals("OK")){
+            s.setCode("0");
+        }
+        return s;
     }
 
     @ApiOperation(
