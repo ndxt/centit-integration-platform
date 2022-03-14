@@ -1,22 +1,23 @@
 package com.centit.framework.tenant.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.dysmsapi20170525.Client;
-import com.aliyun.tea.TeaConverter;
 import com.aliyun.tea.TeaModel;
-import com.aliyun.tea.TeaPair;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.NotificationCenter;
+import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.NoticeMessage;
+import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.security.model.JsonCentitUserDetails;
 import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.framework.system.po.UserInfo;
-import com.centit.support.common.ObjectException;
 import com.centit.support.security.AESSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,6 +45,9 @@ public class VateCodeController extends BaseController {
 
     @Autowired
     private UserInfoDao userInfoDao;
+
+    @Autowired
+    private PlatformEnvironment platformEnvironment;
 
     private static Pattern pattern = Pattern.compile("[0-9]*");
 
@@ -115,6 +119,7 @@ public class VateCodeController extends BaseController {
         if(s != null && s.getCode() != null && s.getCode().equals("OK")){
             s.setCode("0");
         }
+        System.out.println(s.getCode().toString());
         return s;
     }
 
@@ -157,6 +162,10 @@ public class VateCodeController extends BaseController {
                         logger.info("用户:{}修改用户信息手机",userCode);
                     }
                     userInfoDao.updateUser(user);
+                    //刷新缓存中的人员信息
+                    reloadAuthentication(user.getUserCode());
+                    //人员新增更新成功后刷新缓存
+                    CodeRepositoryCache.evictCache("UserInfo");
                 }
             }
             request.getSession().removeAttribute(key);
@@ -189,7 +198,6 @@ public class VateCodeController extends BaseController {
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
                 SendSmsResponseBody s = sendPhone(loginname, loginname, "", request);
-                //System.out.println(s.body);
             }
             return ResponseData.successResponse;
         }catch (Exception e){
@@ -309,6 +317,24 @@ public class VateCodeController extends BaseController {
         // 访问的域名
         config.endpoint = "dysmsapi.aliyuncs.com";
         return new com.aliyun.dysmsapi20170525.Client(config);
+    }
+
+    private void reloadAuthentication(String userCode) {
+        CentitUserDetails centitUserDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
+        centitUserDetails.setLoginIp(getUserIp());
+        SecurityContextHolder.getContext().setAuthentication(centitUserDetails);
+    }
+    /**
+     * 获取用户ip地址
+     * @return
+     */
+    private String getUserIp(){
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof JsonCentitUserDetails){
+            JsonCentitUserDetails userDetails = (JsonCentitUserDetails) principal;
+            return userDetails.getLoginIp();
+        }
+        return "";
     }
 
 }
