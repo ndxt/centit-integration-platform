@@ -54,9 +54,9 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
      * @return
      */
     public List<TenantInfo> listUserTenant(Map<String,Object> filterMap){
-        String sql = " SELECT \n" +
-            "DISTINCT \n" +
-            "A.TOP_UNIT, A.UNIT_NAME,A.SOURCE_URL,A.OWN_USER\n" +
+        String sql = " SELECT " +
+            "DISTINCT " +
+            "A.TOP_UNIT, A.UNIT_NAME,A.SOURCE_URL,A.OWN_USER " +
             "FROM F_TENANT_INFO A  JOIN F_USERUNIT B ON A.TOP_UNIT = B.TOP_UNIT WHERE A.IS_AVAILABLE = 'T'   AND B.USER_CODE = :userCode " ;
         return getJdbcTemplate().execute((ConnectionCallback<List<TenantInfo>>) conn ->OrmDaoUtils.queryObjectsByNamedParamsSql(conn, sql ,
             filterMap, TenantInfo.class));

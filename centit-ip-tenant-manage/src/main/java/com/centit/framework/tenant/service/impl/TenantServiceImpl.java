@@ -707,9 +707,9 @@ public class TenantServiceImpl implements TenantService {
         }
         //排除已经被邀请的用户且没有审核,或者属于本单位的人员
         Set<String> userInfoUserCodes = userInfos.stream().map(UserInfo::getUserCode).collect(Collectors.toSet());
-        List<TenantMemberApply> alreadyApply = tenantMemberApplyDao.listObjectsByProperties(
-            CollectionsOpt.createHashMap("userCode_in", CollectionsOpt.listToArray(userInfoUserCodes),
-                "topUnit", unitCode, "applyState_in", TenantMemberApplyDao.NOT_APPROVE_ARRAY));
+        Map<String, Object> filterMap = CollectionsOpt.createHashMap("userCode_in", CollectionsOpt.listToArray(userInfoUserCodes),
+            "topUnit", unitCode, "applyState_in", TenantMemberApplyDao.NOT_APPROVE_ARRAY);
+        List<TenantMemberApply> alreadyApply = tenantMemberApplyDao.listObjectsByProperties(filterMap);
         List<String> applyUserCodes = alreadyApply.stream().map(TenantMemberApply::getUserCode).collect(Collectors.toList());
         List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("topUnit", unitCode));
         userInfos = userInfos.stream().filter(userInfo ->
@@ -883,9 +883,7 @@ public class TenantServiceImpl implements TenantService {
         WorkGroup workGroup = getWorkGroupByUserCodeAndTopUnit(userCode, topUnit, workGroups);
         String roleCode = null != workGroup ? workGroup.getWorkGroupParameter().getRoleCode() : "";
         tenantJson.put("roleCode",  roleCode);
-        if(StringUtils.isNotBlank(roleCode)) {
-            tenantJson.put("roleName", translateTenantRole(roleCode));
-        }
+        tenantJson.put("roleName", translateTenantRole(roleCode));
 
         //判断当前用户是否为租户所有者或管理员
         boolean isAdmin = MapUtils.getString(tenantJson, "roleCode", "").equals(TenantConstant.TENANT_ADMIN_ROLE_CODE)
@@ -902,18 +900,11 @@ public class TenantServiceImpl implements TenantService {
      * @return 租户角色名称
      */
     private String translateTenantRole(String roleCode) {
-        if (StringUtils.isBlank(roleCode)) {
-            return "";
+        if (TenantConstant.TENANT_ADMIN_ROLE_CODE.equals(roleCode)){
+            return "管理员";
+        }else {
+            return "组员";
         }
-        switch (roleCode) {
-            case TenantConstant.TENANT_ADMIN_ROLE_CODE:
-                return "管理员";
-            case TenantConstant.TENANT_NORMAL_MEMBER_ROLE_CODE:
-                return "组员";
-            default:
-                return "";
-        }
-
     }
 
     /**
@@ -1520,6 +1511,7 @@ public class TenantServiceImpl implements TenantService {
         //如果用户基本信息中topUnit为空为当前新建租户的topUnit
         UserInfo userInfo = userInfoDao.getUserByCode(oldTenantInfo.getOwnUser());
         if (StringUtils.isBlank(userInfo.getTopUnit())) {
+            userInfo.setIsValid("T");
             userInfo.setTopUnit(oldTenantInfo.getTopUnit());
             userInfo.setPrimaryUnit(oldTenantInfo.getTopUnit());
             userInfoDao.updateUser(userInfo);
