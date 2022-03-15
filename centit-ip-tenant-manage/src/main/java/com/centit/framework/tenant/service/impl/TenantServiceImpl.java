@@ -810,10 +810,12 @@ public class TenantServiceImpl implements TenantService {
         if (sysUnitManager.hasSameName(unitInfo)) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT, String.format("机构名%s已存在，请更换！",unitInfo.getUnitName()));
         }
-        Map<String, Object> filterMap = CollectionsOpt.createHashMap("depNo", unitInfo.getDepNo(), "topUnit", unitInfo.getTopUnit());
-        List<UnitInfo> unitInfos = sysUnitManager.listObjects(filterMap);
-        if (unitInfos != null && unitInfos.size() > 0) {
-            return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT,String.format("机构编码%s已存在，请更换！",unitInfo.getDepNo()));
+        if (StringUtils.isNotBlank(unitInfo.getDepNo())){
+            Map<String, Object> filterMap = CollectionsOpt.createHashMap("depNo", unitInfo.getDepNo(), "topUnit", unitInfo.getTopUnit());
+            List<UnitInfo> unitInfos = sysUnitManager.listObjects(filterMap);
+            if (unitInfos != null && unitInfos.size() > 0) {
+                return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT,String.format("机构编码%s已存在，请更换！",unitInfo.getDepNo()));
+            }
         }
         if(unitInfo.getUnitOrder()==null || unitInfo.getUnitOrder()==0) {
             while (!sysUnitManager.isUniqueOrder(unitInfo)) {
