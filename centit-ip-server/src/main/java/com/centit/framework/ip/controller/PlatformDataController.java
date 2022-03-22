@@ -11,9 +11,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.security.model.TopUnitSecurityMetadata;
 import com.centit.framework.system.po.DataDictionary;
-import com.centit.framework.system.po.OsInfo;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
 import com.centit.framework.system.service.OptInfoManager;
@@ -509,11 +507,8 @@ public class PlatformDataController extends BaseController {
                                         String accessUrl,
                                         HttpServletRequest request) {
         List<? extends IUserRole> userRoles = platformEnvironment.listUserRoles(topUnit, userCode);
-        TopUnitSecurityMetadata metadata = CentitSecurityMetadata.securityMetadata.getCachedValue(topUnit);
-        Collection<ConfigAttribute> needRoles = null;
-        if (null != metadata) {
-            needRoles = metadata.matchUrlToRole(accessUrl, request);
-        }
+        Collection<ConfigAttribute> needRoles = CentitSecurityMetadata.matchUrlToRole(accessUrl, request);
+
         if (userRoles == null || needRoles == null) {
             return false;
         }
