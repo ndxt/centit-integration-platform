@@ -95,8 +95,10 @@ public class TenanController extends BaseController {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
         }
         tenantInfo.setCreator(userCode);
-        if (tenantPowerManage.userIsSystemMember() && StringUtils.isBlank(tenantInfo.getOwnUser())){
-            throw new ObjectException("ownUser不能为空");
+        if (tenantPowerManage.userIsSystemMember()){
+            if (StringUtils.isBlank(tenantInfo.getOwnUser())){
+                throw new ObjectException("ownUser不能为空");
+            }
         }else {
             tenantInfo.setOwnUser(userCode);
         }
