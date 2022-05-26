@@ -191,7 +191,7 @@ public class PlatformDataController extends BaseController {
     @ApiOperation(value = "获取应用菜单里的所有模块", notes = "获取应用菜单里的所有模块")
     @RequestMapping(value = "/osmenu/{osId}", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IOptInfo> listOsMenuOptInfos(@PathVariable String osId){
+    public List<? extends IOptInfo> listOsMenuOptInfos(@PathVariable String osId) {
         return platformEnvironment.listMenuOptInfosUnderOsId(osId);
     }
 
@@ -262,6 +262,13 @@ public class PlatformDataController extends BaseController {
         return platformEnvironment.listAllUsers(topUnit);
     }
 
+    @ApiOperation(value = "获取当前租户下的所有的用户", notes = "获取当前租户下所有的用户。")
+    @RequestMapping(value = "/currentusers", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public List<? extends IUserInfo> listCurrentUsers(HttpServletRequest request) {
+        return platformEnvironment.listAllUsers(WebOptUtils.getCurrentTopUnit(request));
+    }
+
     /**
      * 获取租户下所有的机构
      *
@@ -276,6 +283,13 @@ public class PlatformDataController extends BaseController {
     @WrapUpResponseBody
     public List<? extends IUnitInfo> listAllUnits(@PathVariable String topUnit) {
         return platformEnvironment.listAllUnits(topUnit);
+    }
+
+    @ApiOperation(value = "获取当前租户下所有的机构", notes = "获取当前租户下所有的机构。")
+    @RequestMapping(value = "/currentunits", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public List<? extends IUnitInfo> listCurrentUnits(HttpServletRequest request) {
+        return platformEnvironment.listAllUnits(WebOptUtils.getCurrentTopUnit(request));
     }
 
     /**
@@ -293,6 +307,7 @@ public class PlatformDataController extends BaseController {
     public List<? extends IUserUnit> listAllUserUnits(@PathVariable String topUnit) {
         return platformEnvironment.listAllUserUnits(topUnit);
     }
+
 
     /**
      * 获取用户所有的租户
