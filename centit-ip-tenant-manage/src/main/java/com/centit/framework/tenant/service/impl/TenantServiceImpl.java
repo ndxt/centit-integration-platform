@@ -183,13 +183,13 @@ public class TenantServiceImpl implements TenantService {
     @Transactional
     public ResponseData applyAddTenant(TenantInfo tenantInfo) {
 
-        //限制一个用户只能申请一个租户
-        int tenantCount = tenantInfoDao.countObjectByProperties(CollectionsOpt.createHashMap("ownUser", tenantInfo.getOwnUser(), "isAvailable", "T"));
-        if (tenantCount > 0) {
-            if (tenantPowerManage.userIsSystemMember()){
-                return ResponseData.makeErrorMessage(tenantInfo.getOwnUser() + "用户已经拥有一个租户，不能再次申请!");
+        //系统管理员可以帮助其他用户创建多个租户
+        if(!tenantPowerManage.userIsSystemAdmin()) {
+            //限制一个用户只能申请一个租户
+            int tenantCount = tenantInfoDao.countObjectByProperties(CollectionsOpt.createHashMap("ownUser", tenantInfo.getOwnUser(), "isAvailable", "T"));
+            if (tenantCount > 0) {
+                return ResponseData.makeErrorMessage("您已经拥有一个租户，不能再次申请!");
             }
-            return ResponseData.makeErrorMessage("您已经拥有一个租户，不能再次申请!");
         }
         saveTenantInfo(tenantInfo);
         TenantInfo newTenantInfo = new TenantInfo();
