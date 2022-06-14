@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -259,7 +260,7 @@ public class PlatformDataController extends BaseController {
     @RequestMapping(value = "/allusers/{topUnit}", method = RequestMethod.GET)
     @WrapUpResponseBody
     public List<? extends IUserInfo> listAllUsers(@PathVariable String topUnit) {
-        return platformEnvironment.listAllUsers(topUnit);
+        return CodeRepositoryUtil.listAllUsers(topUnit);
     }
 
     @ApiOperation(value = "获取当前租户下的所有的用户", notes = "获取当前租户下所有的用户。")
@@ -282,7 +283,7 @@ public class PlatformDataController extends BaseController {
     @RequestMapping(value = "/allunits/{topUnit}", method = RequestMethod.GET)
     @WrapUpResponseBody
     public List<? extends IUnitInfo> listAllUnits(@PathVariable String topUnit) {
-        return platformEnvironment.listAllUnits(topUnit);
+        return CodeRepositoryUtil.listAllUnits(topUnit);
     }
 
     @ApiOperation(value = "获取当前租户下所有的机构", notes = "获取当前租户下所有的机构。")
