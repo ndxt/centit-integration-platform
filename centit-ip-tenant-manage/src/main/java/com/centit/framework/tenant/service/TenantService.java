@@ -21,8 +21,8 @@ public interface TenantService {
 
     /**
      * 用户注册
-     * @param userinfo
-     * @return
+     * @param userinfo 用户信息
+     * @return ResponseData
      */
     ResponseData registerUserAccount(UserInfo userinfo) ;
 
@@ -32,30 +32,30 @@ public interface TenantService {
      * 2.根据租户信息创建租户单位
      * 3.把租户所有人与机构信息绑定
      * 4.给租户所有人创建机构管理的最高权限（最高权限怎么设置）
-     * @param tenantInfo
-     * @return
+     * @param tenantInfo 租户信息
+     * @return ResponseData
      */
     ResponseData applyAddTenant(TenantInfo tenantInfo);
 
     /**
      * 申请加入租户
      * 可以是用户主动申请，也可以是管理员邀请
-     * @param tenantMemberApply
-     * @return
+     * @param tenantMemberApply 租户成员
+     * @return ResponseData
      */
     ResponseData applyJoinTenant(TenantMemberApply tenantMemberApply);
 
     /**
      * 用户申请加入租户
-     * @param tenantMemberApply
-     * @return
+     * @param tenantMemberApply 租户成员
+     * @return ResponseData
      */
     ResponseData userApplyJoinTenant(TenantMemberApply tenantMemberApply);
 
     /**
      * 管理员邀请用户加入租户
-     * @param tenantMemberApply
-     * @return
+     * @param tenantMemberApply 租户成员
+     * @return ResponseData
      */
     ResponseData adminApplyUserJoinTenant(TenantMemberApply tenantMemberApply);
 
@@ -67,15 +67,15 @@ public interface TenantService {
      * code（用户代码或机构代码）
      * codeType（代码类型，1：用户代码2：机构代码）
      * approveType（审批类型， 1待审批 2已审批）
-     * @param pageDesc
-     * @return
+     * @param pageDesc 分页
+     * @return PageQueryResult
      */
     PageQueryResult listApplyInfo(Map<String,Object> parameters, PageDesc pageDesc);
 
     /**
      * 平台管理员审核租户
-     * @param tenantInfo
-     * @return
+     * @param tenantInfo 租户信息
+     * @return ResponseData
      */
     ResponseData adminCheckTenant(TenantInfo tenantInfo);
 
@@ -83,37 +83,37 @@ public interface TenantService {
      * 同意加入
      * 可以是平台管理员审核用户的加入
      * 也可以是普通用户同意管理员的邀请
-     * @param tenantMemberApplyVo
-     * @return
+     * @param tenantMemberApplyVo 租户成员
+     * @return ResponseData
      */
     ResponseData agreeJoin(TenantMemberApplyVo tenantMemberApplyVo);
 
     /**
      * 更新用户信息
-     * @param userInfo
-     * @return
+     * @param userInfo 用户信息
+     * @return ResponseData
      */
     ResponseData updateUserInfo(UserInfo userInfo);
 
     /**
      * 退出租户
-     * @param topUnit
-     * @return
+     * @param topUnit 租户
+     * @return ResponseData
      */
     ResponseData quitTenant(String topUnit,String userCode);
 
     /**
      * 移除租户内的成员
-     * @param topUnit
-     * @param userCode
-     * @return
+     * @param topUnit 租户
+     * @param userCode 用户代码
+     * @return ResponseData
      */
     ResponseData removeTenantMember(String topUnit,String userCode);
 
     /**
      * 转让租户
-     * @param tenantBusinessLog
-     * @return
+     * @param tenantBusinessLog 转让日志
+     * @return ResponseData
      */
     ResponseData businessTenant(TenantBusinessLog tenantBusinessLog);
 
@@ -121,8 +121,8 @@ public interface TenantService {
     /**
      * 平台审核租户转让
      * 租户所有者交易租户，不需要平台审核
-     * @param tenantBusinessLog
-     * @return
+     * @param tenantBusinessLog 转让日志
+     * @return ResponseData
      */
     @Deprecated
     ResponseData adminCheckTenantBusiness(TenantBusinessLog tenantBusinessLog);
@@ -132,8 +132,8 @@ public interface TenantService {
      * 1.可以是已经审核通过的
      * 2.也可以是待审核的
      * 3.也可以是审核不通过的
-     * @param tenantInfo
-     * @return
+     * @param tenantInfo 租户信息
+     * @return PageQueryResult
      */
     PageQueryResult pageListTenantApply(PageListTenantInfoQo tenantInfo, PageDesc pageDesc);
 
@@ -142,22 +142,22 @@ public interface TenantService {
      * 展示该机构下的人员
      * @param params 请求参数
      * @param pageDesc 分页参数
-     * @return
+     * @return PageQueryResult
      */
     PageQueryResult pageListTenantMember(Map<String,Object> params, PageDesc pageDesc);
 
     /**
      * 租户所有者或平台管理员分配管理员权限
-     * @param tenantMemberQo
-     * @return
+     * @param tenantMemberQo 租户成员
+     * @return ResponseData
      */
     ResponseData assignTenantRole(TenantMemberQo tenantMemberQo);
 
 
     /**
      * 删除租户成员角色
-     * @param tenantMemberQo
-     * @return
+     * @param tenantMemberQo 租户成员
+     * @return ResponseData
      */
     ResponseData deleteTenantRole(TenantMemberQo tenantMemberQo);
 
@@ -165,16 +165,16 @@ public interface TenantService {
     /**
      * 用户所在租户
      * @param userCode 用户code
-     * @return
+     * @return JSONArray
      */
     JSONArray userTenants(String userCode);
 
 
     /**
      * 根据unitName 模糊查询租户信息
-     * @param filterMap
-     * @param pageDesc
-     * @return
+     * @param filterMap 过滤条件
+     * @param pageDesc 分页
+     * @return PageQueryResult
      */
     PageQueryResult pageListTenants(Map<String,Object> filterMap , PageDesc pageDesc);
 
@@ -183,7 +183,7 @@ public interface TenantService {
      * @param paramMap 用户信息
      *                 只能根据userCode，userName，regCellPhone精确查找
      *                 unitCode:必要 当前用户所在租户code
-     * @return 查找userinfo结果
+     * @return ResponseData 查找userinfo结果
      */
     ResponseData findUsers(Map<String,Object> paramMap);
 
@@ -191,29 +191,29 @@ public interface TenantService {
     /**
      *取消加入租户申请
      * @param parameters userCode topUnit 必传
-     * @return
+     * @return ResponseData
      */
     ResponseData cancelApply(Map<String, Object> parameters);
 
     /**
      * 注销租户申请
      * @param parameters topUnit必传
-     * @return
+     * @return ResponseData
      */
     ResponseData deleteTenant(Map<String, Object> parameters);
 
     /**
      * 更新租户信息，为系统管理员和租户所有者，租户管理员使用
-     * @param tenantInfo
-     * @return
+     * @param tenantInfo 租户信息
+     * @return ResponseData
      */
     ResponseData updateTenant(TenantInfo tenantInfo);
 
     /**
      * 创建单位 是对 com.centit.framework.system.service.SysUnitManager#saveNewUnitInfo(com.centit.framework.system.po.UnitInfo)
      * 接口的再次封装
-     * @param unitInfo
-     * @return
+     * @param unitInfo 机构信息
+     * @return ResponseData
      */
     ResponseData addTenantUnit(UnitInfo unitInfo);
 
@@ -222,7 +222,7 @@ public interface TenantService {
      * 接口的再次封装
      * @param userInfo 用户信息
      * @param userUnit 用户单位信息
-     * @return
+     * @return ResponseData
      */
     ResponseData addTenantUser(UserInfo userInfo, UserUnit userUnit);
 

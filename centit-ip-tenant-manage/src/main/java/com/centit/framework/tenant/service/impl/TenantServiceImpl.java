@@ -675,6 +675,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
 
+    @Override
     public JSONArray userTenants(String userCode) {
         List<TenantInfo> tenantInfos = tenantInfoDao.listUserTenant(CollectionsOpt.createHashMap("userCode", userCode));
         if (CollectionUtils.sizeIsEmpty(tenantInfos)){

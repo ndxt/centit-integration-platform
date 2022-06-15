@@ -38,8 +38,8 @@ public interface TenantPowerManage {
 
     /**
      * 租户是否为管理员或所有这
-     * @param topUnit
-     * @return
+     * @param topUnit 租户
+     * @return String
      */
     String userTenantRole(String topUnit);
 
@@ -136,6 +136,7 @@ public interface TenantPowerManage {
 
     /**
      * 租户中用户数量是否达到限制
+     * @param topUnit 租户
      * @return true:超出限制 false：未超出限制
      */
     boolean userNumberLimitIsOver(String topUnit);
@@ -143,7 +144,7 @@ public interface TenantPowerManage {
     /**
      *  租户中单位数量是否达到限制
      * @param topUnit true:超出限制 false：未超出限制
-     * @return
+     * @return boolean
      */
     boolean unitNumberLimitIsOver(String topUnit);
 }

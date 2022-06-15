@@ -303,9 +303,9 @@ public class VateCodeController extends BaseController {
     /**
      * 使用AK&SK初始化账号Client
      * @return Client
-     * @throws Exception
+     * @throws Exception 异常
      */
-    public static com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
+    private static com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
 
         String accessKeyId = "+GrP3D07U/aR2WDtm9iTSUeJ0F00X0f75Byebbcw8fc=";
         String accessKeySecret = "gqdjhi7JEasb2uiOW/riueAXA4vvOxsgYfmdRbAqwIU=";

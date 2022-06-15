@@ -31,9 +31,9 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
 
     /**
      * 查询租户信息和租户所有者对应的用户名
-     * @param filterMap
-     * @param pageDesc
-     * @return
+     * @param filterMap 过滤条件
+     * @param pageDesc 分页
+     * @return JSONArray
      */
     public JSONArray listTenantInfoWithOwnUserName(Map<String,Object> filterMap,PageDesc pageDesc){
         String sql = " SELECT A.TOP_UNIT, A.UNIT_NAME, A.OWN_USER, B.USER_NAME " +
@@ -50,8 +50,8 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
 
     /**
      * 获取用户所在租户
-     * @param filterMap
-     * @return
+     * @param filterMap 过滤
+     * @return List
      */
     public List<TenantInfo> listUserTenant(Map<String,Object> filterMap){
         String sql = " SELECT " +
@@ -61,11 +61,7 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
         return getJdbcTemplate().execute((ConnectionCallback<List<TenantInfo>>) conn ->OrmDaoUtils.queryObjectsByNamedParamsSql(conn, sql ,
             filterMap, TenantInfo.class));
     }
-    /**
-     *把请求参数转换为过滤参数
-     * @param pageListTenantInfoQo
-     * @return
-     */
+
     private HashMap<String, Object> getQoFilterMap(PageListTenantInfoQo pageListTenantInfoQo) {
         HashMap<String, Object> filterMap = new HashMap<>();
 
@@ -115,9 +111,9 @@ public class TenantInfoDao extends BaseDaoImpl<TenantInfo,String> {
 
     /**
      * 校验用户是否为租户所有者
-     * @param topUnit
-     * @param userCode
-     * @return
+     * @param topUnit 租户
+     * @param userCode 用户代码
+     * @return boolean
      */
     public boolean userIsOwner(String topUnit,String userCode) {
         String sql = " SELECT COUNT(1) FROM F_TENANT_INFO WHERE TOP_UNIT = ? AND OWN_USER = ? ";
