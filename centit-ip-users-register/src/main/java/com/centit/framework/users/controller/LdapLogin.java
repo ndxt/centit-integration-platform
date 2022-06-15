@@ -4,6 +4,7 @@ import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.system.service.UserSyncDirectoryManager;
@@ -57,6 +58,8 @@ public class LdapLogin {
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
     @WrapUpResponseBody
+    @RecordOperationLog(content = "ldap登录,操作IP地址:{loginIp}",
+        newValue="ldap登录")
     public ResponseData login(@RequestParam("username") String username,
                               @RequestParam("password") String password,
                               HttpServletRequest request) throws Exception {
