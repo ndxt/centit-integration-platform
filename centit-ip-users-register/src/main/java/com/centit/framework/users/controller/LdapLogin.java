@@ -8,7 +8,6 @@ import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.system.service.UserSyncDirectoryManager;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,12 +15,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -33,7 +32,6 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -53,13 +51,24 @@ public class LdapLogin {
     @Autowired
     private UserSyncDirectoryManager userSyncDirectoryManager;
 
+    @Value("${security.disable.user}")
+    private String disableUser;
+
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
     @WrapUpResponseBody
     public ResponseData login(@RequestParam("username") String username,
                               @RequestParam("password") String password,
                               HttpServletRequest request) throws Exception {
-
+        if (StringUtils.isNotBlank(disableUser)) {
+            disableUser = StringUtils.deleteWhitespace(disableUser);
+            String[] ignoreUsers = disableUser.split(",");
+            for(int i = 0; i < ignoreUsers.length; i++){
+                if (username.contains(ignoreUsers[i])) {
+                    return ResponseData.makeErrorMessage("禁用的用户账号");
+                }
+            }
+        }
         Map<String, Object> map = searchLdapUserByloginName(username);
         Map<String, Object> sessionMap = new HashMap<>();
         if(map==null || map.isEmpty()){
