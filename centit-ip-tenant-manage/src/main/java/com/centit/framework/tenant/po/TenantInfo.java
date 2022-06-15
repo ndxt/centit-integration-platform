@@ -4,9 +4,11 @@ import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
@@ -15,6 +17,8 @@ import java.util.Date;
 
 
 @ApiModel(value = "租户基本信息", description = "租户基本信息")
+@Entity
+@Data
 @Table(name = "f_tenant_info")
 public class TenantInfo implements Serializable {
 
@@ -115,173 +119,15 @@ public class TenantInfo implements Serializable {
     @ApiModelProperty(value = "租户下单位个数上限 ", name = "unitNumberLimit")
     private Integer unitNumberLimit;
 
-    public String getTopUnit() {
-        return topUnit;
-    }
+    @ApiModelProperty(value = "图片id")
+    @Column(name = "PIC_ID")
+    @Length(max = 64, message = "字段长度不能大于{max}")
+    private String picId;
 
-    public void setTopUnit(String topUnit) {
-        this.topUnit = topUnit;
-    }
-
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName;
-    }
-
-    public String getSourceUrl() {
-        return sourceUrl;
-    }
-
-    public void setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
-    }
-
-    public Date getUseLimittime() {
-        return useLimittime;
-    }
-
-    public void setUseLimittime(Date useLimittime) {
-        this.useLimittime = useLimittime;
-    }
-
-    public int getTenantFee() {
-        return tenantFee;
-    }
-
-    public void setTenantFee(int tenantFee) {
-        this.tenantFee = tenantFee;
-    }
-
-    public String getOwnUser() {
-        return ownUser;
-    }
-
-    public void setOwnUser(String ownUser) {
-        this.ownUser = ownUser;
-    }
-
-    public String getIsAvailable() {
-        return isAvailable;
-    }
-
-    public void setIsAvailable(String isAvailable) {
-        this.isAvailable = isAvailable;
-    }
-
-    public Date getApplyTime() {
-        return applyTime;
-    }
-
-    public void setApplyTime(Date applyTime) {
-        this.applyTime = applyTime;
-    }
-
-    public Date getPassTime() {
-        return passTime;
-    }
-
-    public void setPassTime(Date passTime) {
-        this.passTime = passTime;
-    }
-
-    public String getMemo() {
-        return memo;
-    }
-
-    public void setMemo(String memo) {
-        this.memo = memo;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getUpdator() {
-        return updator;
-    }
-
-    public void setUpdator(String updator) {
-        this.updator = updator;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public Integer getDatabaseNumberLimit() {
-        return databaseNumberLimit;
-    }
-
-    public void setDatabaseNumberLimit(Integer databaseNumberLimit) {
-        this.databaseNumberLimit = databaseNumberLimit;
-    }
-
-    public Integer getOsNumberLimit() {
-        return osNumberLimit;
-    }
-
-    public void setOsNumberLimit(Integer osNumberLimit) {
-        this.osNumberLimit = osNumberLimit;
-    }
-
-    public Integer getFileSpaceLimit() {
-        return fileSpaceLimit;
-    }
-
-    public void setFileSpaceLimit(Integer fileSpaceLimit) {
-        this.fileSpaceLimit = fileSpaceLimit;
-    }
-
-    public Integer getDataSpaceLimit() {
-        return dataSpaceLimit;
-    }
-
-    public void setDataSpaceLimit(Integer dataSpaceLimit) {
-        this.dataSpaceLimit = dataSpaceLimit;
-    }
-
-    public Integer getUserNumberLimit() {
-        return userNumberLimit;
-    }
-
-    public void setUserNumberLimit(Integer userNumberLimit) {
-        this.userNumberLimit = userNumberLimit;
-    }
-
-    public Integer getUnitNumberLimit() {
-        return unitNumberLimit;
-    }
-
-    public void setUnitNumberLimit(Integer unitNumberLimit) {
-        this.unitNumberLimit = unitNumberLimit;
-    }
+    @ApiModelProperty(value = "网页logo图片主键")
+    @Column(name = "LOGO_FILE_ID")
+    @Length(max = 64, message = "字段长度不能大于{max}")
+    private String logoFileId;
 
     @Override
     public String toString() {
