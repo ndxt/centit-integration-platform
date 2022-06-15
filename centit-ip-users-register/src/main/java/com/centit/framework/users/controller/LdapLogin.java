@@ -58,8 +58,8 @@ public class LdapLogin {
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
     @WrapUpResponseBody
-    @RecordOperationLog(content = "ldap登录,操作IP地址:{loginIp}",
-        newValue="ldap登录")
+    @RecordOperationLog(content = "用户{username}使用ldap登录,操作IP地址:{loginIp}",
+        newValue="ldap登录", returnValueAsOld = true)
     public ResponseData login(@RequestParam("username") String username,
                               @RequestParam("password") String password,
                               HttpServletRequest request) throws Exception {
