@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,9 +101,10 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/getPhoneCode", method = RequestMethod.POST)
     @ResponseBody
-    public SendSmsResponseBody getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
-                                        @RequestParam("phone") String phone,
-                                        HttpServletRequest request) throws Exception {
+    public Map<String, Object> getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
+                                            @RequestParam("phone") String phone,
+                                            HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Map<String, Object> result = new HashMap<>();
         if(phone != null && !phone.equals("")){
             UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
             if (userInfo != null) {
@@ -112,15 +114,17 @@ public class VateCodeController extends BaseController {
                 bodyMap.put("Message", "此手机号已被使用");
                 bodyMap.put("Code", 500);
                 map.put("body", bodyMap);
-                return TeaModel.toModel(map, new SendSmsResponse()).getBody();
+                return bodyMap;
             }
         }
-        SendSmsResponseBody s = sendPhone(phone, phone, userCode, request);
+        SendSmsResponseBody s = sendPhone(phone, phone, userCode, request, result);
         if(s != null && s.getCode() != null && s.getCode().equals("OK")){
             s.setCode("0");
         }
-        System.out.println(s.getCode().toString());
-        return s;
+        result.put("code", s.getCode());
+        result.put("message", s.getMessage());
+        result.put("x-auth-token", request.getSession().getId());
+        return result;
     }
 
     @ApiOperation(
@@ -137,7 +141,12 @@ public class VateCodeController extends BaseController {
             if (code == null) {
                 return ResponseData.makeErrorMessage(500, "请输入验证码！");
             }
+            boolean flag = true;
             JSONObject json = JSONObject.parseObject(request.getSession().getAttribute(key) + "");
+            if(json == null){
+                flag = false;
+                json = JSONObject.parseObject(request.getHeader("verifyCode"));
+            }
             if(json == null){
                 return ResponseData.makeErrorMessage(500, "未发送验证码！");
             }
@@ -168,7 +177,9 @@ public class VateCodeController extends BaseController {
                     CodeRepositoryCache.evictCache("UserInfo");
                 }
             }
-            request.getSession().removeAttribute(key);
+            if(flag){
+                request.getSession().removeAttribute(key);
+            }
             return ResponseData.makeSuccessResponse();
         }catch (Exception e) {
             e.printStackTrace();
@@ -197,7 +208,7 @@ public class VateCodeController extends BaseController {
                 if(userInfo == null){
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
-                SendSmsResponseBody s = sendPhone(loginname, loginname, "", request);
+                SendSmsResponseBody s = sendPhone(loginname, loginname, "", request, null);
             }
             return ResponseData.successResponse;
         }catch (Exception e){
@@ -221,7 +232,12 @@ public class VateCodeController extends BaseController {
             if (code == null) {
                 return ResponseData.makeErrorMessage(500, "请输入验证码！");
             }
+            boolean flag = true;
             JSONObject json = JSONObject.parseObject(request.getSession().getAttribute(key) + "");
+            if(json == null){
+                flag = false;
+                json = JSONObject.parseObject(request.getHeader("verifyCode"));
+            }
             if(json == null){
                 return ResponseData.makeErrorMessage(500, "未发送验证码！");
             }
@@ -241,7 +257,9 @@ public class VateCodeController extends BaseController {
             }else if(phone != null && !phone.equals("")){
                 userInfo = userInfoDao.getUserByRegCellPhone(phone);
             }
-            request.getSession().removeAttribute(key);
+            if(flag){
+                request.getSession().removeAttribute(key);
+            }
             return ResponseData.makeResponseData(userInfo);
         }catch (Exception e) {
             e.printStackTrace();
@@ -265,7 +283,7 @@ public class VateCodeController extends BaseController {
                 .content(message));
     }
 
-    public SendSmsResponseBody sendPhone(String phone, String key, String userCode, HttpServletRequest request)
+    public SendSmsResponseBody sendPhone(String phone, String key, String userCode, HttpServletRequest request, Map<String, Object> map)
             throws Exception{
         String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
         JSONObject jSONObject = new JSONObject();
@@ -296,6 +314,7 @@ public class VateCodeController extends BaseController {
         json.put("verifyCode", verifyCode);
         json.put("createTime", System.currentTimeMillis());
         request.getSession().setAttribute(key, json);
+        map.put("verifyCode", json);
         // 复制代码运行请自行打印 API 的返回值
         return client.sendSms(sendSmsRequest).getBody();
     }
