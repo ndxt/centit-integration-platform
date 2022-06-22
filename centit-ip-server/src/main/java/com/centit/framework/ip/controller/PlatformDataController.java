@@ -1,6 +1,7 @@
 package com.centit.framework.ip.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
@@ -8,6 +9,7 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.framework.core.dao.DictionaryMapUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitSecurityMetadata;
@@ -36,8 +38,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author codefan
@@ -266,8 +270,18 @@ public class PlatformDataController extends BaseController {
     @ApiOperation(value = "获取当前租户下的所有的用户", notes = "获取当前租户下所有的用户。")
     @RequestMapping(value = "/currentusers", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public List<? extends IUserInfo> listCurrentUsers(HttpServletRequest request) {
-        return platformEnvironment.listAllUsers(WebOptUtils.getCurrentTopUnit(request));
+    public JSONArray listCurrentUsers(HttpServletRequest request) {
+        String topUnit=WebOptUtils.getCurrentTopUnit(request);
+        List<? extends IUserUnit> userUnits=CodeRepositoryUtil.listAllUserUnits(topUnit);
+        List<UserInfo> result = new ArrayList<>();
+        for(IUserUnit un:userUnits){
+            if(Objects.equals(un.getRelType(),"T")){
+                UserInfo userInfo= (UserInfo) CodeRepositoryUtil.getUserInfoByCode(topUnit,un.getUserCode());
+                userInfo.setPrimaryUnit(un.getUnitCode());
+                result.add(userInfo);
+            }
+        }
+        return DictionaryMapUtils.objectsToJSONArray(result);
     }
 
     /**
