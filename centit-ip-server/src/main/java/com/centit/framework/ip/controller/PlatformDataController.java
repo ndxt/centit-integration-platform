@@ -21,6 +21,7 @@ import com.centit.framework.system.service.OptInfoManager;
 import com.centit.framework.system.service.OsInfoManager;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.UserSettingManager;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
@@ -270,7 +271,7 @@ public class PlatformDataController extends BaseController {
     @ApiOperation(value = "获取当前租户下的所有的用户", notes = "获取当前租户下所有的用户。")
     @RequestMapping(value = "/currentusers", method = RequestMethod.GET)
     @WrapUpResponseBody
-    public JSONArray listCurrentUsers(HttpServletRequest request) {
+    public List<UserInfo> listCurrentUsers(HttpServletRequest request) {
         String topUnit=WebOptUtils.getCurrentTopUnit(request);
         List<? extends IUserUnit> userUnits=CodeRepositoryUtil.listAllUserUnits(topUnit);
         List<UserInfo> result = new ArrayList<>();
@@ -281,7 +282,7 @@ public class PlatformDataController extends BaseController {
                 result.add(userInfo);
             }
         }
-        return DictionaryMapUtils.objectsToJSONArray(result);
+        return result;
     }
 
     /**
