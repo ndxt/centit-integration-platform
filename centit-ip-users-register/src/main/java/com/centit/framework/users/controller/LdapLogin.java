@@ -2,6 +2,7 @@ package com.centit.framework.users.controller;
 
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.operationlog.RecordOperationLog;
@@ -42,7 +43,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/ldap")
 @Api(value = "ldap登录相关接口", tags = "ldap登录相关接口")
-public class LdapLogin {
+public class LdapLogin extends BaseController {
 
     private static Logger logger = LoggerFactory.getLogger(LdapLogin.class);
 
@@ -55,18 +56,22 @@ public class LdapLogin {
     @Value("${security.disable.user}")
     private String disableUser;
 
+    public String getOptId() {
+        return "LDAPLOGIN";
+    }
+
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
     @WrapUpResponseBody
     @RecordOperationLog(content = "用户{username}使用ldap登录,操作IP地址:{loginIp}",
-        newValue="ldap登录")
+        newValue = "ldap登录")
     public ResponseData login(@RequestParam("username") String username,
                               @RequestParam("password") String password,
                               HttpServletRequest request) throws Exception {
         if (StringUtils.isNotBlank(disableUser)) {
             disableUser = StringUtils.deleteWhitespace(disableUser);
             String[] ignoreUsers = disableUser.split(",");
-            for(int i = 0; i < ignoreUsers.length; i++){
+            for (int i = 0; i < ignoreUsers.length; i++) {
                 if (username.contains(ignoreUsers[i])) {
                     return ResponseData.makeErrorMessage("禁用的用户账号");
                 }
@@ -74,14 +79,14 @@ public class LdapLogin {
         }
         Map<String, Object> map = searchLdapUserByloginName(username);
         Map<String, Object> sessionMap = new HashMap<>();
-        if(map==null || map.isEmpty()){
+        if (map == null || map.isEmpty()) {
             return ResponseData.makeErrorMessage("未查询到用户");
         }
         try {
             boolean passed = checkUserPasswordByDn(
-                Pretreatment.mapTemplateString("CN={name},CN=Users,DC=centit,DC=com",map),
+                Pretreatment.mapTemplateString("CN={name},CN=Users,DC=centit,DC=com", map),
                 password);
-            if(!passed){
+            if (!passed) {
                 return ResponseData.makeErrorMessage("用户名密码不匹配。");
             }
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(map.get("sAMAccountName") + "");
@@ -95,18 +100,18 @@ public class LdapLogin {
         return ResponseData.makeResponseData(sessionMap);
     }
 
-    public Map<String, Object> searchLdapUserByloginName(String loginName){
+    public Map<String, Object> searchLdapUserByloginName(String loginName) {
         List<UserSyncDirectory> list = userSyncDirectoryManager.listObjects();
         UserSyncDirectory directory = new UserSyncDirectory();
-        if(list != null && list.size() > 0){
-            for(UserSyncDirectory userSyncDirectory : list){
+        if (list != null && list.size() > 0) {
+            for (UserSyncDirectory userSyncDirectory : list) {
                 if (userSyncDirectory.getType().equalsIgnoreCase("LDAP")) {
                     directory = userSyncDirectory;
                 }
             }
         }
         Properties env = new Properties();
-        env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
         env.put(Context.SECURITY_PRINCIPAL, directory.getUser());
         env.put(Context.SECURITY_CREDENTIALS, directory.getUserPwd());
@@ -120,8 +125,8 @@ public class LdapLogin {
             List<String> searchFilters = new ArrayList<>();
             searchFilters.add("(&(objectCategory=person)(objectClass=user)(sAMAccountName={0}))");
             searchFilters.add("(distinguishedName=CN={0},CN=Users,DC=centit,DC=com)");
-            for(String filterStr : searchFilters) {
-                String searchFilter = MessageFormat.format(filterStr,loginName);
+            for (String filterStr : searchFilters) {
+                String searchFilter = MessageFormat.format(filterStr, loginName);
                 String[] userReturnedAtts = new String[]{"displayName", "name", "sAMAccountName",
                     "mail", "distinguishedName", "jobNo", "idCard", "mobilePhone", "description", "memberOf"};
                 searchCtls.setReturningAttributes(userReturnedAtts);
@@ -144,9 +149,9 @@ public class LdapLogin {
             }
             ctx.close();
 
-        }catch (NamingException e) {
+        } catch (NamingException e) {
             //System.out.println(e.getLocalizedMessage());
-            if(ctx != null){
+            if (ctx != null) {
                 try {
                     ctx.close();
                 } catch (NamingException e1) {
@@ -158,9 +163,9 @@ public class LdapLogin {
         return attributes;
     }
 
-    public static String getAttributeString(Attributes attrs, String attrName){
+    public static String getAttributeString(Attributes attrs, String attrName) {
         Attribute attr = attrs.get(attrName);
-        if(attr==null) {
+        if (attr == null) {
             return null;
         }
         try {
@@ -175,20 +180,20 @@ public class LdapLogin {
 
         Properties env = new Properties();
         //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
-        env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
-        env.put(Context.SECURITY_PRINCIPAL,username);
+        env.put(Context.SECURITY_PRINCIPAL, username);
         env.put(Context.SECURITY_CREDENTIALS, password);
         env.put(Context.PROVIDER_URL, "LDAP://192.168.128.5:389");
         LdapContext ctx = null;
         try {
             ctx = new InitialLdapContext(env, null);
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
             return false;
-        }finally {
-            if(ctx!=null) {
+        } finally {
+            if (ctx != null) {
                 ctx.close();
             }
         }
