@@ -195,6 +195,7 @@ public class VateCodeController extends BaseController {
     @WrapUpResponseBody
     public ResponseData findPwd(@RequestParam(value = "loginname") String loginname,
                                 HttpServletRequest request) throws Exception {
+        Map<String, Object> result = new HashMap<>();
         try {
             UserInfo userInfo = new UserInfo();
             if(loginname.indexOf('@')>0){
@@ -208,7 +209,7 @@ public class VateCodeController extends BaseController {
                 if(userInfo == null){
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
-                SendSmsResponseBody s = sendPhone(loginname, loginname, "", request, null);
+                SendSmsResponseBody s = sendPhone(loginname, loginname, "", request, result);
             }
             return ResponseData.successResponse;
         }catch (Exception e){
