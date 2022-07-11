@@ -211,7 +211,8 @@ public class VateCodeController extends BaseController {
                 }
                 SendSmsResponseBody s = sendPhone(loginname, loginname, "", request, result);
             }
-            return ResponseData.successResponse;
+            result.put("x-auth-token", request.getSession().getId());
+            return ResponseData.makeResponseData(result);
         }catch (Exception e){
             e.printStackTrace();
             return ResponseData.errorResponse;
