@@ -38,9 +38,16 @@
             <artifactId>centit-ip-tenant-manage</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+
+       <!-- <dependency>
             <groupId>com.centit.product</groupId>
             <artifactId>rmdb-opt-log</artifactId>
+        </dependency>-->
+
+
+        <dependency>
+            <groupId>com.centit.product</groupId>
+            <artifactId>elk-opt-log</artifactId>
         </dependency>
 
         <dependency>
