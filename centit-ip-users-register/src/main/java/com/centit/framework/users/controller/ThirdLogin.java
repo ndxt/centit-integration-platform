@@ -250,6 +250,7 @@ public class ThirdLogin {
             //从token中获取openid(授权用户唯一标识)
             String openId = wxMpUser.getOpenId();
             String unionId = wxMpUser.getUnionId();
+            System.out.println(unionId);
             String weChatName = wxMpUser.getNickname();
             //paramsMap.put("appKey", wxAppConfig.getAppID());
             paramsMap.put("platId", "2");
