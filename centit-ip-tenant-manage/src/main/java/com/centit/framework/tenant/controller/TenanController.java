@@ -672,7 +672,7 @@ public class TenanController extends BaseController {
         paramsMap.put("userCode", userCode);
         List<UserPlat> userPlats = userPlatService.listObjects(paramsMap, null);
         //第三方登录信息
-        jsonObject.put("userPlats", (userPlats != null && userPlats.size() > 0) ? userPlats : "");
+        jsonObject.put("userPlats", (userPlats != null && userPlats.size() > 0) ? userPlats : new ArrayList<>());
         return jsonObject;
     }
 
