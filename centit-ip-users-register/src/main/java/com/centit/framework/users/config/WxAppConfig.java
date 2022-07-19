@@ -12,6 +12,12 @@ public class WxAppConfig {
     @Value("${wechat.appsecret}")
     private String appSecret;
 
+    @Value("${wechat.mobileAppid}")
+    private String moblieAppId;
+
+    @Value("${wechat.mobileAppSecret}")
+    private String moblieAppSecret;
+
     @Value("${third.redirect_uri}")
     private String redirectLoginUri;
 
@@ -48,5 +54,21 @@ public class WxAppConfig {
 
     public void setRedirectBindUri(String redirectBindUri) {
         this.redirectBindUri = redirectBindUri;
+    }
+
+    public String getMoblieAppId() {
+        return moblieAppId;
+    }
+
+    public void setMoblieAppId(String moblieAppId) {
+        this.moblieAppId = moblieAppId;
+    }
+
+    public String getMoblieAppSecret() {
+        return moblieAppSecret;
+    }
+
+    public void setMoblieAppSecret(String moblieAppSecret) {
+        this.moblieAppSecret = moblieAppSecret;
     }
 }

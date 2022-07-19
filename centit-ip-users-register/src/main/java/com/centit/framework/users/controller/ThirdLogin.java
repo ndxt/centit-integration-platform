@@ -3,6 +3,7 @@ package com.centit.framework.users.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.users.config.AppConfig;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -155,10 +157,11 @@ public class ThirdLogin {
             msg = "微信";
             WxMpUser wxMpUser = weChatService.getWxUser(code);
             //从token中获取openid
-            String openId = wxMpUser.getOpenId();
+            //String openId = wxMpUser.getOpenId();
             String unionId = wxMpUser.getUnionId();
-            paramsMap.put("userId", openId);
-            paramsMap.put("appKey", wxAppConfig.getAppID());
+            paramsMap.put("platId", "2");
+            //paramsMap.put("userId", openId);
+            //paramsMap.put("appKey", wxAppConfig.getAppID());
             paramsMap.put("unionId", unionId);
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
         }else if(DING_LOGIN.equals(type)){
@@ -248,7 +251,8 @@ public class ThirdLogin {
             String openId = wxMpUser.getOpenId();
             String unionId = wxMpUser.getUnionId();
             String weChatName = wxMpUser.getNickname();
-            paramsMap.put("appKey", wxAppConfig.getAppID());
+            //paramsMap.put("appKey", wxAppConfig.getAppID());
+            paramsMap.put("platId", "2");
             paramsMap.put("unionId", unionId);
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
             if(userPlat != null){
@@ -259,7 +263,7 @@ public class ThirdLogin {
                     newUser.setUserId(openId);
                     newUser.setUserCode(userDetails.getUserCode());
                     newUser.setPlatId("2");
-                    newUser.setCorpId("");
+                    newUser.setCorpId("PC");
                     newUser.setAppKey(wxAppConfig.getAppID());
                     newUser.setAppSecret(wxAppConfig.getAppSecret());
                     newUser.setUserName(weChatName);
@@ -353,6 +357,67 @@ public class ThirdLogin {
             returnUrl = returnUrl.replace("/A/", "/#/");
         }
         return "redirect:" + returnUrl;
+    }
+
+
+    @ApiOperation(value = "移动端微信登录", notes = "移动端微信登录")
+    @PostMapping(value = "/mobile/weChat/login")
+    @WrapUpResponseBody
+    public ResponseData weChatLogin(@RequestParam("unionId") String unionId,
+                                    @RequestParam("nickName") String nickName,
+                                    HttpServletRequest request){
+        Map<String, Object> sessionMap = new HashMap<>();
+        try{
+            Map<String, Object> paramsMap = new HashMap<>();
+            paramsMap.put("platId", "2");
+            paramsMap.put("unionId", unionId);
+            UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
+            if(userPlat == null){
+                return ResponseData.makeErrorMessageWithData(sessionMap, 500, "请在登陆后绑定微信。");
+            }
+            CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
+            ud.setLoginIp(WebOptUtils.getRequestAddr(request));
+            SecurityContextHolder.getContext().setAuthentication(ud);
+            sessionMap.put("accessToken", request.getSession().getId());
+            sessionMap.put("userInfo", ud);
+        } catch (Exception e) {
+            return ResponseData.makeErrorMessageWithData(new HashMap<>(), 500, "系统错误。");
+        }
+        return ResponseData.makeResponseData(sessionMap);
+    }
+
+    @ApiOperation(value = "移动端微信绑定", notes = "移动端微信绑定")
+    @PostMapping(value = "/mobile/weChat/bind")
+    @WrapUpResponseBody
+    public ResponseData weChatBind(@RequestParam("unionId") String unionId,
+                                   @RequestParam("nickName") String nickName,
+                                   @RequestParam("userCode") String userCode){
+        try{
+            CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
+            if(userDetails == null){
+                return ResponseData.makeErrorMessageWithData("", 500, "未查询到用户。");
+            }
+            Map<String, Object> paramsMap = new HashMap<>();
+            paramsMap.put("platId", "2");
+            paramsMap.put("unionId", unionId);
+            UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
+            if(userPlat != null){
+                return ResponseData.makeErrorMessageWithData("", 500, "该微信号已绑定，请勿重复绑定。");
+            }
+            UserPlat newUser = new UserPlat();
+            newUser.setUnionId(unionId);
+            newUser.setUserCode(userDetails.getUserCode());
+            newUser.setPlatId("2");
+            newUser.setCorpId("Moblie");
+            newUser.setAppKey(wxAppConfig.getMoblieAppId());
+            //58c5cb02d53e3586dd4f4ea27fede53d
+            newUser.setAppSecret(wxAppConfig.getMoblieAppSecret());
+            newUser.setUserName(nickName);
+            userPlatService.saveUserPlat(newUser);
+        } catch (Exception e) {
+            return ResponseData.makeErrorMessageWithData("", 500, "系统错误。");
+        }
+        return ResponseData.makeResponseData(nickName);
     }
 
 }
