@@ -13,39 +13,27 @@ import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
-import com.centit.search.document.FileDocument;
-import com.centit.search.document.ObjectDocument;
-import com.centit.search.service.ESServerConfig;
-import com.centit.search.service.Impl.ESIndexer;
-import com.centit.search.service.Impl.ESSearcher;
-import com.centit.search.service.IndexerSearcherFactory;
-import com.centit.search.service.Searcher;
-import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.product.oa.EmailMessageSenderImpl;
+import com.centit.support.security.AESSecurityUtils;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
 
 /**
  * Created by codefan on 17-7-18.
  */
 @Configuration
 @ComponentScan(basePackages = "com.centit",
-        excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
+    excludeFilters = @ComponentScan.Filter(value = org.springframework.stereotype.Controller.class))
 @Import({SystemBeanConfig.class,
-        SpringSecurityCasConfig.class,
-        SpringSecurityDaoConfig.class,
-        JdbcConfig.class})
+    SpringSecurityCasConfig.class,
+    SpringSecurityDaoConfig.class,
+    JdbcConfig.class})
 @EnableNacosConfig(globalProperties = @NacosProperties(serverAddr = "${nacos.server-addr}"))
 @NacosPropertySources({@NacosPropertySource(dataId = "${nacos.system-dataid}",groupId = "CENTIT", autoRefreshed = true)}
 )
 public class ServiceConfig {
-
-    @Autowired
-    private Environment env;
-
 
     @Bean
     @Lazy(value = false)
@@ -114,43 +102,5 @@ public class ServiceConfig {
     public WxMpService wxMpService() {
         return new WxMpServiceImpl();
     }
-
-
-    @Bean
-    public ESServerConfig esServerConfig(){
-        ESServerConfig config = new ESServerConfig();
-        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
-        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
-        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
-        config.setOsId(env.getProperty("elasticsearch.osId"));
-        config.setMinScore(NumberBaseOpt.parseFloat(
-            env.getProperty("elasticsearch.filter.minScore"), 0.5f));
-        return config;
-    }
-
-    @Bean(name = "esObjectIndexer")
-    public ESIndexer esObjectIndexer(@Autowired ESServerConfig esServerConfig){
-        return IndexerSearcherFactory.obtainIndexer(esServerConfig, ObjectDocument.class);
-    }
-
-    @Bean
-    public Searcher documentSearcher(@Autowired ESServerConfig esServerConfig){
-        if(BooleanBaseOpt.castObjectToBoolean(env.getProperty("fulltext.index.enable"),false)) {
-            return IndexerSearcherFactory.obtainSearcher(esServerConfig, FileDocument.class);
-        }
-        return null;
-    }
-    @Bean(name = "esObjectSearcher")
-    public ESSearcher esObjectSearcher(@Autowired ESServerConfig esServerConfig){
-        return IndexerSearcherFactory.obtainSearcher(esServerConfig, ObjectDocument.class);
-    }
-
-  /*  @Bean
-    @Lazy(value = false)
-    public OperationLogWriter optLogManager() {
-        ElkOptLogManager operationLog = new ElkOptLogManager();
-        return operationLog;
-    }*/
-
 
 }

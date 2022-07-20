@@ -38,16 +38,9 @@
             <artifactId>centit-ip-tenant-manage</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-       <!-- <dependency>
-            <groupId>com.centit.product</groupId>
-            <artifactId>rmdb-opt-log</artifactId>
-        </dependency>-->
-
-
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>elk-opt-log</artifactId>
+            <artifactId>rmdb-opt-log</artifactId>
         </dependency>
 
         <dependency>
@@ -113,7 +106,7 @@
             <scope>runtime</scope>
         </dependency>
 
-         <dependency>
+        <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <scope>runtime</scope>
@@ -201,14 +194,14 @@
             </properties>
         </profile>
         <profile>
-			<id>dev</id>
-			<properties>
-				<profiles.active></profiles.active>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-	    </profile>
+            <id>dev</id>
+            <properties>
+                <profiles.active></profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
         <profile>
             <id>pressure-test</id>
             <properties>
