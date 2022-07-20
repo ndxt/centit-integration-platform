@@ -14,6 +14,7 @@ import com.centit.support.compiler.Pretreatment;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,8 @@ public class LdapLogin extends BaseController {
     public ResponseData login(@RequestParam("username") String username,
                               @RequestParam("password") String password,
                               HttpServletRequest request) throws Exception {
+        username = StringEscapeUtils.unescapeHtml4(username);
+        password = StringEscapeUtils.unescapeHtml4(password);
         if (StringUtils.isNotBlank(disableUser)) {
             disableUser = StringUtils.deleteWhitespace(disableUser);
             String[] ignoreUsers = disableUser.split(",");
