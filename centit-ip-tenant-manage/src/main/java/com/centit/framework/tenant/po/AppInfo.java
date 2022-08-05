@@ -20,6 +20,8 @@ import java.util.Date;
 @Table(name = "F_APP_INFO")
 public class AppInfo implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "ID")
     @ValueGenerator(strategy = GeneratorType.UUID22)
