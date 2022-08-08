@@ -97,7 +97,7 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public JSONObject getLastAppInfo() {
-        return appInfoDao.getLastAppInfo();
+    public JSONObject getLastAppInfo(String appType) {
+        return appInfoDao.getLastAppInfo(appType);
     }
 }

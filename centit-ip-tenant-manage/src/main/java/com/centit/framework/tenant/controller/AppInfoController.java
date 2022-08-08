@@ -3,6 +3,7 @@ package com.centit.framework.tenant.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.JsonResultUtils;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.OperationLogCenter;
 import com.centit.framework.core.controller.BaseController;
@@ -12,11 +13,13 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,13 +64,20 @@ public class AppInfoController extends BaseController {
         name = "appInfo", value = "json格式，移动端版本信息", required = true,
         paramType = "body", dataTypeClass = AppInfo.class)
     @RequestMapping(method = {RequestMethod.POST})
-    public void saveAppInfo(@RequestBody AppInfo appInfo, HttpServletRequest request, HttpServletResponse response) {
+    @WrapUpResponseBody
+    public ResponseData saveAppInfo(@RequestBody AppInfo appInfo, HttpServletRequest request, HttpServletResponse response) {
         appInfo.setCreator(WebOptUtils.getCurrentUserCode(request));
+         Map<String, Object> filter = new HashMap<>();
+        filter.put("versionId", appInfo.getVersionId());
+        filter.put("appType", appInfo.getAppType());
+        List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
+        if(appInfoList != null && appInfoList.size() > 0){
+            return ResponseData.makeErrorMessage("版本号重复，请勿重复保存!");
+        }
         appInfoService.saveNewObject(appInfo);
-        JsonResultUtils.writeSingleDataJson(appInfo.getId(), response);
-
         OperationLogCenter.logNewObject(request, optId, appInfo.getId(), OperationLog.P_OPT_LOG_METHOD_C,
             "新增移动端版本信息", appInfo);
+        return ResponseData.makeResponseData(appInfo.getId());
     }
 
     @ApiOperation(value = "修改移动端版本信息", notes = "修改移动端版本信息")
@@ -116,10 +128,10 @@ public class AppInfoController extends BaseController {
     }
 
     @ApiOperation(value = "获取最新版的移动端版本", notes = "获取最新版的移动端版本。")
-    @RequestMapping(value = "/getLastAppInfo", method = {RequestMethod.GET})
+    @RequestMapping(value = "/getLastAppInfo/{appType}", method = {RequestMethod.GET})
     @WrapUpResponseBody
-    public JSONObject getLastAppInfo(){
-        return appInfoService.getLastAppInfo();
+    public JSONObject getLastAppInfo(@PathVariable String appType){
+        return appInfoService.getLastAppInfo(appType);
     }
 
 }

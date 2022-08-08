@@ -9,5 +9,5 @@ import com.centit.framework.tenant.po.AppInfo;
  */
 public interface AppInfoService extends BaseEntityManager<AppInfo, String> {
 
-    public JSONObject getLastAppInfo();
+    public JSONObject getLastAppInfo(String appType);
 }
