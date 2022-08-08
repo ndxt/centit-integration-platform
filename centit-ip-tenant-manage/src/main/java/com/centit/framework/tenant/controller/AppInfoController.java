@@ -72,7 +72,7 @@ public class AppInfoController extends BaseController {
         filter.put("appType", appInfo.getAppType());
         List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
         if(appInfoList != null && appInfoList.size() > 0){
-            return ResponseData.makeErrorMessage("版本号重复，请勿重复保存!");
+            return ResponseData.makeErrorMessage("版本号已存在，请勿重复保存!");
         }
         appInfoService.saveNewObject(appInfo);
         OperationLogCenter.logNewObject(request, optId, appInfo.getId(), OperationLog.P_OPT_LOG_METHOD_C,

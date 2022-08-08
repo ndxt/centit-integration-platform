@@ -20,7 +20,7 @@ public class AppInfoDao extends BaseDaoImpl<AppInfo,String>{
     public JSONObject getLastAppInfo(String appType){
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", appType);
-        String sql = " SELECT * FROM F_APP_INFO WHERE VERSION_ID = (SELECT MAX(VERSION_ID) FROM F_APP_INFO ) [ :appType| and APP_TYPE = :appType] ";
+        String sql = " SELECT * FROM F_APP_INFO WHERE VERSION_ID = (SELECT MAX(VERSION_ID) FROM F_APP_INFO WHERE 1 = 1 [ :appType| AND APP_TYPE = :appType] ) ";
         QueryAndNamedParams queryAndNamedParams = QueryUtils.translateQuery(sql, filter);
         return DatabaseOptUtils.getObjectBySqlAsJson(this, queryAndNamedParams.getQuery(), queryAndNamedParams.getParams());
     }
