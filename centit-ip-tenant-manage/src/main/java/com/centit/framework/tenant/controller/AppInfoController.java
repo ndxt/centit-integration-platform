@@ -74,6 +74,10 @@ public class AppInfoController extends BaseController {
         if(appInfoList != null && appInfoList.size() > 0){
             return ResponseData.makeErrorMessage("版本号已存在，请勿重复保存!");
         }
+        if(StringUtils.isNotBlank(appInfo.getFileId())){
+            String fileUrl = "api/fileserver/fileserver/download/pfile/" + appInfo.getFileId();
+            appInfo.setFileUrl(fileUrl);
+        }
         appInfoService.saveNewObject(appInfo);
         OperationLogCenter.logNewObject(request, optId, appInfo.getId(), OperationLog.P_OPT_LOG_METHOD_C,
             "新增移动端版本信息", appInfo);
@@ -95,6 +99,10 @@ public class AppInfoController extends BaseController {
         AppInfo temp = appInfoService.getObjectById(appId);
         AppInfo oldApp = new AppInfo();
         BeanUtils.copyProperties(temp, oldApp);
+        if(StringUtils.isNotBlank(appInfo.getFileId())){
+            String fileUrl = "api/fileserver/fileserver/download/pfile/" + appInfo.getFileId();
+            appInfo.setFileUrl(fileUrl);
+        }
         appInfoService.updateObject(appInfo);
 
         JsonResultUtils.writeBlankJson(response);

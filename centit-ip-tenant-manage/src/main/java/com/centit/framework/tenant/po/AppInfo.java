@@ -54,6 +54,11 @@ public class AppInfo implements Serializable {
     @ApiModelProperty(value = "文件名称", name = "fileName")
     private String fileName;
 
+    @Column(name = "FILE_URL")
+    @Length(max = 500)
+    @ApiModelProperty(value = "文件下载地址", name = "fileUrl")
+    private String fileUrl;
+
     @Column(name = "CREATOR")
     @Length(max = 32)
     @ApiModelProperty(value = "申请人", name = "creator")
