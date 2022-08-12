@@ -145,7 +145,7 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
     @RequestMapping(value = "/getLastAppUrl", method = {RequestMethod.GET})
     public void getLastAppUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String serverName = request.getScheme()+"://"+ request.getServerName()+":"+request.getServerPort();
+        String serverName = request.getScheme()+"://"+ request.getServerName()+":"+request.getServerPort() + "/" + request.getContextPath();
         JSONObject jsonObject = appInfoService.getLastAppInfo("Android");
         String url = "";
         if(jsonObject != null){
