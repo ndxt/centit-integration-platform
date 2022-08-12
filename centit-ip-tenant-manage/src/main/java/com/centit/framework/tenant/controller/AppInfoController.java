@@ -13,7 +13,6 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,5 +141,18 @@ public class AppInfoController extends BaseController {
     public JSONObject getLastAppInfo(@PathVariable String appType){
         return appInfoService.getLastAppInfo(appType);
     }
+
+    @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
+    @RequestMapping(value = "/getLastAppUrl", method = {RequestMethod.GET})
+    public void getLastAppUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String serverName = request.getScheme()+"://"+ request.getServerName()+":"+request.getServerPort();
+        JSONObject jsonObject = appInfoService.getLastAppInfo("Android");
+        String url = "";
+        if(jsonObject != null){
+            url = serverName + "/" + jsonObject.getString("fileUrl");
+        }
+        response.sendRedirect(url);
+    }
+
 
 }
