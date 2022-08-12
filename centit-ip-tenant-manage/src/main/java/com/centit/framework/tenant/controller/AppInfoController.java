@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,9 @@ public class AppInfoController extends BaseController {
     private AppInfoService appInfoService;
 
     private String optId = "APPINFO";
+
+    @Value("${app.key}")
+    private String appKey;
 
     @ApiOperation(value = "移动端版本列表", notes = "移动端版本列表")
     @ApiImplicitParam(
@@ -145,7 +149,7 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
     @RequestMapping(value = "/getLastAppUrl", method = {RequestMethod.GET})
     public void getLastAppUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String serverName = request.getScheme()+"://"+ request.getServerName()+":"+request.getServerPort() + "/" + request.getContextPath();
+        String serverName = request.getScheme()+"://"+ request.getServerName()+":"+request.getServerPort() + "/" + appKey;
         JSONObject jsonObject = appInfoService.getLastAppInfo("Android");
         String url = "";
         if(jsonObject != null){
