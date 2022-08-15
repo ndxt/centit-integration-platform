@@ -13,6 +13,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
+import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -71,7 +72,7 @@ public class AppInfoController extends BaseController {
     @WrapUpResponseBody
     public ResponseData saveAppInfo(@RequestBody AppInfo appInfo, HttpServletRequest request, HttpServletResponse response) {
         appInfo.setCreator(WebOptUtils.getCurrentUserCode(request));
-         Map<String, Object> filter = new HashMap<>();
+        Map<String, Object> filter = new HashMap<>();
         filter.put("versionId", appInfo.getVersionId());
         filter.put("appType", appInfo.getAppType());
         List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
@@ -143,20 +144,86 @@ public class AppInfoController extends BaseController {
     @RequestMapping(value = "/getLastAppInfo/{appType}", method = {RequestMethod.GET})
     @WrapUpResponseBody
     public JSONObject getLastAppInfo(@PathVariable String appType){
-        return appInfoService.getLastAppInfo(appType);
+        Map<String, Object> filter = new HashMap<>();
+        filter.put("appType", appType);
+        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+        if(appInfoList == null || appInfoList.size() == 0){
+            throw new ObjectException("未获取到版本号!");
+        }
+        AppInfo appInfo = new AppInfo();
+        if(appInfoList != null && appInfoList.size() > 0){
+            appInfo = appInfoList.get(0);
+            if(appInfoList.size() > 1){
+                for(int i = 1; i < appInfoList.size(); i++){
+                    AppInfo appNext = appInfoList.get(i);
+                    if(compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0){
+                        appInfo = appNext;
+                    }
+                }
+            }
+        }
+        JSONObject params = JSONObject.parseObject(JSONObject.toJSONString(appInfo));
+        return params;
     }
 
     @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
     @RequestMapping(value = "/getLastAppUrl", method = {RequestMethod.GET})
     public void getLastAppUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String serverName = request.getScheme()+"://"+ request.getServerName()+":"+request.getServerPort() + "/" + appKey;
-        JSONObject jsonObject = appInfoService.getLastAppInfo("Android");
-        String url = "";
-        if(jsonObject != null){
-            url = serverName + "/" + jsonObject.getString("fileUrl");
+        Map<String, Object> filter = new HashMap<>();
+        filter.put("appType", "Android");
+        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+        if(appInfoList == null || appInfoList.size() == 0){
+            throw new ObjectException("未获取到版本号!");
         }
+        AppInfo appInfo = new AppInfo();
+        if(appInfoList != null && appInfoList.size() > 0){
+            appInfo = appInfoList.get(0);
+            if(appInfoList.size() > 1){
+                for(int i = 1; i < appInfoList.size(); i++){
+                    AppInfo appNext = appInfoList.get(i);
+                    if(compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0){
+                        appInfo = appNext;
+                    }
+                }
+            }
+        }
+        String url = serverName + "/" + appInfo.getFileUrl();
         response.sendRedirect(url);
     }
 
+
+    /**
+     * 比较APP版本号的大小
+     * <p>
+     * 1、前者大则返回一个正数
+     * 2、后者大返回一个负数
+     * 3、相等则返回0
+     *
+     * @param version1 app版本号
+     * @param version2 app版本号
+     * @return int
+     */
+    public Integer compareAppVersion(String version1, String version2) {
+        if (version1 == null || version2 == null) {
+            throw new RuntimeException("版本号不能为空");
+        }
+        // 注意此处为正则匹配，不能用.
+        String[] versionArray1 = version1.split("\\.");
+        String[] versionArray2 = version2.split("\\.");
+        int idx = 0;
+        // 取数组最小长度值
+        int minLength = Math.min(versionArray1.length, versionArray2.length);
+        int diff = 0;
+        // 先比较长度，再比较字符
+        while (idx < minLength
+            && (diff = versionArray1[idx].length() - versionArray2[idx].length()) == 0
+            && (diff = versionArray1[idx].compareTo(versionArray2[idx])) == 0) {
+            ++idx;
+        }
+        // 如果已经分出大小，则直接返回，如果未分出大小，则再比较位数，有子版本的为大
+        diff = (diff != 0) ? diff : versionArray1.length - versionArray2.length;
+        return diff;
+    }
 
 }
