@@ -13,7 +13,6 @@ import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
-import com.centit.framework.system.po.ESOperationLog;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
@@ -112,28 +111,28 @@ public class ServiceConfig {
     @Autowired
     private Environment env;
 
-    @Bean
-    public ESIndexer elkOptLogIndexer(){
-        return IndexerSearcherFactory.obtainIndexer(elkOptLogServerConfig(), ESOperationLog.class);
-    }
+//    @Bean
+//    public ESIndexer elkOptLogIndexer(){
+//        return IndexerSearcherFactory.obtainIndexer(elkOptLogServerConfig(), ESOperationLog.class);
+//    }
+//
+//    @Bean
+//    public ESSearcher elkOptLogSearcher(){
+//        return IndexerSearcherFactory.obtainSearcher(elkOptLogServerConfig(), ESOperationLog.class);
+//    }
 
-    @Bean
-    public ESSearcher elkOptLogSearcher(){
-        return IndexerSearcherFactory.obtainSearcher(elkOptLogServerConfig(), ESOperationLog.class);
-    }
-
-    @Bean
-    public ESServerConfig elkOptLogServerConfig(){
-        ESServerConfig config = new ESServerConfig();
-        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
-        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
-        config.setUsername(env.getProperty("elasticsearch.server.username"));
-        config.setPassword(env.getProperty("elasticsearch.server.password"));
-        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
-        config.setOsId(env.getProperty("elasticsearch.osId"));
-        config.setMinScore(NumberBaseOpt.parseFloat(
-            env.getProperty("elasticsearch.filter.minScore"), 0.5f));
-        return config;
-    }
+//    @Bean
+//    public ESServerConfig elkOptLogServerConfig(){
+//        ESServerConfig config = new ESServerConfig();
+//        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
+//        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
+//        config.setUsername(env.getProperty("elasticsearch.server.username"));
+//        config.setPassword(env.getProperty("elasticsearch.server.password"));
+//        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
+//        config.setOsId(env.getProperty("elasticsearch.osId"));
+//        config.setMinScore(NumberBaseOpt.parseFloat(
+//            env.getProperty("elasticsearch.filter.minScore"), 0.5f));
+//        return config;
+//    }
 
 }
