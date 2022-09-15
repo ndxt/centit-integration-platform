@@ -276,8 +276,10 @@ public class PlatformDataController extends BaseController {
         for(IUserUnit un:userUnits){
             if(Objects.equals(un.getRelType(),"T")){
                 UserInfo userInfo= (UserInfo) CodeRepositoryUtil.getUserInfoByCode(topUnit,un.getUserCode());
-                userInfo.setPrimaryUnit(un.getUnitCode());
-                result.add(userInfo);
+                if(userInfo!=null) {
+                    userInfo.setPrimaryUnit(un.getUnitCode());
+                    result.add(userInfo);
+                }
             }
         }
         return result;
