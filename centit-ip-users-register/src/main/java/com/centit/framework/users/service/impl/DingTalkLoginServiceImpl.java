@@ -301,7 +301,6 @@ public class DingTalkLoginServiceImpl implements DingTalkLoginService {
 
     /**
      * 访问/topapi/v2/user/getbymobile 根据手机号查询用户
-     *
      * @param accessToken
      * @param mobile
      * @return

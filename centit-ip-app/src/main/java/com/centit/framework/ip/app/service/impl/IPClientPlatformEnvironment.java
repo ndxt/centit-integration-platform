@@ -322,6 +322,15 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
+    public IUnitInfo loadUnitInfo(String unitCode){
+        return RestfulHttpRequest.getResponseObject(
+            appSession,
+            "/platform/unitinfo/" + unitCode,
+            IUnitInfo.class);
+    }
+
+
+    @Override
     public void updateUserInfo(IUserInfo userInfo) {
         RestfulHttpRequest.jsonPost(
             appSession, "/platform/userinfo",

@@ -1,6 +1,7 @@
 package com.centit.framework.ip.app.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.framework.appclient.RestfulHttpRequest;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
@@ -473,6 +474,18 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public CentitUserDetails loadUserDetailsByUserCode(String userCode) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             CentitUserDetails value = evrnManger.loadUserDetailsByUserCode(userCode);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+
+    @Override
+    public IUnitInfo loadUnitInfo(String unitCode){
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IUnitInfo value = evrnManger.loadUnitInfo(unitCode);
             if(value!=null) {
                 return value;
             }

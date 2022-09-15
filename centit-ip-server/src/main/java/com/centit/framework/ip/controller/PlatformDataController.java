@@ -1,7 +1,6 @@
 package com.centit.framework.ip.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseMapData;
@@ -9,19 +8,15 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
-import com.centit.framework.core.dao.DictionaryMapUtils;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitSecurityMetadata;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.DataDictionary;
+import com.centit.framework.system.po.UnitInfo;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.po.UserSetting;
-import com.centit.framework.system.service.OptInfoManager;
-import com.centit.framework.system.service.OsInfoManager;
-import com.centit.framework.system.service.SysUserManager;
-import com.centit.framework.system.service.UserSettingManager;
-import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.framework.system.service.*;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
@@ -63,6 +58,9 @@ public class PlatformDataController extends BaseController {
 
     @Autowired
     private SysUserManager sysUserManager;
+
+    @Autowired
+    private SysUnitManager sysUnitManager;
 
     @Autowired
     protected OsInfoManager osInfoManager;
@@ -509,6 +507,20 @@ public class PlatformDataController extends BaseController {
     @WrapUpResponseBody
     public UserInfo getUserInfo(@PathVariable String userCode) {
         return sysUserManager.getObjectById(userCode);
+    }
+
+    /**
+     * @param unitCode 机构代码
+     * @return 机构信息
+     */
+    @ApiOperation(value = "获取机构信息", notes = "获取机构信息。")
+    @ApiImplicitParam(
+        name = "unitCode", value = "机构代码",
+        required = true, paramType = "path", dataType = "String")
+    @RequestMapping(value = "/unitinfo/{unitCode}", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public UnitInfo getUnitInfo(@PathVariable String unitCode) {
+        return  sysUnitManager.getObjectById(unitCode);
     }
 
     /**

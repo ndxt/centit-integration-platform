@@ -19,7 +19,6 @@
         <module>centit-ip-server</module>
         <module>centit-ip-users-register</module>
         <module>centit-ip-tenant-manage</module>
-        <module>centit-ip-demo</module>
         <module>centit-ip-dubbo-server-config</module>
         <module>centit-ip-dubbo-client-config</module>
         <module>centit-ip-app-base-config</module>
@@ -128,7 +127,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.4</version>
@@ -140,7 +139,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
 
             <!-- GPG自动签名的插件-->
             <!--<plugin>
