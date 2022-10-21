@@ -217,7 +217,7 @@ public class AppInfoController extends BaseController {
                 }
             }
         }
-        String serverName = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/" + appKey;
+        String serverName = "https://" + request.getServerName() + ":" + request.getServerPort() + "/" + appKey;
         String plist=creatPlist(appInfo,serverName);
         response.reset();
         response.setCharacterEncoding("UTF-8");
