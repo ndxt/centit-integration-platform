@@ -54,6 +54,9 @@ public class AppInfoController extends BaseController {
     @Value("${app.key}")
     private String appKey;
 
+    private String displayImageUrl="/api/fileserver/fileserver/download/pfile/displayImageUrl";
+    private String fullImageUrl="/api/fileserver/fileserver/download/pfile/fullImageUrl";
+
     @ApiOperation(value = "移动端版本列表", notes = "移动端版本列表")
     @ApiImplicitParam(
         name = "pageDesc", value = "json格式，分页对象信息",
@@ -215,12 +218,11 @@ public class AppInfoController extends BaseController {
             }
         }
         String serverName = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/" + appKey;
-        String url = serverName + "/" + appInfo.getFileUrl();
-        String plist=creatPlist(appInfo,url);
+        String plist=creatPlist(appInfo,serverName);
         response.reset();
         response.setCharacterEncoding("UTF-8");
-        response.setHeader("Content-Disposition","attachment;fileName=ios.plist");
-        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition","inline;fileName=ios.plist");
+        response.setContentType("application/xml");
         OutputStream outputStream=response.getOutputStream();
         outputStream.write(plist.getBytes("UTF-8"));
         outputStream.close();
@@ -260,7 +262,7 @@ public class AppInfoController extends BaseController {
         return diff;
     }
 
-    private String creatPlist(AppInfo appInfo, String fileUrl) {
+    private String creatPlist(AppInfo appInfo, String serverName) {
         String pList = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
             + "<plist version=\"1.0\">\n" + "<dict>\n"
@@ -274,7 +276,21 @@ public class AppInfoController extends BaseController {
             + "<string>software-package</string>\n"
             + "<key>url</key>\n"
             //你之前所上传的ipa文件路径
-            + "<string>" + fileUrl + "</string>\n"
+            + "<string>" + serverName + "/" + appInfo.getFileUrl() + "</string>\n"
+            + "</dict>\n"
+            + "<dict>\n"
+            + "<key>kind</key>\n"
+            + "<string>display-image</string>\n"
+            + "<key>url</key>\n"
+            //你之前所上传的ipa文件路径
+            + "<string>" + serverName  + displayImageUrl + "</string>\n"
+            + "</dict>\n"
+            + "<dict>\n"
+            + "<key>kind</key>\n"
+            + "<string>full-size-image</string>\n"
+            + "<key>url</key>\n"
+            //你之前所上传的ipa文件路径
+            + "<string>" + serverName+fullImageUrl + "</string>\n"
             + "</dict>\n"
             + "</array>\n"
             + "<key>metadata</key>\n"
