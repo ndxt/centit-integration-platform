@@ -54,6 +54,7 @@ public class AppInfoController extends BaseController {
     @Value("${app.key}")
     private String appKey;
 
+
     private String displayImageUrl="/api/fileserver/fileserver/download/pfile/displayImageUrl";
     private String fullImageUrl="/api/fileserver/fileserver/download/pfile/fullImageUrl";
 
@@ -217,7 +218,7 @@ public class AppInfoController extends BaseController {
                 }
             }
         }
-        String serverName = "https://" + request.getServerName() + ":" + request.getServerPort() + "/" + appKey;
+        String serverName = "https://" + request.getServerName()+"/" + appKey;
         String plist=creatPlist(appInfo,serverName);
         response.reset();
         response.setCharacterEncoding("UTF-8");
