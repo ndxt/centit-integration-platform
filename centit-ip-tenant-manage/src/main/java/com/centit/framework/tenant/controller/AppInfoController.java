@@ -55,8 +55,8 @@ public class AppInfoController extends BaseController {
     private String appKey;
 
 
-    private String displayImageUrl="/api/fileserver/fileserver/download/pfile/displayImageUrl";
-    private String fullImageUrl="/api/fileserver/fileserver/download/pfile/fullImageUrl";
+    private String displayImageUrl="/api/fileserver/fileserver/download/pfile/displayImageUrl.png";
+    private String fullImageUrl="/api/fileserver/fileserver/download/pfile/fullImageUrl.png";
 
     @ApiOperation(value = "移动端版本列表", notes = "移动端版本列表")
     @ApiImplicitParam(
@@ -198,7 +198,7 @@ public class AppInfoController extends BaseController {
         response.sendRedirect(url);
     }
     @ApiOperation(value = "获取最新版的IOS下载地址", notes = "获取最新版的IOS下载地址。")
-    @RequestMapping(value = "/getLastIOSUrl", method = {RequestMethod.GET})
+    @RequestMapping(value = "/manifest.plist", method = {RequestMethod.GET})
     public void getLastIOSUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", "IOS");
