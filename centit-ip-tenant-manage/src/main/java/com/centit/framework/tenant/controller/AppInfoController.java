@@ -13,6 +13,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -149,27 +150,35 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的移动端版本", notes = "获取最新版的移动端版本。")
     @RequestMapping(value = "/getLastAppInfo/{appType}", method = {RequestMethod.GET})
     @WrapUpResponseBody
-    public JSONObject getLastAppInfo(@PathVariable String appType) {
-        Map<String, Object> filter = new HashMap<>();
-        filter.put("appType", appType);
-        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
-        if (appInfoList == null || appInfoList.size() == 0) {
-            throw new ObjectException("未获取到版本号!");
-        }
-        AppInfo appInfo = new AppInfo();
-        if (appInfoList != null && appInfoList.size() > 0) {
-            appInfo = appInfoList.get(0);
-            if (appInfoList.size() > 1) {
-                for (int i = 1; i < appInfoList.size(); i++) {
-                    AppInfo appNext = appInfoList.get(i);
-                    if (compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0) {
-                        appInfo = appNext;
+    public JSONObject getLastAppInfo(@PathVariable String appType,HttpServletRequest request) {
+        if(appType.equals("IOS")){
+            String serverName = "https://" + request.getServerName()+"/" + appKey;
+            String url="itms-services://?action=download-manifest&url=" +
+                serverName+"/api/framework/system/appInfo/manifest.plist";
+            return JSONObject.parseObject(
+                JSONObject.toJSONString(CollectionsOpt.createHashMap("url",url)));
+        }else {
+            Map<String, Object> filter = new HashMap<>();
+            filter.put("appType", appType);
+            List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+            if (appInfoList == null || appInfoList.size() == 0) {
+                throw new ObjectException("未获取到版本号!");
+            }
+            AppInfo appInfo = new AppInfo();
+            if (appInfoList != null && appInfoList.size() > 0) {
+                appInfo = appInfoList.get(0);
+                if (appInfoList.size() > 1) {
+                    for (int i = 1; i < appInfoList.size(); i++) {
+                        AppInfo appNext = appInfoList.get(i);
+                        if (compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0) {
+                            appInfo = appNext;
+                        }
                     }
                 }
             }
+            JSONObject params = JSONObject.parseObject(JSONObject.toJSONString(appInfo));
+            return params;
         }
-        JSONObject params = JSONObject.parseObject(JSONObject.toJSONString(appInfo));
-        return params;
     }
 
     @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
