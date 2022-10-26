@@ -56,8 +56,8 @@ public class AppInfoController extends BaseController {
     private String appKey;
 
 
-    private String displayImageUrl="/api/fileserver/fileserver/download/pfile/displayImageUrl.png";
-    private String fullImageUrl="/api/fileserver/fileserver/download/pfile/fullImageUrl.png";
+    private String displayImageUrl = "/api/fileserver/fileserver/download/pfile/displayImageUrl.png";
+    private String fullImageUrl = "/api/fileserver/fileserver/download/pfile/fullImageUrl.png";
 
     @ApiOperation(value = "移动端版本列表", notes = "移动端版本列表")
     @ApiImplicitParam(
@@ -150,35 +150,33 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的移动端版本", notes = "获取最新版的移动端版本。")
     @RequestMapping(value = "/getLastAppInfo/{appType}", method = {RequestMethod.GET})
     @WrapUpResponseBody
-    public JSONObject getLastAppInfo(@PathVariable String appType,HttpServletRequest request) {
-        if(appType.equals("IOS")){
-            String serverName = "https://" + request.getServerName()+"/" + appKey;
-            String url="itms-services://?action=download-manifest&url=" +
-                serverName+"/api/framework/system/appInfo/manifest.plist";
-            return JSONObject.parseObject(
-                JSONObject.toJSONString(CollectionsOpt.createHashMap("url",url)));
-        }else {
-            Map<String, Object> filter = new HashMap<>();
-            filter.put("appType", appType);
-            List<AppInfo> appInfoList = appInfoService.listObjects(filter);
-            if (appInfoList == null || appInfoList.size() == 0) {
-                throw new ObjectException("未获取到版本号!");
-            }
-            AppInfo appInfo = new AppInfo();
-            if (appInfoList != null && appInfoList.size() > 0) {
-                appInfo = appInfoList.get(0);
-                if (appInfoList.size() > 1) {
-                    for (int i = 1; i < appInfoList.size(); i++) {
-                        AppInfo appNext = appInfoList.get(i);
-                        if (compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0) {
-                            appInfo = appNext;
-                        }
+    public JSONObject getLastAppInfo(@PathVariable String appType, HttpServletRequest request) {
+        Map<String, Object> filter = new HashMap<>();
+        filter.put("appType", appType);
+        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+        if (appInfoList == null || appInfoList.size() == 0) {
+            throw new ObjectException("未获取到版本号!");
+        }
+        AppInfo appInfo = new AppInfo();
+        if (appInfoList != null && appInfoList.size() > 0) {
+            appInfo = appInfoList.get(0);
+            if (appInfoList.size() > 1) {
+                for (int i = 1; i < appInfoList.size(); i++) {
+                    AppInfo appNext = appInfoList.get(i);
+                    if (compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0) {
+                        appInfo = appNext;
                     }
                 }
             }
-            JSONObject params = JSONObject.parseObject(JSONObject.toJSONString(appInfo));
-            return params;
         }
+        if (appType.equals("IOS")) {
+            String serverName = "https://" + request.getServerName() + "/" + appKey;
+            String url = "itms-services://?action=download-manifest&url=" +
+                serverName + "/api/framework/system/appInfo/manifest.plist";
+            appInfo.setFileUrl(url);
+        }
+        JSONObject params = JSONObject.parseObject(JSONObject.toJSONString(appInfo));
+        return params;
     }
 
     @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
@@ -206,6 +204,7 @@ public class AppInfoController extends BaseController {
         String url = serverName + "/" + appInfo.getFileUrl();
         response.sendRedirect(url);
     }
+
     @ApiOperation(value = "获取最新版的IOS下载地址", notes = "获取最新版的IOS下载地址。")
     @RequestMapping(value = "/manifest.plist", method = {RequestMethod.GET})
     public void getLastIOSUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -227,13 +226,13 @@ public class AppInfoController extends BaseController {
                 }
             }
         }
-        String serverName = "https://" + request.getServerName()+"/" + appKey;
-        String plist=creatPlist(appInfo,serverName);
+        String serverName = "https://" + request.getServerName() + "/" + appKey;
+        String plist = creatPlist(appInfo, serverName);
         response.reset();
         response.setCharacterEncoding("UTF-8");
-        response.setHeader("Content-Disposition","inline;fileName=ios.plist");
+        response.setHeader("Content-Disposition", "inline;fileName=ios.plist");
         response.setContentType("application/xml");
-        OutputStream outputStream=response.getOutputStream();
+        OutputStream outputStream = response.getOutputStream();
         outputStream.write(plist.getBytes("UTF-8"));
         outputStream.close();
     }
@@ -293,14 +292,14 @@ public class AppInfoController extends BaseController {
             + "<string>display-image</string>\n"
             + "<key>url</key>\n"
             //你之前所上传的ipa文件路径
-            + "<string>" + serverName  + displayImageUrl + "</string>\n"
+            + "<string>" + serverName + displayImageUrl + "</string>\n"
             + "</dict>\n"
             + "<dict>\n"
             + "<key>kind</key>\n"
             + "<string>full-size-image</string>\n"
             + "<key>url</key>\n"
             //你之前所上传的ipa文件路径
-            + "<string>" + serverName+fullImageUrl + "</string>\n"
+            + "<string>" + serverName + fullImageUrl + "</string>\n"
             + "</dict>\n"
             + "</array>\n"
             + "<key>metadata</key>\n"
@@ -308,7 +307,7 @@ public class AppInfoController extends BaseController {
             + "<key>bundle-identifier</key>\n"
             + "<string>com.centit.checkWorkApp</string>\n"
             + "<key>bundle-version</key>\n"
-            + "<string>"+appInfo.getVersionId()+"</string>\n"
+            + "<string>" + appInfo.getVersionId() + "</string>\n"
             + "<key>kind</key>\n"
             + "<string>software</string>\n"
             + "<key>platform-identifier</key>\n"
