@@ -12,6 +12,7 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.IDataDictionary;
 import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.model.basedata.IUserUnit;
 import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.JsonCentitUserDetails;
@@ -895,8 +896,22 @@ public class TenantServiceImpl implements TenantService {
         boolean isAdmin = MapUtils.getString(tenantJson, "roleCode", "").equals(TenantConstant.TENANT_ADMIN_ROLE_CODE)
             || MapUtils.getString(tenantJson, "isOwner").equals("T");
         tenantJson.put("isAdmin", isAdmin);
+
+        tenantJson.put("deptMobile", getDeptMobile(topUnit, userCode));
         extendTenantsUserRanks(tenantJson, (List<UserUnit>) CodeRepositoryUtil.listUserUnits(topUnit, userCode));
 
+    }
+    private JSONArray getDeptMobile(String topUnit,String userCode){
+        JSONArray jsonArray=new JSONArray();
+       List<UserUnit> iUserUnitList= (List<UserUnit>) CodeRepositoryUtil.listUserUnits(topUnit, userCode);
+       for(UserUnit userUnit:iUserUnitList){
+           JSONObject jsonObject= (JSONObject) JSONObject.toJSON(userUnit);
+           jsonObject.put("unitName",CodeRepositoryUtil.getValue("unitCode",userUnit.getUnitCode(),topUnit,"zh_CN"));
+          jsonObject.put("userRankText",CodeRepositoryUtil.getValue("RankType",
+              userUnit.getUserRank(),topUnit,"zh_CN"));
+           jsonArray.add(jsonObject);
+       }
+       return jsonArray;
     }
 
     /**
