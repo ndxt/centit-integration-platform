@@ -150,6 +150,11 @@ public class TenantServiceImpl implements TenantService {
 
     @Autowired
     private SysUserManager sysUserManager;
+    @Value("${login.password.minLength:8}")
+    private int passwordMinLength;
+
+    @Value("${login.password.strength:3}")
+    private int passwordStrength;
 
     @Override
     @Transactional
@@ -840,6 +845,9 @@ public class TenantServiceImpl implements TenantService {
         UserInfo dbUserInfo = sysUserManager.loadUserByLoginname(userInfo.getLoginName());
         if (null != dbUserInfo) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_FIELD_INPUT_CONFLICT, String.format("登录名%s已存在，请更换！", userInfo.getLoginName()));
+        }
+        if (CentitPasswordEncoder.checkPasswordStrength(userInfo.getUserPwd(), passwordMinLength ) < passwordStrength) {
+            throw new ObjectException("用户密码强度太低，请输入符合要求的密码！");
         }
         if (null != userInfo.getUserRoles()) {
             userInfo.getUserRoles().forEach(userRole -> userRole.setUserCode(userInfo.getUserCode()));
