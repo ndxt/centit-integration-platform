@@ -270,6 +270,10 @@ public class PlatformDataController extends BaseController {
     @RequestMapping(value = "/currentusers", method = RequestMethod.GET)
     @WrapUpResponseBody
     public List<UserInfo> listCurrentUsers(HttpServletRequest request) {
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if (StringUtils.isBlank(userCode)) {
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
+        }
         String topUnit=WebOptUtils.getCurrentTopUnit(request);
         List<? extends IUserUnit> userUnits=CodeRepositoryUtil.listAllUserUnits(topUnit);
         List<UserInfo> result = new ArrayList<>();
