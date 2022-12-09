@@ -63,6 +63,13 @@
             <version>2.7.0</version>
         </dependency>
 
+        <!--国密算法SM4-->
+        <dependency>
+            <groupId>ArgiSecurity</groupId>
+            <artifactId>ArgiSecurity</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
     <build>
         <!--<resources>

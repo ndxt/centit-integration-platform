@@ -20,6 +20,7 @@ import com.centit.framework.users.service.*;
 import com.centit.support.common.ObjectException;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
+import com.newland.bi3.security.SM4Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -465,8 +466,9 @@ public class ThirdLogin extends BaseController {
                             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
                             if (null != ud) {
                                 //todo 国密sm4或sm3 解密
-                                String password = "";
-                                //String password = SM4dDecrypt(userInfo.getString("userPwd"), uniteConfig.getUniteAppSecret());
+                                SM4Utils sm4 = new SM4Utils();
+                                sm4.secretKey = uniteConfig.getUniteAppSecret();
+                                String password = sm4.decryptData_ECB(userInfo.getString("userPwd"));
                                 if (passwordEncoder.isPasswordValid(ud.getUserInfo().getString("userPin"), password, ud.getUserCode())) {
                                     SecurityContextHolder.getContext().setAuthentication(ud);
                                     accessToken = request.getSession().getId();
