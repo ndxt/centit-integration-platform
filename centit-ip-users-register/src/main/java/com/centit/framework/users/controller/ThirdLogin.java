@@ -9,6 +9,8 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UniteConfig;
 import com.centit.framework.users.config.UrlConstant;
@@ -33,10 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -86,6 +85,9 @@ public class ThirdLogin extends BaseController {
 
     @Autowired
     private CentitPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SysUserManager sysUserManager;
 
     //微信登录
     private static final String WECHAT_LOGIN = "wx";
@@ -466,9 +468,7 @@ public class ThirdLogin extends BaseController {
                             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
                             if (null != ud) {
                                 //todo 国密sm4或sm3 解密
-                                SM4Utils sm4 = new SM4Utils();
-                                sm4.secretKey = uniteConfig.getUniteAppSecret();
-                                String password = sm4.decryptData_ECB(userInfo.getString("userPwd"));
+                                String password = sm4dDecrypt(userInfo.getString("userPwd"), uniteConfig.getUniteAppSecret());
                                 if (passwordEncoder.isPasswordValid(ud.getUserInfo().getString("userPin"), password, ud.getUserCode())) {
                                     SecurityContextHolder.getContext().setAuthentication(ud);
                                     accessToken = request.getSession().getId();
@@ -530,6 +530,42 @@ public class ThirdLogin extends BaseController {
             errorMsg = "error";
         }
         return errorMsg;
+    }
+
+    @ApiOperation(value = "统一门户账号验证", notes = "统一门户账号验证")
+    @ResponseBody
+    @PostMapping(value = "/checkAppUserValid")
+    public Map<String, Object> checkAppUserValid(@RequestBody String userInfo, HttpServletRequest request) {
+        logger.info("统一门户账号验证；{}", userInfo);
+        Map<String, Object> resMap = new HashMap<>();
+        JSONObject userInfoJson = JSON.parseObject(userInfo);
+        if (null != userInfoJson) {
+            String password = sm4dDecrypt(userInfoJson.getString("userPwd"), uniteConfig.getUniteAppSecret());
+            UserInfo user = sysUserManager.loadUserByLoginname(userInfoJson.getString("userAccount"));
+            if (null != user && passwordEncoder.isPasswordValid(user.getUserPin(), password, user.getUserCode())) {
+                resMap.put("status", 200);
+                resMap.put("msg", "OK");
+            } else {
+                resMap.put("status", 601);
+                resMap.put("msg", "登录名不存在或密码错误！");
+            }
+        } else {
+            resMap.put("status", 500);
+            resMap.put("msg", "登入账号和密码信息为空！");
+        }
+        return resMap;
+    }
+
+    private static String sm4dDecrypt(String encryptData, String key) {
+        String decryptData = null;
+        try {
+            SM4Utils sm4 = new SM4Utils();
+            sm4.secretKey = key;
+            decryptData = sm4.decryptData_ECB(encryptData);
+        } catch (Exception e) {
+            return null;
+        }
+        return decryptData;
     }
 
 }
