@@ -469,20 +469,6 @@ public class ThirdLogin extends BaseController {
                             logger.info("loginName:{}", loginName);
                             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
                             if (null != ud) {
-                                //todo 国密sm4或sm3 解密
-                                logger.info("userPwd:{}", userInfo.getString("userPwd"));
-                                logger.info("uniteAppSecret:{}", uniteConfig.getUniteAppSecret());
-                                String password = sm4dDecrypt(userInfo.getString("userPwd"), uniteConfig.getUniteAppSecret());
-                                logger.info("解密后password:{}", password);
-                                /*if (passwordEncoder.isPasswordValid(ud.getUserInfo().getString("userPin"), password, ud.getUserCode())) {
-                                    SecurityContextHolder.getContext().setAuthentication(ud);
-                                    accessToken = request.getSession().getId();
-                                    logger.info("用户名：{}登录成功", loginName);
-                                    //todo token-accessToken redis 持久化
-                                } else {
-                                    logger.error("用户名：{}验证不通过", loginName);
-                                    errorMsg = "登录名" + loginName + "密码错误！";
-                                }*/
                                 SecurityContextHolder.getContext().setAuthentication(ud);
                                 accessToken = request.getSession().getId();
                                 logger.info("用户名：{}登录成功", loginName);
