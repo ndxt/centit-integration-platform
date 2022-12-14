@@ -438,20 +438,21 @@ public class ThirdLogin extends BaseController {
     @GetMapping(value = "/unitelogin")
     public String uniteLogin(HttpServletRequest request) {
         Map<String, Object> filterMap = collectRequestParameters(request);
-        request.changeSessionId();
-        logger.info("验证统一门户单点登陆接口,参数：{}", filterMap);
+        logger.info("统一门户单点登陆,参数：{}", filterMap);
         String token = String.valueOf(filterMap.get("token"));
         String returnUrl = String.valueOf(filterMap.get("returnUrl"));
+        logger.info("returnUrl值:{}", returnUrl);
         token = token.replace(" ", "+");
         String errorMsg = "";
         String accessToken = "";
         try {
+            logger.info("token值：{}", token);
             JSONObject params = new JSONObject();
             params.put("appId", uniteConfig.getAppId());
             params.put("token", URLEncoder.encode(token, "utf-8"));
             //todo token持久化redis，根据token对应关系获取accessToken
 
-            if (StringUtils.isBlank(accessToken)) {
+            if (StringUtils.isBlank(accessToken) && StringUtils.isNotBlank(token)) {
                 //验证token是否有效
                 String tokenResult = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckUrl(), params.toJSONString());
                 logger.info("调用验证token:{},接口返回信息：{}", params, tokenResult);
@@ -460,26 +461,33 @@ public class ThirdLogin extends BaseController {
                     if (null != tokenJson && 200 == tokenJson.getInteger("status")) {
                         //获取扩展信息
                         String loginCheckExtend = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckExtendUrl(), params.toJSONString());
+                        logger.info("调用扩展验证:{},接口返回信息：{}", params, loginCheckExtend);
                         JSONObject loginExtendJson = JSON.parseObject(loginCheckExtend);
                         if (null != loginExtendJson) {
                             JSONObject userInfo = loginExtendJson.getJSONObject("data").getJSONObject("userInfo");
                             String loginName = userInfo.getString("loginName");
-                            userInfo.put("userAccount", userInfo.getString("loginName"));
+                            logger.info("loginName:{}", loginName);
                             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
                             if (null != ud) {
                                 //todo 国密sm4或sm3 解密
+                                logger.info("userPwd:{}", userInfo.getString("userPwd"));
+                                logger.info("uniteAppSecret:{}", uniteConfig.getUniteAppSecret());
                                 String password = sm4dDecrypt(userInfo.getString("userPwd"), uniteConfig.getUniteAppSecret());
-                                if (passwordEncoder.isPasswordValid(ud.getUserInfo().getString("userPin"), password, ud.getUserCode())) {
+                                logger.info("解密后password:{}", password);
+                                /*if (passwordEncoder.isPasswordValid(ud.getUserInfo().getString("userPin"), password, ud.getUserCode())) {
                                     SecurityContextHolder.getContext().setAuthentication(ud);
                                     accessToken = request.getSession().getId();
-                                    logger.info("用户名：{}登录成功", userInfo.getString("loginName"));
+                                    logger.info("用户名：{}登录成功", loginName);
                                     //todo token-accessToken redis 持久化
                                 } else {
-                                    logger.error("用户名：{}验证不通过", userInfo.getString("loginName"));
-                                    errorMsg = "登录名" + userInfo.getString("loginName") + "密码错误！";
-                                }
+                                    logger.error("用户名：{}验证不通过", loginName);
+                                    errorMsg = "登录名" + loginName + "密码错误！";
+                                }*/
+                                SecurityContextHolder.getContext().setAuthentication(ud);
+                                accessToken = request.getSession().getId();
+                                logger.info("用户名：{}登录成功", loginName);
                             } else {
-                                errorMsg = "登录名" + userInfo.getString("loginName") + "不存在！";
+                                errorMsg = "登录名" + loginName + "不存在！";
                             }
                         } else {
                             errorMsg = "统一门户扩展验证接口返回为空！";
@@ -492,6 +500,8 @@ public class ThirdLogin extends BaseController {
                         }
                     }
                 }
+            } else {
+                errorMsg = "统一门户token为空！";
             }
         } catch (Exception e) {
             logger.error("统一门户单点登录异常：{}", e.getMessage());
