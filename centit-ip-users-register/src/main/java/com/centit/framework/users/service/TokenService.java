@@ -21,6 +21,7 @@ import com.dingtalk.api.response.OapiGetJsapiTicketResponse;
 import com.dingtalk.api.response.OapiGettokenResponse;
 import com.dingtalk.api.response.OapiServiceGetCorpTokenResponse;
 import com.taobao.api.ApiException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +111,7 @@ public class TokenService {
         // 从持久化存储中读取
         //String accessToken = getFromCache("accessToken", "access_token");
         String accessToken = getFromDb(appConfig.getAppKey());
-        if (accessToken != null) {
+        if (StringUtils.isNotBlank(accessToken)) {
             return ResponseData.makeResponseData(accessToken);
         }
 
@@ -194,7 +195,7 @@ public class TokenService {
         // 从持久化存储中读取
         //String ticket = getFromCache("jsticket", "ticket");
         String ticket = getFromDb("jsticket");
-        if (ticket != null) {
+        if (StringUtils.isNotBlank(ticket)) {
             return ResponseData.makeResponseData(ticket);
         }
 
@@ -228,13 +229,13 @@ public class TokenService {
         // 从持久化存储中读取
         String accessToken = getFromDb(jsmotSyncConfig.getCustomKey());
         long expiresIn = 0;
-        if (accessToken != null) {
+        if (StringUtils.isNotBlank(accessToken)) {
             return ResponseData.makeResponseData(accessToken);
         }
         String retMsg = "";
         long retCode = 1;
         try {
-            String uri = JsmotConstant.URL_GET_ACCESS_TOKEN + "?customKey=" + jsmotSyncConfig.getCustomKey() + "&customSecret=" + jsmotSyncConfig.getCustomSecret();
+            String uri = jsmotSyncConfig.getJsmotHost() + JsmotConstant.URL_GET_ACCESS_TOKEN + "?customKey=" + jsmotSyncConfig.getCustomKey() + "&customSecret=" + jsmotSyncConfig.getCustomSecret();
             String jsonStr = HttpExecutor.simpleGet(HttpExecutorContext.create(), uri);
             JSONObject jsonObject = JSON.parseObject(jsonStr);
             if (null != jsonObject) {
@@ -246,6 +247,8 @@ public class TokenService {
                 } else {
                     return ResponseData.makeErrorMessage(Integer.valueOf(String.valueOf(retCode)), retMsg);
                 }
+            } else {
+                return ResponseData.makeErrorMessage(1, "调用获取交通云accessToken授权码返回为空");
             }
         } catch (Exception e) {
             log.error("getJsmotAccessToken failed", e);

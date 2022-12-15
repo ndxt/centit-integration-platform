@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class JsmotSyncConfig {
 
+    @Value("${jsmotHost:http://218.2.208.143:10251}")
+    private String jsmotHost;
+
     @Value("${jsmotAppId:85fe34477c954f16ae738452ad80}")
     private String jsmotAppId;
 

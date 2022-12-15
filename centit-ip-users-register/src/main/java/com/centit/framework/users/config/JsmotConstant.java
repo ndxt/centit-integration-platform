@@ -6,22 +6,27 @@ package com.centit.framework.users.config;
 public class JsmotConstant {
 
     /**
-     * 测试环境
-     */
-    private static final String HOST = "http://218.2.208.143:10251";
-
-    /**
      * 获取交通云accessToken授权码
      */
-    public static final String URL_GET_ACCESS_TOKEN = HOST + "/authorize/apiLic/getAccessToken";
+    public static final String URL_GET_ACCESS_TOKEN = "/authorize/apiLic/getAccessToken";
 
     /**
-     * （行业）获取组织机构详情
+     * 新增从业人员
      */
-    public static final String URL_GET_UNIT_DETAIL = HOST + "/organizeuser/dataSync/f/getUnitDetail/{unitCode}";
+    public static final String URL_CREATE_CY = "/organizeuser/dataSync/g/createCY";
 
     /**
-     * （行业）获取用户详情
+     * 获取从业人员详情
      */
-    public static final String URL_GET_FUSER_DETAIL = HOST + "/organizeuser/dataSync/f/getFUserDetail/{userCode}";
+    public static final String URL_GET_CYUSER_DETAIL = "/organizeuser/dataSync/g/getCYUserDetail";
+
+    /**
+     * 新增从业企业
+     */
+    public static final String URL_CORP_REGIST = "/organizeuser/dataSync/c/corpRegist";
+
+    /**
+     * 获取从业企业详情
+     */
+    public static final String URL_GET_CYCORP_INFO = "/organizeuser/dataSync/c/getCYCorpInfo";
 }

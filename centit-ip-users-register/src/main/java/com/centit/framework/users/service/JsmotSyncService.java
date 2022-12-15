@@ -13,5 +13,7 @@ public interface JsmotSyncService {
 
     ResponseData unitCreate(String accessToken, JsmotUnitDTO unitInfo);
 
-    ResponseData getUnitInfo(String accessToken, String deptId);
+    ResponseData getCYUserDetail(String accessToken, String userCode, String flag);
+
+    ResponseData getCYCorpInfo(String accessToken, String userCode, String flag);
 }
