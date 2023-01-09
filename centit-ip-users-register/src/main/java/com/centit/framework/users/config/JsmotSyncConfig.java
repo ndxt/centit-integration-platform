@@ -22,4 +22,13 @@ public class JsmotSyncConfig {
 
     @Value("${customSecret:bdabe60de808493d8b31723cb8c5}")
     private String customSecret;
+
+    @Value("${smsHost:http://218.2.208.142:8082}")
+    private String smsHost;
+
+    @Value("${smsUser:s_keji}")
+    private String smsUser;
+
+    @Value("${smsPwd:Keji1234!}")
+    private String smsPwd;
 }

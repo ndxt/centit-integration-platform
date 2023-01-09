@@ -29,4 +29,29 @@ public class JsmotConstant {
      * 获取从业企业详情
      */
     public static final String URL_GET_CYCORP_INFO = "/organizeuser/dataSync/c/getCYCorpInfo";
+
+    /**
+     * H5单点登录
+     */
+    public static final String URL_H5_AUTHORIZE = "/authorize/tla/authorize";
+
+    /**
+     * H5获取用户的详细信息
+     */
+    public static final String URL_H5_GETUSERINFO_BYCODE = "/authorize/tla/getuserinfo_bycode";
+
+    /**
+     * 短信平台token
+     */
+    public static final String URL_SMS_ACCESS_TOKEN = "/gettoken";
+
+    /**
+     * 单条短信
+     */
+    public static final String URL_SEND_SINGLE_SMS = "/ttworksheet/sendEmaySinglesms";
+
+    /**
+     * 群发短信
+     */
+    public static final String URL_SEND_BATCHONLY_SMS = "/ttworksheet/sendEmayBatchonlysms";
 }

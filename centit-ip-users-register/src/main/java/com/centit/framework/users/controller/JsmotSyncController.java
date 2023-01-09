@@ -6,6 +6,7 @@ import com.centit.framework.system.dao.UnitInfoDao;
 import com.centit.framework.users.config.JsmotSyncConfig;
 import com.centit.framework.users.dto.JsmotUnitDTO;
 import com.centit.framework.users.dto.JsmotUserDTO;
+import com.centit.framework.users.dto.SmsDTO;
 import com.centit.framework.users.service.JsmotSyncService;
 import com.centit.framework.users.service.TokenService;
 import io.swagger.annotations.Api;
@@ -14,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author zfg
@@ -87,5 +90,26 @@ public class JsmotSyncController {
             return ResponseData.makeErrorMessage("获取交通云accessToken失败");
         }
         return jsmotSyncService.getCYCorpInfo(accessToken, id, flag);
+    }
+
+    private String getSmsAccessToken() {
+        String accessToken = "";
+        ResponseData accessTokenData = tokenService.getSmsAccessToken();
+        if (accessTokenData.getCode() != 0) {
+            return "";
+        }
+        accessToken = accessTokenData.getData().toString();
+        return accessToken;
+    }
+
+    @ApiOperation(value = "交通厅短信发送", notes = "交通厅短信发送")
+    @PostMapping(value = "/sendsms")
+    @WrapUpResponseBody
+    public ResponseData sendSms(@RequestBody SmsDTO smsDTO, HttpServletRequest request) {
+        String accessToken = getSmsAccessToken();
+        if (StringUtils.isBlank(accessToken)) {
+            return ResponseData.makeErrorMessage("获取短信平台accessToken失败");
+        }
+        return jsmotSyncService.sendSms(accessToken, smsDTO);
     }
 }
