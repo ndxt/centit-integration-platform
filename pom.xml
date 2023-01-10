@@ -22,6 +22,7 @@
         <module>centit-ip-dubbo-server-config</module>
         <module>centit-ip-dubbo-client-config</module>
         <module>centit-ip-app-base-config</module>
+        <module>jtt-ip-users-register</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -137,6 +138,10 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        &lt;!&ndash; add this to disable checking &ndash;&gt;
+                        &lt;!&ndash;<configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>&ndash;&gt;
                     </execution>
                 </executions>
             </plugin>-->
