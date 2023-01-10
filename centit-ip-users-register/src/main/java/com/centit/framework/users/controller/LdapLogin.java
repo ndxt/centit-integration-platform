@@ -105,14 +105,20 @@ public class LdapLogin extends BaseController {
 
     public Map<String, Object> searchLdapUserByloginName(String loginName) {
         List<UserSyncDirectory> list = userSyncDirectoryManager.listObjects();
-        UserSyncDirectory directory = new UserSyncDirectory();
+        //UserSyncDirectory directory = new UserSyncDirectory();
         if (list != null && list.size() > 0) {
             for (UserSyncDirectory userSyncDirectory : list) {
                 if (userSyncDirectory.getType().equalsIgnoreCase("LDAP")) {
-                    directory = userSyncDirectory;
+                    Map<String, Object> userDataMap = searchLdapUserByloginName(userSyncDirectory, loginName);
+                    if(userDataMap.size()>0){
+                        return userDataMap;
+                    }
                 }
             }
         }
+        return null;
+    }
+    private Map<String, Object> searchLdapUserByloginName(UserSyncDirectory directory, String loginName) {
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
