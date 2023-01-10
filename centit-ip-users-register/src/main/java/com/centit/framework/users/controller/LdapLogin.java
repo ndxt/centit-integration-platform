@@ -1,5 +1,7 @@
 package com.centit.framework.users.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
@@ -9,7 +11,9 @@ import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.system.service.UserSyncDirectoryManager;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.LeftRightPair;
 import com.centit.support.compiler.Pretreatment;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,12 +44,28 @@ import java.util.*;
 
 /**
  * LDAP登录Controller
+
+{
+     searchBase : "(&(objectCategory=person)(objectClass=user)(sAMAccountName={0}))",
+     searchName : "CN=Users,DC=centit,DC=com",
+     loginNameField : "sAMAccountName",
+     returnFields : {
+         userName : "displayName",
+         loginName : "sAMAccountName",
+         name : "name",
+         regEmail : "mail",
+         regCellPhone : "mobilePhone",
+         userDesc : "description"
+     },
+    userURIFormat : "CN={name},CN=Users,DC=centit,DC=com"
+}
  */
 @Controller
 @RequestMapping("/ldap")
 @Api(value = "ldap登录相关接口", tags = "ldap登录相关接口")
 public class LdapLogin extends BaseController {
 
+    private final static String LDAP_USER_ID = "ldapUserURI";
     private static Logger logger = LoggerFactory.getLogger(LdapLogin.class);
 
     @Autowired
@@ -80,19 +100,18 @@ public class LdapLogin extends BaseController {
                 }
             }
         }
-        Map<String, Object> map = searchLdapUserByloginName(username);
+        LeftRightPair<UserSyncDirectory, Map<String, Object>> userLdapInfo = searchUserByloginName(username);
         Map<String, Object> sessionMap = new HashMap<>();
-        if (map == null || map.isEmpty()) {
+        if (userLdapInfo == null) {
             return ResponseData.makeErrorMessage("未查询到用户");
         }
         try {
-            boolean passed = checkUserPasswordByDn(
-                Pretreatment.mapTemplateString("CN={name},CN=Users,DC=centit,DC=com", map),
-                password);
+            Map<String, Object> userLdap = userLdapInfo.getRight();
+            boolean passed = checkUserPasswordByDn(userLdapInfo.getLeft(), userLdapInfo.getRight(), password);
             if (!passed) {
                 return ResponseData.makeErrorMessage("用户名密码不匹配。");
             }
-            CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(map.get("sAMAccountName") + "");
+            CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(StringBaseOpt.castObjectToString(userLdap.get("loginName")));
             ud.setLoginIp(WebOptUtils.getRequestAddr(request));
             SecurityContextHolder.getContext().setAuthentication(ud);
             sessionMap.put("accessToken", request.getSession().getId());
@@ -103,22 +122,22 @@ public class LdapLogin extends BaseController {
         return ResponseData.makeResponseData(sessionMap);
     }
 
-    public Map<String, Object> searchLdapUserByloginName(String loginName) {
+    public LeftRightPair<UserSyncDirectory, Map<String, Object>> searchUserByloginName(String loginName) {
         List<UserSyncDirectory> list = userSyncDirectoryManager.listObjects();
         //UserSyncDirectory directory = new UserSyncDirectory();
         if (list != null && list.size() > 0) {
             for (UserSyncDirectory userSyncDirectory : list) {
-                if (userSyncDirectory.getType().equalsIgnoreCase("LDAP")) {
+                if ("LDAP".equalsIgnoreCase(userSyncDirectory.getType())) {
                     Map<String, Object> userDataMap = searchLdapUserByloginName(userSyncDirectory, loginName);
                     if(userDataMap.size()>0){
-                        return userDataMap;
+                        return new LeftRightPair<>(userSyncDirectory, userDataMap);
                     }
                 }
             }
         }
         return null;
     }
-    private Map<String, Object> searchLdapUserByloginName(UserSyncDirectory directory, String loginName) {
+    public static Map<String, Object> searchLdapUserByloginName(UserSyncDirectory directory, String loginName) {
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
@@ -131,35 +150,52 @@ public class LdapLogin extends BaseController {
             ctx = new InitialLdapContext(env, null);
             SearchControls searchCtls = new SearchControls();
             searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            List<String> searchFilters = new ArrayList<>();
-            searchFilters.add("(&(objectCategory=person)(objectClass=user)(sAMAccountName={0}))");
-            searchFilters.add("(distinguishedName=CN={0},CN=Users,DC=centit,DC=com)");
-            for (String filterStr : searchFilters) {
-                String searchFilter = MessageFormat.format(filterStr, loginName);
-                String[] userReturnedAtts = new String[]{"displayName", "name", "sAMAccountName",
-                    "mail", "distinguishedName", "jobNo", "idCard", "mobilePhone", "description", "memberOf"};
-                searchCtls.setReturningAttributes(userReturnedAtts);
-                NamingEnumeration<SearchResult> answer = ctx.search("CN=Users,DC=centit,DC=com", searchFilter, searchCtls);
-                if (answer.hasMoreElements()) {
-                    SearchResult sr = answer.next();
+            JSONObject searchParams = JSON.parseObject(directory.getSearchBase());
+            // searchBase "(&(objectCategory=person)(objectClass=user)(sAMAccountName={0}))"
+            //  (distinguishedName=CN={0},CN=Users,DC=centit,DC=com)"
+            String searchFilter = MessageFormat.format(searchParams.getString("searchBase"), loginName);
+            // {"displayName", "name", "sAMAccountName",
+            //                "mail", "distinguishedName", "jobNo", "idCard", "mobilePhone", "description", "memberOf"}
+            Map<String, Object> returnFields = CollectionsOpt.objectToMap(searchParams.get("returnFields"));
+            String [] fieldNames = new String[returnFields.size()];
+            int i = 0;
+            for(Object obj : returnFields.values()){
+                fieldNames[i++] = StringBaseOpt.castObjectToString(obj);
+            }
+            searchCtls.setReturningAttributes(fieldNames);
+            // searchName "CN=Users,DC=centit,DC=com"
+            NamingEnumeration<SearchResult> answer = ctx.search(searchParams.getString("searchName") , searchFilter, searchCtls);
+            if (answer.hasMoreElements()) {
+                SearchResult sr = answer.next();
 
-                    Attributes attrs = sr.getAttributes();
-
-                    String principalId = getAttributeString(attrs, "sAMAccountName");
-                    if (StringUtils.isNotBlank(principalId)) {
-                        NamingEnumeration<? extends Attribute> enumeration = attrs.getAll();
-                        while (enumeration.hasMore()) {
-                            Attribute attr = enumeration.next();
-                            attributes.put(attr.getID(), attr.get());
-                        }
-                        ctx.close();
+                Attributes attrs = sr.getAttributes();
+                // loginNameField sAMAccountName
+                String principalId = getAttributeString(attrs, searchParams.getString("loginNameField"));
+                if (StringUtils.isNotBlank(principalId)) {
+                    NamingEnumeration<? extends Attribute> enumeration = attrs.getAll();
+                    while (enumeration.hasMore()) {
+                        Attribute attr = enumeration.next();
+                        attributes.put(attr.getID(), attr.get());
                     }
                 }
             }
             ctx.close();
 
+            if(attributes.size()>0){
+                HashMap<String, Object> returnMap = new HashMap<>(attributes.size()+2);
+                for(Map.Entry<String, Object> ent : returnFields.entrySet()){
+                    Object obj = attributes.get(StringBaseOpt.castObjectToString(ent.getValue()));
+                    if(obj !=null){
+                        returnMap.put(ent.getKey(), obj);
+                    }
+                }
+                returnMap.put(LDAP_USER_ID, Pretreatment.mapTemplateString(
+                        searchParams.getString("userURIFormat"),  attributes));
+                return returnMap;
+            }
+
         } catch (NamingException e) {
-            //System.out.println(e.getLocalizedMessage());
+            System.out.println(e.getLocalizedMessage());
             if (ctx != null) {
                 try {
                     ctx.close();
@@ -169,7 +205,7 @@ public class LdapLogin extends BaseController {
             }
 
         }
-        return attributes;
+        return null;
     }
 
     public static String getAttributeString(Attributes attrs, String attrName) {
@@ -185,15 +221,16 @@ public class LdapLogin extends BaseController {
         }
     }
 
-    public boolean checkUserPasswordByDn(String username, String password) throws NamingException {
+    public boolean checkUserPasswordByDn(UserSyncDirectory directory, Map<String, Object> userLdapInfo, String password) throws NamingException {
 
         Properties env = new Properties();
         //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
-        env.put(Context.SECURITY_PRINCIPAL, username);
+        env.put(Context.SECURITY_PRINCIPAL, StringBaseOpt.castObjectToString(userLdapInfo.get(LDAP_USER_ID)));
         env.put(Context.SECURITY_CREDENTIALS, password);
-        env.put(Context.PROVIDER_URL, "LDAP://192.168.128.5:389");
+        //"LDAP://192.168.128.5:389"
+        env.put(Context.PROVIDER_URL, directory.getUrl() );
         LdapContext ctx = null;
         try {
             ctx = new InitialLdapContext(env, null);
