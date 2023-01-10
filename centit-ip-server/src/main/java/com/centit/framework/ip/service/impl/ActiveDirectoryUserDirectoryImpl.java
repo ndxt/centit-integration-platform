@@ -59,89 +59,9 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     @NotNull
     private CentitPasswordEncoder passwordEncoder;
 
-    //@Value("${userdirectory.ldap.url:}")
-    private String ldapUrl;
-
-    //@Value("${userdirectory.ldap.username:}")
-    private String ldapUser;
-
-    //@Value("${userdirectory.ldap.userpassword:}")
-    private String ldapUserPwd;
-
-    //@Value("${userdirectory.ldap.searchbase:}")
-    private String searchBase;
-
-    //等级默认为普通员工 YG
-    //@Value("${userdirectory.default.rank:YG}")
-    @NotNull
-    private String defaultRank;
-
-    //岗位默认为普通职员 ZY
-    //@Value("${userdirectory.default.station:ZY}")
-    @NotNull
-    private String defaultStation;
-
-    //@Value("${userdirectory.default.rolecode:}")
-    private String defaultUserRole;
-
     @Value("${framework.password.default.generator:}")
-    protected String defaultPassWorkFormat;
+    protected String defaultPasswordFormat;
 
-    public String getDefaultUserRole() {
-        return defaultUserRole;
-    }
-
-    public void setDefaultUserRole(String defaultUserRole) {
-        this.defaultUserRole = defaultUserRole;
-    }
-
-    public String getDefaultRank() {
-        return defaultRank;
-    }
-
-    public void setDefaultRank(String defaultRank) {
-        this.defaultRank = defaultRank;
-    }
-
-    public String getDefaultStation() {
-        return defaultStation;
-    }
-
-    public void setDefaultStation(String defaultStation) {
-        this.defaultStation = defaultStation;
-    }
-
-    public String getLdapUrl() {
-        return ldapUrl;
-    }
-
-    public void setLdapUrl(String ldapUrl) {
-        this.ldapUrl = ldapUrl;
-    }
-
-    public String getLdapUser() {
-        return ldapUser;
-    }
-
-    public void setLdapUser(String ldapUser) {
-        this.ldapUser = ldapUser;
-    }
-
-    public String getLdapUserPwd() {
-        return ldapUserPwd;
-    }
-
-    public void setLdapUserPwd(String ldapUserPwd) {
-        this.ldapUserPwd = ldapUserPwd;
-    }
-
-    public String getSearchBase() {
-        return searchBase;
-    }
-
-    public void setSearchBase(String searchBase) {
-        this.searchBase = searchBase;
-    }
 
     public static String getAttributeString(Attribute attr){
         if(attr==null) {
@@ -235,7 +155,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 
             searchFilter = "(&(objectCategory=person)(objectClass=user))";//"(objectCategory=group)"
             String[] userReturnedAtts = new String[]{"memberOf", "displayName", "sAMAccountName",
-                "mail", distName};
+                "mail", distName, "mobilePhone", "idCard", "jobNo"};
             searchCtls.setReturningAttributes(userReturnedAtts);
             answer = ctx.search(searchBase, searchFilter,searchCtls);
             while (answer.hasMoreElements()) {
@@ -349,8 +269,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
 
     private String getDefaultPassword(String userCode) {
         String rawPass = "000000";
-        if(StringUtils.isNotBlank(defaultPassWorkFormat)){
-            rawPass = Pretreatment.mapTemplateString(defaultPassWorkFormat,userCode);
+        if(StringUtils.isNotBlank(defaultPasswordFormat)){
+            rawPass = Pretreatment.mapTemplateStringAsFormula(defaultPasswordFormat, userCode);
         }
         return passwordEncoder.createPassword(rawPass, userCode);
     }
