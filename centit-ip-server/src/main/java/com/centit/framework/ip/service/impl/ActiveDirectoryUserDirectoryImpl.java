@@ -159,6 +159,11 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
         return getAttributeString(attr.get(attrName));
     }
 
+    /**
+     * TODO 这个方法要重写
+     * @param directory LDAP用户目录信息； 需要根据配置信息自动适配
+     * @return 同步的数量
+     */
     @Override
     @Transactional(rollbackFor=Exception.class)
     public int synchroniseUserDirectory(UserSyncDirectory directory) {
@@ -200,6 +205,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     unitInfo.setCreateDate(now);
                     //-----------------------------
                   }
+
+                //directory.getTopUnit()
                 unitInfo.setUnitName(unitName);
                 unitInfo.setUnitDesc(getAttributeString(attrs, "managedBy"));
                 unitInfo.setLastModifyDate(now);

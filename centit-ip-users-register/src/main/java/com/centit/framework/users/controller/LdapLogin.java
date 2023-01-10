@@ -100,29 +100,68 @@ public class LdapLogin extends BaseController {
                 }
             }
         }
-        LeftRightPair<UserSyncDirectory, Map<String, Object>> userLdapInfo = searchUserByloginName(username);
-        Map<String, Object> sessionMap = new HashMap<>();
-        if (userLdapInfo == null) {
-            return ResponseData.makeErrorMessage("未查询到用户");
-        }
-        try {
-            Map<String, Object> userLdap = userLdapInfo.getRight();
-            boolean passed = checkUserPasswordByDn(userLdapInfo.getLeft(), userLdapInfo.getRight(), password);
-            if (!passed) {
-                return ResponseData.makeErrorMessage("用户名密码不匹配。");
+
+        List<UserSyncDirectory> directories = userSyncDirectoryManager.listObjects();
+        for (UserSyncDirectory directory : directories){
+            boolean passed = checkUserPasswordByDn(directory, username, password);
+            if (passed) {
+                CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(username);
+                ud.setLoginIp(WebOptUtils.getRequestAddr(request));
+                SecurityContextHolder.getContext().setAuthentication(ud);
+                Map<String, Object> sessionMap = new HashMap<>();
+                sessionMap.put("accessToken", request.getSession().getId());
+                sessionMap.put("userInfo", ud);
+                return ResponseData.makeResponseData(sessionMap);
             }
-            CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(StringBaseOpt.castObjectToString(userLdap.get("loginName")));
-            ud.setLoginIp(WebOptUtils.getRequestAddr(request));
-            SecurityContextHolder.getContext().setAuthentication(ud);
-            sessionMap.put("accessToken", request.getSession().getId());
-            sessionMap.put("userInfo", ud);
-        } catch (NamingException e) {
-            return ResponseData.makeErrorMessage("系统错误。");
         }
-        return ResponseData.makeResponseData(sessionMap);
+        return ResponseData.makeErrorMessage("用户名密码不匹配。");
     }
 
-    public LeftRightPair<UserSyncDirectory, Map<String, Object>> searchUserByloginName(String loginName) {
+
+    public static boolean checkUserPasswordByDn(UserSyncDirectory directory, String loginName, String password) {
+
+        Properties env = new Properties();
+        //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
+        JSONObject searchParams = JSON.parseObject(directory.getSearchBase());
+        String userURIFormat = searchParams.getString("userURIFormat");
+        if(StringUtils.isBlank(userURIFormat)){
+            userURIFormat = "CN={name},CN=Users,DC={topUnit},DC=com";
+        }
+        String userURI =  Pretreatment.mapTemplateString(userURIFormat,
+            CollectionsOpt.createHashMap("loginName", loginName, "name", loginName, "topUnit", directory.getTopUnit()));
+
+        env.put(Context.SECURITY_PRINCIPAL, userURI);
+        env.put(Context.SECURITY_CREDENTIALS, password);
+        //"LDAP://192.168.128.5:389"
+        env.put(Context.PROVIDER_URL, directory.getUrl() );
+        LdapContext ctx = null;
+        try {
+            ctx = new InitialLdapContext(env, null);
+            try {
+                Attributes attrs = ctx.getAttributes(userURI);
+                //if (attrs)
+            } catch (NamingException ex ){
+                //do noting
+            }
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        } finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                }
+            }
+        }
+    }
+/*
+
+    public LeftRightPair<UserSyncDirectory, Map<String, Object>> searchUserByLoginName(String loginName) {
         List<UserSyncDirectory> list = userSyncDirectoryManager.listObjects();
         //UserSyncDirectory directory = new UserSyncDirectory();
         if (list != null && list.size() > 0) {
@@ -220,30 +259,7 @@ public class LdapLogin extends BaseController {
             return null;
         }
     }
-
-    public boolean checkUserPasswordByDn(UserSyncDirectory directory, Map<String, Object> userLdapInfo, String password) throws NamingException {
-
-        Properties env = new Properties();
-        //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
-        env.put(Context.SECURITY_PRINCIPAL, StringBaseOpt.castObjectToString(userLdapInfo.get(LDAP_USER_ID)));
-        env.put(Context.SECURITY_CREDENTIALS, password);
-        //"LDAP://192.168.128.5:389"
-        env.put(Context.PROVIDER_URL, directory.getUrl() );
-        LdapContext ctx = null;
-        try {
-            ctx = new InitialLdapContext(env, null);
-            return true;
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return false;
-        } finally {
-            if (ctx != null) {
-                ctx.close();
-            }
-        }
-    }
+*/
 
 
 }

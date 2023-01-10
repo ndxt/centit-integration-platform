@@ -9,6 +9,7 @@ import java.util.Map;
 public class TestLdapSearch {
     public static void main(String[] args) {
         UserSyncDirectory directory = new UserSyncDirectory();
+        directory.setTopUnit("centit");
         directory.setUrl("LDAP://192.168.128.5:389");
         directory.setUser("accountcentit@centit.com");
         directory.setUserPwd("*********");
@@ -26,7 +27,8 @@ public class TestLdapSearch {
             " }, "+
             " userURIFormat : \"CN={name},CN=Users,DC=centit,DC=com\" "+
          "}");
-        Map<String, Object> userInfo = LdapLogin.searchLdapUserByloginName(directory, "codefan");
-        System.out.println(JSON.toJSONString(userInfo));
+        //Map<String, Object> userInfo = LdapLogin.searchLdapUserByloginName(directory, "codefan");
+        boolean pass = LdapLogin.checkUserPasswordByDn(directory, "codefan", "******");
+        System.out.println(JSON.toJSONString(pass));
     }
 }
