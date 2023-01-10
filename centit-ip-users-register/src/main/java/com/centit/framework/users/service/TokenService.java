@@ -1,13 +1,19 @@
 package com.centit.framework.users.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.users.config.AppConfig;
+import com.centit.framework.users.config.JsmotConstant;
+import com.centit.framework.users.config.JsmotSyncConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.po.AccessToken;
 import com.centit.framework.users.po.DingTalkSuite;
 import com.centit.framework.users.utils.FileUtil;
+import com.centit.framework.users.utils.HttpUtil;
 import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.request.OapiGetJsapiTicketRequest;
 import com.dingtalk.api.request.OapiGettokenRequest;
@@ -16,6 +22,7 @@ import com.dingtalk.api.response.OapiGetJsapiTicketResponse;
 import com.dingtalk.api.response.OapiGettokenResponse;
 import com.dingtalk.api.response.OapiServiceGetCorpTokenResponse;
 import com.taobao.api.ApiException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +55,9 @@ public class TokenService {
 
     @Autowired
     private DingTalkSuiteService dingTalkSuiteService;
+
+    @Autowired
+    private JsmotSyncConfig jsmotSyncConfig;
 
     public String getTokenFromCache() {
         return getFromCache("accessToken", "access_token");
@@ -102,7 +112,7 @@ public class TokenService {
         // 从持久化存储中读取
         //String accessToken = getFromCache("accessToken", "access_token");
         String accessToken = getFromDb(appConfig.getAppKey());
-        if (accessToken != null) {
+        if (StringUtils.isNotBlank(accessToken)) {
             return ResponseData.makeResponseData(accessToken);
         }
 
@@ -186,7 +196,7 @@ public class TokenService {
         // 从持久化存储中读取
         //String ticket = getFromCache("jsticket", "ticket");
         String ticket = getFromDb("jsticket");
-        if (ticket != null) {
+        if (StringUtils.isNotBlank(ticket)) {
             return ResponseData.makeResponseData(ticket);
         }
 
@@ -216,4 +226,70 @@ public class TokenService {
         return ResponseData.makeResponseData(ticket);
     }
 
+    public ResponseData getJsmotAccessToken() {
+        // 从持久化存储中读取
+        String accessToken = getFromDb(jsmotSyncConfig.getCustomKey());
+        long expiresIn = 0;
+        if (StringUtils.isNotBlank(accessToken)) {
+            return ResponseData.makeResponseData(accessToken);
+        }
+        String retMsg = "";
+        long retCode = 1;
+        try {
+            String uri = jsmotSyncConfig.getJsmotHost() + JsmotConstant.URL_GET_ACCESS_TOKEN + "?customKey=" + jsmotSyncConfig.getCustomKey() + "&customSecret=" + jsmotSyncConfig.getCustomSecret();
+            String jsonStr = HttpExecutor.simpleGet(HttpExecutorContext.create(), uri);
+            JSONObject jsonObject = JSON.parseObject(jsonStr);
+            if (null != jsonObject) {
+                retCode = jsonObject.getLong("retCode");
+                retMsg = jsonObject.getString("retMsg");
+                if (retCode == 0) {
+                    accessToken = jsonObject.getJSONObject("bizData").getString("accessToken");
+                    expiresIn = jsonObject.getJSONObject("bizData").getLong("validperiod");
+                } else {
+                    return ResponseData.makeErrorMessage(Integer.valueOf(String.valueOf(retCode)), retMsg);
+                }
+            } else {
+                return ResponseData.makeErrorMessage(1, "调用获取交通云accessToken授权码返回为空");
+            }
+        } catch (Exception e) {
+            log.error("getJsmotAccessToken failed", e);
+            return ResponseData.makeErrorMessage(1, e.getMessage());
+        }
+        saveTokenTodb(jsmotSyncConfig.getCustomKey(), accessToken, expiresIn);
+        return ResponseData.makeResponseData(accessToken);
+    }
+
+    public ResponseData getSmsAccessToken() {
+        // 从持久化存储中读取
+        String accessToken = getFromDb(jsmotSyncConfig.getSmsUser());
+        long expiresIn = 0;
+        if (StringUtils.isNotBlank(accessToken)) {
+            return ResponseData.makeResponseData(accessToken);
+        }
+        String retMsg = "";
+        long retCode = 1;
+        try {
+            String uri = jsmotSyncConfig.getSmsHost() + JsmotConstant.URL_SMS_ACCESS_TOKEN;
+            String param = "username=" + jsmotSyncConfig.getSmsUser() + "&password=" + jsmotSyncConfig.getSmsPwd();
+            String jsonStr = HttpUtil.httpPostRequest(uri, "form", "", param);
+            JSONObject jsonObject = JSON.parseObject(jsonStr);
+            if (null != jsonObject) {
+                retCode = jsonObject.getLong("code");
+                retMsg = jsonObject.getString("msg");
+                if (retCode == 200) {
+                    accessToken = jsonObject.getJSONObject("data").getString("token");
+                    expiresIn = jsonObject.getJSONObject("data").getLong("expiresIn");
+                } else {
+                    return ResponseData.makeErrorMessage(Integer.valueOf(String.valueOf(retCode)), retMsg);
+                }
+            } else {
+                return ResponseData.makeErrorMessage(1, "调用获取短信平台accessToken授权码返回为空");
+            }
+        } catch (Exception e) {
+            log.error("getSmsAccessToken failed", e);
+            return ResponseData.makeErrorMessage(1, e.getMessage());
+        }
+        saveTokenTodb(jsmotSyncConfig.getSmsUser(), accessToken, expiresIn);
+        return ResponseData.makeResponseData(accessToken);
+    }
 }

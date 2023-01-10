@@ -711,9 +711,6 @@ public class TenanController extends BaseController {
     @WrapUpResponseBody
     public ResponseData addTenantUser(@ParamName("us") @Valid UserInfo userInfo, UserUnit userUnit, HttpServletRequest request) {
         String userCode = WebOptUtils.getCurrentUserCode(request);
-        if (StringUtils.isBlank(userCode)){
-            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
-        }
         if (null == userUnit || StringUtils.isBlank(userUnit.getTopUnit())){
             return ResponseData.makeErrorMessage("topUnit不能为空!");
         }

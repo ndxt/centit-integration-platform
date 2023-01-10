@@ -13,6 +13,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -32,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,10 @@ public class AppInfoController extends BaseController {
 
     @Value("${app.key}")
     private String appKey;
+
+
+    private String displayImageUrl = "/api/fileserver/fileserver/download/pfile/displayImageUrl.png";
+    private String fullImageUrl = "/api/fileserver/fileserver/download/pfile/fullImageUrl.png";
 
     @ApiOperation(value = "移动端版本列表", notes = "移动端版本列表")
     @ApiImplicitParam(
@@ -76,10 +83,10 @@ public class AppInfoController extends BaseController {
         filter.put("versionId", appInfo.getVersionId());
         filter.put("appType", appInfo.getAppType());
         List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
-        if(appInfoList != null && appInfoList.size() > 0){
+        if (appInfoList != null && appInfoList.size() > 0) {
             return ResponseData.makeErrorMessage("版本号已存在，请勿重复保存!");
         }
-        if(StringUtils.isNotBlank(appInfo.getFileId())){
+        if (StringUtils.isNotBlank(appInfo.getFileId())) {
             String fileUrl = "api/fileserver/fileserver/download/pfile/" + appInfo.getFileId();
             appInfo.setFileUrl(fileUrl);
         }
@@ -100,11 +107,11 @@ public class AppInfoController extends BaseController {
     })
     @RequestMapping(value = "/{appId}", method = {RequestMethod.PUT})
     public void updateAppInfoById(@PathVariable String appId, @RequestBody AppInfo appInfo,
-                                   HttpServletRequest request, HttpServletResponse response) {
+                                  HttpServletRequest request, HttpServletResponse response) {
         AppInfo temp = appInfoService.getObjectById(appId);
         AppInfo oldApp = new AppInfo();
         BeanUtils.copyProperties(temp, oldApp);
-        if(StringUtils.isNotBlank(appInfo.getFileId())){
+        if (StringUtils.isNotBlank(appInfo.getFileId())) {
             String fileUrl = "api/fileserver/fileserver/download/pfile/" + appInfo.getFileId();
             appInfo.setFileUrl(fileUrl);
         }
@@ -122,7 +129,7 @@ public class AppInfoController extends BaseController {
         required = true, paramType = "path", dataType = "String")
     @RequestMapping(value = "/{appId}", method = {RequestMethod.GET})
     @WrapUpResponseBody
-    public AppInfo getAppInfoById(@PathVariable String appId, HttpServletResponse response){
+    public AppInfo getAppInfoById(@PathVariable String appId, HttpServletResponse response) {
         return appInfoService.getObjectById(appId);
     }
 
@@ -131,7 +138,7 @@ public class AppInfoController extends BaseController {
         name = "appId", value = "移动端版本代码",
         required = true, paramType = "path", dataType = "String")
     @RequestMapping(value = "/{appId}", method = {RequestMethod.DELETE})
-    public void deleteAppInfo(@PathVariable String appId, HttpServletRequest request, HttpServletResponse response){
+    public void deleteAppInfo(@PathVariable String appId, HttpServletRequest request, HttpServletResponse response) {
         AppInfo appInfo = appInfoService.getObjectById(appId);
         appInfoService.deleteObjectById(appId);
         JsonResultUtils.writeBlankJson(response);
@@ -143,24 +150,30 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的移动端版本", notes = "获取最新版的移动端版本。")
     @RequestMapping(value = "/getLastAppInfo/{appType}", method = {RequestMethod.GET})
     @WrapUpResponseBody
-    public JSONObject getLastAppInfo(@PathVariable String appType){
+    public JSONObject getLastAppInfo(@PathVariable String appType, HttpServletRequest request) {
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", appType);
         List<AppInfo> appInfoList = appInfoService.listObjects(filter);
-        if(appInfoList == null || appInfoList.size() == 0){
+        if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
         }
         AppInfo appInfo = new AppInfo();
-        if(appInfoList != null && appInfoList.size() > 0){
+        if (appInfoList != null && appInfoList.size() > 0) {
             appInfo = appInfoList.get(0);
-            if(appInfoList.size() > 1){
-                for(int i = 1; i < appInfoList.size(); i++){
+            if (appInfoList.size() > 1) {
+                for (int i = 1; i < appInfoList.size(); i++) {
                     AppInfo appNext = appInfoList.get(i);
-                    if(compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0){
+                    if (compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0) {
                         appInfo = appNext;
                     }
                 }
             }
+        }
+        if (appType.equals("IOS")) {
+            String serverName = "https://" + request.getServerName() + "/" + appKey;
+            String url = "itms-services://?action=download-manifest&url=" +
+                serverName + "/api/framework/system/appInfo/manifest.plist";
+            appInfo.setFileUrl(url);
         }
         JSONObject params = JSONObject.parseObject(JSONObject.toJSONString(appInfo));
         return params;
@@ -169,20 +182,20 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
     @RequestMapping(value = "/getLastAppUrl", method = {RequestMethod.GET})
     public void getLastAppUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String serverName = request.getScheme()+"://"+ request.getServerName()+":"+request.getServerPort() + "/" + appKey;
+        String serverName = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/" + appKey;
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", "Android");
         List<AppInfo> appInfoList = appInfoService.listObjects(filter);
-        if(appInfoList == null || appInfoList.size() == 0){
+        if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
         }
         AppInfo appInfo = new AppInfo();
-        if(appInfoList != null && appInfoList.size() > 0){
+        if (appInfoList != null && appInfoList.size() > 0) {
             appInfo = appInfoList.get(0);
-            if(appInfoList.size() > 1){
-                for(int i = 1; i < appInfoList.size(); i++){
+            if (appInfoList.size() > 1) {
+                for (int i = 1; i < appInfoList.size(); i++) {
                     AppInfo appNext = appInfoList.get(i);
-                    if(compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0){
+                    if (compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0) {
                         appInfo = appNext;
                     }
                 }
@@ -190,6 +203,38 @@ public class AppInfoController extends BaseController {
         }
         String url = serverName + "/" + appInfo.getFileUrl();
         response.sendRedirect(url);
+    }
+
+    @ApiOperation(value = "获取最新版的IOS下载地址", notes = "获取最新版的IOS下载地址。")
+    @RequestMapping(value = "/manifest.plist", method = {RequestMethod.GET})
+    public void getLastIOSUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, Object> filter = new HashMap<>();
+        filter.put("appType", "IOS");
+        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+        if (appInfoList == null || appInfoList.size() == 0) {
+            throw new ObjectException("未获取到版本号!");
+        }
+        AppInfo appInfo = new AppInfo();
+        if (appInfoList != null && appInfoList.size() > 0) {
+            appInfo = appInfoList.get(0);
+            if (appInfoList.size() > 1) {
+                for (int i = 1; i < appInfoList.size(); i++) {
+                    AppInfo appNext = appInfoList.get(i);
+                    if (compareAppVersion(appInfo.getVersionId(), appNext.getVersionId()) < 0) {
+                        appInfo = appNext;
+                    }
+                }
+            }
+        }
+        String serverName = "https://" + request.getServerName() + "/" + appKey;
+        String plist = creatPlist(appInfo, serverName);
+        response.reset();
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Content-Disposition", "inline;fileName=ios.plist");
+        response.setContentType("application/xml");
+        OutputStream outputStream = response.getOutputStream();
+        outputStream.write(plist.getBytes("UTF-8"));
+        outputStream.close();
     }
 
 
@@ -204,7 +249,7 @@ public class AppInfoController extends BaseController {
      * @param version2 app版本号
      * @return int
      */
-    public Integer compareAppVersion(String version1, String version2) {
+    private Integer compareAppVersion(String version1, String version2) {
         if (version1 == null || version2 == null) {
             throw new RuntimeException("版本号不能为空");
         }
@@ -226,4 +271,54 @@ public class AppInfoController extends BaseController {
         return diff;
     }
 
+    private String creatPlist(AppInfo appInfo, String serverName) {
+        String pList = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
+            + "<plist version=\"1.0\">\n" + "<dict>\n"
+            + "<key>items</key>\n"
+            + "<array>\n"
+            + "<dict>\n"
+            + "<key>assets</key>\n"
+            + "<array>\n"
+            + "<dict>\n"
+            + "<key>kind</key>\n"
+            + "<string>software-package</string>\n"
+            + "<key>url</key>\n"
+            //你之前所上传的ipa文件路径
+            + "<string>" + serverName + "/" + appInfo.getFileUrl() + "</string>\n"
+            + "</dict>\n"
+            + "<dict>\n"
+            + "<key>kind</key>\n"
+            + "<string>display-image</string>\n"
+            + "<key>url</key>\n"
+            //你之前所上传的ipa文件路径
+            + "<string>" + serverName + displayImageUrl + "</string>\n"
+            + "</dict>\n"
+            + "<dict>\n"
+            + "<key>kind</key>\n"
+            + "<string>full-size-image</string>\n"
+            + "<key>url</key>\n"
+            //你之前所上传的ipa文件路径
+            + "<string>" + serverName + fullImageUrl + "</string>\n"
+            + "</dict>\n"
+            + "</array>\n"
+            + "<key>metadata</key>\n"
+            + "<dict>\n"
+            + "<key>bundle-identifier</key>\n"
+            + "<string>com.centit.checkWorkApp</string>\n"
+            + "<key>bundle-version</key>\n"
+            + "<string>" + appInfo.getVersionId() + "</string>\n"
+            + "<key>kind</key>\n"
+            + "<string>software</string>\n"
+            + "<key>platform-identifier</key>\n"
+            + "<string>com.apple.platform.iphoneos</string>\n"
+            + "<key>title</key>\n"
+            + "<string>乐扣开发平台</string>\n"
+            + "</dict>\n"
+            + "</dict>\n"
+            + "</array>\n"
+            + "</dict>\n"
+            + "</plist>";
+        return pList;
+    }
 }

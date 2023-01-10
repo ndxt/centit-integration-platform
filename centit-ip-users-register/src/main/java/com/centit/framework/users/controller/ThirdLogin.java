@@ -1,12 +1,18 @@
 package com.centit.framework.users.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
+import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.users.config.AppConfig;
+import com.centit.framework.users.config.UniteConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.config.WxAppConfig;
 import com.centit.framework.users.dto.DingUserDTO;
@@ -14,6 +20,9 @@ import com.centit.framework.users.po.Platform;
 import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.*;
 import com.centit.support.common.ObjectException;
+import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
+import com.newland.bi3.security.SM4Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -26,14 +35,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +51,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/third")
 @Api(value = "第三方平台登录相关接口", tags = "第三方平台登录相关接口")
-public class ThirdLogin {
+public class ThirdLogin extends BaseController {
 
     @Autowired
     private WxMpService wxOpenService;
@@ -71,6 +79,15 @@ public class ThirdLogin {
 
     @Autowired
     private WeChatService weChatService;
+
+    @Autowired
+    private UniteConfig uniteConfig;
+
+    @Autowired
+    private CentitPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SysUserManager sysUserManager;
 
     //微信登录
     private static final String WECHAT_LOGIN = "wx";
@@ -106,26 +123,26 @@ public class ThirdLogin {
                             HttpServletResponse response) throws IOException {
         String url = "";
         String authorizeUrl = "";
-        if(WECHAT_LOGIN.equals(type)){
+        if (WECHAT_LOGIN.equals(type)) {
             //微信登录
             //url = wxAppConfig.getRedirectLoginUri() + "?returnUrl=" + returnUrl;
             url = wxAppConfig.getRedirectLoginUri() + "?type=" + type + "&returnUrl=" + returnUrl;
             authorizeUrl = wxOpenService.buildQrConnectUrl(url, WxConsts.QRCONNECT_SCOPE_SNSAPI_LOGIN, "");
-        }else if(WECHAT_BIND.equals(type)){
+        } else if (WECHAT_BIND.equals(type)) {
             //微信账号绑定
-            if(userCode == null || "".equals(userCode)){
+            if (userCode == null || "".equals(userCode)) {
                 throw new ObjectException("缺少参数userCode;");
             }
             url = wxAppConfig.getRedirectBindUri() + "?type=" + type + "&returnUrl=" + returnUrl + "&userCode=" + userCode;
             authorizeUrl = wxOpenService.buildQrConnectUrl(url, WxConsts.QRCONNECT_SCOPE_SNSAPI_LOGIN, "");
-        }else if(DING_LOGIN.equals(type)){
+        } else if (DING_LOGIN.equals(type)) {
             //钉钉登陆页面
             url = URIUtil.encodeURIComponent(appConfig.getRedirectUri() + "?type=" + type + "&returnUrl=" + returnUrl);
             authorizeUrl = UrlConstant.URL_GET_QRCONNECT + "?appid=" + appConfig.getAppKey() + "&response_type=code" +
                 "&scope=snsapi_login&redirect_uri=" + url;
-        }else if(DING_BIND.equals(type)){
+        } else if (DING_BIND.equals(type)) {
             //钉钉账号绑定
-            if(userCode == null || "".equals(userCode)){
+            if (userCode == null || "".equals(userCode)) {
                 throw new ObjectException("缺少参数userCode;");
             }
             url = URIUtil.encodeURIComponent(appConfig.getRedirectBindUri() + "?type=" + type + "&returnUrl=" + returnUrl + "&userCode=" + userCode);
@@ -137,10 +154,11 @@ public class ThirdLogin {
 
     /**
      * 获取用户信息: 微信/钉钉/QQ
+     *
      * @param code
      * @param state
      * @param request
-     * @param type  weChat;ding;QQ
+     * @param type    weChat;ding;QQ
      * @return
      */
     @GetMapping("/qrUserInfo")
@@ -151,10 +169,8 @@ public class ThirdLogin {
                              HttpServletRequest request) {
         Map<String, Object> paramsMap = new HashMap<>();
         UserPlat userPlat = new UserPlat();
-        String msg = "";
-        if(WECHAT_LOGIN.equals(type)){
+        if (WECHAT_LOGIN.equals(type)) {
             //微信登录
-            msg = "微信";
             WxMpUser wxMpUser = weChatService.getWxUser(code);
             //从token中获取openid
             //String openId = wxMpUser.getOpenId();
@@ -164,9 +180,8 @@ public class ThirdLogin {
             //paramsMap.put("appKey", wxAppConfig.getAppID());
             paramsMap.put("unionId", unionId);
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-        }else if(DING_LOGIN.equals(type)){
+        } else if (DING_LOGIN.equals(type)) {
             //钉钉登录
-            msg = "钉钉";
             //获取access_token
             String accessToken = "";
             ResponseData accessTokenData = tokenService.getAccessToken();
@@ -198,17 +213,16 @@ public class ThirdLogin {
             paramsMap.put("appKey", appConfig.getAppKey());
             paramsMap.put("appSecret", appConfig.getAppSecret());
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-        }else if(QQ_LOGIN.equals(type)){
+        } else if (QQ_LOGIN.equals(type)) {
             //QQ登录
-            msg = "QQ";
         }
-        if(userPlat == null){
+        if (null == userPlat) {
             returnUrl = appConfig.getRedirectLoginUrl() + "A/login?accessToken=noUser&type=" + type;
         } else {
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
             ud.setLoginIp(WebOptUtils.getRequestAddr(request));
             SecurityContextHolder.getContext().setAuthentication(ud);
-            if (returnUrl != null && returnUrl.contains("?")) {
+            if (StringUtils.isNotBlank(returnUrl) && returnUrl.contains("?")) {
                 returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
             } else {
                 returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
@@ -216,7 +230,7 @@ public class ThirdLogin {
         }
 
         //占位符 替换成/#/(特殊字符)
-        if (returnUrl != null && returnUrl.indexOf("/A/") > -1) {
+        if (StringUtils.isNotBlank(returnUrl) && returnUrl.indexOf("/A/") > -1) {
             returnUrl = returnUrl.replace("/A/", "/#/");
         }
         return "redirect:" + returnUrl;
@@ -224,10 +238,11 @@ public class ThirdLogin {
 
     /**
      * 获取用户信息: 微信/钉钉/QQ
+     *
      * @param code
      * @param state
      * @param request
-     * @param type  weChat;ding;QQ
+     * @param type    weChat;ding;QQ
      * @return
      */
     @GetMapping("/bindUserInfo")
@@ -237,41 +252,42 @@ public class ThirdLogin {
                                @RequestParam("returnUrl") String returnUrl,
                                @RequestParam("type") String type,
                                HttpServletRequest request) {
-        if(userCode == null || "".equals(userCode)){
+        if (userCode == null || "".equals(userCode)) {
             throw new ObjectException("500", "userCode为空");
         }
         Map<String, Object> paramsMap = new HashMap<>();
         UserPlat userPlat = new UserPlat();
         CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
+        if (null == userDetails) {
+            throw new ObjectException("500", "根据userCode获取用户信息为空");
+        }
         String regCellPhone = userDetails.getUserInfo().getString("regCellPhone");
         UserPlat newUser = new UserPlat();
-        if(WECHAT_BIND.equals(type)){
+        if (WECHAT_BIND.equals(type)) {
             WxMpUser wxMpUser = weChatService.getWxUser(code);
             //从token中获取openid(授权用户唯一标识)
             String openId = wxMpUser.getOpenId();
             String unionId = wxMpUser.getUnionId();
-            System.out.println(unionId);
+            logger.info("unionId：{}", unionId);
             String weChatName = wxMpUser.getNickname();
             //paramsMap.put("appKey", wxAppConfig.getAppID());
             paramsMap.put("platId", "2");
             paramsMap.put("unionId", unionId);
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-            if(userPlat != null){
-                returnUrl = returnUrl + "?accessToken=noBind&type="+type;
-            }else{
-                if (null != userDetails) {
-                    newUser.setUnionId(unionId);
-                    newUser.setUserId(openId);
-                    newUser.setUserCode(userDetails.getUserCode());
-                    newUser.setPlatId("2");
-                    newUser.setCorpId("PC");
-                    newUser.setAppKey(wxAppConfig.getAppID());
-                    newUser.setAppSecret(wxAppConfig.getAppSecret());
-                    newUser.setUserName(weChatName);
-                    userPlatService.saveUserPlat(newUser);
-                }
+            if (null != userPlat) {
+                returnUrl = returnUrl + "?accessToken=noBind&type=" + type;
+            } else {
+                newUser.setUnionId(unionId);
+                newUser.setUserId(openId);
+                newUser.setUserCode(userDetails.getUserCode());
+                newUser.setPlatId("2");
+                newUser.setCorpId("PC");
+                newUser.setAppKey(wxAppConfig.getAppID());
+                newUser.setAppSecret(wxAppConfig.getAppSecret());
+                newUser.setUserName(weChatName);
+                userPlatService.saveUserPlat(newUser);
             }
-        }else if(DING_BIND.equals(type)){
+        } else if (DING_BIND.equals(type)) {
             //获取access_token
             String accessToken = "";
             ResponseData accessTokenData = tokenService.getAccessToken();
@@ -309,10 +325,10 @@ public class ThirdLogin {
             if (userInfoData.getCode() != 0) {
                 throw new ObjectException(userIdData.getCode(), userIdData.getMessage());
             }
-            JSONObject jsonObject = JSONObject.parseObject(userInfoData.getData().toString());
+            JSONObject jsonObject = JSON.parseObject(userInfoData.getData().toString());
             String name = "";
             if (null != jsonObject) {
-                JSONObject userObject = JSONObject.parseObject(jsonObject.getString("result"));
+                JSONObject userObject = JSON.parseObject(jsonObject.getString("result"));
                 if (null != userObject) {
                     name = userObject.getString("name");
                 }
@@ -322,39 +338,36 @@ public class ThirdLogin {
             paramsMap.put("appKey", appConfig.getAppKey());
             paramsMap.put("appSecret", appConfig.getAppSecret());
             userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-            if(userPlat != null){
-                returnUrl = returnUrl + "?accessToken=noBind&type="+type;
-            }else{
-                if (null != userDetails) {
-                    newUser.setUserCode(userDetails.getUserCode());
-                    Map<String, Object> platMap = new HashMap<>();
-                    platMap.put("corpId", appConfig.getCorpId());
-                    Platform platform = platformService.getPlatformByProperties(platMap);
-                    if (null != platform) {
-                        newUser.setPlatId(platform.getPlatId());
-                    }
-                    newUser.setCorpId(appConfig.getCorpId());
-                    newUser.setAppKey(appConfig.getAppKey());
-                    newUser.setAppSecret(appConfig.getAppSecret());
-                    newUser.setUnionId(unionid);
-                    newUser.setUserId(userId);
-                    newUser.setUserName(name);
-                    userPlatService.saveUserPlat(newUser);
-
+            if (null != userPlat) {
+                returnUrl = returnUrl + "?accessToken=noBind&type=" + type;
+            } else {
+                newUser.setUserCode(userDetails.getUserCode());
+                Map<String, Object> platMap = new HashMap<>();
+                platMap.put("corpId", appConfig.getCorpId());
+                Platform platform = platformService.getPlatformByProperties(platMap);
+                if (null != platform) {
+                    newUser.setPlatId(platform.getPlatId());
                 }
+                newUser.setCorpId(appConfig.getCorpId());
+                newUser.setAppKey(appConfig.getAppKey());
+                newUser.setAppSecret(appConfig.getAppSecret());
+                newUser.setUnionId(unionid);
+                newUser.setUserId(userId);
+                newUser.setUserName(name);
+                userPlatService.saveUserPlat(newUser);
             }
-        }else if(QQ_BIND.equals(type)){
-
+        } else if (QQ_BIND.equals(type)) {
+            // QQ
         }
-        if(userPlat == null){
-            if (returnUrl != null && returnUrl.contains("?")) {
+        if (null == userPlat) {
+            if (StringUtils.isNotBlank(returnUrl) && returnUrl.contains("?")) {
                 returnUrl = returnUrl + "&accessToken=" + request.getSession().getId();
             } else {
                 returnUrl = returnUrl + "?accessToken=" + request.getSession().getId();
             }
         }
         //占位符 替换成/#/(特殊字符)
-        if (returnUrl != null && returnUrl.indexOf("/A/") > -1) {
+        if (StringUtils.isNotBlank(returnUrl) && returnUrl.indexOf("/A/") > -1) {
             returnUrl = returnUrl.replace("/A/", "/#/");
         }
         return "redirect:" + returnUrl;
@@ -366,14 +379,14 @@ public class ThirdLogin {
     @WrapUpResponseBody
     public ResponseData weChatLogin(@RequestParam("unionId") String unionId,
                                     @RequestParam("nickName") String nickName,
-                                    HttpServletRequest request){
+                                    HttpServletRequest request) {
         Map<String, Object> sessionMap = new HashMap<>();
-        try{
+        try {
             Map<String, Object> paramsMap = new HashMap<>();
             paramsMap.put("platId", "2");
             paramsMap.put("unionId", unionId);
             UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-            if(userPlat == null){
+            if (userPlat == null) {
                 return ResponseData.makeErrorMessageWithData(sessionMap, 500, "请在登陆后绑定微信。");
             }
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
@@ -392,17 +405,17 @@ public class ThirdLogin {
     @WrapUpResponseBody
     public ResponseData weChatBind(@RequestParam("unionId") String unionId,
                                    @RequestParam("nickName") String nickName,
-                                   @RequestParam("userCode") String userCode){
-        try{
+                                   @RequestParam("userCode") String userCode) {
+        try {
             CentitUserDetails userDetails = platformEnvironment.loadUserDetailsByUserCode(userCode);
-            if(userDetails == null){
+            if (null == userDetails) {
                 return ResponseData.makeErrorMessageWithData("", 500, "未查询到用户。");
             }
             Map<String, Object> paramsMap = new HashMap<>();
             paramsMap.put("platId", "2");
             paramsMap.put("unionId", unionId);
             UserPlat userPlat = userPlatService.getUserPlatByProperties(paramsMap);
-            if(userPlat != null){
+            if (null != userPlat) {
                 return ResponseData.makeErrorMessageWithData("", 500, "该微信号已绑定，请勿重复绑定。");
             }
             UserPlat newUser = new UserPlat();
@@ -419,6 +432,136 @@ public class ThirdLogin {
             return ResponseData.makeErrorMessageWithData("", 500, "系统错误。");
         }
         return ResponseData.makeResponseData(nickName);
+    }
+
+    @ApiOperation(value = "统一门户单点登陆", notes = "统一门户单点登陆")
+    @GetMapping(value = "/unitelogin")
+    public String uniteLogin(HttpServletRequest request) {
+        Map<String, Object> filterMap = collectRequestParameters(request);
+        logger.info("统一门户单点登陆,参数：{}", filterMap);
+        String token = String.valueOf(filterMap.get("token"));
+        String returnUrl = String.valueOf(filterMap.get("returnUrl"));
+        logger.info("returnUrl值:{}", returnUrl);
+        token = token.replace(" ", "+");
+        String errorMsg = "";
+        String accessToken = "";
+        try {
+            logger.info("token值：{}", token);
+            JSONObject params = new JSONObject();
+            params.put("appId", uniteConfig.getAppId());
+            params.put("token", URLEncoder.encode(token, "utf-8"));
+            //todo token持久化redis，根据token对应关系获取accessToken
+
+            if (StringUtils.isBlank(accessToken) && StringUtils.isNotBlank(token)) {
+                //验证token是否有效
+                String tokenResult = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckUrl(), params.toJSONString());
+                logger.info("调用验证token:{},接口返回信息：{}", params, tokenResult);
+                if (StringUtils.isNotEmpty(tokenResult)) {
+                    JSONObject tokenJson = JSON.parseObject(tokenResult);
+                    if (null != tokenJson && 200 == tokenJson.getInteger("status")) {
+                        //获取扩展信息
+                        String loginCheckExtend = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckExtendUrl(), params.toJSONString());
+                        logger.info("调用扩展验证:{},接口返回信息：{}", params, loginCheckExtend);
+                        JSONObject loginExtendJson = JSON.parseObject(loginCheckExtend);
+                        if (null != loginExtendJson) {
+                            JSONObject userInfo = loginExtendJson.getJSONObject("data").getJSONObject("userInfo");
+                            String loginName = userInfo.getString("loginName");
+                            logger.info("loginName:{}", loginName);
+                            CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
+                            if (null != ud) {
+                                SecurityContextHolder.getContext().setAuthentication(ud);
+                                accessToken = request.getSession().getId();
+                                logger.info("用户名：{}登录成功", loginName);
+                            } else {
+                                errorMsg = "登录名" + loginName + "不存在！";
+                            }
+                        } else {
+                            errorMsg = "统一门户扩展验证接口返回为空！";
+                        }
+                    } else {
+                        if (null != tokenJson) {
+                            errorMsg = tokenJson.getString("msg");
+                        } else {
+                            errorMsg = "统一门户token验证接口返回为空！";
+                        }
+                    }
+                }
+            } else {
+                errorMsg = "统一门户token为空！";
+            }
+        } catch (Exception e) {
+            logger.error("统一门户单点登录异常：{}", e.getMessage());
+            errorMsg = "统一门户单点登录异常:" + e.getMessage();
+        }
+        if (StringUtils.isNotBlank(errorMsg)) {
+            String errorUrl = "redirect:redirecterror";
+            try {
+                errorUrl = errorUrl + "?msg=" + URLEncoder.encode(errorMsg, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                logger.error("URLEncoder异常", e);
+            }
+            return errorUrl;
+        } else {
+            if (StringUtils.isNotBlank(returnUrl) && returnUrl.contains("?")) {
+                returnUrl = returnUrl + "&accessToken=" + accessToken;
+            } else {
+                returnUrl = returnUrl + "?accessToken=" + accessToken;
+            }
+            //占位符 替换成/#/(特殊字符)
+            if (StringUtils.isNotBlank(returnUrl) && returnUrl.indexOf("/A/") > -1) {
+                returnUrl = returnUrl.replace("/A/", "/#/");
+            }
+        }
+        return "redirect:" + returnUrl;
+    }
+
+    /**
+     * redirect返回失败信息
+     */
+    @GetMapping("/redirecterror")
+    @WrapUpResponseBody
+    public String redirectError(HttpServletRequest request) {
+        String errorMsg = request.getParameter("msg");
+        if (StringUtils.isBlank(errorMsg)) {
+            errorMsg = "error";
+        }
+        return errorMsg;
+    }
+
+    @ApiOperation(value = "统一门户账号验证", notes = "统一门户账号验证")
+    @ResponseBody
+    @PostMapping(value = "/checkAppUserValid")
+    public Map<String, Object> checkAppUserValid(@RequestBody String userInfo, HttpServletRequest request) {
+        logger.info("统一门户账号验证；{}", userInfo);
+        Map<String, Object> resMap = new HashMap<>();
+        JSONObject userInfoJson = JSON.parseObject(userInfo);
+        if (null != userInfoJson) {
+            String password = sm4dDecrypt(userInfoJson.getString("userPwd"), uniteConfig.getUniteAppSecret());
+            UserInfo user = sysUserManager.loadUserByLoginname(userInfoJson.getString("userAccount"));
+            if (null != user && passwordEncoder.isPasswordValid(user.getUserPin(), password, user.getUserCode())) {
+                resMap.put("status", 200);
+                resMap.put("msg", "OK");
+            } else {
+                resMap.put("status", 601);
+                resMap.put("msg", "登录名不存在或密码错误！");
+            }
+        } else {
+            resMap.put("status", 500);
+            resMap.put("msg", "登入账号和密码信息为空！");
+        }
+        return resMap;
+    }
+
+    private static String sm4dDecrypt(String encryptData, String key) {
+        String decryptData = null;
+        try {
+            SM4Utils sm4 = new SM4Utils();
+            sm4.secretKey = key;
+            decryptData = sm4.decryptData_ECB(encryptData);
+        } catch (Exception e) {
+            return null;
+        }
+        return decryptData;
     }
 
 }

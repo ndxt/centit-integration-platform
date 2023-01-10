@@ -3,6 +3,7 @@ package com.centit.framework.ip.config;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.components.OperationLogCenter;
+import com.centit.framework.core.controller.MvcConfigUtil;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -39,6 +40,7 @@ public class InstantiationServiceBeanPostProcessor implements ApplicationListene
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         CodeRepositoryCache.setAllCacheFreshPeriod(CodeRepositoryCache.CACHE_FRESH_PERIOD_SECONDS);
+        MvcConfigUtil.fastjsonGlobalConfig();
         WebOptUtils.setExceptionNotAsHttpError(httpExceptionNotAsHttpError);
         WebOptUtils.setIsTenant(supportTenant);
         if (optLogManager != null) {
