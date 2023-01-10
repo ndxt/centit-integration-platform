@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.users.controller.LdapLogin;
 
-import java.util.Map;
-
 public class TestLdapSearch {
     public static void main(String[] args) {
         UserSyncDirectory directory = new UserSyncDirectory();
@@ -25,7 +23,8 @@ public class TestLdapSearch {
                    " regCellPhone : \"mobilePhone\", "+
                    " userDesc : \"description\" "+
             " }, "+
-            " userURIFormat : \"CN={name},CN=Users,DC=centit,DC=com\" "+
+            //" userURIFormat : \"distinguishedName=CN={name},CN=Users,DC=centit,DC=com\" "+
+            " userURIFormat : \"{name}@centit.com\" "+
          "}");
         //Map<String, Object> userInfo = LdapLogin.searchLdapUserByloginName(directory, "codefan");
         boolean pass = LdapLogin.checkUserPasswordByDn(directory, "codefan", "******");

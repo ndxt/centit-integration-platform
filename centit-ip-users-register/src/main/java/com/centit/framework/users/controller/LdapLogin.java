@@ -120,18 +120,18 @@ public class LdapLogin extends BaseController {
 
     public static boolean checkUserPasswordByDn(UserSyncDirectory directory, String loginName, String password) {
 
-        Properties env = new Properties();
-        //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
         JSONObject searchParams = JSON.parseObject(directory.getSearchBase());
         String userURIFormat = searchParams.getString("userURIFormat");
         if(StringUtils.isBlank(userURIFormat)){
-            userURIFormat = "CN={name},CN=Users,DC={topUnit},DC=com";
+            userURIFormat = "{name}@{topUnit}.com";
         }
         String userURI =  Pretreatment.mapTemplateString(userURIFormat,
             CollectionsOpt.createHashMap("loginName", loginName, "name", loginName, "topUnit", directory.getTopUnit()));
 
+        Properties env = new Properties();
+        //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
         env.put(Context.SECURITY_PRINCIPAL, userURI);
         env.put(Context.SECURITY_CREDENTIALS, password);
         //"LDAP://192.168.128.5:389"
@@ -139,12 +139,6 @@ public class LdapLogin extends BaseController {
         LdapContext ctx = null;
         try {
             ctx = new InitialLdapContext(env, null);
-            try {
-                Attributes attrs = ctx.getAttributes(userURI);
-                //if (attrs)
-            } catch (NamingException ex ){
-                //do noting
-            }
             return true;
         } catch (Exception e) {
             logger.error(e.getMessage());
