@@ -181,6 +181,12 @@
             <artifactId>message-sender-utils</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>jtt-ip-users-register</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>

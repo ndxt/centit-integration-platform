@@ -1,4 +1,4 @@
-package com.centit.framework.users.controller;
+package com.centit.framework.jtt.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -11,12 +11,12 @@ import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.JsonCentitUserDetails;
 import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.framework.system.po.UserInfo;
-import com.centit.framework.users.config.JsmotSyncConfig;
-import com.centit.framework.users.dto.JsmotUnitDTO;
-import com.centit.framework.users.dto.JsmotUserDTO;
-import com.centit.framework.users.dto.SmsDTO;
-import com.centit.framework.users.service.JsmotSyncService;
-import com.centit.framework.users.service.TokenService;
+import com.centit.framework.jtt.config.JsmotSyncConfig;
+import com.centit.framework.jtt.dto.JsmotUnitDTO;
+import com.centit.framework.jtt.dto.JsmotUserDTO;
+import com.centit.framework.jtt.dto.SmsDTO;
+import com.centit.framework.jtt.service.JsmotSyncService;
+import com.centit.framework.jtt.service.JttAccessTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +43,7 @@ public class JsmotSyncController extends BaseController {
     private JsmotSyncConfig jsmotSyncConfig;
 
     @Autowired
-    private TokenService tokenService;
+    private JttAccessTokenService jttAccessTokenService;
 
     @Autowired
     private JsmotSyncService jsmotSyncService;
@@ -56,7 +56,7 @@ public class JsmotSyncController extends BaseController {
 
     private String getAccessToken() {
         String accessToken = "";
-        ResponseData accessTokenData = tokenService.getJsmotAccessToken();
+        ResponseData accessTokenData = jttAccessTokenService.getJsmotAccessToken();
         if (accessTokenData.getCode() != 0) {
             return "";
         }
@@ -110,7 +110,7 @@ public class JsmotSyncController extends BaseController {
 
     private String getSmsAccessToken() {
         String accessToken = "";
-        ResponseData accessTokenData = tokenService.getSmsAccessToken();
+        ResponseData accessTokenData = jttAccessTokenService.getSmsAccessToken();
         if (accessTokenData.getCode() != 0) {
             return "";
         }

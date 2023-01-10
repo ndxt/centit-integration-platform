@@ -1,4 +1,4 @@
-package com.centit.framework.users.dto;
+package com.centit.framework.jtt.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

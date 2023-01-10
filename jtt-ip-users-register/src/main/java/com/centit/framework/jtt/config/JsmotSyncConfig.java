@@ -1,4 +1,4 @@
-package com.centit.framework.users.config;
+package com.centit.framework.jtt.config;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

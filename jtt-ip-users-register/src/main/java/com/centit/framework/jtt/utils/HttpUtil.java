@@ -1,4 +1,4 @@
-package com.centit.framework.users.utils;
+package com.centit.framework.jtt.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

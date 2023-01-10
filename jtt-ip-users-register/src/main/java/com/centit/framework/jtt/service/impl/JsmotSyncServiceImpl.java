@@ -1,16 +1,16 @@
-package com.centit.framework.users.service.impl;
+package com.centit.framework.jtt.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.users.config.JsmotConstant;
-import com.centit.framework.users.config.JsmotSyncConfig;
-import com.centit.framework.users.dto.JsmotUnitDTO;
-import com.centit.framework.users.dto.JsmotUserDTO;
-import com.centit.framework.users.dto.SmsDTO;
-import com.centit.framework.users.service.JsmotSyncService;
-import com.centit.framework.users.utils.HttpUtil;
+import com.centit.framework.jtt.config.JsmotConstant;
+import com.centit.framework.jtt.config.JsmotSyncConfig;
+import com.centit.framework.jtt.dto.JsmotUnitDTO;
+import com.centit.framework.jtt.dto.JsmotUserDTO;
+import com.centit.framework.jtt.dto.SmsDTO;
+import com.centit.framework.jtt.service.JsmotSyncService;
+import com.centit.framework.jtt.utils.HttpUtil;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import org.apache.commons.collections4.CollectionUtils;

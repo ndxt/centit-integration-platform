@@ -1,9 +1,9 @@
-package com.centit.framework.users.service;
+package com.centit.framework.jtt.service;
 
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.users.dto.JsmotUnitDTO;
-import com.centit.framework.users.dto.JsmotUserDTO;
-import com.centit.framework.users.dto.SmsDTO;
+import com.centit.framework.jtt.dto.JsmotUnitDTO;
+import com.centit.framework.jtt.dto.JsmotUserDTO;
+import com.centit.framework.jtt.dto.SmsDTO;
 
 /**
  * @author zfg
