@@ -31,7 +31,7 @@ public class TestLdapSearch {
                 " unitDesc : \"description\" "+
             " }, "+
             //" userURIFormat : \"distinguishedName=CN={name},CN=Users,DC=centit,DC=com\" "+
-            " userURIFormat : \"{name}@centit.com\" "+
+            " userURIFormat : \"{loginName}@centit.com\" "+
          "}");
         //Map<String, Object> userInfo = LdapLogin.searchLdapUserByloginName(directory, "codefan");
         boolean pass = LdapLogin.checkUserPasswordByDn(directory, "codefan", "******");

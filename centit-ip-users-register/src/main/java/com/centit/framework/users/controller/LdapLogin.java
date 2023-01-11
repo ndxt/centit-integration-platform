@@ -57,7 +57,7 @@ import java.util.*;
          regCellPhone : "mobilePhone",
          userDesc : "description"
      },
-    userURIFormat : "CN={name},CN=Users,DC=centit,DC=com"
+    userURIFormat : "{loginName}@centit.com"
 }
  */
 @Controller
