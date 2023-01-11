@@ -95,8 +95,11 @@ public class LdapLogin extends BaseController {
             }
         }
 
-        List<UserSyncDirectory> directories = userSyncDirectoryManager.listObjects();
+        List<UserSyncDirectory> directories = userSyncDirectoryManager.listLdapDirectory();
         for (UserSyncDirectory directory : directories){
+            if(StringUtils.isBlank(directory.getUrl())){
+                continue;
+            }
             boolean passed = checkUserPasswordByDn(directory, username, password);
             if (passed) {
                 CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(username);

@@ -117,12 +117,12 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     @Override
     @Transactional(rollbackFor=Exception.class)
     public int synchroniseUserDirectory(UserSyncDirectory directory) {
-        Properties env = new Properties();
         //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
-
+        if(StringUtils.isBlank(directory.getUrl())){
+            return -2;
+        }
 
         JSONObject searchParams = JSON.parseObject(directory.getSearchBase());
-
         String unitSearchBase =StringBaseOpt.castObjectToString(searchParams.getString("unitSearchBase"),
              "CN=Users,DC=com");
         String unitSearchFilter =StringBaseOpt.castObjectToString(searchParams.getString("unitSearchFilter"),
@@ -156,6 +156,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
         String userURI = Pretreatment.mapTemplateString(userURIFormat,
             CollectionsOpt.createHashMap("loginName", directory.getUser(), "topUnit", directory.getTopUnit()));
 
+        Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
         env.put(Context.SECURITY_PRINCIPAL, userURI);
@@ -238,8 +239,6 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     userInfo.setUserPin(getDefaultPassword(userInfo.getUserCode()));
                     createUser = true;
                 }
-
-
 
                 String regEmail = userMap.get("regEmail");
                 if (StringUtils.isNotBlank(regEmail) && regEmail.length() < 60 &&
