@@ -178,41 +178,27 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 if(StringUtils.isBlank(unitMap.get("unitName"))|| StringUtils.isBlank(unitMap.get("unitTag"))){
                     continue;
                 }
+
                 UnitInfo unitInfo = unitInfoDao.getUnitByTag(unitMap.get("unitTag"));
-                boolean createNew = unitInfo==null;
-                if(createNew){
+                if(unitInfo==null){
                     unitInfo = new UnitInfo();
-//                    unitInfo.setUnitCode(unitInfoDao.getNextKey());
                     unitInfo.setUnitTag(unitMap.get("unitTag"));
                     unitInfo.setIsValid("T");
                     unitInfo.setUnitType("A");
                     unitInfo.setCreateDate(now);
-                    //-----------------------------
-                  }
-
-                //directory.getTopUnit()
-                unitInfo.setUnitName(unitMap.get("unitName"));
-                unitInfo.setUnitDesc(unitMap.get("unitDesc"));
-                unitInfo.setLastModifyDate(now);
-                if(createNew){
-                    unitInfoDao.saveNewObject(unitInfo);
+                    unitInfo.setTopUnit(directory.getTopUnit());
                     unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
-                    UnitInfo parentUnit = unitInfoDao.getObjectById(unitInfo.getParentUnit());
-                    if (parentUnit != null) {
-                        unitInfo.setUnitPath(parentUnit.getUnitPath() + "/" + unitInfo.getUnitCode());
-                        //加上租户
-                        unitInfo.setTopUnit(parentUnit.getTopUnit());
-                    }
-                    if (StringUtils.isBlank(unitInfo.getTopUnit()) && StringUtils.isNotBlank(unitInfo.getUnitPath())) {
-                        String[] unitCodeArray = unitInfo.getUnitPath().split("/");
-                        if (ArrayUtils.isNotEmpty(unitCodeArray) && unitCodeArray.length > 1) {
-                            //加上租户
-                            unitInfo.setTopUnit(unitCodeArray[1]);
-                        }
-                    }
-                    unitInfoDao.updateUnit(unitInfo);
+                    unitInfo.setUnitName(unitMap.get("unitName"));
+                    unitInfo.setUnitDesc(unitMap.get("unitDesc"));
+                    unitInfo.setLastModifyDate(now);
+                    unitInfoDao.saveNewObject(unitInfo);
                 }else {
-                    unitInfoDao.updateUnit(unitInfo);
+                    if(StringUtils.isNotBlank(unitMap.get("unitName")) &&
+                         !StringUtils.equals(unitInfo.getUnitName(), unitMap.get("unitName"))) {
+                        unitInfo.setUnitName(unitMap.get("unitName"));
+                        unitInfo.setUnitDesc(unitMap.get("unitDesc"));
+                        unitInfoDao.updateUnit(unitInfo);
+                    }
                 }
                 allUnits.put(unitMap.get("unitTag"), unitInfo);
             }
@@ -267,51 +253,52 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     role.setChangeDesc("LDAP同步时默认设置。");
                     userRoleDao.mergeUserRole(role);
                 }
+                if("T".equals( userInfo.getIsValid())) {
+                    Attribute members = attrs.get(userUnitField);
+                    if (members != null) {
+                        NamingEnumeration<?> ms = members.getAll();
+                        while (ms.hasMoreElements()) {
+                            Object member = ms.next();
+                            String groupName = StringBaseOpt.objectToString(member);
+                            UnitInfo u = allUnits.get(groupName);
 
-                Attribute members =  attrs.get(userUnitField);
-                if(members!=null){
-                    NamingEnumeration<?> ms = members.getAll();
-                    while (ms.hasMoreElements()) {
-                        Object member =  ms.next();
-                        String groupName = StringBaseOpt.objectToString(member);
-                        UnitInfo u = allUnits.get(groupName);
-                        if(u!=null){
-                            if ((StringUtils.isNotBlank(u.getUnitCode()))&&(StringUtils.isBlank(userInfo.getPrimaryUnit()))) {
-                                userInfo.setPrimaryUnit(u.getUnitCode());
-                                userInfoDao.updateUser(userInfo);
-                                UnitInfo unitInfo = unitInfoDao.getObjectById(userInfo.getPrimaryUnit());
-                                if (null != unitInfo && StringUtils.isNotBlank(unitInfo.getTopUnit())) {
-                                    userInfo.setTopUnit(unitInfo.getTopUnit());
-                                }
-                                if (null != unitInfo && StringUtils.isBlank(userInfo.getTopUnit()) && StringUtils.isNotBlank(unitInfo.getUnitPath())) {
-                                    String[] unitCodeArray = unitInfo.getUnitPath().split("/");
-                                    if (ArrayUtils.isNotEmpty(unitCodeArray) && unitCodeArray.length > 1) {
-                                        userInfo.setTopUnit(unitCodeArray[1]);
+                            if (u != null && "T".equals(u.getIsValid())) {
+                                if ((StringUtils.isNotBlank(u.getUnitCode())) && (StringUtils.isBlank(userInfo.getPrimaryUnit()))) {
+                                    userInfo.setPrimaryUnit(u.getUnitCode());
+                                    userInfoDao.updateUser(userInfo);
+                                    UnitInfo unitInfo = unitInfoDao.getObjectById(userInfo.getPrimaryUnit());
+                                    if (null != unitInfo && StringUtils.isNotBlank(unitInfo.getTopUnit())) {
+                                        userInfo.setTopUnit(unitInfo.getTopUnit());
                                     }
+                                    if (null != unitInfo && StringUtils.isBlank(userInfo.getTopUnit()) && StringUtils.isNotBlank(unitInfo.getUnitPath())) {
+                                        String[] unitCodeArray = unitInfo.getUnitPath().split("/");
+                                        if (ArrayUtils.isNotEmpty(unitCodeArray) && unitCodeArray.length > 1) {
+                                            userInfo.setTopUnit(unitCodeArray[1]);
+                                        }
+                                    }
+                                    userInfoDao.updateUser(userInfo);
                                 }
-                                userInfoDao.updateUser(userInfo);
-                            }
-                            List<UserUnit> uus = userUnitDao.listObjectByUserUnit(
-                                    userInfo.getUserCode(),u.getUnitCode());
-                            if (CollectionUtils.isEmpty(uus)) {
-                                UserUnit uu = new UserUnit();
-                                uu.setUserUnitId(UuidOpt.getUuidAsString());
-                                uu.setUnitCode(u.getUnitCode());
-                                uu.setUserCode(userInfo.getUserCode());
-                                uu.setCreateDate(now);
-                                if (u.getUnitCode().equals(userInfo.getPrimaryUnit())) {
-                                    uu.setRelType("T");
-                                }else{
-                                    uu.setRelType("F");
+                                List<UserUnit> uus = userUnitDao.listObjectByUserUnit(
+                                    userInfo.getUserCode(), u.getUnitCode());
+                                if (CollectionUtils.isEmpty(uus)) {
+                                    UserUnit uu = new UserUnit();
+                                    uu.setUserUnitId(UuidOpt.getUuidAsString());
+                                    uu.setUnitCode(u.getUnitCode());
+                                    uu.setUserCode(userInfo.getUserCode());
+                                    uu.setCreateDate(now);
+                                    if (u.getUnitCode().equals(userInfo.getPrimaryUnit())) {
+                                        uu.setRelType("T");
+                                    } else {
+                                        uu.setRelType("F");
+                                    }
+                                    uu.setUserRank(directory.getDefaultRank());
+                                    uu.setUserStation(directory.getDefaultStation());
+                                    userUnitDao.saveNewObject(uu);
                                 }
-                                uu.setUserRank(directory.getDefaultRank());
-                                uu.setUserStation(directory.getDefaultStation());
-                                userUnitDao.saveNewObject(uu);
                             }
                         }
                     }
                 }
-
             }
             ctx.close();
             return 0;
