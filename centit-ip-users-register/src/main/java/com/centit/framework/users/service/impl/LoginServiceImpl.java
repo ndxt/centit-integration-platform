@@ -1,8 +1,8 @@
 package com.centit.framework.users.service.impl;
 
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.users.po.AuthCallback;
 import com.centit.framework.users.po.AccessToken;
+import com.centit.framework.users.po.AuthCallback;
 import com.centit.framework.users.service.LoginService;
 import org.springframework.stereotype.Service;
 

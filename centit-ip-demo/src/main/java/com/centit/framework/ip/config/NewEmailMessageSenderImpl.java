@@ -7,7 +7,6 @@ import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.MessageSender;
 import com.centit.framework.model.basedata.IUserInfo;
 import com.centit.framework.model.basedata.NoticeMessage;
-import com.centit.product.oa.EmailMessageSenderImpl;
 import com.centit.product.oa.SendMailExecutor;
 import org.apache.commons.mail.EmailException;
 import org.slf4j.Logger;

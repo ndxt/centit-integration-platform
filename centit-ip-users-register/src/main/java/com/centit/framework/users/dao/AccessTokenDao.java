@@ -3,7 +3,6 @@ package com.centit.framework.users.dao;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.users.po.AccessToken;
-import com.centit.framework.users.po.DingTalkSuite;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;

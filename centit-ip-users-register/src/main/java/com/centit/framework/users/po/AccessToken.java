@@ -6,7 +6,6 @@ import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.ValueGenerator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;

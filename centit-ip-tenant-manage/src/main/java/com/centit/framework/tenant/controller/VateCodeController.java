@@ -1,7 +1,9 @@
 package com.centit.framework.tenant.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.tea.TeaModel;
+import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
+import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
+import com.aliyun.teaopenapi.models.Config;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
@@ -21,8 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import com.aliyun.dysmsapi20170525.models.*;
-import com.aliyun.teaopenapi.models.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 

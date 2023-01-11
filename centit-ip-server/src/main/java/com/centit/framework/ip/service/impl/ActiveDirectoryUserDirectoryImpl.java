@@ -35,7 +35,6 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.validation.constraints.NotNull;
-import java.text.MessageFormat;
 import java.util.*;
 
 @Service("activeDirectoryUserDirectory")

@@ -1,10 +1,7 @@
 package com.centit.framework.ip.app.test;
 
 import com.centit.support.security.AESSecurityUtils;
-import sun.misc.BASE64Encoder;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URLEncoder;
 
 public class TestPlatSystem {

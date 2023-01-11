@@ -3,16 +3,14 @@ package com.centit.framework.users.test;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.ip.service.impl.ActiveDirectoryUserDirectoryImpl;
-import com.centit.framework.system.po.*;
-import com.centit.framework.users.controller.LdapLogin;
+import com.centit.framework.system.po.UnitInfo;
+import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.compiler.Pretreatment;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -23,7 +21,10 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class TestLdap {
 

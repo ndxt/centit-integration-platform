@@ -7,7 +7,6 @@ import com.centit.framework.core.controller.MvcConfigUtil;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.OperationLogWriter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-
 import com.centit.framework.system.service.impl.DBPlatformEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -2,8 +2,8 @@ package com.centit.framework.users.service;
 
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
-import com.centit.framework.users.po.AuthCallback;
 import com.centit.framework.users.po.AccessToken;
+import com.centit.framework.users.po.AuthCallback;
 
 /**
  * @author zfg

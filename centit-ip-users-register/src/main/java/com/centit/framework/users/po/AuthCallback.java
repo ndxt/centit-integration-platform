@@ -1,7 +1,5 @@
 package com.centit.framework.users.po;
 
-import lombok.*;
-
 import java.io.Serializable;
 
 /**
