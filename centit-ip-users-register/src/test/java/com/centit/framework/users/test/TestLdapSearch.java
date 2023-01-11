@@ -5,6 +5,7 @@ import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.users.controller.LdapLogin;
 
 public class TestLdapSearch {
+
     public static void main(String[] args) {
         UserSyncDirectory directory = new UserSyncDirectory();
         directory.setTopUnit("centit");
@@ -12,16 +13,22 @@ public class TestLdapSearch {
         directory.setUser("accountcentit@centit.com");
         directory.setUserPwd("*********");
         directory.setSearchBase("{ " +
-             " searchBase : \"(&(objectCategory=person)(objectClass=user)(sAMAccountName={0}))\", "+
-             " searchName : \"CN=Users,DC=centit,DC=com\", "+
-             " loginNameField : \"sAMAccountName\", "+
-             " returnFields : { "+
+            " userSearchBase : \"CN=Users,DC=centit,DC=com\", "+
+            " userSearchFilter : \"(&(objectCategory=person)(objectClass=user))\", "+
+            " unitSearchBase : \"CN=Users,DC=centit,DC=com\", "+
+            " unitSearchFilter : \"(objectCategory=group)\", "+
+            " userUnitField : \"memberOf\", "+
+            " userFieldMap : { "+
                    " userName : \"displayName\", "+
                    " loginName : \"sAMAccountName\", "+
-                   " name : \"name\", "+
                    " regEmail : \"mail\", "+
                    " regCellPhone : \"mobilePhone\", "+
                    " userDesc : \"description\" "+
+            " }, "+
+            " unitFieldMap : { "+
+                " unitTag : \"distinguishedName\", "+
+                " unitName : \"name\", "+
+                " unitDesc : \"description\" "+
             " }, "+
             //" userURIFormat : \"distinguishedName=CN={name},CN=Users,DC=centit,DC=com\" "+
             " userURIFormat : \"{name}@centit.com\" "+
@@ -31,3 +38,4 @@ public class TestLdapSearch {
         System.out.println(JSON.toJSONString(pass));
     }
 }
+

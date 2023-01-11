@@ -123,10 +123,10 @@ public class LdapLogin extends BaseController {
         JSONObject searchParams = JSON.parseObject(directory.getSearchBase());
         String userURIFormat = searchParams.getString("userURIFormat");
         if(StringUtils.isBlank(userURIFormat)){
-            userURIFormat = "{name}@{topUnit}.com";
+            userURIFormat = "{loginName}";
         }
-        String userURI =  Pretreatment.mapTemplateString(userURIFormat,
-            CollectionsOpt.createHashMap("loginName", loginName, "name", loginName, "topUnit", directory.getTopUnit()));
+        String userURI = Pretreatment.mapTemplateString(userURIFormat,
+            CollectionsOpt.createHashMap("loginName", loginName, "topUnit", directory.getTopUnit()));
 
         Properties env = new Properties();
         //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com

@@ -28,8 +28,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.framework.version>5.2-SNAPSHOT</centit.framework.version>
-        <centit.commons.version>2.3-SNAPSHOT</centit.commons.version>
         <jdk.version>1.8</jdk.version>
     </properties>
 

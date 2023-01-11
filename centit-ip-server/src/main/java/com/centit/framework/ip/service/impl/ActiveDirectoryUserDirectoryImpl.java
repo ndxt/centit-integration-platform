@@ -1,5 +1,7 @@
 package com.centit.framework.ip.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.ip.service.UserDirectory;
 import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.system.dao.UnitInfoDao;
@@ -7,6 +9,7 @@ import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.framework.system.dao.UserRoleDao;
 import com.centit.framework.system.dao.UserUnitDao;
 import com.centit.framework.system.po.*;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
@@ -32,6 +35,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.validation.constraints.NotNull;
+import java.text.MessageFormat;
 import java.util.*;
 
 @Service("activeDirectoryUserDirectory")
@@ -75,12 +79,39 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
         }
     }
 
-    public static String getAttributeString(Attributes attr, String attrName){
-        return getAttributeString(attr.get(attrName));
+    public static Map<String, String> fetchAttributeMap(Attributes attr, Map<String, Object> fieldMap){
+        Map<String, String> valueMap = new HashMap<>(fieldMap.size()+1);
+        for(Map.Entry<String, Object> ent : fieldMap.entrySet()){
+            valueMap.put(ent.getKey(),
+                getAttributeString(attr.get(StringBaseOpt.castObjectToString(ent.getValue()))));
+        }
+        return valueMap ;
     }
 
     /**
-     * TODO 这个方法要重写
+     * LDAP登录Controller
+
+     {
+         userSearchBase : "CN=Users,DC=centit,DC=com",
+         userSearchFilter : "(&(objectCategory=person)(objectClass=user))",
+         unitSearchBase : "CN=Users,DC=centit,DC=com",
+         unitSearchFilter : "(objectCategory=group)",
+         userUnitField : "memberOf",
+         userFieldMap : {
+             userName : "displayName",
+             loginName : "sAMAccountName",
+             regEmail : "mail",
+             regCellPhone : "mobilePhone",
+             userDesc : "description"
+         },
+         unitFieldMap : {
+             unitTag : "distinguishedName",
+             unitName : "name",
+             unitDesc : "description",
+         },
+         userURIFormat : "{loginName}@centit.com"
+     }
+
      * @param directory LDAP用户目录信息； 需要根据配置信息自动适配
      * @return 同步的数量
      */
@@ -89,37 +120,70 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     public int synchroniseUserDirectory(UserSyncDirectory directory) {
         Properties env = new Properties();
         //String ldapURL = "LDAP://192.168.128.5:389";//ip:port ldap://192.168.128.5:389/CN=Users,DC=centit,DC=com
-        String searchBase = directory.getSearchBase();
+
+
+        JSONObject searchParams = JSON.parseObject(directory.getSearchBase());
+
+        String unitSearchBase =StringBaseOpt.castObjectToString(searchParams.getString("unitSearchBase"),
+             "CN=Users,DC=com");
+        String unitSearchFilter =StringBaseOpt.castObjectToString(searchParams.getString("unitSearchFilter"),
+            "(objectCategory=group)");
+        String userSearchBase =StringBaseOpt.castObjectToString(searchParams.getString("userSearchBase"),
+            "CN=Users,DC=com");
+        String userSearchFilter =StringBaseOpt.castObjectToString(searchParams.getString("userSearchFilter"),
+            "(&(objectCategory=person)(objectClass=user))");
+        // {"displayName", "name", "sAMAccountName",
+        //                "mail", "distinguishedName", "jobNo", "idCard", "mobilePhone", "description", "memberOf"}
+        Map<String, Object> userFields = CollectionsOpt.objectToMap(searchParams.get("userFieldMap"));
+        String [] userFieldNames = new String[userFields.size()];
+        int i = 0;
+        for(Object obj : userFields.values()){
+            userFieldNames[i++] = StringBaseOpt.castObjectToString(obj);
+        }
+
+        Map<String, Object> unitFields = CollectionsOpt.objectToMap(searchParams.get("unitFieldMap"));
+        String [] unitFieldNames = new String[unitFields.size()];
+        i = 0;
+        for(Object obj : unitFields.values()){
+            unitFieldNames[i++] = StringBaseOpt.castObjectToString(obj);
+        }
+        String userUnitField =StringBaseOpt.castObjectToString(searchParams.getString("userUnitField"),
+            "memberOf");
+
+        String userURIFormat = searchParams.getString("userURIFormat");
+        if(StringUtils.isBlank(userURIFormat)){
+            userURIFormat = "{loginName}";
+        }
+        String userURI = Pretreatment.mapTemplateString(userURIFormat,
+            CollectionsOpt.createHashMap("loginName", directory.getUser(), "topUnit", directory.getTopUnit()));
+
         env.put(Context.INITIAL_CONTEXT_FACTORY,"com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");//"none","simple","strong"
-        env.put(Context.SECURITY_PRINCIPAL, directory.getUser());
-        env.put(Context.SECURITY_CREDENTIALS, directory.getUserPwd());
+        env.put(Context.SECURITY_PRINCIPAL, userURI);
+        env.put(Context.SECURITY_CREDENTIALS, directory.getClearPassword());
         env.put(Context.PROVIDER_URL, directory.getUrl());
         Date now = DatetimeOpt.currentUtilDate();
         try {
-            String distName = "distinguishedName";
             LdapContext ctx = new InitialLdapContext(env, null);
             SearchControls searchCtls = new SearchControls();
             searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             Map<String,UnitInfo> allUnits = new HashMap<>();
-            String searchFilter = "(objectCategory=group)";//
-            String[] returnedAtts = new String[]{"name", "description", distName, "managedBy"};
-            searchCtls.setReturningAttributes(returnedAtts);
-            NamingEnumeration<SearchResult> answer = ctx.search(searchBase, searchFilter,searchCtls);
+
+            searchCtls.setReturningAttributes(unitFieldNames);
+            NamingEnumeration<SearchResult> answer = ctx.search(unitSearchBase, unitSearchFilter, searchCtls);
             while (answer.hasMoreElements()) {
                 SearchResult sr = answer.next();
                 Attributes attrs = sr.getAttributes();
-                String distinguishedName = getAttributeString(attrs, distName);
-                String unitName = getAttributeString(attrs,"description");
-                if(unitName==null || distinguishedName==null){
+                Map<String, String> unitMap = fetchAttributeMap( attrs, unitFields);
+                if(StringUtils.isBlank(unitMap.get("unitName"))|| StringUtils.isBlank(unitMap.get("unitTag"))){
                     continue;
                 }
-                UnitInfo unitInfo = unitInfoDao.getUnitByTag(distinguishedName);
+                UnitInfo unitInfo = unitInfoDao.getUnitByTag(unitMap.get("unitTag"));
                 boolean createNew = unitInfo==null;
                 if(createNew){
                     unitInfo = new UnitInfo();
 //                    unitInfo.setUnitCode(unitInfoDao.getNextKey());
-                    unitInfo.setUnitTag(distinguishedName);
+                    unitInfo.setUnitTag(unitMap.get("unitTag"));
                     unitInfo.setIsValid("T");
                     unitInfo.setUnitType("A");
                     unitInfo.setCreateDate(now);
@@ -127,8 +191,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                   }
 
                 //directory.getTopUnit()
-                unitInfo.setUnitName(unitName);
-                unitInfo.setUnitDesc(getAttributeString(attrs, "managedBy"));
+                unitInfo.setUnitName(unitMap.get("unitName"));
+                unitInfo.setUnitDesc(unitMap.get("unitDesc"));
                 unitInfo.setLastModifyDate(now);
                 if(createNew){
                     unitInfoDao.saveNewObject(unitInfo);
@@ -150,55 +214,47 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 }else {
                     unitInfoDao.updateUnit(unitInfo);
                 }
-                allUnits.put(distinguishedName, unitInfo);
+                allUnits.put(unitMap.get("unitTag"), unitInfo);
             }
 
-            searchFilter = "(&(objectCategory=person)(objectClass=user))";//"(objectCategory=group)"
-            String[] userReturnedAtts = new String[]{"memberOf", "displayName", "sAMAccountName",
-                "mail", distName, "mobilePhone", "idCard", "jobNo"};
-            searchCtls.setReturningAttributes(userReturnedAtts);
-            answer = ctx.search(searchBase, searchFilter,searchCtls);
+            searchCtls.setReturningAttributes(userFieldNames);
+            answer = ctx.search(userSearchBase, userSearchFilter, searchCtls);
             while (answer.hasMoreElements()) {
-                SearchResult sr = (SearchResult) answer.next();
+                SearchResult sr = answer.next();
                 Attributes attrs = sr.getAttributes();
-                String loginName = getAttributeString(attrs,"sAMAccountName");
-                String userName = getAttributeString(attrs,"displayName");
-                if(userName==null || loginName==null){
+
+                Map<String, String> userMap = fetchAttributeMap( attrs, userFields);
+                if(StringUtils.isBlank(userMap.get("userName"))|| StringUtils.isBlank(userMap.get("loginName"))){
                     continue;
                 }
+
                 boolean createUser=false;
-                UserInfo userInfo = userInfoDao.getUserByLoginName(loginName);
+                UserInfo userInfo = userInfoDao.getUserByLoginName(userMap.get("loginName"));
                 if(userInfo==null) {
                     userInfo = new UserInfo();
 //                    userInfo.setUserCode(userInfoDao.getNextKey());
                     userInfo.setIsValid("T");
-                    userInfo.setLoginName(loginName);
+                    userInfo.setLoginName(userMap.get("loginName"));
                     userInfo.setCreateDate(now);
                     userInfo.setUserPin(getDefaultPassword(userInfo.getUserCode()));
                     createUser = true;
                 }
-                String regEmail = getAttributeString(attrs, "mail");
+
+
+
+                String regEmail = userMap.get("regEmail");
                 if (StringUtils.isNotBlank(regEmail) && regEmail.length() < 60 &&
                     userInfoDao.getUserByRegEmail(regEmail) == null) {
                     userInfo.setRegEmail(regEmail);
                 }
-                String regCellPhone = getAttributeString(attrs, "mobilePhone");
+                String regCellPhone = userMap.get("regCellPhone");
                 if (StringUtils.isNotBlank(regCellPhone) && regCellPhone.length() < 15 &&
                     userInfoDao.getUserByRegCellPhone(regCellPhone) == null) {
                     userInfo.setRegCellPhone(regCellPhone);
                 }
-                String idCardNo = getAttributeString(attrs, "idCard");
-                if (StringUtils.isNotBlank(idCardNo) && idCardNo.length() < 20 &&
-                    userInfoDao.getUserByIdCardNo(idCardNo) == null) {
-                    userInfo.setIdCardNo(idCardNo);
-                }
-                String userWord = getAttributeString(attrs,"jobNo");
-                if (StringUtils.isNotBlank(userWord) && userWord.length() < 20 &&
-                    userInfoDao.getUserByUserWord(userWord) == null) {
-                    userInfo.setUserWord(userWord);
-                }
-                userInfo.setUserTag(getAttributeString(attrs, distName));
-                userInfo.setUserName(userName);
+
+                userInfo.setUserName(userMap.get("userName"));
+                userInfo.setUserDesc(userMap.get("userDesc"));
                 userInfo.setUpdateDate(now);
                 if(createUser) {
                     userInfoDao.saveNewObject(userInfo);
@@ -214,7 +270,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     userRoleDao.mergeUserRole(role);
                 }
 
-                Attribute members =  attrs.get("memberOf");
+                Attribute members =  attrs.get(userUnitField);
                 if(members!=null){
                     NamingEnumeration<?> ms = members.getAll();
                     while (ms.hasMoreElements()) {
@@ -268,7 +324,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     }
 
     private String getDefaultPassword(String userCode) {
-        String rawPass = "000000";
+        String rawPass = UuidOpt.randomString(12);
         if(StringUtils.isNotBlank(defaultPasswordFormat)){
             rawPass = Pretreatment.mapTemplateStringAsFormula(defaultPasswordFormat, userCode);
         }
