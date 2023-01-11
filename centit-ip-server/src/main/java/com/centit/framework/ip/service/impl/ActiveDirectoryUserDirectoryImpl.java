@@ -9,10 +9,7 @@ import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.framework.system.dao.UserRoleDao;
 import com.centit.framework.system.dao.UserUnitDao;
 import com.centit.framework.system.po.*;
-import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.UuidOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.compiler.Pretreatment;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -182,21 +179,25 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                 UnitInfo unitInfo = unitInfoDao.getUnitByTag(unitMap.get("unitTag"));
                 if(unitInfo==null){
                     unitInfo = new UnitInfo();
-                    unitInfo.setUnitTag(unitMap.get("unitTag"));
+
                     unitInfo.setIsValid("T");
                     unitInfo.setUnitType("A");
-                    unitInfo.setCreateDate(now);
+
+                    for(Map.Entry<String, String> ent : unitMap.entrySet()){
+                        ReflectionOpt.setFieldValue(unitInfo, ent.getKey(), ent.getValue(), String.class);
+                    }
+
                     unitInfo.setTopUnit(directory.getTopUnit());
-                    unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
-                    unitInfo.setUnitName(unitMap.get("unitName"));
-                    unitInfo.setUnitDesc(unitMap.get("unitDesc"));
-                    unitInfo.setLastModifyDate(now);
+                    //saveNewObject 会自动生成 unitCode
                     unitInfoDao.saveNewObject(unitInfo);
-                }else {
+                    unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
+                    unitInfoDao.updateUnit(unitInfo);
+                }else { //机构名称变换才更新，减少不必要的更新操作
                     if(StringUtils.isNotBlank(unitMap.get("unitName")) &&
                          !StringUtils.equals(unitInfo.getUnitName(), unitMap.get("unitName"))) {
-                        unitInfo.setUnitName(unitMap.get("unitName"));
-                        unitInfo.setUnitDesc(unitMap.get("unitDesc"));
+                        for(Map.Entry<String, String> ent : unitMap.entrySet()){
+                            ReflectionOpt.setFieldValue(unitInfo, ent.getKey(), ent.getValue(), String.class);
+                        }
                         unitInfoDao.updateUnit(unitInfo);
                     }
                 }
@@ -222,38 +223,50 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     userInfo.setIsValid("T");
                     userInfo.setLoginName(userMap.get("loginName"));
                     userInfo.setCreateDate(now);
-                    userInfo.setUserPin(getDefaultPassword(userInfo.getUserCode()));
+                    userInfo.setUserPin(getDefaultPassword());
                     createUser = true;
                 }
-
-                String regEmail = userMap.get("regEmail");
-                if (StringUtils.isNotBlank(regEmail) && regEmail.length() < 60 &&
-                    userInfoDao.getUserByRegEmail(regEmail) == null) {
-                    userInfo.setRegEmail(regEmail);
+                for(Map.Entry<String, String> ent : userMap.entrySet()){
+                    String fieldKey = ent.getKey();
+                    if("loginName".equals(fieldKey)) continue;
+                    if("regEmail".equals(fieldKey)) {
+                        String regEmail = ent.getValue();
+                        if (StringUtils.isNotBlank(regEmail) && regEmail.length() < 60 &&
+                             !regEmail.equals(userInfo.getRegEmail()) &&
+                            userInfoDao.getUserByRegEmail(regEmail) == null){
+                            userInfo.setRegEmail(regEmail);
+                        }
+                        continue;
+                    }
+                    if("regCellPhone".equals(fieldKey)) {
+                        String regCellPhone = ent.getValue();
+                        if (StringUtils.isNotBlank(regCellPhone) && regCellPhone.length() <= 15 &&
+                            !regCellPhone.equals(userInfo.getRegCellPhone()) &&
+                            userInfoDao.getUserByRegCellPhone(regCellPhone)  == null){
+                            userInfo.setRegCellPhone(regCellPhone);
+                        }
+                        continue;
+                    }
+                    ReflectionOpt.setFieldValue(userInfo, fieldKey, ent.getValue(), String.class);
                 }
-                String regCellPhone = userMap.get("regCellPhone");
-                if (StringUtils.isNotBlank(regCellPhone) && regCellPhone.length() < 15 &&
-                    userInfoDao.getUserByRegCellPhone(regCellPhone) == null) {
-                    userInfo.setRegCellPhone(regCellPhone);
-                }
 
-                userInfo.setUserName(userMap.get("userName"));
-                userInfo.setUserDesc(userMap.get("userDesc"));
                 userInfo.setUpdateDate(now);
                 if(createUser) {
                     userInfoDao.saveNewObject(userInfo);
                 }else{
                     userInfoDao.updateUser(userInfo);
                 }
-                if(createUser && StringUtils.isNoneBlank(directory.getDefaultUserRole())){
-                    UserRole role = new UserRole(
-                            new UserRoleId(userInfo.getUserCode(), directory.getDefaultUserRole()));
-                    role.setObtainDate(now);
-                    role.setCreateDate(now);
-                    role.setChangeDesc("LDAP同步时默认设置。");
-                    userRoleDao.mergeUserRole(role);
-                }
+                // 如果已经是禁用的用户，不再同步用户的其他信息
                 if("T".equals( userInfo.getIsValid())) {
+                    if(createUser && StringUtils.isNoneBlank(directory.getDefaultUserRole())){
+                        UserRole role = new UserRole(
+                                new UserRoleId(userInfo.getUserCode(), directory.getDefaultUserRole()));
+                        role.setObtainDate(now);
+                        role.setCreateDate(now);
+                        role.setChangeDesc("LDAP同步时默认设置。");
+                        userRoleDao.mergeUserRole(role);
+                    }
+
                     Attribute members = attrs.get(userUnitField);
                     if (members != null) {
                         NamingEnumeration<?> ms = members.getAll();
@@ -308,11 +321,8 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
         }
     }
 
-    private String getDefaultPassword(String userCode) {
+    private String getDefaultPassword() {
         String rawPass = UuidOpt.randomString(12);
-        if(StringUtils.isNotBlank(defaultPasswordFormat)){
-            rawPass = Pretreatment.mapTemplateStringAsFormula(defaultPasswordFormat, userCode);
-        }
-        return passwordEncoder.createPassword(rawPass, userCode);
+        return passwordEncoder.createPassword(rawPass, "salt");
     }
 }
