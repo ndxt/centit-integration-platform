@@ -87,26 +87,26 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
     /**
      * LDAP登录Controller
 
-     {
-         userSearchBase : "CN=Users,DC=centit,DC=com",
-         userSearchFilter : "(&(objectCategory=person)(objectClass=user))",
-         unitSearchBase : "CN=Users,DC=centit,DC=com",
-         unitSearchFilter : "(objectCategory=group)",
-         userUnitField : "memberOf",
-         userFieldMap : {
-             userName : "displayName",
-             loginName : "sAMAccountName",
-             regEmail : "mail",
-             regCellPhone : "mobilePhone",
-             userDesc : "description"
-         },
-         unitFieldMap : {
-             unitTag : "distinguishedName",
-             unitName : "name",
-             unitDesc : "description",
-         },
-         userURIFormat : "{loginName}@centit.com"
-     }
+{
+     userSearchBase : "CN=Users,DC=centit,DC=com",
+     userSearchFilter : "(&(objectCategory=person)(objectClass=user))",
+     unitSearchBase : "CN=Users,DC=centit,DC=com",
+     unitSearchFilter : "(objectCategory=group)",
+     userUnitField : "memberOf",
+     userFieldMap : {
+         userName : "displayName",
+         loginName : "sAMAccountName",
+         regEmail : "mail",
+         regCellPhone : "mobilePhone",
+         userDesc : "description"
+     },
+     unitFieldMap : {
+         unitTag : "distinguishedName",
+         unitName : "name",
+         unitDesc : "description",
+     },
+     userURIFormat : "{loginName}@centit.com"
+}
 
      * @param directory LDAP用户目录信息； 需要根据配置信息自动适配
      * @return 同步的数量
@@ -192,7 +192,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                     unitInfoDao.saveNewObject(unitInfo);
                     unitInfo.setUnitPath("/"+unitInfo.getUnitCode());
                     unitInfoDao.updateUnit(unitInfo);
-                }else { //机构名称变换才更新，减少不必要的更新操作
+                }/*else { //机构名称变换才更新，减少不必要的更新操作 机构只新增，不修改
                     if(StringUtils.isNotBlank(unitMap.get("unitName")) &&
                          !StringUtils.equals(unitInfo.getUnitName(), unitMap.get("unitName"))) {
                         for(Map.Entry<String, String> ent : unitMap.entrySet()){
@@ -200,7 +200,7 @@ public class ActiveDirectoryUserDirectoryImpl implements UserDirectory{
                         }
                         unitInfoDao.updateUnit(unitInfo);
                     }
-                }
+                }*/
                 allUnits.put(unitMap.get("unitTag"), unitInfo);
             }
 
