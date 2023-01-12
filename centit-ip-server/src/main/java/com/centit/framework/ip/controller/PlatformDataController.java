@@ -302,7 +302,7 @@ public class PlatformDataController extends BaseController {
     @RequestMapping(value = "/allunits/{topUnit}", method = RequestMethod.GET)
     @WrapUpResponseBody
     public List<? extends IUnitInfo> listAllUnits(@PathVariable String topUnit) {
-        return CodeRepositoryUtil.listAllUnits(topUnit);
+        return CodeRepositoryUtil.getAllUnits(topUnit,"T");
     }
 
     @ApiOperation(value = "获取当前租户下所有的机构", notes = "获取当前租户下所有的机构。")
