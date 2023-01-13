@@ -7,7 +7,6 @@ import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.po.AccessToken;
 import com.centit.framework.users.po.DingTalkSuite;
 import com.centit.framework.users.utils.FileUtil;
-import com.centit.support.algorithm.DatetimeOpt;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.request.OapiGetJsapiTicketRequest;
 import com.dingtalk.api.request.OapiGettokenRequest;
@@ -158,8 +157,7 @@ public class TokenService {
     public String getFromDb(String section) {
         AccessToken accessToken = accessTokenService.getObjectById(section);
         if (null != accessToken) {
-            long createTime = DatetimeOpt.convertStringToDate(accessToken.getCreateTime(),
-                DatetimeOpt.getDateTimePattern()).getTime();
+            long createTime = accessToken.getCreateTime().getTime();
             if (System.currentTimeMillis() - createTime <= CACHE_TTL) {
                 return accessToken.getAccessToken();
             }
@@ -172,8 +170,7 @@ public class TokenService {
         accessToken.setAppId(section);
         accessToken.setAccessToken(value);
         accessToken.setExpireIn(expiresIn);
-        accessToken.setExpireTime(DatetimeOpt.convertDatetimeToString(
-            new Date((System.currentTimeMillis() + expiresIn * 1000))));
+        accessToken.setExpireTime(new Date((System.currentTimeMillis() + expiresIn * 1000)));
         accessTokenService.saveAccessToke(accessToken);
     }
 

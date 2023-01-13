@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 授权所需的token
@@ -39,21 +40,18 @@ public class JttToken implements Serializable {
 
     @Column(name = "EXPIRETIME")
     @ApiModelProperty(value = "过期时间", name = "expireTime")
-    @Temporal(TemporalType.TIMESTAMP)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()")
-    private String expireTime;
+    private Date expireTime;
 
     @Column(name = "CREATETIME")
     @ApiModelProperty(value = "创建时间", name = "createTime")
-    @Temporal(TemporalType.TIMESTAMP)
     @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()")
-    private String createTime;
+    private Date createTime;
 
     @Column(name = "UPDATETIME")
     @ApiModelProperty(value = "更新时间", name = "updateTime")
-    @ValueGenerator(strategy = GeneratorType.FUNCTION, occasion = GeneratorTime.NEW_UPDATE,
-        condition = GeneratorCondition.ALWAYS, value = "today()")
-    private String updateTime;
+    @ValueGenerator(strategy = GeneratorType.FUNCTION, condition = GeneratorCondition.ALWAYS, value = "today()")
+    private Date updateTime;
 
     private String refreshToken;
     private int refreshTokenExpireIn;
@@ -89,27 +87,27 @@ public class JttToken implements Serializable {
         this.expireIn = expireIn;
     }
 
-    public String getExpireTime() {
+    public Date getExpireTime() {
         return expireTime;
     }
 
-    public void setExpireTime(String expireTime) {
+    public void setExpireTime(Date expireTime) {
         this.expireTime = expireTime;
     }
 
-    public String getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public String getUpdateTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(String updateTime) {
+    public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
 

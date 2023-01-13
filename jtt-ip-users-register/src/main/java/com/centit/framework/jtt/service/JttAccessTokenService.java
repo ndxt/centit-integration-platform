@@ -7,7 +7,6 @@ import com.centit.framework.jtt.config.JsmotConstant;
 import com.centit.framework.jtt.config.JsmotSyncConfig;
 import com.centit.framework.jtt.po.JttToken;
 import com.centit.framework.jtt.utils.HttpUtil;
-import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import org.apache.commons.lang3.StringUtils;
@@ -25,9 +24,9 @@ import java.util.Date;
 public class JttAccessTokenService {
     private static final Logger log = LoggerFactory.getLogger(JttAccessTokenService.class);
     /**
-     * 缓存时间：7200秒（2小时）
+     * 缓存时间：3600秒（1小时）
      */
-    private static final long CACHE_TTL = 60 * 60 * 2 * 1000L;
+    private static final long CACHE_TTL = 60 * 60 * 1 * 1000L;
 
     @Autowired
     private JttTokenService jttTokenService;
@@ -38,9 +37,8 @@ public class JttAccessTokenService {
     public String getFromDb(String section) {
         JttToken accessToken = jttTokenService.getObjectById(section);
         if (null != accessToken) {
-            long createTime = DatetimeOpt.convertStringToDate(accessToken.getCreateTime(),
-                DatetimeOpt.getDateTimePattern()).getTime();
-            if (System.currentTimeMillis() - createTime <= CACHE_TTL) {
+            long createTime = accessToken.getCreateTime().getTime();
+            if (System.currentTimeMillis() - createTime <= accessToken.getExpireIn() * 1000L) {
                 return accessToken.getAccessToken();
             }
         }
@@ -52,8 +50,7 @@ public class JttAccessTokenService {
         accessToken.setAppId(section);
         accessToken.setAccessToken(value);
         accessToken.setExpireIn(expiresIn);
-        accessToken.setExpireTime(DatetimeOpt.convertDatetimeToString(
-            new Date((System.currentTimeMillis() + expiresIn * 1000))));
+        accessToken.setExpireTime(new Date((System.currentTimeMillis() + expiresIn * 1000)));
         jttTokenService.saveAccessToke(accessToken);
     }
 
