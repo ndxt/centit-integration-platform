@@ -31,4 +31,7 @@ public class JsmotSyncConfig {
 
     @Value("${smsPwd:Keji1234!}")
     private String smsPwd;
+
+    @Value("${appReturnUrl:https://cloud.centit.com/locode/page/A/apps/uBWhsxgWS7mN6f4dmWxNAw}")
+    private String appReturnUrl;
 }
