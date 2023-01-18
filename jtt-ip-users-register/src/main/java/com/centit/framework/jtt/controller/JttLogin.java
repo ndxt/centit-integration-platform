@@ -62,8 +62,8 @@ public class JttLogin extends BaseController {
     public String uniteLogin(HttpServletRequest request) {
         Map<String, Object> filterMap = collectRequestParameters(request);
         logger.info("统一门户单点登陆,参数：{}", filterMap);
-        String token = String.valueOf(filterMap.get("token"));
-        String returnUrl = String.valueOf(filterMap.get("returnUrl"));
+        String token = request.getParameter("token");
+        String returnUrl = request.getParameter("returnUrl");
         logger.info("returnUrl值:{}", returnUrl);
         token = token.replace(" ", "+");
         String errorMsg = "";
@@ -143,8 +143,8 @@ public class JttLogin extends BaseController {
     public String appLogin(HttpServletRequest request) {
         Map<String, Object> filterMap = collectRequestParameters(request);
         logger.info("移动端单点登陆,参数：{}", filterMap);
-        String tmpAuthCode = String.valueOf(filterMap.get("tmp_auth_code"));
-        String returnUrl = String.valueOf(filterMap.get("returnUrl"));
+        String tmpAuthCode = request.getParameter("tmp_auth_code");
+        String returnUrl = request.getParameter("returnUrl");
         logger.info("returnUrl值:{}", returnUrl);
         if (StringUtils.isBlank(returnUrl)) {
             returnUrl = jsmotSyncConfig.getAppReturnUrl();
