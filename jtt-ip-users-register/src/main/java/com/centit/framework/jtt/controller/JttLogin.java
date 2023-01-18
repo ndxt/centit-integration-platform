@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
+import com.centit.framework.jtt.config.JsmotSyncConfig;
 import com.centit.framework.jtt.config.UniteConfig;
 import com.centit.framework.jtt.service.JttAccessTokenService;
 import com.centit.framework.model.adapter.PlatformEnvironment;
@@ -51,9 +52,93 @@ public class JttLogin extends BaseController {
     @Autowired
     private SysUserManager sysUserManager;
 
+    @Autowired
+    private JsmotSyncConfig jsmotSyncConfig;
+
     @ApiOperation(value = "统一门户单点登陆", notes = "统一门户单点登陆")
     @GetMapping(value = "/unitelogin")
     public String uniteLogin(HttpServletRequest request) {
+        Map<String, Object> filterMap = collectRequestParameters(request);
+        logger.info("统一门户单点登陆,参数：{}", filterMap);
+        String token = String.valueOf(filterMap.get("token"));
+        String returnUrl = String.valueOf(filterMap.get("returnUrl"));
+        logger.info("returnUrl值:{}", returnUrl);
+        token = token.replace(" ", "+");
+        String errorMsg = "";
+        String accessToken = "";
+        try {
+            logger.info("token值：{}", token);
+            JSONObject params = new JSONObject();
+            params.put("appId", uniteConfig.getAppId());
+            params.put("token", URLEncoder.encode(token, "utf-8"));
+            //todo token持久化redis，根据token对应关系获取accessToken
+
+            if (StringUtils.isBlank(accessToken) && StringUtils.isNotBlank(token)) {
+                //验证token是否有效
+                String tokenResult = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckUrl(), params.toJSONString());
+                logger.info("调用验证token:{},接口返回信息：{}", params, tokenResult);
+                if (StringUtils.isNotEmpty(tokenResult)) {
+                    JSONObject tokenJson = JSON.parseObject(tokenResult);
+                    if (null != tokenJson && 200 == tokenJson.getInteger("status")) {
+                        //获取扩展信息
+                        String loginCheckExtend = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckExtendUrl(), params.toJSONString());
+                        logger.info("调用扩展验证:{},接口返回信息：{}", params, loginCheckExtend);
+                        JSONObject loginExtendJson = JSON.parseObject(loginCheckExtend);
+                        if (null != loginExtendJson) {
+                            JSONObject userInfo = loginExtendJson.getJSONObject("data").getJSONObject("userInfo");
+                            String loginName = userInfo.getString("loginName");
+                            logger.info("loginName:{}", loginName);
+                            CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
+                            if (null != ud) {
+                                SecurityContextHolder.getContext().setAuthentication(ud);
+                                accessToken = request.getSession().getId();
+                                logger.info("用户名：{}登录成功", loginName);
+                            } else {
+                                errorMsg = "登录名" + loginName + "不存在！";
+                            }
+                        } else {
+                            errorMsg = "统一门户扩展验证接口返回为空！";
+                        }
+                    } else {
+                        if (null != tokenJson) {
+                            errorMsg = tokenJson.getString("msg");
+                        } else {
+                            errorMsg = "统一门户token验证接口返回为空！";
+                        }
+                    }
+                }
+            } else {
+                errorMsg = "统一门户token为空！";
+            }
+        } catch (Exception e) {
+            logger.error("统一门户单点登录异常：{}", e.getMessage());
+            errorMsg = "统一门户单点登录异常:" + e.getMessage();
+        }
+        if (StringUtils.isNotBlank(errorMsg)) {
+            String errorUrl = "redirect:redirecterror";
+            try {
+                errorUrl = errorUrl + "?msg=" + URLEncoder.encode(errorMsg, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                logger.error("URLEncoder异常", e);
+            }
+            return errorUrl;
+        } else {
+            if (StringUtils.isNotBlank(returnUrl) && returnUrl.contains("?")) {
+                returnUrl = returnUrl + "&accessToken=" + accessToken;
+            } else {
+                returnUrl = returnUrl + "?accessToken=" + accessToken;
+            }
+            //占位符 替换成/#/(特殊字符)
+            if (StringUtils.isNotBlank(returnUrl) && returnUrl.indexOf("/A/") > -1) {
+                returnUrl = returnUrl.replace("/A/", "/#/");
+            }
+        }
+        return "redirect:" + returnUrl;
+    }
+
+    @ApiOperation(value = "移动端单点登陆", notes = "移动端单点登陆")
+    @GetMapping(value = "/appLogin")
+    public String appLogin(HttpServletRequest request) {
         Map<String, Object> filterMap = collectRequestParameters(request);
         logger.info("统一门户单点登陆,参数：{}", filterMap);
         String token = String.valueOf(filterMap.get("token"));
