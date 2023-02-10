@@ -34,7 +34,7 @@ public class SocialDeptAuthServiceImpl implements SocialDeptAuthService {
 
     @Override
     public List<SocialDeptAuth> listObjects(Map<String, Object> filterMap, PageDesc pageDesc) {
-        return socialDeptAuthDao.listObjects(filterMap, pageDesc);
+        return socialDeptAuthDao.listObjectsByProperties(filterMap, pageDesc);
     }
 
     @Override

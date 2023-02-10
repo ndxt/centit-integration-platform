@@ -503,7 +503,7 @@ public class TenantServiceImpl implements TenantService {
      * @param userCode 用户code
      */
     private void updateUserInfoAfterRemoveTenantUser(String unitCode, String userCode) {
-        List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("userCode", userCode));
+        List<UserUnit> userUnits = userUnitDao.listObjectsByProperties(CollectionsOpt.createHashMap("userCode", userCode));
         Set<String> topUnits = userUnits.stream().filter(userUnit -> StringUtils.isNotBlank(userUnit.getTopUnit()) && !unitCode.equals(userUnit.getTopUnit()))
             .map(UserUnit::getTopUnit).collect(Collectors.toSet());
         UserInfo userInfo = userInfoDao.getUserByCode(userCode);
@@ -720,7 +720,7 @@ public class TenantServiceImpl implements TenantService {
             "topUnit", unitCode, "applyState_in", TenantMemberApplyDao.NOT_APPROVE_ARRAY);
         List<TenantMemberApply> alreadyApply = tenantMemberApplyDao.listObjectsByProperties(filterMap);
         List<String> applyUserCodes = alreadyApply.stream().map(TenantMemberApply::getUserCode).collect(Collectors.toList());
-        List<UserUnit> userUnits = userUnitDao.listObjects(CollectionsOpt.createHashMap("topUnit", unitCode));
+        List<UserUnit> userUnits = userUnitDao.listObjectsByProperties(CollectionsOpt.createHashMap("topUnit", unitCode));
         userInfos = userInfos.stream().filter(userInfo ->
             null == getUserUnitByUserCode(userUnits, userInfo.getUserCode()) && !applyUserCodes.contains(userInfo.getUserCode())).collect(Collectors.toList());
         //脱敏操作

@@ -23,12 +23,12 @@ public class PlatformServiceImpl implements PlatformService {
 
     @Override
     public List<Platform> listObjects(Map<String, Object> filterMap) {
-        return platformDao.listObjects(filterMap);
+        return platformDao.listObjectsByProperties(filterMap);
     }
 
     @Override
     public List<Platform> listObjects(Map<String, Object> filterMap, PageDesc pageDesc) {
-        return platformDao.listObjects(filterMap, pageDesc);
+        return platformDao.listObjectsByProperties(filterMap, pageDesc);
     }
 
     @Override

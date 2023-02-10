@@ -3,6 +3,7 @@ package com.centit.framework.users.dao;
 import com.centit.framework.core.dao.CodeBook;
 import com.centit.framework.jdbc.dao.BaseDaoImpl;
 import com.centit.framework.users.po.UserPlat;
+import com.centit.support.algorithm.CollectionsOpt;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,6 @@ public class UserPlatDao extends BaseDaoImpl<UserPlat, String> {
 
     @Transactional
     public List<UserPlat> listPlatUsersByPlatId(String platId) {
-        return listObjectsByProperty("platId", platId);
+        return listObjectsByProperties(CollectionsOpt.createHashMap("platId", platId));
     }
 }

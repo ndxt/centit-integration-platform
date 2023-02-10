@@ -46,7 +46,7 @@ public class UserPlatServiceImpl implements UserPlatService {
 
     @Override
     public List<UserPlat> listObjects(Map<String, Object> filterMap, PageDesc pageDesc) {
-        return userPlatDao.listObjects(filterMap, pageDesc);
+        return userPlatDao.listObjectsByProperties(filterMap, pageDesc);
     }
 
     @Override

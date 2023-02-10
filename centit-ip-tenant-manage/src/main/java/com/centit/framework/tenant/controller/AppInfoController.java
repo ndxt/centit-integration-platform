@@ -163,7 +163,7 @@ public class AppInfoController extends BaseController {
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", appType);
         filter.put("ownApp",ownApp);
-        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+        List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
         if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
         }
@@ -200,7 +200,7 @@ public class AppInfoController extends BaseController {
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", "Android");
         filter.put("ownApp",ownApp);
-        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+        List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
         if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
         }
@@ -230,7 +230,7 @@ public class AppInfoController extends BaseController {
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", "IOS");
         filter.put("ownApp",ownApp);
-        List<AppInfo> appInfoList = appInfoService.listObjects(filter);
+        List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
         if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
         }

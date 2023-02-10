@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.framework.tenant.dao.AppInfoDao;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.PageDesc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,19 +27,15 @@ public class AppInfoServiceImpl implements AppInfoService {
         return appInfoDao.listObjects();
     }
 
-    @Override
-    public List<AppInfo> listObjects(Map<String, Object> map) {
-        return appInfoDao.listObjects(map);
-    }
 
     @Override
-    public List<AppInfo> listObjects(Map<String, Object> map, PageDesc pageDesc) {
-        return appInfoDao.listObjects(map, pageDesc);
+    public List<AppInfo> listObjectsByProperties(Map<String, Object> map, PageDesc pageDesc) {
+        return appInfoDao.listObjectsByProperties(map, pageDesc);
     }
 
     @Override
     public List<AppInfo> listObjectsByProperty(String s, Object o) {
-        return appInfoDao.listObjectsByProperty(s, o);
+        return appInfoDao.listObjectsByProperties(CollectionsOpt.createHashMap(s, o));
     }
 
     @Override
@@ -78,7 +75,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public AppInfo getObjectByProperty(String s, Object o) {
-        return appInfoDao.getObjectByProperty(s, o);
+        return appInfoDao.getObjectByProperties(CollectionsOpt.createHashMap(s, o));
     }
 
     @Override
@@ -88,7 +85,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public JSONArray listObjectsAsJson(Map<String, Object> map, PageDesc pageDesc) {
-        return appInfoDao.listObjectsAsJson(map, pageDesc);
+        return appInfoDao.listObjectsByPropertiesAsJson(map, pageDesc);
     }
 
     @Override

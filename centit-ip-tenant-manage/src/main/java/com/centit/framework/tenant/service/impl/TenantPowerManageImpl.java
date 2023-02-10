@@ -88,7 +88,7 @@ public class TenantPowerManageImpl implements TenantPowerManage {
     @Override
     public boolean userIsTenantMember(String userCode, String topUnit) {
         Map<String, Object> filterMap = CollectionsOpt.createHashMap("userCode", userCode, "topUnit", topUnit);
-        return !CollectionUtils.sizeIsEmpty(userUnitDao.listObjects(filterMap));
+        return userUnitDao.countObjectByProperties(filterMap)>0;
     }
 
     @Override
