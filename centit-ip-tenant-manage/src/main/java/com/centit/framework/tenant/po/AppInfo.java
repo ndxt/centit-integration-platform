@@ -44,6 +44,16 @@ public class AppInfo implements Serializable {
     @ApiModelProperty(value = "设备类型", name = "appType")
     private String appType;
 
+    @Column(name = "OWN_APP")
+    @Length(max = 100)
+    @ApiModelProperty(value = "所属应用", name = "ownApp")
+    private String ownApp;
+
+    @Column(name = "top_unit")
+    @Length(max = 32)
+    @ApiModelProperty(value = "所属租户", name = "topUnit")
+    private String topUnit;
+
     @Column(name = "FILE_ID")
     @Length(max = 100)
     @ApiModelProperty(value = "文件Id", name = "fileId")

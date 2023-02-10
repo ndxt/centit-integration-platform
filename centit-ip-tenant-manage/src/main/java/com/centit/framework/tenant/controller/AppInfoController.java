@@ -13,6 +13,7 @@ import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.basedata.OperationLog;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
 import io.swagger.annotations.Api;
@@ -65,6 +66,8 @@ public class AppInfoController extends BaseController {
     @WrapUpResponseBody(contentType = WrapUpContentType.MAP_DICT)
     public PageQueryResult<Object> list(PageDesc pageDesc, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> searchColumn = BaseController.collectRequestParameters(request);
+        String topUnit = WebOptUtils.getCurrentTopUnit(request);
+        searchColumn.put("topUnit",topUnit);
         JSONArray listObjects = appInfoService.listObjectsAsJson(searchColumn, pageDesc);
         return PageQueryResult.createJSONArrayResult(listObjects, pageDesc, AppInfo.class);
     }
@@ -77,9 +80,13 @@ public class AppInfoController extends BaseController {
     @WrapUpResponseBody
     public ResponseData saveAppInfo(@RequestBody AppInfo appInfo, HttpServletRequest request, HttpServletResponse response) {
         appInfo.setCreator(WebOptUtils.getCurrentUserCode(request));
+        String topUnit = WebOptUtils.getCurrentTopUnit(request);
+        appInfo.setTopUnit(topUnit);
         Map<String, Object> filter = new HashMap<>();
         filter.put("versionId", appInfo.getVersionId());
         filter.put("appType", appInfo.getAppType());
+        filter.put("topUnit",appInfo.getTopUnit());
+        filter.put("ownApp",appInfo.getOwnApp());
         List<AppInfo> appInfoList = appInfoService.listObjectsByProperties(filter);
         if (appInfoList != null && appInfoList.size() > 0) {
             return ResponseData.makeErrorMessage("版本号已存在，请勿重复保存!");
@@ -149,8 +156,13 @@ public class AppInfoController extends BaseController {
     @RequestMapping(value = "/getLastAppInfo/{appType}", method = {RequestMethod.GET})
     @WrapUpResponseBody
     public JSONObject getLastAppInfo(@PathVariable String appType, HttpServletRequest request) {
+        String ownApp=request.getParameter("ownApp");
+        if(StringBaseOpt.isNvl(ownApp)){
+            ownApp="system";
+        }
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", appType);
+        filter.put("ownApp",ownApp);
         List<AppInfo> appInfoList = appInfoService.listObjects(filter);
         if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
@@ -180,9 +192,14 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的移动端下载地址", notes = "获取最新版的移动端下载地址。")
     @RequestMapping(value = "/getLastAppUrl", method = {RequestMethod.GET})
     public void getLastAppUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String ownApp=request.getParameter("ownApp");
+        if(StringBaseOpt.isNvl(ownApp)){
+            ownApp="system";
+        }
         String serverName = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/" + appKey;
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", "Android");
+        filter.put("ownApp",ownApp);
         List<AppInfo> appInfoList = appInfoService.listObjects(filter);
         if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
@@ -206,8 +223,13 @@ public class AppInfoController extends BaseController {
     @ApiOperation(value = "获取最新版的IOS下载地址", notes = "获取最新版的IOS下载地址。")
     @RequestMapping(value = "/manifest.plist", method = {RequestMethod.GET})
     public void getLastIOSUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String ownApp=request.getParameter("ownApp");
+        if(StringBaseOpt.isNvl(ownApp)){
+            ownApp="system";
+        }
         Map<String, Object> filter = new HashMap<>();
         filter.put("appType", "IOS");
+        filter.put("ownApp",ownApp);
         List<AppInfo> appInfoList = appInfoService.listObjects(filter);
         if (appInfoList == null || appInfoList.size() == 0) {
             throw new ObjectException("未获取到版本号!");
