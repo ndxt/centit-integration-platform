@@ -95,12 +95,6 @@
             http://www.open-open.com/lib/view/open1412731740452.html
             http://www.oschina.net/translate/oauth-2-developers-guide -->
 
-        <!--
-        <dependency>
-          <groupId>org.springframework.security.oauth</groupId>
-          <artifactId>spring-security-oauth2</artifactId>
-          <version>${spring-security-oauth2.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
@@ -133,12 +127,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.5</version>
-            <scope>runtime</scope>
-        </dependency> -->
         <dependency>
             <groupId>com.dm</groupId>
             <artifactId>dmjdbc7</artifactId>
@@ -170,11 +158,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--<dependency>
-            <groupId>com.shentong</groupId>
-            <artifactId>shentongjdbc</artifactId>
-            <version>4.0</version>
-        </dependency>-->
 
         <dependency>
             <groupId>com.centit.framework</groupId>
@@ -184,15 +167,15 @@
 
         <dependency>
             <groupId>com.centit.product</groupId>
-            <artifactId>message-sender-utils</artifactId>
+            <artifactId>msgpusher-plugin-email</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>jtt-ip-users-register</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency>-->
 
     </dependencies>
 
