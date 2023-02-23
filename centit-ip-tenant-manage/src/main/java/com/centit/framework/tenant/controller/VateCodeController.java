@@ -360,7 +360,6 @@ public class VateCodeController extends BaseController {
             //发送成功
             //将验证码存入到Redis中
             redisTemplate.boundValueOps(phone).set(json);
-            map.put("verifyCode", json);
         }
         return result;
     }
