@@ -18,7 +18,9 @@ import com.centit.framework.system.po.UserInfo;
 import com.centit.support.security.AESSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,6 +53,9 @@ public class VateCodeController extends BaseController {
     @Autowired
     private PlatformEnvironment platformEnvironment;
 
+    @Autowired(required = false)
+    private RedisTemplate<String, JSONObject> redisTemplate;
+
     private static Pattern pattern = Pattern.compile("[0-9]*");
 
     @ApiOperation(
@@ -60,7 +66,7 @@ public class VateCodeController extends BaseController {
     @WrapUpResponseBody
     public ResponseData checkOnly(@RequestParam(value = "loginname") String loginname,
                                   HttpServletRequest request) throws Exception{
-        UserInfo userInfo = new UserInfo();
+        UserInfo userInfo;
         String msg = "";
         Matcher isNum = pattern.matcher(loginname);
         if(loginname.indexOf('@')>0){
@@ -85,14 +91,26 @@ public class VateCodeController extends BaseController {
     )
     @RequestMapping(value = "/getEmailCode", method = RequestMethod.POST)
     @WrapUpResponseBody
-    public ResponseData getEmailCode(@RequestParam(value = "userCode", required = false) String userCode,
-                                     @RequestParam("email") String email,
+    public ResponseData getEmailCode(@RequestParam("email") String email,
                                      HttpServletRequest request) {
+        JSONObject jsonObject = redisTemplate.boundValueOps(email).get();
+        Map<String, Object> bodyMap = new HashMap<>();
+        if(jsonObject != null){
+            Long createTime = jsonObject.getLong("createTime");
+            if ((System.currentTimeMillis() - createTime) < 1000 * 60) {
+                bodyMap.put("Message", "验证码发送时间小于1分钟，请稍后再试。");
+                bodyMap.put("Code", 500);
+                return ResponseData.makeResponseData(bodyMap);
+            }else{
+                //重新发送则删除之前存入redis中的数据
+                redisTemplate.delete(email);
+            }
+        }
         UserInfo userInfo = userInfoDao.getUserByRegEmail(email);
         if (userInfo != null) {
             return ResponseData.makeErrorMessage("此邮箱已被使用！");
         }
-        return sendEmail(email, email, request);
+        return sendEmail(email, request);
     }
 
     @ApiOperation(
@@ -105,19 +123,31 @@ public class VateCodeController extends BaseController {
                                             @RequestParam("phone") String phone,
                                             HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> result = new HashMap<>();
+        JSONObject jsonObject = redisTemplate.boundValueOps(phone).get();
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> bodyMap = new HashMap<>();
+        if(jsonObject != null){
+            Long createTime = jsonObject.getLong("createTime");
+            if ((System.currentTimeMillis() - createTime) < 1000 * 60) {
+                bodyMap.put("Message", "验证码发送时间小于1分钟，请稍后再试。");
+                bodyMap.put("Code", 500);
+                map.put("body", bodyMap);
+                return bodyMap;
+            }else{
+                //重新发送则删除之前存入redis中的数据
+                redisTemplate.delete(phone);
+            }
+        }
         if(phone != null && !phone.equals("")){
             UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
             if (userInfo != null) {
-                //throw new Exception("此手机号已被使用！");
-                Map<String, Object> map = new HashMap<String, Object>();
-                Map<String, Object> bodyMap = new HashMap<String, Object>();
                 bodyMap.put("Message", "此手机号已被使用");
                 bodyMap.put("Code", 500);
                 map.put("body", bodyMap);
                 return bodyMap;
             }
         }
-        SendSmsResponseBody s = sendPhone(phone, phone, userCode, request, result);
+        SendSmsResponseBody s = sendPhone(phone, userCode, request, result);
         if(s != null && s.getCode() != null && s.getCode().equals("OK")){
             s.setCode("0");
         }
@@ -127,6 +157,14 @@ public class VateCodeController extends BaseController {
         return result;
     }
 
+    /**
+     * 校验验证码并且更新用户信息
+     * @param userCode 用户编码
+     * @param key 手机号或者邮箱
+     * @param code 验证码
+     * @param request
+     * @return
+     */
     @ApiOperation(
         value = "校验和更新",
         notes = "校验和更新"
@@ -141,10 +179,9 @@ public class VateCodeController extends BaseController {
             if (code == null) {
                 return ResponseData.makeErrorMessage(500, "请输入验证码！");
             }
-            boolean flag = true;
-            JSONObject json = JSONObject.parseObject(request.getSession().getAttribute(key) + "");
+            //从Redis中获取验证码和部分信息
+            JSONObject json = redisTemplate.boundValueOps(key).get();
             if(json == null){
-                flag = false;
                 json = JSONObject.parseObject(request.getHeader("verifyCode"));
             }
             if(json == null){
@@ -160,13 +197,13 @@ public class VateCodeController extends BaseController {
             if ((System.currentTimeMillis() - createTime) > 1000 * 60 * 5) {
                 return ResponseData.makeErrorMessage(500, "验证码已过期！");
             }
-            if(userCode != null && !userCode.equals("")){
+            if(StringUtils.isNotBlank(userCode)){
                 UserInfo user = userInfoDao.getUserByCode(userCode);
                 if (user != null) {
-                    if(email != null && !email.equals("")){
+                    if(StringUtils.isNotBlank(email)){
                         user.setRegEmail(email);
                         logger.info("用户:{}修改用户信息邮箱",userCode);
-                    }else if(phone != null && !phone.equals("")){
+                    }else if(StringUtils.isNotBlank(phone)){
                         user.setRegCellPhone(phone);
                         logger.info("用户:{}修改用户信息手机",userCode);
                     }
@@ -177,9 +214,7 @@ public class VateCodeController extends BaseController {
                     CodeRepositoryCache.evictCache("UserInfo");
                 }
             }
-            if(flag){
-                request.getSession().removeAttribute(key);
-            }
+            redisTemplate.delete(key);
             return ResponseData.makeSuccessResponse();
         }catch (Exception e) {
             e.printStackTrace();
@@ -187,6 +222,13 @@ public class VateCodeController extends BaseController {
         return ResponseData.errorResponse;
     }
 
+    /**
+     *
+     * @param loginname  手机号或者邮箱
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @ApiOperation(
         value = "找回密码(发送验证码 手机/邮箱)",
         notes = "找回密码(发送验证码 手机/邮箱)"
@@ -197,19 +239,19 @@ public class VateCodeController extends BaseController {
                                 HttpServletRequest request) throws Exception {
         Map<String, Object> result = new HashMap<>();
         try {
-            UserInfo userInfo = new UserInfo();
+            UserInfo userInfo;
             if(loginname.indexOf('@')>0){
                 userInfo = userInfoDao.getUserByRegEmail(loginname);
                 if(userInfo == null){
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
-                sendEmail(loginname, loginname, request);
+                sendEmail(loginname, request);
             }else{
                 userInfo = userInfoDao.getUserByRegCellPhone(loginname);
                 if(userInfo == null){
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
-                SendSmsResponseBody s = sendPhone(loginname, loginname, "", request, result);
+                sendPhone(loginname, "", request, result);
             }
             result.put("x-auth-token", request.getSession().getId());
             return ResponseData.makeResponseData(result);
@@ -234,10 +276,9 @@ public class VateCodeController extends BaseController {
             if (code == null) {
                 return ResponseData.makeErrorMessage(500, "请输入验证码！");
             }
-            boolean flag = true;
-            JSONObject json = JSONObject.parseObject(request.getSession().getAttribute(key) + "");
+            //从Redis中获取验证码和部分信息
+            JSONObject json = redisTemplate.boundValueOps(key).get();
             if(json == null){
-                flag = false;
                 json = JSONObject.parseObject(request.getHeader("verifyCode"));
             }
             if(json == null){
@@ -254,14 +295,12 @@ public class VateCodeController extends BaseController {
                 return ResponseData.makeErrorMessage(500, "验证码已过期！");
             }
             UserInfo userInfo = new UserInfo();
-            if(email != null && !email.equals("")){
+            if(StringUtils.isNotBlank(email)){
                 userInfo = userInfoDao.getUserByRegEmail(email);
-            }else if(phone != null && !phone.equals("")){
+            }else if(StringUtils.isNotBlank(phone)){
                 userInfo = userInfoDao.getUserByRegCellPhone(phone);
             }
-            if(flag){
-                request.getSession().removeAttribute(key);
-            }
+            redisTemplate.delete(key);
             return ResponseData.makeResponseData(userInfo);
         }catch (Exception e) {
             e.printStackTrace();
@@ -270,7 +309,7 @@ public class VateCodeController extends BaseController {
     }
 
 
-    public ResponseData sendEmail(String email, String key, HttpServletRequest request){
+    public ResponseData sendEmail(String email, HttpServletRequest request){
         String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
         String message = "您的验证码为:" + verifyCode + "，该码有效期为5分钟，该码只能使用一次!";
         List<String> sendMessageUser = new ArrayList<>();
@@ -279,20 +318,23 @@ public class VateCodeController extends BaseController {
         json.put("email", email);
         json.put("verifyCode", verifyCode);
         json.put("createTime", System.currentTimeMillis());
-        request.getSession().setAttribute(key, json);
-        return notificationCenter.sendMessage("system", sendMessageUser,
+        ResponseData result = notificationCenter.sendMessage("system", sendMessageUser,
             NoticeMessage.create().operation("email").method("post").subject("您有新邮件")
                 .content(message));
+        if(result.getCode() == 0){
+            //发送成功则将JSON保存到session和Redis中
+            redisTemplate.boundValueOps(email).set(json);
+        }
+        return result;
     }
 
-    public SendSmsResponseBody sendPhone(String phone, String key, String userCode, HttpServletRequest request, Map<String, Object> map)
+    public SendSmsResponseBody sendPhone(String phone, String userCode, HttpServletRequest request, Map<String, Object> map)
             throws Exception{
         String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
         JSONObject jSONObject = new JSONObject();
         jSONObject.put("code", verifyCode);
         if(userCode != null && !userCode.equals("")){
-            UserInfo userInfo = new UserInfo();
-            userInfo = userInfoDao.getUserByCode(userCode);
+            UserInfo userInfo = userInfoDao.getUserByCode(userCode);
             if(userInfo != null){
                 jSONObject.put("product", "用户"+userInfo.getUserName());
             }else{
@@ -301,10 +343,6 @@ public class VateCodeController extends BaseController {
         }else{
             jSONObject.put("product", "用户");
         }
-        //+GrP3D07U/aR2WDtm9iTSUeJ0F00X0f75Byebbcw8fc=
-        //String accessKeyId = AESSecurityUtils.encryptAndBase64("LTAI5tEa6fT8PoidN8PkQNnN", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
-        //gqdjhi7JEasb2uiOW/riueAXA4vvOxsgYfmdRbAqwIU=
-        //String accessKeySecret = AESSecurityUtils.encryptAndBase64("SeirpGApf75fAow1rT1qVJ7v0zqCRy", "0123456789abcdefghijklmnopqrstuvwxyzABCDEF");
         com.aliyun.dysmsapi20170525.Client client = VateCodeController.createClient();
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
             .setSignName("身份验证")
@@ -315,10 +353,15 @@ public class VateCodeController extends BaseController {
         json.put("phone", phone);
         json.put("verifyCode", verifyCode);
         json.put("createTime", System.currentTimeMillis());
-        request.getSession().setAttribute(key, json);
-        map.put("verifyCode", json);
+        json.put("IP", InetAddress.getLocalHost().getHostAddress());
         // 复制代码运行请自行打印 API 的返回值
-        return client.sendSms(sendSmsRequest).getBody();
+        SendSmsResponseBody result = client.sendSms(sendSmsRequest).getBody();
+        if(result.getCode().equals("OK")){
+            //发送成功
+            //将验证码存入到Redis中
+            redisTemplate.boundValueOps(phone).set(json);
+        }
+        return result;
     }
 
     /**

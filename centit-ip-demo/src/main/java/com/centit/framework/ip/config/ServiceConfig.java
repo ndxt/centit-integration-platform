@@ -15,6 +15,8 @@ import com.centit.framework.security.model.StandardPasswordEncoderImpl;
 import com.centit.framework.system.config.SystemBeanConfig;
 import com.centit.msgpusher.plugins.EMailMsgPusher;
 import com.centit.msgpusher.plugins.SystemUserEmailSupport;
+import com.centit.search.service.ESServerConfig;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.security.AESSecurityUtils;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
@@ -112,18 +114,17 @@ public class ServiceConfig {
 //        return IndexerSearcherFactory.obtainSearcher(elkOptLogServerConfig(), ESOperationLog.class);
 //    }
 
-//    @Bean
-//    public ESServerConfig elkOptLogServerConfig(){
-//        ESServerConfig config = new ESServerConfig();
-//        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
-//        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
-//        config.setUsername(env.getProperty("elasticsearch.server.username"));
-//        config.setPassword(env.getProperty("elasticsearch.server.password"));
-//        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
-//        config.setOsId(env.getProperty("elasticsearch.osId"));
-//        config.setMinScore(NumberBaseOpt.parseFloat(
-//            env.getProperty("elasticsearch.filter.minScore"), 0.5f));
-//        return config;
-//    }
+    @Bean
+    public ESServerConfig elkOptLogServerConfig(){
+        ESServerConfig config = new ESServerConfig();
+        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
+        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
+        config.setUsername(env.getProperty("elasticsearch.server.username"));
+        config.setPassword(env.getProperty("elasticsearch.server.password"));
+        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
+        config.setOsId(env.getProperty("elasticsearch.osId"));
+        config.setMinScore(NumberBaseOpt.parseFloat(env.getProperty("elasticsearch.filter.minScore"), 0.5f));
+        return config;
+    }
 
 }

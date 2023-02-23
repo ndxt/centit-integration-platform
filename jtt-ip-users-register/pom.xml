@@ -49,6 +49,12 @@
             <version>1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.centit.framework</groupId>
+            <artifactId>centit-ip-tenant-manage</artifactId>
+            <version>5.3-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
 </project>
