@@ -214,7 +214,6 @@ public class VateCodeController extends BaseController {
                     CodeRepositoryCache.evictCache("UserInfo");
                 }
             }
-            request.getSession().removeAttribute(key);
             redisTemplate.delete(key);
             return ResponseData.makeSuccessResponse();
         }catch (Exception e) {
@@ -301,7 +300,6 @@ public class VateCodeController extends BaseController {
             }else if(StringUtils.isNotBlank(phone)){
                 userInfo = userInfoDao.getUserByRegCellPhone(phone);
             }
-            request.getSession().removeAttribute(key);
             redisTemplate.delete(key);
             return ResponseData.makeResponseData(userInfo);
         }catch (Exception e) {
@@ -325,7 +323,6 @@ public class VateCodeController extends BaseController {
                 .content(message));
         if(result.getCode() == 0){
             //发送成功则将JSON保存到session和Redis中
-            request.getSession().setAttribute(email, json);
             redisTemplate.boundValueOps(email).set(json);
         }
         return result;
@@ -361,7 +358,6 @@ public class VateCodeController extends BaseController {
         SendSmsResponseBody result = client.sendSms(sendSmsRequest).getBody();
         if(result.getCode().equals("OK")){
             //发送成功
-            request.getSession().setAttribute(phone, json);
             //将验证码存入到Redis中
             redisTemplate.boundValueOps(phone).set(json);
             map.put("verifyCode", json);

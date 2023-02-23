@@ -229,7 +229,6 @@ public class JsmotSyncController extends BaseController {
                     CodeRepositoryCache.evictCache("UserInfo");
                 }
             }
-            request.getSession().removeAttribute(key);
             redisTemplate.delete(key);
             return ResponseData.makeSuccessResponse();
         } catch (Exception e) {
@@ -262,7 +261,6 @@ public class JsmotSyncController extends BaseController {
         smsDTO.setMobile(phone);
         ResponseData result = jsmotSyncService.sendSms(accessToken, smsDTO);
         if(result.getCode() == 0){
-            request.getSession().setAttribute(phone, json);
             redisTemplate.boundValueOps(phone).set(json);
         }
         return result;
