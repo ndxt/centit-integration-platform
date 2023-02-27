@@ -13,9 +13,9 @@ import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.system.service.UserSyncDirectoryManager;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.Pretreatment;
+import com.centit.support.security.SecurityOptUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -76,16 +76,7 @@ public class LdapLogin extends BaseController {
         return "LDAPLOGIN";
     }
 
-    private String decodeSecurityString(String sStr){
-        if(sStr==null)
-            return "";
-        sStr = sStr.trim();
-        if (sStr.startsWith("cipher:")) {
-            return new String(Base64.decodeBase64(sStr.substring(7))).trim();
-        } else {
-            return sStr;
-        }
-    }
+
 
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
@@ -95,8 +86,8 @@ public class LdapLogin extends BaseController {
     public ResponseData login(@RequestParam("username") String username,
                               @RequestParam("password") String password,
                               HttpServletRequest request) throws Exception {
-        username = decodeSecurityString(StringEscapeUtils.unescapeHtml4(username));
-        password = decodeSecurityString(StringEscapeUtils.unescapeHtml4(password));
+        username = SecurityOptUtils.decodeSecurityString(StringEscapeUtils.unescapeHtml4(username));
+        password = SecurityOptUtils.decodeSecurityString(StringEscapeUtils.unescapeHtml4(password));
 
         if (StringUtils.isNotBlank(disableUser)) {
             disableUser = StringUtils.deleteWhitespace(disableUser);
