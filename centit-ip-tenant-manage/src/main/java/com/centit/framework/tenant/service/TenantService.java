@@ -1,6 +1,6 @@
 package com.centit.framework.tenant.service;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.system.po.UnitInfo;

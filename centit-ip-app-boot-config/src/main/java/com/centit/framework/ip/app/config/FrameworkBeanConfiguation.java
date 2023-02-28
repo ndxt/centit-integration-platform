@@ -1,6 +1,6 @@
 package com.centit.framework.ip.app.config;
 
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
 import com.centit.framework.core.controller.MvcConfigUtil;
 import com.centit.framework.ip.app.service.impl.IPClientPlatformEnvironment;
 import com.centit.framework.ip.app.service.impl.PlatformEnvironmentProxy;

@@ -1,8 +1,8 @@
 package com.centit.framework.tenant.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.components.CodeRepositoryCache;
@@ -912,7 +912,7 @@ public class TenantServiceImpl implements TenantService {
         JSONArray jsonArray=new JSONArray();
        List<UserUnit> iUserUnitList= (List<UserUnit>) CodeRepositoryUtil.listUserUnits(topUnit, userCode);
        for(UserUnit userUnit:iUserUnitList){
-           JSONObject jsonObject= (JSONObject) JSONObject.toJSON(userUnit);
+           JSONObject jsonObject=  JSONObject.from(userUnit);
            jsonObject.put("unitName",CodeRepositoryUtil.getValue("unitCode",userUnit.getUnitCode(),topUnit,"zh_CN"));
           jsonObject.put("userRankText",CodeRepositoryUtil.getValue("RankType",
               userUnit.getUserRank(),topUnit,"zh_CN"));
@@ -1650,7 +1650,7 @@ public class TenantServiceImpl implements TenantService {
         for (TenantInfo tenantInfo : tenantInfos) {
             Map<String, ? extends IUserInfo> userRepo = CodeRepositoryUtil.getUserRepo(tenantInfo.getTopUnit());
             IUserInfo ownUserInfo = userRepo.get(tenantInfo.getOwnUser());
-            JSONObject jsonObject = (JSONObject) JSONObject.toJSON(tenantInfo);
+            JSONObject jsonObject = JSONObject.from(tenantInfo);
             jsonObject.put("ownUserName", null == ownUserInfo ? "" : ownUserInfo.getUserName());
             jsonArray.add(jsonObject);
         }

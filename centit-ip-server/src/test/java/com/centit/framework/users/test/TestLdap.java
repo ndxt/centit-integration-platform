@@ -1,7 +1,7 @@
 package com.centit.framework.users.test;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.ip.service.impl.ActiveDirectoryUserDirectoryImpl;
 import com.centit.framework.system.po.UnitInfo;
 import com.centit.framework.system.po.UserInfo;

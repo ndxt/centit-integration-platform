@@ -1,7 +1,7 @@
 package com.centit.framework.users.service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.system.po.UserSyncDirectory;
 import com.centit.framework.users.dto.DingUnitDTO;

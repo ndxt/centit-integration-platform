@@ -1,7 +1,7 @@
 package com.centit.framework.tenant.service.impl;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.tenant.dao.AppInfoDao;
 import com.centit.framework.tenant.po.AppInfo;
 import com.centit.framework.tenant.service.AppInfoService;
