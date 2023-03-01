@@ -115,7 +115,7 @@ public class LdapLogin extends BaseController {
                 return ResponseData.makeResponseData(sessionMap);
             }
         }
-        return ResponseData.makeErrorMessage("用户名或密码错误！");
+        return ResponseData.makeErrorMessage("用户名或密码错误");
     }
 
 
