@@ -3,8 +3,12 @@ package com.centit.framework.ip.app.service.impl;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
+import com.centit.framework.security.model.OptTreeNode;
+import com.centit.support.database.utils.PageDesc;
+import org.springframework.security.access.ConfigAttribute;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by codefan on 16-12-16.
@@ -152,6 +156,14 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
             if(iOptInfo!=null) {
                 return iOptInfo;
             }
+        }
+        return null;
+    }
+
+    @Override
+    public IOptInfo updateOptInfo(IOptInfo optInfo) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            evrnManger.updateOptInfo(optInfo);
         }
         return null;
     }
@@ -382,6 +394,17 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
         return null;
     }
 
+    @Override
+    public List<? extends IOptInfo> listOptInfoByRole(String roleCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IOptInfo> value = evrnManger.listOptInfoByRole(roleCode);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     /**
      * 获取操作方法信息
      *
@@ -391,6 +414,68 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
     public List<? extends IOptMethod> listAllOptMethod(String topUnit) {
         for(PlatformEnvironment evrnManger:evrnMangers){
             List<? extends IOptMethod> value = evrnManger.listAllOptMethod(topUnit);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public OptTreeNode getSysOptTree() {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            OptTreeNode value = evrnManger.getSysOptTree();
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<? extends IOptMethod> listOptMethodByRoleCode(String roleCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IOptMethod> value = evrnManger.listOptMethodByRoleCode(roleCode);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public IOptMethod addOptMethod(IOptMethod optMethod) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOptMethod value = evrnManger.addOptMethod(optMethod);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public IOptMethod mergeOptMethod(IOptMethod optMethod) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            IOptMethod value = evrnManger.mergeOptMethod(optMethod);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteOptMethod(String optCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            evrnManger.deleteOptMethod(optCode);
+        }
+    }
+
+    @Override
+    public List<ConfigAttribute> getRolesWithApiId(String apiId) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<ConfigAttribute> value = evrnManger.getRolesWithApiId(apiId);
             if(value!=null) {
                 return value;
             }
@@ -443,6 +528,91 @@ public class PlatformEnvironmentProxy implements PlatformEnvironment
             }
         }
         return null;
+    }
+
+    @Override
+    public void deleteDataDictionary(String catalogCode) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            evrnManger.deleteDataDictionary(catalogCode);
+        }
+    }
+
+    @Override
+    public int[] updateOptIdByOptCodes(String optId, List<String> optCodes) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            int[] value = evrnManger.updateOptIdByOptCodes(optId, optCodes);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean deleteOptInfoByOptId(String optId) {
+        boolean isDelete = false;
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            isDelete = isDelete || evrnManger.deleteOptInfoByOptId(optId);
+        }
+        return isDelete;
+    }
+
+    @Override
+    public boolean deleteOptDefAndRolepowerByOptCode(String optCode) {
+        boolean isDelete = false;
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            isDelete = isDelete || evrnManger.deleteOptDefAndRolepowerByOptCode(optCode);
+        }
+        return isDelete;
+    }
+
+    @Override
+    public int countUserByTopUnit(String topUnit) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            int value = evrnManger.countUserByTopUnit(topUnit);
+            if(value > 0) {
+                return value;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int countUnitByTopUnit(String topUnit) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            int value = evrnManger.countUnitByTopUnit(topUnit);
+            if(value > 0) {
+                return value;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<? extends IWorkGroup> listWorkGroup(Map<String, Object> filterMap, PageDesc pageDesc) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            List<? extends IWorkGroup> value = evrnManger.listWorkGroup(filterMap, pageDesc);
+            if(value!=null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void batchWorkGroup(List<IWorkGroup> workGroups) {
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            evrnManger.batchWorkGroup(workGroups);
+        }
+    }
+
+    @Override
+    public boolean loginUserIsExistWorkGroup(String osId, String userCode) {
+        boolean isExists = false;
+        for(PlatformEnvironment evrnManger:evrnMangers){
+            isExists = isExists || evrnManger.loginUserIsExistWorkGroup(osId, userCode);
+        }
+        return isExists;
     }
 
     /**

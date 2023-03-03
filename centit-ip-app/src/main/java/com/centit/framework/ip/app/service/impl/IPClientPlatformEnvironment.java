@@ -7,9 +7,12 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.*;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.security.model.JsonCentitUserDetails;
+import com.centit.framework.security.model.OptTreeNode;
 import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.database.utils.PageDesc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.ConfigAttribute;
 
 import java.util.HashMap;
 import java.util.List;
@@ -105,6 +108,11 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
             "/platform/optinfo",
             optInfo);
         return HttpReceiveJSON.valueOfJson(result).getDataAsObject(IOptInfo.class);
+    }
+
+    @Override
+    public IOptInfo updateOptInfo(IOptInfo optInfo) {
+        return null;
     }
 
 
@@ -244,6 +252,51 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
+    public void deleteDataDictionary(String catalogCode) {
+
+    }
+
+    @Override
+    public int[] updateOptIdByOptCodes(String optId, List<String> optCodes) {
+        return new int[0];
+    }
+
+    @Override
+    public boolean deleteOptInfoByOptId(String optId) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteOptDefAndRolepowerByOptCode(String optCode) {
+        return false;
+    }
+
+    @Override
+    public int countUserByTopUnit(String topUnit) {
+        return 0;
+    }
+
+    @Override
+    public int countUnitByTopUnit(String topUnit) {
+        return 0;
+    }
+
+    @Override
+    public List<? extends IWorkGroup> listWorkGroup(Map<String, Object> filterMap, PageDesc pageDesc) {
+        return null;
+    }
+
+    @Override
+    public void batchWorkGroup(List<IWorkGroup> workGroups) {
+
+    }
+
+    @Override
+    public boolean loginUserIsExistWorkGroup(String osId, String userCode) {
+        return false;
+    }
+
+    @Override
     public List<? extends IRolePower> listAllRolePower(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
@@ -265,11 +318,46 @@ public class IPClientPlatformEnvironment implements PlatformEnvironment {
     }
 
     @Override
+    public List<? extends IOptInfo> listOptInfoByRole(String roleCode) {
+        return null;
+    }
+
+    @Override
     public List<? extends IOptMethod> listAllOptMethod(String topUnit) {
         return RestfulHttpRequest.getResponseObjectList(
             appSession,
             "/platform/alloptmethods/" + topUnit,
             IOptMethod.class);
+    }
+
+    @Override
+    public OptTreeNode getSysOptTree() {
+        return null;
+    }
+
+    @Override
+    public List<? extends IOptMethod> listOptMethodByRoleCode(String roleCode) {
+        return null;
+    }
+
+    @Override
+    public IOptMethod addOptMethod(IOptMethod optMethod) {
+        return null;
+    }
+
+    @Override
+    public IOptMethod mergeOptMethod(IOptMethod optMethod) {
+        return null;
+    }
+
+    @Override
+    public void deleteOptMethod(String optCode) {
+
+    }
+
+    @Override
+    public List<ConfigAttribute> getRolesWithApiId(String apiId) {
+        return null;
     }
 
     /**
