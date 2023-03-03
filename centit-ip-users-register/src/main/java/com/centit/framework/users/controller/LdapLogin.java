@@ -39,7 +39,6 @@ import java.util.Properties;
 
 /**
  * LDAP登录Controller
-
 {
      searchBase : "(&(objectCategory=person)(objectClass=user)(sAMAccountName={0}))",
      searchName : "CN=Users,DC=centit,DC=com",
@@ -75,8 +74,6 @@ public class LdapLogin extends BaseController {
     public String getOptId() {
         return "LDAPLOGIN";
     }
-
-
 
     @ApiOperation(value = "ldap登录", notes = "ldap登录")
     @PostMapping(value = "/login")
@@ -117,7 +114,6 @@ public class LdapLogin extends BaseController {
         }
         return ResponseData.makeErrorMessage("用户名或密码错误");
     }
-
 
     public static boolean checkUserPasswordByDn(UserSyncDirectory directory, String loginName, String password) {
 
