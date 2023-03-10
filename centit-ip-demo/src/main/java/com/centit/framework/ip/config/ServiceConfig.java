@@ -17,7 +17,7 @@ import com.centit.msgpusher.plugins.EMailMsgPusher;
 import com.centit.msgpusher.plugins.SystemUserEmailSupport;
 import com.centit.search.service.ESServerConfig;
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.security.SecurityOptUtils;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class ServiceConfig {
         messageManager.setEmailServerHost("mail.centit.com");
         messageManager.setEmailServerPort(25);
         messageManager.setEmailServerUser("alertmail2@centit.com");
-        messageManager.setEmailServerPwd(AESSecurityUtils.decryptBase64String("LZhLhIlJ6gtIlUZ6/NassA==", ""));
+        messageManager.setEmailServerPwd(SecurityOptUtils.decodeSecurityString("cipher:o6YOHiUOg8jBZFkQtGW/9Q=="));
 
         messageManager.setUserEmailSupport(new SystemUserEmailSupport());
 
