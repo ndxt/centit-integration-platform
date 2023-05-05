@@ -1,4 +1,4 @@
-package com.centit.framework.users.utils;
+package com.centit.framework.users.dingtalk;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;

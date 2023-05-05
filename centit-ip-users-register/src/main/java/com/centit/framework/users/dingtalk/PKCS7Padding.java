@@ -1,4 +1,4 @@
-package com.centit.framework.users.utils.aes;
+package com.centit.framework.users.dingtalk;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
