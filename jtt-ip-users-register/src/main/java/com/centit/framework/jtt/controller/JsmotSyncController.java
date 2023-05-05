@@ -230,7 +230,7 @@ public class JsmotSyncController extends BaseController {
                 }
             }
             redisTemplate.delete(key);
-            return ResponseData.makeSuccessResponse();
+            return ResponseData.makeResponseData(code);
         } catch (Exception e) {
             logger.error("验证码校验和用户信息更新异常:{}", e.getMessage());
             return ResponseData.errorResponse;

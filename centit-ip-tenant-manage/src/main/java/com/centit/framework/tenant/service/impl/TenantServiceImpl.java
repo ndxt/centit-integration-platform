@@ -710,6 +710,7 @@ public class TenantServiceImpl implements TenantService {
         if (StringUtils.isBlank(unitCode)) {
             return ResponseData.makeErrorMessage("unitCode不能为空");
         }
+        paramMap.remove("unitCode");
         List<UserInfo> userInfos = userInfoDao.listObjectsByProperties(paramMap);
         if (CollectionUtils.sizeIsEmpty(userInfos)) {
             return ResponseData.makeResponseData(CollectionUtils.emptyCollection());
