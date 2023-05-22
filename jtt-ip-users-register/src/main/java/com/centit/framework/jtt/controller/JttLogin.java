@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 第三方登录Controller
@@ -336,7 +336,7 @@ public class JttLogin extends BaseController {
             sessionMap.put("userInfo", ud);
             return ResponseData.makeResponseData(sessionMap);
         } else {
-            redisTemplate.boundValueOps(phone).expire(Duration.ofSeconds(300L));
+            redisTemplate.boundValueOps(phone).expire(60L * 5, TimeUnit.SECONDS);
             return ResponseData.makeErrorMessage("未查询到" + phone + "对应手机号用户");
         }
     }
