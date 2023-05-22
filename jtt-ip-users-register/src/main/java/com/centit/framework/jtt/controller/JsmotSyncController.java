@@ -137,12 +137,13 @@ public class JsmotSyncController extends BaseController {
     @PostMapping(value = "/getphonecode")
     @ResponseBody
     public Map<String, Object> getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
-                                            @RequestParam("phone") String phone, HttpServletRequest request,
-                                            HttpServletResponse response) {
+                                            @RequestParam("phone") String phone,
+                                            @RequestParam("type") String type,
+                                            HttpServletRequest request, HttpServletResponse response) {
         JSONObject jsonObject = redisTemplate.boundValueOps(phone).get();
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> bodyMap = new HashMap<>();
-        if(jsonObject != null){
+        if (jsonObject != null) {
             Long createTime = jsonObject.getLong("createTime");
             if ((System.currentTimeMillis() - createTime) < 1000 * 60) {
                 //验证发送时间，防止多次发送验证码
@@ -150,12 +151,12 @@ public class JsmotSyncController extends BaseController {
                 bodyMap.put("Code", 500);
                 map.put("body", bodyMap);
                 return bodyMap;
-            }else{
+            } else {
                 //重新发送则删除之前存入redis中的数据
                 redisTemplate.delete(phone);
             }
         }
-        if (StringUtils.isNotBlank(phone)) {
+        if (!"login".equals(type) && StringUtils.isNotBlank(phone)) {
             UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
             if (userInfo != null) {
                 bodyMap.put("Message", "此手机号已被使用");
@@ -196,10 +197,10 @@ public class JsmotSyncController extends BaseController {
             }
             //从Redis中获取验证码和部分信息
             JSONObject json = redisTemplate.boundValueOps(key).get();
-            if (json == null) {
+            if (null == json) {
                 json = JSON.parseObject(request.getHeader("verifyCode"));
             }
-            if (json == null) {
+            if (null == json) {
                 return ResponseData.makeErrorMessage(500, "未发送验证码！");
             }
             String verifyCode = json.getString("verifyCode");
@@ -210,6 +211,7 @@ public class JsmotSyncController extends BaseController {
                 return ResponseData.makeErrorMessage(500, "验证码错误！");
             }
             if ((System.currentTimeMillis() - createTime) > 1000 * 60 * 5) {
+                redisTemplate.delete(phone);
                 return ResponseData.makeErrorMessage(500, "验证码已过期！");
             }
             if (StringUtils.isNotBlank(userCode)) {
@@ -260,7 +262,7 @@ public class JsmotSyncController extends BaseController {
         smsDTO.setContent(conten);
         smsDTO.setMobile(phone);
         ResponseData result = jsmotSyncService.sendSms(accessToken, smsDTO);
-        if(result.getCode() == 0){
+        if (result.getCode() == 0) {
             redisTemplate.boundValueOps(phone).set(json);
         }
         return result;

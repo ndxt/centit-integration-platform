@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,15 +61,19 @@ public class JttLogin extends BaseController {
 
     @Autowired
     private JsmotSyncConfig jsmotSyncConfig;
+
+    @Autowired(required = false)
+    private RedisTemplate<String, JSONObject> redisTemplate;
+
     @ApiOperation(value = "水务集团单点登陆", notes = "水务集团单点登陆")
     @GetMapping(value = "/waterlogin")
     public String waterLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         CentitUserDetails userDetails = WebOptUtils.getCurrentUserDetails(request);
         String returnUrl = request.getParameter("returnUrl");
-        if (userDetails==null) {
+        if (null == userDetails) {
             String loginName = request.getHeader("oam_remote_user");
-            if(loginName==null){
-                loginName=request.getParameter("testUserCode");
+            if (null == loginName) {
+                loginName = request.getParameter("testUserCode");
             }
             String errorMsg = "";
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
@@ -89,9 +95,10 @@ public class JttLogin extends BaseController {
         if (StringUtils.isNotBlank(returnUrl) && returnUrl.indexOf("/A/") > -1) {
             returnUrl = returnUrl.replace("/A/", "/#/");
         }
-        response.setHeader("x-auth-token",request.getSession().getId());
-        return "redirect:" +returnUrl;
+        response.setHeader("x-auth-token", request.getSession().getId());
+        return "redirect:" + returnUrl;
     }
+
     @ApiOperation(value = "统一门户单点登陆", notes = "统一门户单点登陆")
     @GetMapping(value = "/unitelogin")
     public String uniteLogin(HttpServletRequest request) {
@@ -288,6 +295,50 @@ public class JttLogin extends BaseController {
             resMap.put("msg", "登入账号和密码信息为空！");
         }
         return resMap;
+    }
+
+    @ApiOperation(value = "短信登陆", notes = "短信登陆")
+    @PostMapping(value = "/smslogin")
+    @WrapUpResponseBody
+    public ResponseData smslogin(@RequestParam("phone") String phone,
+                                 @RequestParam("code") String code,
+                                 HttpServletRequest request) throws Exception {
+        if (StringUtils.isBlank(phone)) {
+            return ResponseData.makeErrorMessage(500, "请输入手机号！");
+        }
+        if (StringUtils.isBlank(code)) {
+            return ResponseData.makeErrorMessage(500, "请输入验证码！");
+        }
+        //从Redis中获取验证码和部分信息
+        JSONObject json = redisTemplate.boundValueOps(phone).get();
+        if (null == json) {
+            json = JSON.parseObject(request.getHeader("verifyCode"));
+        }
+        if (null == json) {
+            return ResponseData.makeErrorMessage(500, "未发送验证码！");
+        }
+        String verifyCode = json.getString("verifyCode");
+        Long createTime = json.getLong("createTime");
+        if (!verifyCode.equals(code)) {
+            return ResponseData.makeErrorMessage(500, "验证码错误！");
+        }
+        if ((System.currentTimeMillis() - createTime) > 1000 * 60 * 5) {
+            redisTemplate.delete(phone);
+            return ResponseData.makeErrorMessage(500, "验证码已过期！");
+        }
+        CentitUserDetails ud = platformEnvironment.loadUserDetailsByRegCellPhone(phone);
+        if (null != ud) {
+            redisTemplate.delete(phone);
+            ud.setLoginIp(WebOptUtils.getRequestAddr(request));
+            SecurityContextHolder.getContext().setAuthentication(ud);
+            Map<String, Object> sessionMap = new HashMap<>();
+            sessionMap.put("accessToken", request.getSession().getId());
+            sessionMap.put("userInfo", ud);
+            return ResponseData.makeResponseData(sessionMap);
+        } else {
+            redisTemplate.boundValueOps(phone).expire(Duration.ofSeconds(300L));
+            return ResponseData.makeErrorMessage("未查询到" + phone + "对应手机号用户");
+        }
     }
 
     private static String sm4dDecrypt(String encryptData, String key) {
