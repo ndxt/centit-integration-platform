@@ -14,6 +14,8 @@ import com.centit.framework.tenant.vo.TenantMemberApplyVo;
 import com.centit.framework.tenant.vo.TenantMemberQo;
 import com.centit.support.database.utils.PageDesc;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 public interface TenantService {
@@ -187,6 +189,8 @@ public interface TenantService {
      */
     ResponseData findUsers(Map<String,Object> paramMap);
 
+
+    List<UserInfo> searchUsers(Map<String,Object> paramMap);
 
     /**
      *取消加入租户申请

@@ -632,9 +632,18 @@ public class TenanController extends BaseController {
     @WrapUpResponseBody
     public ResponseData findUsers(HttpServletRequest request) {
         Map<String, Object> paramMap = collectRequestParameters(request);
-
         return tenantService.findUsers(paramMap);
+    }
 
+    @ApiOperation(
+        value = "查询用户信息",
+        notes = "查询租户信息，只能根据userCode，userName，regCellPhone精确查找"
+    )
+    @RequestMapping(value = "/searchUsers", method = RequestMethod.GET)
+    @WrapUpResponseBody
+    public List<UserInfo> searchUsers(HttpServletRequest request) {
+        Map<String, Object> paramMap = collectRequestParameters(request);
+        return tenantService.searchUsers(paramMap);
     }
 
 

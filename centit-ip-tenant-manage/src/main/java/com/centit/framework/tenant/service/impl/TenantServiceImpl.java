@@ -698,6 +698,18 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    public List<UserInfo> searchUsers(Map<String,Object> paramMap){
+        String userName = MapUtils.getString(paramMap, "userName");
+        String regCellPhone = MapUtils.getString(paramMap, "regCellPhone");
+        String userCode = MapUtils.getString(paramMap, "userCode");
+        if (StringUtils.isAllBlank(userName, regCellPhone, userCode)) {
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "用户ID，用户名，电话至少输入一个参数");
+        }
+        paramMap.remove("unitCode");
+        return userInfoDao.listObjectsByProperties(paramMap);
+    }
+
+    @Override
     public ResponseData findUsers(Map<String, Object> paramMap) {
 
         String unitCode = MapUtils.getString(paramMap, "unitCode");
@@ -711,6 +723,7 @@ public class TenantServiceImpl implements TenantService {
             return ResponseData.makeErrorMessage("unitCode不能为空");
         }
         paramMap.remove("unitCode");
+
         List<UserInfo> userInfos = userInfoDao.listObjectsByProperties(paramMap);
         if (CollectionUtils.sizeIsEmpty(userInfos)) {
             return ResponseData.makeResponseData(CollectionUtils.emptyCollection());
