@@ -702,7 +702,8 @@ public class TenantServiceImpl implements TenantService {
         String userName = MapUtils.getString(paramMap, "userName");
         String regCellPhone = MapUtils.getString(paramMap, "regCellPhone");
         String userCode = MapUtils.getString(paramMap, "userCode");
-        if (StringUtils.isAllBlank(userName, regCellPhone, userCode)) {
+        String email = MapUtils.getString(paramMap, "regEmail");
+        if (StringUtils.isAllBlank(userName, regCellPhone, userCode, email)) {
             throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "用户ID，用户名，电话至少输入一个参数");
         }
         paramMap.remove("unitCode");
@@ -716,7 +717,8 @@ public class TenantServiceImpl implements TenantService {
         String userName = MapUtils.getString(paramMap, "userName");
         String regCellPhone = MapUtils.getString(paramMap, "regCellPhone");
         String userCode = MapUtils.getString(paramMap, "userCode");
-        if (StringUtils.isAllBlank(userName, regCellPhone, userCode)) {
+        String email = MapUtils.getString(paramMap, "regEmail");
+        if (StringUtils.isAllBlank(userName, regCellPhone, userCode, email)) {
             return ResponseData.makeResponseData("");
         }
         if (StringUtils.isBlank(unitCode)) {
