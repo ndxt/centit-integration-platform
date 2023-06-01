@@ -50,9 +50,6 @@ public class PlatformDataController extends BaseController {
     @Autowired
     private UserSettingManager userSettingManager;
 
-    /*@Autowired
-    private SysRoleManager sysRoleManager;*/
-
     @Autowired
     protected PlatformEnvironment platformEnvironment;
 
