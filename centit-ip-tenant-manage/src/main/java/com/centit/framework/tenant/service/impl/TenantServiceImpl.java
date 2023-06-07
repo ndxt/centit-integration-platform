@@ -701,10 +701,10 @@ public class TenantServiceImpl implements TenantService {
     public List<UserInfo> searchUsers(Map<String,Object> paramMap){
         String userName = MapUtils.getString(paramMap, "userName");
         String regCellPhone = MapUtils.getString(paramMap, "regCellPhone");
-        String userCode = MapUtils.getString(paramMap, "userCode");
+        String loginName = MapUtils.getString(paramMap, "loginName");
         String email = MapUtils.getString(paramMap, "regEmail");
-        if (StringUtils.isAllBlank(userName, regCellPhone, userCode, email)) {
-            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "用户ID，用户名，电话至少输入一个参数");
+        if (StringUtils.isAllBlank(userName, regCellPhone, loginName, email)) {
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "用户名、登录名、电话和EMail至少输入一个参数。");
         }
         paramMap.remove("unitCode");
         return userInfoDao.listObjectsByProperties(paramMap);
@@ -718,7 +718,8 @@ public class TenantServiceImpl implements TenantService {
         String regCellPhone = MapUtils.getString(paramMap, "regCellPhone");
         String userCode = MapUtils.getString(paramMap, "userCode");
         String email = MapUtils.getString(paramMap, "regEmail");
-        if (StringUtils.isAllBlank(userName, regCellPhone, userCode, email)) {
+        String loginName = MapUtils.getString(paramMap, "loginName");
+        if (StringUtils.isAllBlank(userName, regCellPhone, userCode, email, loginName)) {
             return ResponseData.makeResponseData("");
         }
         if (StringUtils.isBlank(unitCode)) {
