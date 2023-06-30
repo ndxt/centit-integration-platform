@@ -22,4 +22,7 @@ public class UniteConfig {
 
     @Value("${uniteAppSecret:}")
     private String uniteAppSecret;
+
+    @Value("${useSSL:}")
+    private String useSSL;
 }

@@ -15,12 +15,15 @@ import com.centit.framework.security.model.CentitPasswordEncoder;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.system.po.UserInfo;
 import com.centit.framework.system.service.SysUserManager;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.newland.bi3.security.SM4Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -119,13 +122,22 @@ public class JttLogin extends BaseController {
 
             if (StringUtils.isBlank(accessToken) && StringUtils.isNotBlank(token)) {
                 //验证token是否有效
-                String tokenResult = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckUrl(), params.toJSONString());
+                Boolean useSSL = BooleanBaseOpt.castObjectToBoolean(uniteConfig.getUseSSL(), false);
+                HttpClientContext context = HttpClientContext.create();
+                CloseableHttpClient httpClient = null;
+                if (useSSL) {
+                    httpClient = HttpExecutor.createKeepSessionHttpsClient();
+                } else {
+                    httpClient = HttpExecutor.createKeepSessionHttpClient();
+                }
+                HttpExecutorContext executorContext = HttpExecutorContext.create(httpClient).context(context);
+                String tokenResult = HttpExecutor.jsonPost(executorContext, uniteConfig.getLoginCheckUrl(), params.toJSONString());
                 logger.info("调用验证token:{},接口返回信息：{}", params, tokenResult);
                 if (StringUtils.isNotEmpty(tokenResult)) {
                     JSONObject tokenJson = JSON.parseObject(tokenResult);
                     if (null != tokenJson && 200 == tokenJson.getInteger("status")) {
                         //获取扩展信息
-                        String loginCheckExtend = HttpExecutor.jsonPost(HttpExecutorContext.create(), uniteConfig.getLoginCheckExtendUrl(), params.toJSONString());
+                        String loginCheckExtend = HttpExecutor.jsonPost(executorContext, uniteConfig.getLoginCheckExtendUrl(), params.toJSONString());
                         logger.info("调用扩展验证:{},接口返回信息：{}", params, loginCheckExtend);
                         JSONObject loginExtendJson = JSON.parseObject(loginCheckExtend);
                         if (null != loginExtendJson) {
