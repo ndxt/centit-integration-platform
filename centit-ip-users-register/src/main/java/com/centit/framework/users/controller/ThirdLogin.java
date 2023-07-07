@@ -439,9 +439,9 @@ public class ThirdLogin extends BaseController {
         if (StringUtils.isNotBlank(userCode)) {
             ud = platformEnvironment.loadUserDetailsByUserCode(userCode);
         } else if (StringUtils.isNotBlank(loginName)) {
-            ud = platformEnvironment.loadUserDetailsByLoginName(userCode);
+            ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
         } if (StringUtils.isNotBlank(regCellPhone)) {
-            ud = platformEnvironment.loadUserDetailsByRegCellPhone(userCode);
+            ud = platformEnvironment.loadUserDetailsByRegCellPhone(regCellPhone);
         }
         if (null == ud) {
             return ResponseData.makeErrorMessage("用户信息为空!");
