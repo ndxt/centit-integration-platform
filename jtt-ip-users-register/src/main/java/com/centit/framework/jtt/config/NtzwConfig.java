@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class NtzwConfig {
 
-    @Value("${appId:}")
-    private String appId;
+    @Value("${ntAppId:}")
+    private String ntAppId;
 
     @Value("${ticketUrl:https://nts.jszwfw.gov.cn:9087/ntzwdt/rest/dhloginauth/ticketValidate}")
     private String ticketUrl;

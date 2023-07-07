@@ -56,7 +56,7 @@ public class NtzwLogin extends BaseController {
         try {
             logger.info("ticket值：{}", ticket);
             JSONObject params = new JSONObject();
-            params.put("appid", ntzwConfig.getAppId());
+            params.put("appid", ntzwConfig.getNtAppId());
             params.put("ticket", ticket);
             // params.put("token", URLEncoder.encode(ticket, "utf-8"));
             if (StringUtils.isBlank(accessToken) && StringUtils.isNotBlank(ticket)) {
