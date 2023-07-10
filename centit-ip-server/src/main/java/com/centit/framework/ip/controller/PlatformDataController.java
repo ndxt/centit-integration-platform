@@ -34,10 +34,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author codefan
@@ -263,29 +261,6 @@ public class PlatformDataController extends BaseController {
         return CodeRepositoryUtil.listAllUsers(topUnit);
     }
 
-    @ApiOperation(value = "获取当前租户下的所有的用户", notes = "获取当前租户下所有的用户。")
-    @RequestMapping(value = "/currentusers", method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public List<UserInfo> listCurrentUsers(HttpServletRequest request) {
-        String userCode = WebOptUtils.getCurrentUserCode(request);
-        if (StringUtils.isBlank(userCode)) {
-            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录!");
-        }
-        String topUnit=WebOptUtils.getCurrentTopUnit(request);
-        List<? extends IUserUnit> userUnits=CodeRepositoryUtil.listAllUserUnits(topUnit);
-        List<UserInfo> result = new ArrayList<>();
-        for(IUserUnit un:userUnits){
-            if(Objects.equals(un.getRelType(),"T")){
-                UserInfo userInfo= (UserInfo) CodeRepositoryUtil.getUserInfoByCode(topUnit,un.getUserCode());
-                if(userInfo!=null) {
-                    userInfo.setPrimaryUnit(un.getUnitCode());
-                    result.add(userInfo);
-                }
-            }
-        }
-        return result;
-    }
-
     /**
      * 获取租户下所有的机构
      *
@@ -300,13 +275,6 @@ public class PlatformDataController extends BaseController {
     @WrapUpResponseBody
     public List<? extends IUnitInfo> listAllUnits(@PathVariable String topUnit) {
         return CodeRepositoryUtil.getAllUnits(topUnit,"T");
-    }
-
-    @ApiOperation(value = "获取当前租户下所有的机构", notes = "获取当前租户下所有的机构。")
-    @RequestMapping(value = "/currentunits", method = RequestMethod.GET)
-    @WrapUpResponseBody
-    public List<? extends IUnitInfo> listCurrentUnits(HttpServletRequest request) {
-        return platformEnvironment.listAllUnits(WebOptUtils.getCurrentTopUnit(request));
     }
 
     /**
