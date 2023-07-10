@@ -7,6 +7,7 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
@@ -15,6 +16,7 @@ import com.centit.framework.users.dto.DingUserDTO;
 import com.centit.framework.users.po.Platform;
 import com.centit.framework.users.po.UserPlat;
 import com.centit.framework.users.service.*;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -419,4 +421,33 @@ public class ThirdLogin extends BaseController {
         return ResponseData.makeResponseData(nickName);
     }
 
+    /**
+     * 第三方用户单点登录
+     *
+     * @param request request
+     * @return ResponseData
+     */
+    @ApiOperation(value = "第三方用户单点登录", notes = "第三方用户单点登录")
+    @PostMapping(value = "/loginasclient")
+    @WrapUpResponseBody
+    public ResponseData loginAsClient(HttpServletRequest request) {
+        Map<String, Object> formValue = BaseController.collectRequestParameters(request);
+        String userCode = StringBaseOpt.objectToString(formValue.get("userCode"));
+        String loginName = StringBaseOpt.objectToString(formValue.get("loginName"));
+        String regCellPhone = StringBaseOpt.objectToString(formValue.get("regCellPhone"));
+        CentitUserDetails ud = null;
+        if (StringUtils.isNotBlank(userCode)) {
+            ud = platformEnvironment.loadUserDetailsByUserCode(userCode);
+        } else if (StringUtils.isNotBlank(loginName)) {
+            ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
+        } if (StringUtils.isNotBlank(regCellPhone)) {
+            ud = platformEnvironment.loadUserDetailsByRegCellPhone(regCellPhone);
+        }
+        if (null == ud) {
+            return ResponseData.makeErrorMessage("用户信息为空!");
+        }
+        SecurityContextHolder.getContext().setAuthentication(ud);
+        return ResponseData.makeResponseData(
+            SecurityContextUtils.SecurityContextTokenName, request.getSession().getId());
+    }
 }
