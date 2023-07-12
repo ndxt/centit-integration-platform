@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class NtzwConfig {
 
-    @Value("${ntAppId:}")
+    @Value("${ntAppId:effcb17b-ba24-4362-b599-a341a3019783}")
     private String ntAppId;
 
     @Value("${ticketUrl:https://nts.jszwfw.gov.cn:9087/ntzwdt/rest/dhloginauth/ticketValidate}")
@@ -25,6 +25,9 @@ public class NtzwConfig {
     @Value("${findCorpUrl:https://nts.jszwfw.gov.cn:9087/ntzwdt/rest/dhloginauth/findCorporationByToken}")
     private String findCorpUrl;
 
-    @Value("${ntSSL:}")
+    @Value("${ntSSL:true}")
     private String ntSSL;
+
+    @Value("${ntReturnUrl:https://cloud.centit.com/locode/page/A/apps/X9qvYWgSTR-O4nQSwxxW2g/pages/3vM_wWigQQmVbmm54JsgGw}")
+    private String ntReturnUrl;
 }

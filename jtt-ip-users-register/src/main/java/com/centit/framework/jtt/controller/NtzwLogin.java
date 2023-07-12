@@ -49,6 +49,9 @@ public class NtzwLogin extends BaseController {
         logger.info("南通政务单点登陆,参数：{}", filterMap);
         String ticket = request.getParameter("ticket");
         String returnUrl = request.getParameter("returnUrl");
+        if (StringUtils.isBlank(returnUrl)) {
+            returnUrl = ntzwConfig.getNtReturnUrl();
+        }
         logger.info("returnUrl值:{}", returnUrl);
         //ticket = ticket.replace(" ", "+");
         String errorMsg = "";
@@ -74,18 +77,22 @@ public class NtzwLogin extends BaseController {
                 logger.info("调用验证ticket:{},接口返回信息：{}", params, ticketResult);
                 if (StringUtils.isNotEmpty(ticketResult)) {
                     JSONObject ticketJson = JSON.parseObject(ticketResult);
-                    if (null != ticketJson && null != ticketJson.getJSONObject("tocken")) {
+                    if (null != ticketJson) {
                         //获取token信息
-                        JSONObject tockenObject = ticketJson.getJSONObject("tocken");
+                        String tocken = ticketJson.getString("tocken");
                         params.remove("ticket");
-                        params.put("token",tockenObject.getString("token"));
+                        params.put("token",tocken);
                         String loginUser = HttpExecutor.jsonPost(executorContext, ntzwConfig.getFindUserUrl(), params.toJSONString());
                         logger.info("调用获取用户:{},接口返回信息：{}", params, loginUser);
                         JSONObject loginUserJson = JSON.parseObject(loginUser);
                         if (null != loginUserJson && StringUtils.isBlank(loginUserJson.getString("errormsg"))) {
                             String loginName = loginUserJson.getString("loginname");
-                            logger.info("loginName:{}", loginName);
+                            String mobile = loginUserJson.getString("mobile");
+                            logger.info("loginName:{},mobile:{}", loginName, mobile);
                             CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(loginName);
+                            if (null == ud) {
+                                ud = platformEnvironment.loadUserDetailsByRegCellPhone(mobile);
+                            }
                             if (null != ud) {
                                 SecurityContextHolder.getContext().setAuthentication(ud);
                                 accessToken = request.getSession().getId();
