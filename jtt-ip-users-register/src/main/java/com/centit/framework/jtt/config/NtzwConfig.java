@@ -28,6 +28,6 @@ public class NtzwConfig {
     @Value("${ntSSL:true}")
     private String ntSSL;
 
-    @Value("${ntReturnUrl:https://cloud.centit.com/locode/page/A    /apps/X9qvYWgSTR-O4nQSwxxW2g}")
+    @Value("${ntReturnUrl:https://cloud.centit.com/locode/page/A/apps/X9qvYWgSTR-O4nQSwxxW2g}")
     private String ntReturnUrl;
 }
