@@ -2,6 +2,7 @@ package com.centit.framework.jtt.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.jtt.config.NtzwConfig;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,7 +46,8 @@ public class NtzwLogin extends BaseController {
 
     @ApiOperation(value = "南通政务单点登陆", notes = "南通政务单点登陆")
     @GetMapping(value = "/login")
-    public String login(HttpServletRequest request) {
+    public ResponseData login(HttpServletRequest request) {
+        Map<String,Object> result = new HashMap<>();
         Map<String, Object> filterMap = collectRequestParameters(request);
         logger.info("南通政务单点登陆,参数：{}", filterMap);
         String ticket = request.getParameter("ticket");
@@ -99,7 +102,11 @@ public class NtzwLogin extends BaseController {
                                 accessToken = request.getSession().getId();
                                 logger.info("用户名：{}登录成功", loginName);
                             } else {
-                                errorMsg = "登录名" + loginName + "不存在！";
+                                String corpJsonStr = HttpExecutor.jsonPost(executorContext, ntzwConfig.getFindCorpUrl(), params.toJSONString());
+                                JSONObject corpJson = JSON.parseObject(corpJsonStr);
+                                result.put("userInfo",loginUserJson);
+                                result.put("unitInfo",corpJson);
+                                return ResponseData.makeResponseData(result);
                             }
                         } else {
                             if (null != loginUserJson) {
@@ -132,8 +139,8 @@ public class NtzwLogin extends BaseController {
             } catch (UnsupportedEncodingException e) {
                 logger.error("URLEncoder异常", e);
             }
-            return errorUrl;
-        } else {
+            result.put("url",errorUrl);
+        } else{
             if (StringUtils.isNotBlank(returnUrl) && returnUrl.contains("?")) {
                 returnUrl = returnUrl + "&accessToken=" + accessToken;
             } else {
@@ -143,8 +150,9 @@ public class NtzwLogin extends BaseController {
             if (StringUtils.isNotBlank(returnUrl) && returnUrl.indexOf("/A/") > -1) {
                 returnUrl = returnUrl.replace("/A/", "/#/");
             }
+            result.put("url",returnUrl);
         }
-        return "redirect:" + returnUrl;
+        return ResponseData.makeResponseData(result);
     }
 
     /**
