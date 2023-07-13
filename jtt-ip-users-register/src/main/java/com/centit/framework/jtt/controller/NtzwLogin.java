@@ -133,24 +133,15 @@ public class NtzwLogin extends BaseController {
             errorMsg = "南通政务单点登录异常:" + e.getMessage();
         }
         if (StringUtils.isNotBlank(errorMsg)) {
-            String errorUrl = "redirect:redirecterror";
-            try {
-                errorUrl = errorUrl + "?msg=" + URLEncoder.encode(errorMsg, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                logger.error("URLEncoder异常", e);
-            }
-            result.put("url",errorUrl);
+//            String errorUrl = "redirect:redirecterror";
+//            try {
+//                errorUrl = errorUrl + "?msg=" + URLEncoder.encode(errorMsg, "UTF-8");
+//            } catch (UnsupportedEncodingException e) {
+//                logger.error("URLEncoder异常", e);
+//            }
+            result.put("errorMsg",errorMsg);
         } else{
-            if (StringUtils.isNotBlank(returnUrl) && returnUrl.contains("?")) {
-                returnUrl = returnUrl + "&accessToken=" + accessToken;
-            } else {
-                returnUrl = returnUrl + "?accessToken=" + accessToken;
-            }
-            //占位符 替换成/#/(特殊字符)
-            if (StringUtils.isNotBlank(returnUrl) && returnUrl.indexOf("/A/") > -1) {
-                returnUrl = returnUrl.replace("/A/", "/#/");
-            }
-            result.put("url",returnUrl);
+            result.put("accessToken",accessToken);
         }
         return ResponseData.makeResponseData(result);
     }
