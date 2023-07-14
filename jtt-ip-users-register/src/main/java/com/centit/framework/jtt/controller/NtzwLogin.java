@@ -84,9 +84,9 @@ public class NtzwLogin extends BaseController {
                     JSONObject ticketJson = JSON.parseObject(ticketResult);
                     if (null != ticketJson) {
                         //获取token信息
-                        String tocken = ticketJson.getString("tocken");
+                        String token = ticketJson.getString("token");
                         params.remove("ticket");
-                        params.put("token",tocken);
+                        params.put("token",token);
                         String loginUser = HttpExecutor.jsonPost(executorContext, ntzwConfig.getFindUserUrl(), params.toJSONString());
                         logger.info("调用获取用户:{},接口返回信息：{}", params, loginUser);
                         //返回用户转json 对象
