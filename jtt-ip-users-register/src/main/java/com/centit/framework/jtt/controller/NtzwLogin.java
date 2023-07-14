@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -46,7 +47,8 @@ public class NtzwLogin extends BaseController {
 
     @ApiOperation(value = "南通政务单点登陆", notes = "南通政务单点登陆")
     @GetMapping(value = "/login")
-    public ResponseData login(HttpServletRequest request) {
+    @ResponseBody
+    public Map<String, Object> login(HttpServletRequest request) {
         Map<String,Object> result = new HashMap<>();
         Map<String, Object> filterMap = collectRequestParameters(request);
         logger.info("南通政务单点登陆,参数：{}", filterMap);
@@ -104,9 +106,12 @@ public class NtzwLogin extends BaseController {
                             } else {
                                 String corpJsonStr = HttpExecutor.jsonPost(executorContext, ntzwConfig.getFindCorpUrl(), params.toJSONString());
                                 JSONObject corpJson = JSON.parseObject(corpJsonStr);
-                                result.put("userInfo",loginUserJson);
-                                result.put("unitInfo",corpJson);
-                                return ResponseData.makeResponseData(result);
+                                Map<String,Object> data = new HashMap<>();
+                                data.put("userInfo",loginUserJson);
+                                data.put("unitInfo",corpJson);
+                                result.put("status", 300);
+                                result.put("data",data);
+                                return result;
                             }
                         } else {
                             if (null != loginUserJson) {
@@ -139,11 +144,16 @@ public class NtzwLogin extends BaseController {
 //            } catch (UnsupportedEncodingException e) {
 //                logger.error("URLEncoder异常", e);
 //            }
-            result.put("errorMsg",errorMsg);
+            result.put("status", 500);
+            result.put("msg",errorMsg);
         } else{
-            result.put("accessToken",accessToken);
+            result.put("status", 200);
+            result.put("msg", "登陆成功");
+            Map<String,Object> data = new HashMap<>();
+            data.put("accessToken",accessToken);
+            result.put("data",data);
         }
-        return ResponseData.makeResponseData(result);
+        return result;
     }
 
     /**
