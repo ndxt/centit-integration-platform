@@ -55,7 +55,7 @@ import java.util.Map;
     tags = {"租户管理接口"},
     value = "租户管理接口"
 )
-public class TenanController extends BaseController {
+public class TenantController extends BaseController {
 
     @Autowired
     private TenantService tenantService;
@@ -733,7 +733,7 @@ public class TenanController extends BaseController {
             return ResponseData.makeErrorMessage("topUnit不能为空!");
         }
         userUnit.setCreator(userCode);
-        return tenantService.addTenantUser(userInfo,userUnit);
+        return tenantService.addTenantUser(userInfo, userUnit);
 
     }
 }
