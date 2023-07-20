@@ -3,6 +3,7 @@ package com.centit.framework.jtt.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.jtt.config.NtzwConfig;
@@ -154,6 +155,19 @@ public class NtzwLogin extends BaseController {
             result.put("data",data);
         }
         return result;
+    }
+
+    /**
+     * 用户注册之后更新缓存
+     */
+    @GetMapping("/updateCache")
+    @WrapUpResponseBody
+    public ResponseData updateCache(HttpServletRequest request) {
+        Map<String, Object> filterMap = collectRequestParameters(request);
+        logger.info("用户注册之后更新缓存,参数：{}", filterMap);
+        String cacheName = request.getParameter("cacheName");
+        CodeRepositoryCache.evictCache(cacheName);
+        return ResponseData.makeResponseData("更新成功");
     }
 
     /**
