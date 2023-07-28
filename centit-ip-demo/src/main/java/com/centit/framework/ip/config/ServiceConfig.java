@@ -5,7 +5,6 @@ import com.alibaba.nacos.spring.context.annotation.config.EnableNacosConfig;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySource;
 import com.alibaba.nacos.spring.context.annotation.config.NacosPropertySources;
 import com.centit.framework.components.impl.NotificationCenterImpl;
-import com.centit.framework.config.InitialWebRuntimeEnvironment;
 import com.centit.framework.config.SpringSecurityCasConfig;
 import com.centit.framework.config.SpringSecurityDaoConfig;
 import com.centit.framework.jdbc.config.JdbcConfig;
@@ -21,7 +20,10 @@ import com.centit.support.security.SecurityOptUtils;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
 /**
@@ -39,13 +41,6 @@ import org.springframework.core.env.Environment;
 )
 public class ServiceConfig {
 
-    @Bean
-    @Lazy(value = false)
-    public InitialWebRuntimeEnvironment initialEnvironment() {
-        InitialWebRuntimeEnvironment initialWebRuntimeEnvironment = new InitialWebRuntimeEnvironment();
-        initialWebRuntimeEnvironment.initialEnvironment();
-        return initialWebRuntimeEnvironment;
-    }
     /**
      * 这个bean必须要有
      * @return CentitPasswordEncoder 密码加密算法
