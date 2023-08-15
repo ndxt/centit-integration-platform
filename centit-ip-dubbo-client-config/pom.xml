@@ -17,11 +17,13 @@
             <artifactId>framework-dubbo-client-config</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>centit-ip-app-base-config</artifactId>
+            <artifactId>framework-system-entity</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>framework-adapter</artifactId>
