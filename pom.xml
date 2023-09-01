@@ -6,22 +6,18 @@
     <parent>
         <artifactId>framework-snapshot-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.framework</groupId>
     <artifactId>centit-integration-platform</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
     <modules>
-        <module>centit-ip-app</module>
-        <module>centit-ip-app-config</module>
-        <module>centit-ip-app-boot-config</module>
         <module>centit-ip-server</module>
         <module>centit-ip-users-register</module>
         <module>centit-ip-tenant-manage</module>
         <module>centit-ip-dubbo-server-config</module>
         <module>centit-ip-dubbo-client-config</module>
-        <module>centit-ip-app-base-config</module>
         <module>integraton-platform-dubbo-adapter</module>
         <module>jtt-ip-users-register</module>
     </modules>

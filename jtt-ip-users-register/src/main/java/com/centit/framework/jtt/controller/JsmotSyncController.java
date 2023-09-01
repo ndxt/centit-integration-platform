@@ -13,10 +13,9 @@ import com.centit.framework.jtt.dto.SmsDTO;
 import com.centit.framework.jtt.service.JsmotSyncService;
 import com.centit.framework.jtt.service.JttAccessTokenService;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.security.model.JsonCentitUserDetails;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.system.dao.UserInfoDao;
-import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.model.basedata.UserInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -276,8 +275,8 @@ public class JsmotSyncController extends BaseController {
 
     private String getUserIp() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof JsonCentitUserDetails) {
-            JsonCentitUserDetails userDetails = (JsonCentitUserDetails) principal;
+        if (principal instanceof CentitUserDetails) {
+            CentitUserDetails userDetails = (CentitUserDetails) principal;
             return userDetails.getLoginIp();
         }
         return "";

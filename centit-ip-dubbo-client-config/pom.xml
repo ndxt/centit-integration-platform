@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-integration-platform</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,15 +20,10 @@
 
         <dependency>
             <groupId>com.centit.framework</groupId>
-            <artifactId>framework-system-entity</artifactId>
+            <artifactId>framework-core</artifactId>
             <version>${centit.framework.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.centit.framework</groupId>
-            <artifactId>framework-adapter</artifactId>
-            <version>${centit.framework.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>integraton-platform-dubbo-adapter</artifactId>

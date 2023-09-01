@@ -11,9 +11,9 @@ import com.centit.framework.jtt.config.JsmotSyncConfig;
 import com.centit.framework.jtt.config.UniteConfig;
 import com.centit.framework.jtt.service.JttAccessTokenService;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.security.model.CentitPasswordEncoder;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.model.security.CentitPasswordEncoder;
+import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.network.HttpExecutor;
@@ -288,7 +288,7 @@ public class JttLogin extends BaseController {
     @ApiOperation(value = "统一门户账号验证", notes = "统一门户账号验证")
     @ResponseBody
     @PostMapping(value = "/checkAppUserValid")
-    public Map<String, Object> checkAppUserValid(@RequestBody String userInfo, HttpServletRequest request) {
+    public Map<String, Object> checkAppUserValid(@RequestBody String userInfo) {
         logger.info("统一门户账号验证；{}", userInfo);
         Map<String, Object> resMap = new HashMap<>();
         JSONObject userInfoJson = JSON.parseObject(userInfo);

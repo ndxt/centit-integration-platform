@@ -1,8 +1,8 @@
 package com.centit.framework.dubbo.config;
 
-import com.centit.framework.dubbo.service.UserDetailsServiceImpl;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.security.model.CentitUserDetailsService;
+import com.centit.framework.model.security.CentitUserDetailsService;
+import com.centit.framework.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +18,7 @@ public class IpServerDubboClientConfig {
 
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
-        return //new LazyCsrfTokenRepository(
+        return //new LazyCsrfTokenRepository()
             new HttpSessionCsrfTokenRepository();
     }
 
@@ -28,7 +28,8 @@ public class IpServerDubboClientConfig {
     }
 
     @Bean
-    public CentitUserDetailsService centitUserDetailsService(@Autowired @Qualifier("platformEnvironment") PlatformEnvironment platformEnvironment) {
+    public CentitUserDetailsService centitUserDetailsService(
+        @Autowired @Qualifier("platformEnvironment") PlatformEnvironment platformEnvironment) {
         UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl();
         userDetailsService.setPlatformEnvironment(platformEnvironment);
         return userDetailsService;
