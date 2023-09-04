@@ -1,6 +1,6 @@
 package com.centit.framework.ip.service;
 
-import com.centit.framework.system.po.UserSyncDirectory;
+import com.centit.framework.model.basedata.UserSyncDirectory;
 
 public interface UserDirectory {
 

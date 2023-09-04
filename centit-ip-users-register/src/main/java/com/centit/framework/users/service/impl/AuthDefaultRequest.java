@@ -2,7 +2,7 @@ package com.centit.framework.users.service.impl;
 
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.common.ResponseSingleData;
-import com.centit.framework.system.po.UserInfo;
+import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.po.AccessToken;
 import com.centit.framework.users.po.AuthCallback;

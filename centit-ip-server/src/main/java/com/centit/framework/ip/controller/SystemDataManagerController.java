@@ -3,7 +3,7 @@ package com.centit.framework.ip.controller;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.ip.service.UserDirectory;
-import com.centit.framework.system.po.UserSyncDirectory;
+import com.centit.framework.model.basedata.UserSyncDirectory;
 import com.centit.framework.system.service.UserSyncDirectoryManager;
 import com.centit.framework.users.service.DingTalkLoginService;
 import io.swagger.annotations.Api;

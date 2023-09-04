@@ -3,9 +3,9 @@ package com.centit.framework.tenant.service;
 import com.alibaba.fastjson2.JSONArray;
 import com.centit.framework.common.ResponseData;
 import com.centit.framework.core.dao.PageQueryResult;
-import com.centit.framework.system.po.UnitInfo;
-import com.centit.framework.system.po.UserInfo;
-import com.centit.framework.system.po.UserUnit;
+import com.centit.framework.model.basedata.UnitInfo;
+import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.basedata.UserUnit;
 import com.centit.framework.tenant.po.TenantBusinessLog;
 import com.centit.framework.tenant.po.TenantInfo;
 import com.centit.framework.tenant.po.TenantMemberApply;
@@ -14,7 +14,6 @@ import com.centit.framework.tenant.vo.TenantMemberApplyVo;
 import com.centit.framework.tenant.vo.TenantMemberQo;
 import com.centit.support.database.utils.PageDesc;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -214,7 +213,7 @@ public interface TenantService {
     ResponseData updateTenant(TenantInfo tenantInfo);
 
     /**
-     * 创建单位 是对 com.centit.framework.system.service.SysUnitManager#saveNewUnitInfo(com.centit.framework.system.po.UnitInfo)
+     * 创建单位 是对 com.centit.framework.system.service.SysUnitManager#saveNewUnitInfo(com.centit.framework.model.basedata.UnitInfo)
      * 接口的再次封装
      * @param unitInfo 机构信息
      * @return ResponseData
@@ -222,7 +221,7 @@ public interface TenantService {
     ResponseData addTenantUnit(UnitInfo unitInfo);
 
     /**
-     * 新增用户 是对 com.centit.framework.system.controller.UserInfoController#create(com.centit.framework.system.po.UserInfo, com.centit.framework.system.po.UserUnit, javax.servlet.http.HttpServletRequest)
+     * 新增用户 是对 com.centit.framework.system.controller.UserInfoController#create(com.centit.framework.model.basedata.UserInfo, com.centit.framework.model.basedata.UserUnit, javax.servlet.http.HttpServletRequest)
      * 接口的再次封装
      * @param userInfo 用户信息
      * @param userUnit 用户单位信息

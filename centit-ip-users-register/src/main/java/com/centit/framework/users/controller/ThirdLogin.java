@@ -7,8 +7,8 @@ import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.security.SecurityContextUtils;
-import com.centit.framework.security.model.CentitUserDetails;
 import com.centit.framework.users.config.AppConfig;
 import com.centit.framework.users.config.UrlConstant;
 import com.centit.framework.users.config.WxAppConfig;
@@ -248,7 +248,7 @@ public class ThirdLogin extends BaseController {
         if (null == userDetails) {
             throw new ObjectException("500", "根据userCode获取用户信息为空");
         }
-        String regCellPhone = userDetails.getUserInfo().getString("regCellPhone");
+        String regCellPhone = userDetails.getUserInfo().getRegCellPhone();
         UserPlat newUser = new UserPlat();
         if (WECHAT_BIND.equals(type)) {
             WxMpUser wxMpUser = weChatService.getWxUser(code);

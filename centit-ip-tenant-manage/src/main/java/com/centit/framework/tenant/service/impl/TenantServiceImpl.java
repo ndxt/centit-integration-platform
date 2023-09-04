@@ -10,13 +10,10 @@ import com.centit.framework.components.CodeRepositoryUtil;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.filter.RequestThreadLocal;
 import com.centit.framework.model.adapter.PlatformEnvironment;
-import com.centit.framework.model.basedata.IDataDictionary;
-import com.centit.framework.model.basedata.IUserInfo;
-import com.centit.framework.security.model.CentitPasswordEncoder;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.security.model.JsonCentitUserDetails;
+import com.centit.framework.model.basedata.*;
+import com.centit.framework.model.security.CentitPasswordEncoder;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.system.dao.*;
-import com.centit.framework.system.po.*;
 import com.centit.framework.system.service.SysUnitManager;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.framework.system.service.WorkGroupManager;
@@ -243,7 +240,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public ResponseData userApplyJoinTenant(TenantMemberApply tenantMemberApply) {
 
-        IUserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApply.getTopUnit(), tenantMemberApply.getUserCode());
+        UserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApply.getTopUnit(), tenantMemberApply.getUserCode());
         if (Objects.nonNull(userInfo)) {
             return ResponseData.makeErrorMessage("您已经是改租户成员，无需重复申请");
         }
@@ -265,7 +262,7 @@ public class TenantServiceImpl implements TenantService {
         if (!isTenantAdmin) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_UNAUTHORIZED, "您没有邀请权限");
         }
-        IUserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApply.getTopUnit(), tenantMemberApply.getUserCode());
+        UserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApply.getTopUnit(), tenantMemberApply.getUserCode());
         if (Objects.nonNull(userInfo)) {
             return ResponseData.makeErrorMessage("用户已经是本租户成员，无需重复邀请!");
         }
@@ -348,7 +345,7 @@ public class TenantServiceImpl implements TenantService {
         if (!StringUtils.equalsAny(applyState, "3", "4")) {
             return ResponseData.makeErrorMessage(ResponseData.ERROR_INTERNAL_SERVER_ERROR, "applyState属性值有误");
         }
-        IUserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApplyVo.getTopUnit(), tenantMemberApplyVo.getUserCode());
+        UserInfo userInfo = CodeRepositoryUtil.getUserInfoByCode(tenantMemberApplyVo.getTopUnit(), tenantMemberApplyVo.getUserCode());
         if (Objects.nonNull(userInfo)) {
             return ResponseData.makeErrorMessage("用户已加入租户，无需重复审核!");
         }
@@ -1013,7 +1010,7 @@ public class TenantServiceImpl implements TenantService {
             if (findMapListKeyIndex(userRankList, "userRank", unitMatch.getUserRank()) == -1) {
                 HashMap<String, Object> userRankMap = new HashMap<>();
                 userRankMap.put("userUnitId", unitMatch.getUserUnitId());
-                IDataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType",
+                DataDictionary rankTypeDic = CodeRepositoryUtil.getDataPiece("RankType",
                     unitMatch.getUserRank(), unitMatch.getTopUnit());
                 userRankMap.put("userRank", unitMatch.getUserRank());
                 userRankMap.put("userRankText", null == rankTypeDic ? "" : rankTypeDic.getDataValue());
@@ -1629,8 +1626,8 @@ public class TenantServiceImpl implements TenantService {
      */
     private String getUserIp() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof JsonCentitUserDetails) {
-            JsonCentitUserDetails userDetails = (JsonCentitUserDetails) principal;
+        if (principal instanceof CentitUserDetails) {
+            CentitUserDetails userDetails = (CentitUserDetails) principal;
             return userDetails.getLoginIp();
         }
         return "";
@@ -1665,8 +1662,8 @@ public class TenantServiceImpl implements TenantService {
     private JSONArray translateTenantInfos(List<TenantInfo> tenantInfos) {
         JSONArray jsonArray = new JSONArray();
         for (TenantInfo tenantInfo : tenantInfos) {
-            Map<String, ? extends IUserInfo> userRepo = CodeRepositoryUtil.getUserRepo(tenantInfo.getTopUnit());
-            IUserInfo ownUserInfo = userRepo.get(tenantInfo.getOwnUser());
+            Map<String, UserInfo> userRepo = CodeRepositoryUtil.getUserRepo(tenantInfo.getTopUnit());
+            UserInfo ownUserInfo = userRepo.get(tenantInfo.getOwnUser());
             JSONObject jsonObject = JSONObject.from(tenantInfo);
             jsonObject.put("ownUserName", null == ownUserInfo ? "" : ownUserInfo.getUserName());
             jsonArray.add(jsonObject);

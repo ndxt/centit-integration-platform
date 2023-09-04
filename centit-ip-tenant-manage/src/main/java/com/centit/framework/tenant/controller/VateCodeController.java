@@ -11,10 +11,9 @@ import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.NotificationCenter;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.NoticeMessage;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.security.model.JsonCentitUserDetails;
+import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.system.dao.UserInfoDao;
-import com.centit.framework.system.po.UserInfo;
 import com.centit.support.security.AESSecurityUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -394,8 +393,8 @@ public class VateCodeController extends BaseController {
      */
     private String getUserIp(){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(principal instanceof JsonCentitUserDetails){
-            JsonCentitUserDetails userDetails = (JsonCentitUserDetails) principal;
+        if(principal instanceof CentitUserDetails){
+            CentitUserDetails userDetails = (CentitUserDetails) principal;
             return userDetails.getLoginIp();
         }
         return "";

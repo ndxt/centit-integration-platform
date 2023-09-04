@@ -1,7 +1,7 @@
 package com.centit.framework.users.test;
 
 import com.alibaba.fastjson2.JSON;
-import com.centit.framework.system.po.UserSyncDirectory;
+import com.centit.framework.model.basedata.UserSyncDirectory;
 import com.centit.framework.users.controller.LdapLogin;
 
 public class TestLdapSearch {

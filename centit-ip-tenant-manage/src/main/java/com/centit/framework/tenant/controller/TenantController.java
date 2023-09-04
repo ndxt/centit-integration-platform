@@ -9,11 +9,11 @@ import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.core.dao.PageQueryResult;
 import com.centit.framework.model.adapter.PlatformEnvironment;
+import com.centit.framework.model.basedata.UnitInfo;
+import com.centit.framework.model.basedata.UserInfo;
+import com.centit.framework.model.basedata.UserUnit;
+import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.operationlog.RecordOperationLog;
-import com.centit.framework.security.model.CentitUserDetails;
-import com.centit.framework.system.po.UnitInfo;
-import com.centit.framework.system.po.UserInfo;
-import com.centit.framework.system.po.UserUnit;
 import com.centit.framework.tenant.po.TenantBusinessLog;
 import com.centit.framework.tenant.po.TenantInfo;
 import com.centit.framework.tenant.po.TenantMemberApply;
@@ -36,6 +36,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -672,14 +673,15 @@ public class TenantController extends BaseController {
         if (ud instanceof CentitUserDetails) {
             //补充tenantRole字段信息
             CentitUserDetails centitUserDetails = (CentitUserDetails) ud;
-            JSONObject userInfo = centitUserDetails.getUserInfo();
-            userCode = userInfo.getString("userCode");
+            UserInfo userInfo = centitUserDetails.getUserInfo();
+            userCode = userInfo.getUserCode();
             String topUnitCode = centitUserDetails.getTopUnitCode();
             String tenantRole = "";
             if (StringUtils.isNotBlank(topUnitCode)) {
                 tenantRole = tenantPowerManage.userTenantRole(topUnitCode);
             }
-            userInfo.put("tenantRole", tenantRole);
+            centitUserDetails.setTenantRole(tenantRole);
+            //userInfo.setR put("tenantRole", tenantRole);
         }
         //补充userTenants字段信息
         JSONObject jsonObject = (JSONObject) JSON.toJSON(ud);

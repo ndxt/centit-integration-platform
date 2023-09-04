@@ -2,7 +2,7 @@ package com.centit.framework.tenant.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.components.CodeRepositoryUtil;
-import com.centit.framework.model.basedata.IUserInfo;
+import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.tenant.dao.TenantInfoDao;
 import com.centit.framework.tenant.po.TenantInfo;
 import com.centit.tenant.dubbo.adapter.TenantManageService;
@@ -23,8 +23,8 @@ public class TenantManageServiceImpl implements TenantManageService {
             return null;
         }
         //单独翻译租户所有者姓名
-        Map<String, ? extends IUserInfo> userRepo = CodeRepositoryUtil.getUserRepo(topUnit);
-        IUserInfo ownUserInfo = userRepo.get(tenantInfo.getOwnUser());
+        Map<String, UserInfo> userRepo = CodeRepositoryUtil.getUserRepo(topUnit);
+        UserInfo ownUserInfo = userRepo.get(tenantInfo.getOwnUser());
         JSONObject jsonObject = JSONObject.from(tenantInfo);
         jsonObject.put("ownUserName", null == ownUserInfo ? "" : ownUserInfo.getUserName());
         return jsonObject;
