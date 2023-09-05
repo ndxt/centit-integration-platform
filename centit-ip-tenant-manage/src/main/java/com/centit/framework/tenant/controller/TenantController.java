@@ -667,6 +667,7 @@ public class TenantController extends BaseController {
         if (ud == null) {
             throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN, "用户没有登录或者超时，请重新登录！");
         }
+        JSONObject jsonObject;
         String userCode = "";
         //tenantRole和userTenant信息随时有可能改变，所以不建议放到SecurityContext中
         if (ud instanceof CentitUserDetails) {
@@ -680,10 +681,11 @@ public class TenantController extends BaseController {
                 tenantRole = tenantPowerManage.userTenantRole(topUnitCode);
             }
             centitUserDetails.setTenantRole(tenantRole);
-            //userInfo.setR put("tenantRole", tenantRole);
+            jsonObject = centitUserDetails.toJsonWithoutSensitive();
+        } else {
+            //补充userTenants字段信息
+            jsonObject = (JSONObject) JSON.toJSON(ud);
         }
-        //补充userTenants字段信息
-        JSONObject jsonObject = (JSONObject) JSON.toJSON(ud);
         JSONArray userTenants = tenantService.userTenants(userCode);
         jsonObject.put("userTenants", userTenants);
         //获取微信用户信息
