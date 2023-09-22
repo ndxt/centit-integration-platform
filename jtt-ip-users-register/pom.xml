@@ -52,7 +52,7 @@
         <dependency>
             <groupId>com.centit.framework</groupId>
             <artifactId>centit-ip-tenant-manage</artifactId>
-            <version>5.4-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>

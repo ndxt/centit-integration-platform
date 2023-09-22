@@ -3,15 +3,16 @@ package com.centit.framework.users.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.framework.common.ResponseData;
-import com.centit.framework.common.WebOptUtils;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
 import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.UserSyncDirectory;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.operationlog.RecordOperationLog;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.framework.system.service.UserSyncDirectoryManager;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.security.SecurityOptUtils;
 import io.swagger.annotations.Api;
@@ -32,9 +33,7 @@ import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -104,12 +103,12 @@ public class LdapLogin extends BaseController {
             boolean passed = checkUserPasswordByDn(directory, username, password);
             if (passed) {
                 CentitUserDetails ud = platformEnvironment.loadUserDetailsByLoginName(username);
-                ud.setLoginIp(WebOptUtils.getRequestAddr(request));
+                if(ud==null){
+                    throw new ObjectException(ResponseData.ERROR_USER_NOTFOUND, "user not found--" + username);
+                }
                 SecurityContextHolder.getContext().setAuthentication(ud);
-                Map<String, Object> sessionMap = new HashMap<>();
-                sessionMap.put("accessToken", request.getSession().getId());
-                sessionMap.put("userInfo", ud);
-                return ResponseData.makeResponseData(sessionMap);
+                SecurityContextUtils.fetchAndSetLocalParams(ud, request, platformEnvironment);
+                return SecurityContextUtils.makeLoginSuccessResponse(ud, request);
             }
         }
         return ResponseData.makeErrorMessage("用户名或密码错误");

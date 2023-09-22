@@ -14,6 +14,7 @@ import com.centit.framework.model.adapter.PlatformEnvironment;
 import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitPasswordEncoder;
 import com.centit.framework.model.security.CentitUserDetails;
+import com.centit.framework.security.SecurityContextUtils;
 import com.centit.framework.system.service.SysUserManager;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.network.HttpExecutor;
@@ -341,12 +342,10 @@ public class JttLogin extends BaseController {
         CentitUserDetails ud = platformEnvironment.loadUserDetailsByRegCellPhone(phone);
         if (null != ud) {
             redisTemplate.delete(phone);
-            ud.setLoginIp(WebOptUtils.getRequestAddr(request));
+
             SecurityContextHolder.getContext().setAuthentication(ud);
-            Map<String, Object> sessionMap = new HashMap<>();
-            sessionMap.put("accessToken", request.getSession().getId());
-            sessionMap.put("userInfo", ud);
-            return ResponseData.makeResponseData(sessionMap);
+            SecurityContextUtils.fetchAndSetLocalParams(ud, request, platformEnvironment);
+            return SecurityContextUtils.makeLoginSuccessResponse(ud, request);
         } else {
             redisTemplate.boundValueOps(phone).expire(60L * 5, TimeUnit.SECONDS);
             return ResponseData.makeErrorMessage("未查询到" + phone + "对应手机号用户");

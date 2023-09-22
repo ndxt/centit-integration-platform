@@ -377,14 +377,15 @@ public class ThirdLogin extends BaseController {
                 return ResponseData.makeErrorMessageWithData(sessionMap, 500, "请在登陆后绑定微信。");
             }
             CentitUserDetails ud = platformEnvironment.loadUserDetailsByUserCode(userPlat.getUserCode());
-            ud.setLoginIp(WebOptUtils.getRequestAddr(request));
+            if(ud==null){
+                throw new ObjectException(ResponseData.ERROR_USER_NOTFOUND, "user not found--" + userPlat.getUserCode());
+            }
             SecurityContextHolder.getContext().setAuthentication(ud);
-            sessionMap.put("accessToken", request.getSession().getId());
-            sessionMap.put("userInfo", ud);
+            SecurityContextUtils.fetchAndSetLocalParams(ud, request, platformEnvironment);
+            return SecurityContextUtils.makeLoginSuccessResponse(ud, request);
         } catch (Exception e) {
             return ResponseData.makeErrorMessageWithData(new HashMap<>(), 500, "系统错误。");
         }
-        return ResponseData.makeResponseData(sessionMap);
     }
 
     @ApiOperation(value = "移动端微信绑定", notes = "移动端微信绑定")
