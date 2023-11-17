@@ -16,13 +16,5 @@
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>rt</artifactId>
-            <version>${jdk.version}</version>
-            <scope>system</scope>
-            <systemPath>${java.home}/lib/rt.jar</systemPath>
-        </dependency>
     </dependencies>
 </project>
