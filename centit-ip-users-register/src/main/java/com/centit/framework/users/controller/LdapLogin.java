@@ -100,7 +100,7 @@ public class LdapLogin extends BaseController {
             if(!StringBaseOpt.isNvl(sessionCheckcode) &&
                 !CaptchaImageUtil.checkcodeMatch(sessionCheckcode, requestCheckcode)){
                     //if(request_checkcode==null || ! request_checkcode.equalsIgnoreCase(session_checkcode)  )
-                    throw new AuthenticationServiceException("bad checkcode");
+                    throw new AuthenticationServiceException("验证码输入有误，请检查后重新输入！");
             }
         }
 
