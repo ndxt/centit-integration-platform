@@ -11,9 +11,12 @@ import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.operationlog.RecordOperationLog;
 import com.centit.framework.security.SecurityContextUtils;
 import com.centit.framework.system.service.UserSyncDirectoryManager;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Pretreatment;
+import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.security.SecurityOptUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,6 +86,28 @@ public class LdapLogin extends BaseController {
     public ResponseData login(@RequestParam("username") String username,
                               @RequestParam("password") String password,
                               HttpServletRequest request) throws Exception {
+        if (!BooleanBaseOpt.castObjectToBoolean(
+            request.getSession().getAttribute(
+                SecurityContextUtils.AJAX_CHECK_CAPTCHA_RESULT), false)) {
+
+            String requestCheckcode = request.getParameter(CaptchaImageUtil.REQUESTCHECKCODE);
+
+            String sessionCheckcode = StringBaseOpt.castObjectToString(
+                request.getSession().getAttribute(CaptchaImageUtil.SESSIONCHECKCODE));
+
+            request.getSession().removeAttribute(CaptchaImageUtil.SESSIONCHECKCODE);
+
+            if(!StringBaseOpt.isNvl(sessionCheckcode) &&
+                !CaptchaImageUtil.checkcodeMatch(sessionCheckcode, requestCheckcode)){
+                    //if(request_checkcode==null || ! request_checkcode.equalsIgnoreCase(session_checkcode)  )
+                    throw new AuthenticationServiceException("bad checkcode");
+            }
+        }
+
+        request.getSession().setAttribute(
+            SecurityContextUtils.AJAX_CHECK_CAPTCHA_RESULT, false);
+
+
         username = SecurityOptUtils.decodeSecurityString(StringEscapeUtils.unescapeHtml4(username));
         password = SecurityOptUtils.decodeSecurityString(StringEscapeUtils.unescapeHtml4(password));
 
