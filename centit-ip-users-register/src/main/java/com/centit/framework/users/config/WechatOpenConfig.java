@@ -4,6 +4,7 @@ import me.chanjar.weixin.mp.api.WxMpConfigStorage;
 import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +29,11 @@ public class WechatOpenConfig {
         WxMpInMemoryConfigStorage wxMpInMemoryConfigStorage = new WxMpInMemoryConfigStorage();
         wxMpInMemoryConfigStorage.setAppId(wxAppConfig.getAppID());
         String secret = wxAppConfig.getAppSecret();
-        byte[] decoded = Base64.getDecoder().decode(secret);
-        String decodeStr = new String(decoded);
-        wxMpInMemoryConfigStorage.setSecret(decodeStr);
+        if(StringUtils.isNotBlank(secret)) {
+            byte[] decoded = Base64.getDecoder().decode(secret);
+            String decodeStr = new String(decoded);
+            wxMpInMemoryConfigStorage.setSecret(decodeStr);
+        }
         return wxMpInMemoryConfigStorage;
     }
 }

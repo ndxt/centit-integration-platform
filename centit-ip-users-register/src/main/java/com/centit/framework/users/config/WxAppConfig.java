@@ -6,22 +6,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WxAppConfig {
 
-    @Value("${wechat.appid}")
+    @Value("${wechat.appid:}")
     private String appID;
 
-    @Value("${wechat.appsecret}")
+    @Value("${wechat.appsecret:}")
     private String appSecret;
 
-    @Value("${wechat.mobileAppid}")
+    @Value("${wechat.mobileAppid:}")
     private String moblieAppId;
 
-    @Value("${wechat.mobileAppSecret}")
+    @Value("${wechat.mobileAppSecret:}")
     private String moblieAppSecret;
 
-    @Value("${third.redirect_uri}")
+    @Value("${third.redirect_uri:}")
     private String redirectLoginUri;
 
-    @Value("${third.redirect_binduri}")
+    @Value("${third.redirect_binduri:}")
     private String redirectBindUri;
 
     public String getAppID() {
