@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-@Service
+@Service("tenantManageServiceImpl")
 public class TenantManageServiceImpl implements TenantManageService {
     @Autowired
     private TenantInfoDao tenantInfoDao;
