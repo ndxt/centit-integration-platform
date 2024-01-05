@@ -384,11 +384,15 @@ public class TenantServiceImpl implements TenantService {
         //由于需要根据邮箱或这手机号确认用户身份，所以不允许用户直接修改邮箱和手机号码
         userinfo.setRegEmail(null);
         userinfo.setRegCellPhone(null);
+
         userinfo.setUpdateDate(nowDate());
         userinfo.setUpdator(userinfo.getUserCode());
         userinfo.setCreateDate(oldUserByCode.getCreateDate());
         if (StringUtils.isNotBlank(userinfo.getUserPwd())) {
             userinfo.setUserPin(passwordEncoder.createPassword(userinfo.getUserPwd(), ""));
+        }else{
+            userinfo.setUserPwd(null);
+            userinfo.setUserPin(null);
         }
         userInfoDao.updateUser(userinfo);
         //刷新缓存中的人员信息

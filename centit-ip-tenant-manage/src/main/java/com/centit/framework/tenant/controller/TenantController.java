@@ -424,7 +424,7 @@ public class TenantController extends BaseController {
     public ResponseData adminCheckTenant(@RequestBody TenantInfo tenantInfo,HttpServletRequest request) {
         String userCode = WebOptUtils.getCurrentUserCode(request);
         if (StringUtils.isBlank(userCode)){
-            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,"您未登录");
+            throw new ObjectException(ResponseData.ERROR_USER_NOT_LOGIN,ResponseData.ERROR_NOT_LOGIN_MSG);
         }
         tenantInfo.setUpdator(userCode);
         return tenantService.adminCheckTenant(tenantInfo);
@@ -437,15 +437,17 @@ public class TenantController extends BaseController {
     @RequestMapping(value = "/updateUserInfo", method = RequestMethod.PUT)
     @WrapUpResponseBody
     //@RecordOperationLog(content = "操作IP地址:{loginIp},用户{loginUser.userName}更新用户信息",tag = "{userCodes}")
-    public ResponseData updateUserInfo(@RequestBody UserInfo userInfo) {
-
+    public ResponseData updateUserInfo(@RequestBody UserInfo userInfo, HttpServletRequest request) {
+        String userCode = WebOptUtils.getCurrentUserCode(request);
+        if(!StringUtils.equals(userCode, userInfo.getUserCode())){
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,"只有用户自己才能修改自己的信息！");
+        }
         try {
             return tenantService.updateUserInfo(userInfo);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("更新人员信息失败。失败原因：{},入参：{}", e, userInfo.toString());
+            throw new ObjectException(ObjectException.DATABASE_OPERATE_EXCEPTION,
+                "更新人员信息失败。失败原因：" + e.getMessage() );
         }
-        return ResponseData.errorResponse;
     }
 
     @ApiOperation(
