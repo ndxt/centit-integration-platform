@@ -97,28 +97,18 @@ public class ServiceConfig {
 
 
     @Autowired
-    private Environment env;
-
-//    @Bean
-//    public ESIndexer elkOptLogIndexer(){
-//        return IndexerSearcherFactory.obtainIndexer(elkOptLogServerConfig(), ESOperationLog.class);
-//    }
-//
-//    @Bean
-//    public ESSearcher elkOptLogSearcher(){
-//        return IndexerSearcherFactory.obtainSearcher(elkOptLogServerConfig(), ESOperationLog.class);
-//    }
+    private Environment environment;
 
     @Bean
-    public ESServerConfig elkOptLogServerConfig(){
+    public ESServerConfig esServerConfig(){
         ESServerConfig config = new ESServerConfig();
-        config.setServerHostIp(env.getProperty("elasticsearch.server.ip"));
-        config.setServerHostPort(env.getProperty("elasticsearch.server.port"));
-        config.setUsername(env.getProperty("elasticsearch.server.username"));
-        config.setPassword(env.getProperty("elasticsearch.server.password"));
-        config.setClusterName(env.getProperty("elasticsearch.server.cluster"));
-        config.setOsId(env.getProperty("elasticsearch.osId"));
-        config.setMinScore(NumberBaseOpt.parseFloat(env.getProperty("elasticsearch.filter.minScore"), 0.5f));
+        config.setServerHostIp(environment.getProperty("elasticsearch.server.ip"));
+        config.setServerHostPort(environment.getProperty("elasticsearch.server.port"));
+        config.setUsername(environment.getProperty("elasticsearch.server.username"));
+        config.setPassword(environment.getProperty("elasticsearch.server.password"));
+        config.setClusterName(environment.getProperty("elasticsearch.server.cluster"));
+        config.setOsId(environment.getProperty("elasticsearch.osId"));
+        config.setMinScore(NumberBaseOpt.parseFloat(environment.getProperty("elasticsearch.filter.minScore"), 0.5f));
         return config;
     }
 
