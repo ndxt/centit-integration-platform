@@ -923,12 +923,12 @@ public class TenantServiceImpl implements TenantService {
         tenantJson.put("isAdmin", isAdmin);
 
         tenantJson.put("deptMobile", getDeptMobile(topUnit, userCode));
-        extendTenantsUserRanks(tenantJson, (List<UserUnit>) CodeRepositoryUtil.listUserUnits(topUnit, userCode));
+        extendTenantsUserRanks(tenantJson, CodeRepositoryUtil.listUserUnits(topUnit, userCode));
 
     }
     private JSONArray getDeptMobile(String topUnit,String userCode){
         JSONArray jsonArray=new JSONArray();
-       List<UserUnit> iUserUnitList= (List<UserUnit>) CodeRepositoryUtil.listUserUnits(topUnit, userCode);
+       List<UserUnit> iUserUnitList = CodeRepositoryUtil.listUserUnits(topUnit, userCode);
        for(UserUnit userUnit:iUserUnitList){
            JSONObject jsonObject=  JSONObject.from(userUnit);
            jsonObject.put("unitName",CodeRepositoryUtil.getValue("unitCode",userUnit.getUnitCode(),topUnit,"zh_CN"));
