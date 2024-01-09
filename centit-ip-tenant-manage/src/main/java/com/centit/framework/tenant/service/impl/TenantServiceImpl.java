@@ -34,6 +34,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.database.utils.PageDesc;
+import com.centit.support.security.DesensitizeOptUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -745,7 +746,7 @@ public class TenantServiceImpl implements TenantService {
         userInfos.forEach(userInfo -> {
             userInfo.setUserPwd(null);
             userInfo.setUserPin(null);
-            userInfo.setRegCellPhone(cleanPhoneSensitive(userInfo.getRegCellPhone()));
+            userInfo.setRegCellPhone(DesensitizeOptUtils.phone(userInfo.getRegCellPhone()));
         });
         return ResponseData.makeResponseData(userInfos);
     }
@@ -1637,31 +1638,6 @@ public class TenantServiceImpl implements TenantService {
         return "";
     }
 
-    /**
-     * 对手机号进行脱敏操作
-     *
-     * @param phoneNo
-     * @return
-     */
-    private String cleanPhoneSensitive(String phoneNo) {
-        if (StringUtils.isBlank(phoneNo)) {
-            return "";
-        }
-        int firstLength = 0;
-        int endLength;
-        int phoneLength = phoneNo.length();
-        if (phoneLength > 10) {
-            firstLength = 3;
-            endLength = 4;
-        } else if (phoneLength > 5) {
-            firstLength = 2;
-            endLength = 2;
-        } else {
-            endLength = 1;
-        }
-        String reg = "(\\w{" + firstLength + "})\\w*(\\w{" + endLength + "})";
-        return phoneNo.replaceAll(reg, "$1*****$2");
-    }
 
     private JSONArray translateTenantInfos(List<TenantInfo> tenantInfos) {
         JSONArray jsonArray = new JSONArray();
