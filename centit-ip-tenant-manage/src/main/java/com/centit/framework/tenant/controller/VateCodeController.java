@@ -20,6 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -43,6 +44,11 @@ import java.util.regex.Pattern;
 @RequestMapping("/vateCode")
 @Api(value = "邮箱、手机号验证码接口", tags = "邮箱、手机号验证码接口")
 public class VateCodeController extends BaseController {
+
+    @Value("${third.services.aliyun.access.key:}")
+    private String accessKeyId;
+    @Value("${third.services.aliyun.access.secret:}")
+    private String accessKeySecret;
 
     @Autowired
     private NotificationCenter notificationCenter;
@@ -343,7 +349,7 @@ public class VateCodeController extends BaseController {
         }else{
             jSONObject.put("product", "用户");
         }
-        com.aliyun.dysmsapi20170525.Client client = VateCodeController.createClient();
+        com.aliyun.dysmsapi20170525.Client client = this.createClient();
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
             .setSignName("身份验证")
             .setTemplateCode("SMS_65920066")
@@ -369,9 +375,8 @@ public class VateCodeController extends BaseController {
      * @return Client
      * @throws Exception 异常
      */
-    private static com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
-        String accessKeyId = "aescbc:TONKvx2YV04PN4jFgz133lJh4D+iA6aYruotddfjNso=";
-        String accessKeySecret = "aescbc:QMncoAhumCckCKik3x0Fc+e51jfUNfSyOEoBhg/SaTY=";
+    private com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
+
         Config config = new Config()
             // 您的AccessKey ID
             .setAccessKeyId(SecurityOptUtils.decodeSecurityString(accessKeyId))
