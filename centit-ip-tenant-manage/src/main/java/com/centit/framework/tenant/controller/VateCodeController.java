@@ -15,6 +15,7 @@ import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.system.dao.UserInfoDao;
 import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.security.SecurityOptUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -369,14 +370,13 @@ public class VateCodeController extends BaseController {
      * @throws Exception 异常
      */
     private static com.aliyun.dysmsapi20170525.Client createClient() throws Exception {
-
-        String accessKeyId = "+GrP3D07U/aR2WDtm9iTSUeJ0F00X0f75Byebbcw8fc=";
-        String accessKeySecret = "gqdjhi7JEasb2uiOW/riueAXA4vvOxsgYfmdRbAqwIU=";
+        String accessKeyId = "aescbc:TONKvx2YV04PN4jFgz133lJh4D+iA6aYruotddfjNso=";
+        String accessKeySecret = "aescbc:QMncoAhumCckCKik3x0Fc+e51jfUNfSyOEoBhg/SaTY=";
         Config config = new Config()
             // 您的AccessKey ID
-            .setAccessKeyId(AESSecurityUtils.decryptBase64String(accessKeyId, "0123456789abcdefghijklmnopqrstuvwxyzABCDEF"))
+            .setAccessKeyId(SecurityOptUtils.decodeSecurityString(accessKeyId))
             // 您的AccessKey Secret
-            .setAccessKeySecret(AESSecurityUtils.decryptBase64String(accessKeySecret, "0123456789abcdefghijklmnopqrstuvwxyzABCDEF"));
+            .setAccessKeySecret(SecurityOptUtils.decodeSecurityString(accessKeySecret));
         // 访问的域名
         config.endpoint = "dysmsapi.aliyuncs.com";
         return new com.aliyun.dysmsapi20170525.Client(config);
