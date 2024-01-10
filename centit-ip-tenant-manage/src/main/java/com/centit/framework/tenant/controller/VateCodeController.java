@@ -5,6 +5,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
 import com.aliyun.teaopenapi.models.Config;
 import com.centit.framework.common.ResponseData;
+import com.centit.framework.common.ResponseMapData;
 import com.centit.framework.components.CodeRepositoryCache;
 import com.centit.framework.core.controller.BaseController;
 import com.centit.framework.core.controller.WrapUpResponseBody;
@@ -14,7 +15,9 @@ import com.centit.framework.model.basedata.NoticeMessage;
 import com.centit.framework.model.basedata.UserInfo;
 import com.centit.framework.model.security.CentitUserDetails;
 import com.centit.framework.system.dao.UserInfoDao;
-import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.security.SecurityOptUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +30,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -104,9 +106,7 @@ public class VateCodeController extends BaseController {
         if(jsonObject != null){
             Long createTime = jsonObject.getLong("createTime");
             if ((System.currentTimeMillis() - createTime) < 1000 * 60) {
-                bodyMap.put("Message", "验证码发送时间小于1分钟，请稍后再试。");
-                bodyMap.put("Code", 500);
-                return ResponseData.makeResponseData(bodyMap);
+                return ResponseData.makeErrorMessage(ObjectException.DATA_VALIDATE_ERROR, "验证码发送时间小于1分钟，请稍后再试。");
             }else{
                 //重新发送则删除之前存入redis中的数据
                 redisTemplate.delete(email);
@@ -124,21 +124,15 @@ public class VateCodeController extends BaseController {
         notes = "获取手机验证码"
     )
     @RequestMapping(value = "/getPhoneCode", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
+    @WrapUpResponseBody
+    public ResponseData getPhoneCode(@RequestParam(value = "userCode", required = false) String userCode,
                                             @RequestParam("phone") String phone,
                                             HttpServletRequest request, HttpServletResponse response) throws Exception {
-        Map<String, Object> result = new HashMap<>();
         JSONObject jsonObject = redisTemplate.boundValueOps(phone).get();
-        Map<String, Object> map = new HashMap<>();
-        Map<String, Object> bodyMap = new HashMap<>();
         if(jsonObject != null){
             Long createTime = jsonObject.getLong("createTime");
             if ((System.currentTimeMillis() - createTime) < 1000 * 60) {
-                bodyMap.put("Message", "验证码发送时间小于1分钟，请稍后再试。");
-                bodyMap.put("Code", 500);
-                map.put("body", bodyMap);
-                return bodyMap;
+                return ResponseData.makeErrorMessage(ObjectException.DATA_VALIDATE_ERROR, "验证码发送时间小于1分钟，请稍后再试。");
             }else{
                 //重新发送则删除之前存入redis中的数据
                 redisTemplate.delete(phone);
@@ -147,19 +141,17 @@ public class VateCodeController extends BaseController {
         if(phone != null && !phone.equals("")){
             UserInfo userInfo = userInfoDao.getUserByRegCellPhone(phone);
             if (userInfo != null) {
-                bodyMap.put("Message", "此手机号已被使用");
-                bodyMap.put("Code", 500);
-                map.put("body", bodyMap);
-                return bodyMap;
+                return ResponseData.makeErrorMessage(ObjectException.DATA_VALIDATE_ERROR, "此手机号已被使用");
             }
         }
-        SendSmsResponseBody s = sendPhone(phone, userCode, request, result);
+        SendSmsResponseBody s = sendPhone(phone, userCode);
         if(s != null && s.getCode() != null && s.getCode().equals("OK")){
             s.setCode("0");
         }
-        result.put("code", s.getCode());
-        result.put("message", s.getMessage());
-        result.put("x-auth-token", request.getSession().getId());
+        ResponseMapData result = ResponseData.makeResponseData(
+            CollectionsOpt.createHashMap("x-auth-token", request.getSession().getId()));
+        result.setCode(NumberBaseOpt.castObjectToInteger(s.getCode(), 500));
+        result.setMessage(s.getMessage());
         return result;
     }
 
@@ -257,7 +249,7 @@ public class VateCodeController extends BaseController {
                 if(userInfo == null){
                     return ResponseData.makeErrorMessage("用户不存在");
                 }
-                sendPhone(loginname, "", request, result);
+                sendPhone(loginname, "");
             }
             result.put("x-auth-token", request.getSession().getId());
             return ResponseData.makeResponseData(result);
@@ -334,7 +326,7 @@ public class VateCodeController extends BaseController {
         return result;
     }
 
-    public SendSmsResponseBody sendPhone(String phone, String userCode, HttpServletRequest request, Map<String, Object> map)
+    public SendSmsResponseBody sendPhone(String phone, String userCode)
             throws Exception{
         String verifyCode = String.valueOf(new Random().nextInt(899999) + 100000);
         JSONObject jSONObject = new JSONObject();
