@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -77,6 +74,7 @@ public class AppInfo implements Serializable {
     @Column(name = "CREATE_TIME")
     @ApiModelProperty(value = "创建时间", name = "createTime")
     @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()")
+    @OrderBy("DESC")
     private Date createTime;
 
 }
